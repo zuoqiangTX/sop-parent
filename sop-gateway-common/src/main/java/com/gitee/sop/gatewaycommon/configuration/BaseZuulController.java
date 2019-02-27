@@ -23,7 +23,9 @@ public class BaseZuulController implements ErrorController {
 
     public static final String ERROR_PATH = "/error";
 
-    // 错误最终会到这里来
+    /**
+     * 错误最终会到这里来
+     */
     @RequestMapping(ERROR_PATH)
     @ResponseBody
     public Object error(HttpServletRequest request, HttpServletResponse response) {

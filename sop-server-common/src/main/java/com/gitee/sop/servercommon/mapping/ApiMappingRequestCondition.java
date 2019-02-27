@@ -8,6 +8,9 @@ import org.springframework.web.servlet.mvc.condition.RequestCondition;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * @author tanghc
+ */
 @Getter
 @Slf4j
 public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRequestCondition> {
@@ -26,8 +29,12 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
         return this;
     }
 
-    // 如果版本号跟当前对象中的版本号匹配，则表是命中的对应的方法
-    // 否则返回null，表示不匹配
+    /**
+     * 如果版本号跟当前对象中的版本号匹配，则表是命中的对应的方法
+     * 否则返回null，表示不匹配
+     * @param request
+     * @return
+     */
     @Override
     public ApiMappingRequestCondition getMatchingCondition(HttpServletRequest request) {
         String version = this.getVersion(request);
@@ -43,8 +50,13 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
     }
 
 
-    // 对两个RequestCondition对象进行比较，这里主要是如果存在两个注册的一样的Mapping，那么就会对
-    // 这两个Mapping进行排序，以判断哪个Mapping更适合处理当前request请求
+    /**
+     * 对两个RequestCondition对象进行比较，这里主要是如果存在两个注册的一样的Mapping，
+     * 那么就会对这两个Mapping进行排序，以判断哪个Mapping更适合处理当前request请求
+     * @param other
+     * @param request
+     * @return
+     */
     @Override
     public int compareTo(ApiMappingRequestCondition other, HttpServletRequest request) {
         return null != apiMappingInfo && null == other.apiMappingInfo ? 1

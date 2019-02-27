@@ -2,6 +2,9 @@ package com.gitee.sop.servercommon.message;
 
 import lombok.Data;
 
+/**
+ * @author tanghc
+ */
 @Data
 public class ServiceErrorImpl implements ServiceError {
     private String sub_code;

@@ -2,6 +2,9 @@ package com.gitee.sop.gatewaycommon.message;
 
 import lombok.Data;
 
+/**
+ * @author thc
+ */
 @Data
 public class ErrorImpl implements Error {
     private String code;

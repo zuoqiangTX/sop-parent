@@ -76,10 +76,15 @@ public abstract class BaseZuulFilter extends ZuulFilter {
      * Any filterType made be created or added and doRun by calling FilterProcessor.runFilters(type)
      */
     public enum FilterType {
+        /** zuul过滤器pre类型 */
         PRE("pre"),
+        /** zuul过滤器route类型 */
         ROUTE("route"),
+        /** zuul过滤器post类型 */
         POST("post"),
+        /** zuul过滤器error类型 */
         ERROR("error"),
+        /** zuul过滤器static类型 */
         STATIC("static"),
         ;
 

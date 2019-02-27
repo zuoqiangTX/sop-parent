@@ -5,6 +5,9 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+/**
+ * @author tanghc
+ */
 public class ApiMetaChangeListener implements MessageListener {
 
     private ApiMetaManager apiMetaManager;

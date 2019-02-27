@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.lang.reflect.Method;
 
+/**
+ * @author tanghc
+ */
 public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping implements PriorityOrdered {
 
     private static StringValueResolver stringValueResolver = new ApiMappingStringValueResolver();

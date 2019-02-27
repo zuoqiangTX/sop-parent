@@ -56,8 +56,8 @@ public enum ErrorEnum {
     ;
     private ErrorMeta errorMeta;
 
-    ErrorEnum(String code, String sub_code) {
-        this.errorMeta = new ErrorMeta("open.error_", code, sub_code);
+    ErrorEnum(String code, String subCode) {
+        this.errorMeta = new ErrorMeta("open.error_", code, subCode);
     }
 
     public ErrorMeta getErrorMeta() {

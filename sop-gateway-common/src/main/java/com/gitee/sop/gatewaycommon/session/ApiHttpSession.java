@@ -207,7 +207,7 @@ public class ApiHttpSession implements HttpSession, Serializable {
      * @return a representation of this session's serialized state
      */
     public Serializable serializeState() {
-        HashMap<String, Serializable> state = new HashMap<String, Serializable>();
+        HashMap<String, Serializable> state = new HashMap<String, Serializable>(16);
         for (Iterator<Map.Entry<String, Object>> it = this.attributes.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
             String name = entry.getKey();

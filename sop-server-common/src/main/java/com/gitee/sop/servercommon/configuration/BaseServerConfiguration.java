@@ -49,7 +49,10 @@ public class BaseServerConfiguration extends WebMvcConfigurationSupport {
         super.addInterceptors(registry);
     }
 
-    // 自定义Mapping，详见@ApiMapping
+    /**
+     * 自定义Mapping，详见@ApiMapping
+     * @return
+     */
     @Override
     protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
         ApiMetaManager apiMetaManager = new RedisApiMetaManager(redisTemplate);

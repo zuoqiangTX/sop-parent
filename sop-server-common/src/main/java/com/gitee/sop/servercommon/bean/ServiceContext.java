@@ -5,13 +5,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author tanghc
+ */
 public class ServiceContext extends ConcurrentHashMap<String, Object> {
 
     public static final String REQUEST_KEY = "request";
     public static final String RESPONSE_KEY = "response";
     protected static Class<? extends ServiceContext> contextClass = ServiceContext.class;
 
-    protected static final ThreadLocal<? extends ServiceContext> threadLocal = new ThreadLocal<ServiceContext>() {
+    protected static final ThreadLocal<? extends ServiceContext> THREAD_LOCAL = new ThreadLocal<ServiceContext>() {
         @Override
         protected ServiceContext initialValue() {
             try {
@@ -47,7 +50,7 @@ public class ServiceContext extends ConcurrentHashMap<String, Object> {
      * @return the current ServiceContext
      */
     public static ServiceContext getCurrentContext() {
-        return threadLocal.get();
+        return THREAD_LOCAL.get();
     }
 
     /**
@@ -91,8 +94,11 @@ public class ServiceContext extends ConcurrentHashMap<String, Object> {
      * @param value
      */
     public void set(String key, Object value) {
-        if (value != null) put(key, value);
-        else remove(key);
+        if (value != null) {
+            put(key, value);
+        } else {
+            remove(key);
+        }
     }
 
     /**
@@ -129,10 +135,10 @@ public class ServiceContext extends ConcurrentHashMap<String, Object> {
 
 
     /**
-     * unsets the threadLocal context. Done at the end of the request.
+     * unsets the THREAD_LOCAL context. Done at the end of the request.
      */
     public void unset() {
-        threadLocal.remove();
+        THREAD_LOCAL.remove();
     }
 
 

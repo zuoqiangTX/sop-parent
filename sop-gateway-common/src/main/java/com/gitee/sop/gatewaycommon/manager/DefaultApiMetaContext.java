@@ -16,10 +16,10 @@ import java.util.Map;
 @Slf4j
 public class DefaultApiMetaContext implements ApiMetaContext {
 
-    // key：nameVersion
+    /** key：nameVersion */
     private Map<String, Route> nameVersionServiceIdMap = new HashMap<>(128);
 
-    // key: serviceId , value: md5
+    /** key: serviceId , value: md5 */
     private Map<String, String> serviceIdMd5Map = new HashMap<>(16);
 
     @Override

@@ -1,37 +1,45 @@
-# SOP
+# SOP(Simple Open Platform)
 
-#### 介绍
-一个简单易用的接口开放平台（Simple Open Platform），可实现类似于淘宝开放平台的调用方式。
+一个开放平台解决方案项目，基于Spring Cloud实现，目标是能够让用户快速得搭建起自己的开放平台。
 
-#### 软件架构
-软件架构说明
+SOP提供了两种接口调用方式，分别是：[支付宝开放平台](https://docs.open.alipay.com/api)的调用方式和[淘宝开放平台](http://open.taobao.com/api.htm?docId=285&docType=2)的调用方式。
+通过简单的配置后，你的项目就具备了和支付宝开放平台的一样的接口提供能力。
 
+SOP封装了开放平台大部分功能包括：签名验证、统一异常处理、统一返回内容 、业务参数验证（JSR-303）、秘钥管理等，未来还会实现更多功能。
 
-#### 安装教程
+## 项目特点
 
-1. xxxx
-2. xxxx
-3. xxxx
+- 接入方式简单，与老项目不冲突，老项目注册到注册中心，然后的方法上加上注解即可。
+- 架构松耦合，业务代码实现在各自微服务上，SOP不参与业务实现，这也是Spring Cloud微服务体系带来的好处。
+- 扩展简单，开放平台对应的功能各自独立，可以自定义实现自己的需求，如：更改参数，更改签名规则等。
 
-#### 使用说明
+## 谁能使用这个项目
 
-1. xxxx
-2. xxxx
-3. xxxx
+- 有现成的项目，想改造成开放平台供他人调用
+- 有现成的项目，想暴露其中几个接口并通过开放平台供他人调用
+- 想搭一个开放平台新项目，并结合微服务的方式去维护
+- 对开放平台感兴趣的朋友
 
-#### 参与贡献
+以上情况都可以考虑使用SOP
 
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+## 架构图
 
 
-#### 码云特技
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+## 工程说明
+
+- sop-registry：注册中心，eureka实现
+- sop-gateway：网关，zuul实现，统一访问入口
+- sop-gateway-common：网关公共模块，封装常用功能，包含签名校验等功能。
+- sop-server-common：微服务端公共模块，封装配套功能
+- sop-story：示例，story服务，同时作为Provider提供服务
+- sop-book：示例，book服务，也是Consumer，调用story提供的服务
+- sop-test：测试用例
+
+## 相关文档
+
+
+
+## 沟通交流
+
+Q群：328419269

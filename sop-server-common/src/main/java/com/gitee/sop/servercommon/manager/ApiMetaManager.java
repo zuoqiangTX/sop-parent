@@ -8,5 +8,9 @@ import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 public interface ApiMetaManager {
     String API_STORE_KEY = "com.gitee.sop.api";
 
+    /**
+     * 上传API
+     * @param serviceApiInfo
+     */
     void uploadApi(ServiceApiInfo serviceApiInfo);
 }

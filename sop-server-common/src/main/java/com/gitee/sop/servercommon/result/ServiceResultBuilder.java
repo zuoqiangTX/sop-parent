@@ -8,11 +8,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface ServiceResultBuilder {
 
-
     /**
      * 构建错误返回结果
-     *
-     * @param throwable 异常
+     * @param request
+     * @param response
+     * @param throwable
      * @return 返回最终结果
      */
     Object buildError(HttpServletRequest request, HttpServletResponse response, Throwable throwable);

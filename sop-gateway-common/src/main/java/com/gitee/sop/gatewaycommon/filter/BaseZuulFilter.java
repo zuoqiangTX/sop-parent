@@ -17,10 +17,26 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     private Integer filterOrder;
 
+    /**
+     * 获取过滤器类型
+     * @return 返回FilterType
+     * @see ZuulFilter#filterType() filterType()
+     */
     protected abstract FilterType getFilterType();
 
+    /**
+     * 获取过滤器顺序
+     * @return
+     * @see ZuulFilter#filterOrder() filterOrder()
+     */
     protected abstract int getFilterOrder();
 
+    /**
+     * 执行run
+     * @param requestContext
+     * @return
+     * @throws ZuulException
+     */
     protected abstract Object doRun(RequestContext requestContext) throws ZuulException;
 
     /**

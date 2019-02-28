@@ -11,8 +11,8 @@ public enum  StoryErrorEnum {
     ;
     private ServiceErrorMeta errorMeta;
 
-    StoryErrorEnum(String sub_code) {
-        this.errorMeta = new ServiceErrorMeta("isp.error_", sub_code);
+    StoryErrorEnum(String subCode) {
+        this.errorMeta = new ServiceErrorMeta("isp.error_", subCode);
     }
 
     public ServiceErrorMeta getErrorMeta() {

@@ -10,8 +10,8 @@ public enum ServiceErrorEnum {
     ;
     private ServiceErrorMeta errorMeta;
 
-    ServiceErrorEnum(String sub_code) {
-        this.errorMeta = new ServiceErrorMeta("isp.error_", sub_code);
+    ServiceErrorEnum(String subCode) {
+        this.errorMeta = new ServiceErrorMeta("isp.error_", subCode);
     }
 
     public ServiceErrorMeta getErrorMeta() {

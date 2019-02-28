@@ -118,14 +118,17 @@ public class ApiValidator implements Validator {
     protected void checkSign(ApiParam param) {
         String clientSign = param.fetchSign();
         try {
-            if (StringUtils.isEmpty(param.fetchSign())) {
+            if (StringUtils.isEmpty(clientSign)) {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion(), ParamNames.SIGN_NAME);
             }
-            String secret = ApiContext.getApiConfig().getAppSecretManager().getSecret(param.fetchAppKey());
+            ApiConfig apiConfig = ApiContext.getApiConfig();
+            AppSecretManager appSecretManager = apiConfig.getAppSecretManager();
+            // 根据appId获取秘钥
+            String secret = appSecretManager.getSecret(param.fetchAppKey());
             if (StringUtils.isEmpty(secret)) {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();
             }
-            Signer signer = ApiContext.getApiConfig().getSigner();
+            Signer signer = apiConfig.getSigner();
             boolean isRightSign = signer.checkSign(ApiContext.getRequest(), secret);
             // 错误的sign
             if (!isRightSign) {

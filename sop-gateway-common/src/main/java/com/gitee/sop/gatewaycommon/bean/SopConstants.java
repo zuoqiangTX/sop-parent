@@ -8,9 +8,9 @@ import java.nio.charset.StandardCharsets;
  */
 public class SopConstants {
     
-    public static final String NULL = "null";
     public static final String RANDOM_KEY_NAME = "ssl_randomKey";
     public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
+    public static final String UTF8 = "UTF-8";
     public static final String FORMAT_JSON = "json";
     public static final String FORMAT_XML = "xml";
     public static final String AUTHORIZATION = "Authorization";
@@ -30,4 +30,21 @@ public class SopConstants {
     
     public static final String REST_PARAM_NAME = "_REST_PARAM_NAME_";
     public static final String REST_PARAM_VERSION = "_REST_PARAM_VERSION_";
+
+    /**
+     * 在拦截器中调用获取参数：
+     * String cachedBody = (String)exchange.getAttribute(SopConstants.CACHE_REQUEST_BODY_OBJECT_KEY);
+     */
+    public static final String CACHE_REQUEST_BODY_OBJECT_KEY = "cachedRequestBodyObject";
+
+    /**
+     * 在拦截器中调用获取参数：
+     * Map<String, String> params = exchange.getAttribute(SopConstants.CACHE_REQUEST_BODY_FOR_MAP);
+     */
+    public static final String CACHE_REQUEST_BODY_FOR_MAP = "cacheRequestBodyForMap";
+
+    public static final String CACHE_API_PARAM = "cacheApiParam";
+
+    public static final String X_BIZ_ERROR_CODE = "x-biz-error-code";
+
 }

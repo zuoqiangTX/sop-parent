@@ -16,10 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 public class AlipaySigner implements Signer {
 
     @Override
-    public boolean checkSign(HttpServletRequest request, String secret) {
+    public boolean checkSign(ApiParam apiParam, String secret) {
         // 服务端存的是公钥
         String publicKey = secret;
-        ApiParam apiParam = ApiContext.getApiParam();
         String charset = apiParam.fetchCharset();
         String signType = apiParam.fetchSignMethod();
         if (signType == null) {

@@ -2,8 +2,9 @@ package com.gitee.sop.gatewaycommon.param;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
-import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.StringUtils;
+//import com.netflix.zuul.context.RequestContext;
+//import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -14,6 +15,10 @@ import java.util.Map;
  * @author tanghc
  */
 public class ApiParam extends JSONObject implements Param {
+
+    public ApiParam() {
+    }
+
     public ApiParam(Map<String, Object> map) {
         super(map);
     }
@@ -36,7 +41,8 @@ public class ApiParam extends JSONObject implements Param {
     }
 
     public HttpServletRequest fetchRequest() {
-        return RequestContext.getCurrentContext().getRequest();
+//        return RequestContext.getCurrentContext().getRequest();
+        return null;
     }
 
     /**

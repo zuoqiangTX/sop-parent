@@ -49,7 +49,7 @@ public class ApiValidator implements Validator {
             checkAppKey(param);
             checkSign(param);
         }
-        checkUploadFile(param);
+//        checkUploadFile(param);
         checkTimeout(param);
         checkFormat(param);
     }
@@ -59,28 +59,28 @@ public class ApiValidator implements Validator {
      *
      * @param param
      */
-    protected void checkUploadFile(ApiParam param) {
-        UploadContext uploadContext = ApiContext.getUploadContext();
-        if (uploadContext != null) {
-            try {
-                List<MultipartFile> files = uploadContext.getAllFile();
-                for (MultipartFile file : files) {
-                    // 客户端传来的文件md5
-                    String clientMd5 = param.getString(file.getName());
-                    if (clientMd5 != null) {
-                        String fileMd5 = DigestUtils.md5Hex(file.getBytes());
-                        if (!clientMd5.equals(fileMd5)) {
-                            throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("验证上传文件MD5错误", e);
-                throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
-            }
-        }
-
-    }
+//    protected void checkUploadFile(ApiParam param) {
+//        UploadContext uploadContext = ApiContext.getUploadContext();
+//        if (uploadContext != null) {
+//            try {
+//                List<MultipartFile> files = uploadContext.getAllFile();
+//                for (MultipartFile file : files) {
+//                    // 客户端传来的文件md5
+//                    String clientMd5 = param.getString(file.getName());
+//                    if (clientMd5 != null) {
+//                        String fileMd5 = DigestUtils.md5Hex(file.getBytes());
+//                        if (!clientMd5.equals(fileMd5)) {
+//                            throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                logger.error("验证上传文件MD5错误", e);
+//                throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
+//            }
+//        }
+//
+//    }
 
     protected void checkTimeout(ApiParam param) {
         int timeoutSeconds = ApiContext.getApiConfig().getTimeoutSeconds();
@@ -129,7 +129,7 @@ public class ApiValidator implements Validator {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();
             }
             Signer signer = apiConfig.getSigner();
-            boolean isRightSign = signer.checkSign(ApiContext.getRequest(), secret);
+            boolean isRightSign = signer.checkSign(param, secret);
             // 错误的sign
             if (!isRightSign) {
                 throw ErrorEnum.ISV_INVALID_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion());

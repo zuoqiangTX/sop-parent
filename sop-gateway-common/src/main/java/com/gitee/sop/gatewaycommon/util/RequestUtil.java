@@ -1,137 +1,46 @@
 package com.gitee.sop.gatewaycommon.util;
 
-import com.alibaba.fastjson.JSON;
-import com.gitee.sop.gatewaycommon.message.ErrorEnum;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
 
 /**
  * @author tanghc
  */
 public class RequestUtil {
 
-    private static final String CONTENT_TYPE_URLENCODED = "application/x-www-form-urlencoded";
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final String CONTENT_TYPE_TEXT = "text/plain";
-
     private static final String UTF8 = "UTF-8";
-    private static final String GET = "get";
-
-    private static final String UNKOWN = "unknown";
-    private static final String LOCAL_IP = "127.0.0.1";
-    private static final int IP_LEN = 15;
-
-    public static String getText(HttpServletRequest request) throws Exception {
-        return IOUtils.toString(request.getInputStream(), UTF8);
-    }
 
     /**
-     * 从request中获取json。如果提交方式是application/x-www-form-urlencoded，则组装成json格式。
-     * 
-     * @param request request对象
-     * @return 返回json
-     * @throws IOException
+     * 将get类型的参数转换成map，
+     *
+     * @param query charset=utf-8&biz_content=xxx
+     * @return
      */
-    public static String getJson(HttpServletRequest request) throws Exception {
-        String requestJson = null;
-        String contectType = request.getContentType();
-        if (StringUtils.isBlank(contectType)) {
-            throw ErrorEnum.ISV_INVALID_CONTENT_TYPE.getErrorMeta().getException(contectType);
-        }
-
-        contectType = contectType.toLowerCase();
-
-        if (contectType.contains(CONTENT_TYPE_JSON) || contectType.contains(CONTENT_TYPE_TEXT)) {
-            requestJson = getText(request);
-        } else if (contectType.contains(CONTENT_TYPE_URLENCODED)) {
-            Map<String, Object> params = convertRequestParamsToMap(request);
-            requestJson = JSON.toJSONString(params);
-        } else {
-            throw ErrorEnum.ISV_INVALID_CONTENT_TYPE.getErrorMeta().getException(contectType);
-        }
-        return requestJson;
-    }
-
-    /**
-     * request中的参数转换成map
-     * 
-     * @param request request对象
-     * @return 返回参数键值对
-     */
-    public static Map<String, Object> convertRequestParamsToMap(HttpServletRequest request) {
-        Map<String, String[]> paramMap = request.getParameterMap();
-        if(paramMap == null || paramMap.isEmpty()) {
+    public static Map<String, String> parseQueryToMap(String query) {
+        if (query == null) {
             return Collections.emptyMap();
         }
-        Map<String, Object> retMap = new HashMap<String, Object>(paramMap.size());
-
-        Set<Entry<String, String[]>> entrySet = paramMap.entrySet();
-
-        for (Entry<String, String[]> entry : entrySet) {
-            String name = entry.getKey();
-            String[] values = entry.getValue();
-            if (values.length == 1) {
-                retMap.put(name, values[0]);
-            }
-        }
-        return retMap;
-    }
-
-    /**
-     * 获取客户端真实IP
-     * 
-     * @param request request对象
-     * @return 返回ip
-     */
-    public static String getClientIP(HttpServletRequest request) {
-        String ipAddress = request.getHeader("x-forwarded-for");
-        if (ipAddress == null || ipAddress.length() == 0 || UNKOWN.equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getHeader("Proxy-Client-IP");
-        }
-        if (ipAddress == null || ipAddress.length() == 0 || UNKOWN.equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ipAddress == null || ipAddress.length() == 0 || UNKOWN.equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getRemoteAddr();
-            if (LOCAL_IP.equals(ipAddress)) {
-                // 根据网卡取本机配置的IP
+        String[] queryList = StringUtils.split(query, '&');
+        Map<String, String> params = new HashMap<>(16);
+        for (String param : queryList) {
+            String[] paramArr = param.split("\\=");
+            if (paramArr.length == 2) {
                 try {
-                    InetAddress inet = InetAddress.getLocalHost();
-                    ipAddress = inet.getHostAddress();
-                } catch (UnknownHostException e) {
-                    // ignore
+                    params.put(paramArr[0], URLDecoder.decode(paramArr[1], UTF8));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
-            }
-
-        }
-
-        // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
-        if (ipAddress != null && ipAddress.length() > IP_LEN) {
-            if (ipAddress.indexOf(",") > 0) {
-                ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+            } else if (paramArr.length == 1) {
+                params.put(paramArr[0], "");
             }
         }
-        return ipAddress;
-
-    }
-    
-    /**
-     * 是否是get请求
-     * @param request request对象
-     * @return true，是
-     */
-    public static boolean isGetRequest(HttpServletRequest request) {
-        return GET.equalsIgnoreCase(request.getMethod());
+        return params;
     }
 
 }

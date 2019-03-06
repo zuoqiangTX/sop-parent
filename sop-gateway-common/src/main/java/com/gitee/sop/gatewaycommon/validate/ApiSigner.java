@@ -3,7 +3,6 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
-import org.apache.tomcat.util.buf.HexUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +50,6 @@ public class ApiSigner extends AbstractSigner {
         byte[] bytes = signEncipher.encrypt(source, secret);
 
         // 第四步：把二进制转化为大写的十六进制
-        return HexUtils.toHexString(bytes).toUpperCase();
+        return byte2hex(bytes).toUpperCase();
     }
 }

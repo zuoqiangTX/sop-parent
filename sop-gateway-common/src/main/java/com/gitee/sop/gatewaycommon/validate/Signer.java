@@ -1,5 +1,7 @@
 package com.gitee.sop.gatewaycommon.validate;
 
+import com.gitee.sop.gatewaycommon.param.ApiParam;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -11,10 +13,10 @@ public interface Signer {
 
     /**
      * 签名校验
-     * @param request
+     * @param apiParam 参数
      * @param secret 秘钥
      * @return true签名正确
      */
-    boolean checkSign(HttpServletRequest request, String secret);
+    boolean checkSign(ApiParam apiParam, String secret);
     
 }

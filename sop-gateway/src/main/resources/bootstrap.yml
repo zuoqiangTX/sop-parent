@@ -1,0 +1,8 @@
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181

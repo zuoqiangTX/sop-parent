@@ -1,13 +1,9 @@
 package com.gitee.sop.gatewaycommon.bean;
 
-import com.gitee.sop.gatewaycommon.configuration.BaseZuulController;
-import com.gitee.sop.gatewaycommon.param.ApiParamParser;
-import com.gitee.sop.gatewaycommon.param.ParamParser;
+import com.gitee.sop.gatewaycommon.param.ApiParamBuilder;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.ApiResultExecutor;
-import com.gitee.sop.gatewaycommon.result.JsonResultSerializer;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
-import com.gitee.sop.gatewaycommon.result.ResultSerializer;
-import com.gitee.sop.gatewaycommon.result.XmlResultSerializer;
 import com.gitee.sop.gatewaycommon.secret.AppSecretManager;
 import com.gitee.sop.gatewaycommon.secret.CacheAppSecretManager;
 import com.gitee.sop.gatewaycommon.session.ApiSessionManager;
@@ -41,15 +37,6 @@ public class ApiConfig {
     private ResultExecutor resultExecutor = new ApiResultExecutor();
 
     /**
-     * json序列化
-     */
-    private ResultSerializer jsonResultSerializer = new JsonResultSerializer();
-    /**
-     * xml序列化
-     */
-    private ResultSerializer xmlResultSerializer = new XmlResultSerializer();
-
-    /**
      * app秘钥管理
      */
     private AppSecretManager appSecretManager = new CacheAppSecretManager();
@@ -65,9 +52,9 @@ public class ApiConfig {
     private Signer signer = new ApiSigner();
 
     /**
-     * 参数解析
+     * 参数解析，gateway
      */
-    private ParamParser paramParser = new ApiParamParser();
+    private ParamBuilder paramBuilder = new ApiParamBuilder();
 
     /**
      * 验证
@@ -83,12 +70,6 @@ public class ApiConfig {
      * 错误模块
      */
     private List<String> i18nModules = new ArrayList<String>();
-
-    /**
-     * 基础Controller
-     */
-    private BaseZuulController baseZuulController = new BaseZuulController();
-
 
     // -------- fields ---------
     /**

@@ -7,8 +7,7 @@ import com.gitee.sop.gatewaycommon.validate.AbstractSigner;
 import com.gitee.sop.gatewaycommon.validate.SignEncipher;
 import com.gitee.sop.gatewaycommon.validate.SignEncipherHMAC_MD5;
 import com.gitee.sop.gatewaycommon.validate.SignEncipherMD5;
-import org.apache.commons.lang.StringUtils;
-import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +58,6 @@ public class TaobaoSigner extends AbstractSigner {
         byte[] bytes = signEncipher.encrypt(source, secret);
 
         // 第四步：把二进制转化为大写的十六进制
-        return HexUtils.toHexString(bytes).toUpperCase();
+        return byte2hex(bytes).toUpperCase();
     }
 }

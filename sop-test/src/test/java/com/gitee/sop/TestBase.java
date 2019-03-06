@@ -27,24 +27,6 @@ import java.util.stream.Collectors;
  * @author tanghc
  */
 public class TestBase extends TestCase {
-    public void post(String url, String postJson) throws IOException {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(url);
-        // 构造消息头
-
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-        // 构建消息实体
-        StringEntity entity = new StringEntity(postJson, Charset.forName("UTF-8"));
-        entity.setContentEncoding("UTF-8");
-        // 发送Json格式的数据请求
-        entity.setContentType("application/json");
-        post.setEntity(entity);
-
-        HttpResponse response = httpClient.execute(post);
-        HttpEntity responseEntity = response.getEntity();
-        String content = IOUtils.toString(responseEntity.getContent(), "UTF-8");
-        System.out.println(content);
-    }
 
     /**
      * 发送POST请求
@@ -52,7 +34,7 @@ public class TestBase extends TestCase {
      * @return JSON或者字符串
      * @throws Exception
      */
-    public static String post(String url, Map<String, String> params) throws Exception{
+    public static String post(String url, Map<String, String> params) {
         CloseableHttpClient client = null;
         CloseableHttpResponse response = null;
         try{
@@ -78,7 +60,7 @@ public class TestBase extends TestCase {
             /**
              * 设置请求的报文头部的编码
              */
-            post.setHeader(new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8"));
+            post.setHeader(new BasicHeader("Content-Type", "application/x-www-form-urlencoded"));
             /**
              * 执行post请求
              */

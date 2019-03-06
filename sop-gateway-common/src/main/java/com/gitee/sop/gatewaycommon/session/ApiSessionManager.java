@@ -1,6 +1,5 @@
 package com.gitee.sop.gatewaycommon.session;
 
-import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -14,9 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * session管理,默认存放的是{@link ApiHttpSession}。采用谷歌guava缓存实现。
- * 
- * @author tanghc
  *
+ * @author tanghc
  */
 public class ApiSessionManager implements SessionManager {
     private static Logger logger = LoggerFactory.getLogger(ApiSessionManager.class);
@@ -31,7 +29,7 @@ public class ApiSessionManager implements SessionManager {
 
     @Override
     public HttpSession getSession(String sessionId) {
-        if(sessionId == null) {
+        if (sessionId == null) {
             return this.createSession(sessionId);
         }
         try {
@@ -45,12 +43,12 @@ public class ApiSessionManager implements SessionManager {
 
     /**
      * 创建一个session
-     * 
+     *
      * @param sessionId 传null将返回一个新session
      * @return 返回session
      */
     protected HttpSession createSession(String sessionId) {
-        ServletContext servletContext = getServletContext();
+        ServletContext servletContext = null;
         HttpSession session = this.newSession(sessionId, servletContext);
         session.setMaxInactiveInterval(getSessionTimeout());
         this.cache.put(session.getId(), session);
@@ -59,17 +57,13 @@ public class ApiSessionManager implements SessionManager {
 
     /**
      * 返回新的session实例
-     * 
+     *
      * @param sessionId
      * @param servletContext
      * @return 返回session
      */
     protected HttpSession newSession(String sessionId, ServletContext servletContext) {
         return new ApiHttpSession(servletContext, sessionId);
-    }
-
-    protected ServletContext getServletContext() {
-        return ApiContext.getServletContext();
     }
 
     protected LoadingCache<String, HttpSession> buildCache() {
@@ -90,7 +84,7 @@ public class ApiSessionManager implements SessionManager {
 
     /**
      * 过期时间,分钟,默认20分钟
-     * 
+     *
      * @return 返回过期时间
      */
     public int getSessionTimeout() {

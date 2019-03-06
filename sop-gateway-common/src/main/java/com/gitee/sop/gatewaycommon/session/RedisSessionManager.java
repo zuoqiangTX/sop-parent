@@ -1,6 +1,5 @@
 package com.gitee.sop.gatewaycommon.session;
 
-import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
@@ -10,17 +9,20 @@ import java.util.UUID;
 
 /**
  * SessionManager的redis实现，使用redis管理session
- * 
- * @author tanghc
  *
+ * @author tanghc
  */
 public class RedisSessionManager implements SessionManager {
 
     private ApiRedisTemplate redisTemplate;
 
-    /** 过期时间，30分钟 */
+    /**
+     * 过期时间，30分钟
+     */
     private int sessionTimeout = 30;
-    /** 存入redis中key的前缀 */
+    /**
+     * 存入redis中key的前缀
+     */
     private String keyPrefix = "session:";
 
     public RedisSessionManager(@SuppressWarnings("rawtypes") RedisTemplate redisTemplate) {
@@ -32,7 +34,7 @@ public class RedisSessionManager implements SessionManager {
     public HttpSession getSession(String sessionId) {
         return this.getSession(sessionId, this.keyPrefix);
     }
-    
+
     public HttpSession getSession(String sessionId, String keyPrefix) {
         if (this.hasKey(sessionId)) {
             return RedisHttpSession.createExistSession(sessionId, getServletContext(), redisTemplate, keyPrefix);
@@ -42,9 +44,10 @@ public class RedisSessionManager implements SessionManager {
                     redisTemplate, keyPrefix);
         }
     }
-    
+
     /**
      * 构建sessionId
+     *
      * @param id
      * @return 返回sessionid
      */
@@ -62,7 +65,7 @@ public class RedisSessionManager implements SessionManager {
     }
 
     public ServletContext getServletContext() {
-        return ApiContext.getServletContext();
+        return null;
     }
 
     public int getSessionTimeout() {
@@ -71,6 +74,7 @@ public class RedisSessionManager implements SessionManager {
 
     /**
      * 设置session过期时间，单位分钟
+     *
      * @param sessionTimeout
      */
     public void setSessionTimeout(int sessionTimeout) {
@@ -91,6 +95,7 @@ public class RedisSessionManager implements SessionManager {
 
     /**
      * 设置存入redis中key的前缀，默认为"session:"
+     *
      * @param keyPrefix
      */
     public void setKeyPrefix(String keyPrefix) {

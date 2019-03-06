@@ -4,6 +4,8 @@ import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
 import lombok.Getter;
 
+import java.util.Locale;
+
 /**
  * 错误对象
  *
@@ -11,6 +13,8 @@ import lombok.Getter;
  */
 @Getter
 public class ErrorMeta {
+
+    private static final Locale ZH_CN = Locale.SIMPLIFIED_CHINESE;
 
     private String modulePrefix;
     private String code;
@@ -23,7 +27,7 @@ public class ErrorMeta {
     }
 
     public Error getError() {
-        return ErrorFactory.getError(this, ApiContext.getLocale());
+        return ErrorFactory.getError(this, ZH_CN);
     }
 
     /**
@@ -33,14 +37,18 @@ public class ErrorMeta {
      * @return 返回exception
      */
     public ApiException getException(Object... params) {
+        Locale locale = ZH_CN;
         if (params != null && params.length == 1) {
             Object param = params[0];
             if (param instanceof Throwable) {
-                Error error = ErrorFactory.getError(this, ApiContext.getLocale());
+                Error error = ErrorFactory.getError(this, ZH_CN);
                 return new ApiException((Throwable) param, error);
             }
+            if (param instanceof Locale) {
+                locale = (Locale) param;
+            }
         }
-        Error error = ErrorFactory.getError(this, ApiContext.getLocale(), params);
+        Error error = ErrorFactory.getError(this, locale, params);
         return new ApiException(error);
     }
 

@@ -12,7 +12,7 @@
 		<module>sop-registry</module>
 		<module>sop-gateway</module>
 		<module>sop-gateway-common</module>
-		<module>sop-server-common</module>
+		<module>sop-service-common</module>
 		<module>sop-story</module>
 		<module>sop-book</module>
 		<module>sop-test</module>

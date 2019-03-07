@@ -1,8 +1,9 @@
 package com.gitee.sop.gatewaycommon.bean;
 
-import com.gitee.sop.gatewaycommon.param.ApiParamBuilder;
+import com.gitee.sop.gatewaycommon.gateway.param.GatewayParamBuilder;
+import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
-import com.gitee.sop.gatewaycommon.result.ApiResultExecutor;
+import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
 import com.gitee.sop.gatewaycommon.secret.AppSecretManager;
 import com.gitee.sop.gatewaycommon.secret.CacheAppSecretManager;
@@ -14,7 +15,12 @@ import com.gitee.sop.gatewaycommon.validate.ApiValidator;
 import com.gitee.sop.gatewaycommon.validate.Encrypter;
 import com.gitee.sop.gatewaycommon.validate.Signer;
 import com.gitee.sop.gatewaycommon.validate.Validator;
+import com.gitee.sop.gatewaycommon.zuul.configuration.BaseZuulController;
+import com.gitee.sop.gatewaycommon.zuul.param.ZuulParamBuilder;
+import com.gitee.sop.gatewaycommon.zuul.result.ZuulResultExecutor;
+import com.netflix.zuul.context.RequestContext;
 import lombok.Data;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +38,14 @@ public class ApiConfig {
     }
 
     /**
-     * 合并结果处理
+     * gateway合并结果处理
      */
-    private ResultExecutor resultExecutor = new ApiResultExecutor();
+    private ResultExecutor<ServerWebExchange, GatewayResult> gatewayResultExecutor = new GatewayResultExecutor();
+
+    /**
+     * zuul合并结果处理
+     */
+    private ResultExecutor<RequestContext, String> zuulResultExecutor = new ZuulResultExecutor();
 
     /**
      * app秘钥管理
@@ -54,7 +65,12 @@ public class ApiConfig {
     /**
      * 参数解析，gateway
      */
-    private ParamBuilder paramBuilder = new ApiParamBuilder();
+    private ParamBuilder<ServerWebExchange> gatewayParamBuilder = new GatewayParamBuilder();
+
+    /**
+     * 参数解析，zuul
+     */
+    private ParamBuilder<RequestContext> zuulParamBuilder = new ZuulParamBuilder();
 
     /**
      * 验证
@@ -65,6 +81,8 @@ public class ApiConfig {
      * session管理
      */
     private SessionManager sessionManager = new ApiSessionManager();
+
+    private BaseZuulController baseZuulController = new BaseZuulController();
 
     /**
      * 错误模块

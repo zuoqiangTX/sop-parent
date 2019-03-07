@@ -1,12 +1,15 @@
 package com.gitee.sop.gatewaycommon.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -41,6 +44,40 @@ public class RequestUtil {
             }
         }
         return params;
+    }
+
+    /**
+     * request中的参数转换成map
+     *
+     * @param request request对象
+     * @return 返回参数键值对
+     */
+    public static Map<String, Object> convertRequestParamsToMap(HttpServletRequest request) {
+        Map<String, String[]> paramMap = request.getParameterMap();
+        if(paramMap == null || paramMap.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, Object> retMap = new HashMap<String, Object>(paramMap.size());
+
+        Set<Map.Entry<String, String[]>> entrySet = paramMap.entrySet();
+
+        for (Map.Entry<String, String[]> entry : entrySet) {
+            String name = entry.getKey();
+            String[] values = entry.getValue();
+            if (values.length == 1) {
+                retMap.put(name, values[0]);
+            } else if (values.length > 1) {
+                retMap.put(name, values);
+            } else {
+                retMap.put(name, "");
+            }
+        }
+
+        return retMap;
+    }
+
+    public static String getText(HttpServletRequest request) throws Exception {
+        return IOUtils.toString(request.getInputStream(), UTF8);
     }
 
 }

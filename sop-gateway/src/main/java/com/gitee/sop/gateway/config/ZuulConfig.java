@@ -1,29 +1,25 @@
 package com.gitee.sop.gateway.config;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.gateway.configuration.AlipayGatewayConfiguration;
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
+import com.gitee.sop.gatewaycommon.zuul.configuration.TaobaoZuulConfiguration;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * 使用Spring Cloud Gateway
+ * 使用Spring Cloud Zuul，推荐使用
  *
- * 注意：下面两个只能使用一个。
- *
- * 使用前，前往启动类SopGatewayApplication.java 注释掉@EnableZuulProxy
+ * 注意：下面两个只能使用一个
  */
 
 /**
  * 开通支付宝开放平台能力
  * @author tanghc
  */
-
-//@Configuration
-public class GatewayConfig extends AlipayGatewayConfiguration {
+@Configuration
+public class ZuulConfig extends AlipayZuulConfiguration {
 
     {
         Map<String, String> appSecretStore = new HashMap();
@@ -33,10 +29,11 @@ public class GatewayConfig extends AlipayGatewayConfiguration {
 }
 
 /**
- * 开通淘宝开放平能力
+ * 开通支付宝开放平台能力
+ * @author tanghc
  */
 //@Configuration
-//public class GatewayConfig extends TaobaoGatewayConfiguration {
+//public class ZuulConfig extends TaobaoZuulConfiguration {
 //
 //    {
 //        Map<String, String> appSecretStore = new HashMap();
@@ -44,4 +41,5 @@ public class GatewayConfig extends AlipayGatewayConfiguration {
 //        ApiContext.getApiConfig().addAppSecret(appSecretStore);
 //    }
 //}
+
 

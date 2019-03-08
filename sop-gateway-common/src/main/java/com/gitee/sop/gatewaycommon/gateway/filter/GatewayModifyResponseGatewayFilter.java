@@ -26,6 +26,10 @@ import reactor.core.publisher.Mono;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
 
+/**
+ * 修改返回结果
+ * @author thc
+ */
 public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered {
 
 

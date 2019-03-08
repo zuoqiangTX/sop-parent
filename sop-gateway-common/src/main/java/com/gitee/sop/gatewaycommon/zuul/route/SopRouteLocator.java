@@ -16,10 +16,10 @@ import java.util.List;
  */
 public class SopRouteLocator implements RouteLocator, Ordered {
 
-    private RouteRepository<Route> routeRepository;
+    private ZuulRouteRepository zuulRouteRepository;
 
-    public SopRouteLocator(RouteRepository<Route> routeRepository) {
-        this.routeRepository = routeRepository;
+    public SopRouteLocator(ZuulRouteRepository zuulRouteRepository) {
+        this.zuulRouteRepository = zuulRouteRepository;
     }
 
     @Override
@@ -29,14 +29,14 @@ public class SopRouteLocator implements RouteLocator, Ordered {
 
     @Override
     public List<Route> getRoutes() {
-        return null;
+        return zuulRouteRepository.listAll();
     }
 
     @Override
     public Route getMatchingRoute(String path) {
         ApiParam param = ZuulContext.getApiParam();
         String nameVersion = param.fetchNameVersion();
-        return routeRepository.get(nameVersion);
+        return zuulRouteRepository.get(nameVersion);
     }
 
     @Override

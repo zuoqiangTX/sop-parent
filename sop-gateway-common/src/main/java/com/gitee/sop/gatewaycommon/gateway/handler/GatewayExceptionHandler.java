@@ -39,7 +39,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
          * 错误记录
          */
         ServerHttpRequest request = exchange.getRequest();
-        log.error("[全局异常处理]异常请求路径:{},记录异常信息:{}", request.getPath(), ex.getMessage());
+        log.error("[全局异常处理]异常请求路径:{}, msg:{}", request.getPath(), ex.getMessage(), ex);
         /**
          * 参考AbstractErrorWebExceptionHandler
          */

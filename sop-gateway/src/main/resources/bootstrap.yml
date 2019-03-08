@@ -6,3 +6,6 @@ spring:
   cloud:
     zookeeper:
       connect-string: localhost:2181
+
+zuul:
+  servlet-path: /api # 入口地址，默认是/zuul

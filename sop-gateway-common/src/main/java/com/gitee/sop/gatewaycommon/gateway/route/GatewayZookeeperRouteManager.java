@@ -21,20 +21,15 @@ import java.util.List;
  */
 @Getter
 @Slf4j
-public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayRouteDefinition, GatewayServiceRouteInfo, RouteDefinition> {
+public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServiceRouteInfo, GatewayRouteDefinition, RouteDefinition> {
 
-    public GatewayZookeeperRouteManager(Environment environment, RouteRepository<RouteDefinition> routeRepository) {
+    public GatewayZookeeperRouteManager(Environment environment, RouteRepository<GatewayServiceRouteInfo, RouteDefinition> routeRepository) {
         super(environment, routeRepository);
     }
 
     @Override
     protected Class<GatewayServiceRouteInfo> getServiceRouteInfoClass() {
         return GatewayServiceRouteInfo.class;
-    }
-
-    @Override
-    protected Class<GatewayRouteDefinition> getRouteDefinitionClass() {
-        return GatewayRouteDefinition.class;
     }
 
     @Override

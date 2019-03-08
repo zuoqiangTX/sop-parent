@@ -7,6 +7,7 @@ import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.message.ErrorMeta;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -23,6 +24,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     public static final String GATEWAY_CODE_NAME = "code";
     public static final String GATEWAY_MSG_NAME = "msg";
     public static final String DATA_SUFFIX = "_response";
+    public static final String ARRAY_START = "[";
+    public static final String ARRAY_END = "]";
+    public static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
+
 
     /**
      * 获取业务方约定的返回码
@@ -40,6 +45,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     @Override
     public String mergeResult(T request, String serviceResult) {
+        serviceResult = wrapResult(serviceResult);
         int responseStatus = this.getBizHeaderCode(request);
         JSONObject jsonObjectService;
         if (responseStatus == HttpStatus.OK.value()) {
@@ -60,6 +66,20 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             jsonObjectService.put(GATEWAY_MSG_NAME, ISP_UNKNOW_ERROR_META.getError().getMsg());
         }
         return this.merge(request, jsonObjectService);
+    }
+
+    protected String wrapResult(String serviceResult) {
+        if (serviceResult == null) {
+            serviceResult = "";
+        }
+        serviceResult = serviceResult.trim();
+        if (StringUtils.isEmpty(serviceResult)) {
+            return SopConstants.EMPTY_JSON;
+        }
+        if (serviceResult.startsWith(ARRAY_START) && serviceResult.endsWith(ARRAY_END)) {
+            return String.format(ROOT_JSON, serviceResult);
+        }
+        return serviceResult;
     }
 
     public String merge(T exchange, JSONObject jsonObjectService) {

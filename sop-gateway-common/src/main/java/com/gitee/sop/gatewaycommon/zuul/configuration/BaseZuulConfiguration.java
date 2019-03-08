@@ -37,6 +37,11 @@ public class BaseZuulConfiguration {
     protected RouteManager apiMetaManager;
 
     @Bean
+    SopRouteLocator sopRouteLocator(ZuulRouteRepository zuulRouteRepository) {
+        return new SopRouteLocator(zuulRouteRepository);
+    }
+
+    @Bean
     ZuulZookeeperRouteManager zuulZookeeperRouteManager(Environment environment, ZuulRouteRepository zuulRouteRepository) {
         return new ZuulZookeeperRouteManager(environment, zuulRouteRepository);
     }

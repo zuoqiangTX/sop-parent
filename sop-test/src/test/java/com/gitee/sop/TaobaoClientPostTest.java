@@ -15,9 +15,9 @@ import java.util.Map;
 public class TaobaoClientPostTest extends TestBase {
 
 
-    String url = "http://localhost:8081";
+    String url = "http://localhost:8081/api";
     String appId = "taobao_test";
-    // 支付宝私钥
+    // 淘宝私钥
     String secret = "G9w0BAQEFAAOCAQ8AMIIBCgKCA";
 
     /*

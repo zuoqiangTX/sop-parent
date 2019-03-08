@@ -3,12 +3,12 @@ package com.gitee.sop.gatewaycommon.manager;
 /**
  * @author tanghc
  */
-public interface RouteRepository<T> {
+public interface RouteRepository<R, T> {
     T get(String id);
 
-    String add(T route);
-
-    String update(T route);
+    String add(R serviceRouteInfo, T route);
 
     void delete(String id);
+
+    void deleteAll(R serviceRouteInfo);
 }

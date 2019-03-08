@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.filter;
 
+import com.gitee.sop.gatewaycommon.util.RoutePathUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -15,10 +16,9 @@ import java.net.URI;
 import static org.springframework.cloud.gateway.filter.LoadBalancerClientFilter.LOAD_BALANCER_CLIENT_FILTER_ORDER;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
-import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.containsEncodedParts;
 
 /**
- * 在LoadBalancerClientFilter后面处理，处理成我们想要的uri
+ * 在LoadBalancerClientFilter后面处理，从Route中找到具体的path，然后插入到uri的path中
  *
  * @author tanghc
  */
@@ -32,25 +32,22 @@ public class LoadBalancerClientExtFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        URI url = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
-        URI routeUri = route.getUri();
-
-        URI requestUrl = url;
-
-        String uriStr = routeUri.toString();
-        String[] uriArr = uriStr.split("\\#");
-        if (uriArr.length == 2) {
-            String path = uriArr[1];
+        String path = this.findPath(route);
+        if (StringUtils.hasLength(path)) {
+            URI url = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
             UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUri(url);
-            if (StringUtils.hasLength(path)) {
-                uriComponentsBuilder.path(path);
-            }
-            requestUrl = uriComponentsBuilder.build(true).toUri();
+            uriComponentsBuilder.path(path);
+            URI requestUrl = uriComponentsBuilder.build(true).toUri();
+            exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, requestUrl);
         }
-
-        exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, requestUrl);
         return chain.filter(exchange);
+    }
+
+    protected String findPath(Route route) {
+        URI routeUri = route.getUri();
+        String uriStr = routeUri.toString();
+        return RoutePathUtil.findPath(uriStr);
     }
 
 }

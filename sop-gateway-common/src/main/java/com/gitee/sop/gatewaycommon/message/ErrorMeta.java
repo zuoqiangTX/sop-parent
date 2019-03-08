@@ -2,8 +2,11 @@ package com.gitee.sop.gatewaycommon.message;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.netflix.zuul.context.RequestContext;
 import lombok.Getter;
+import sun.plugin.cache.CacheUpdateHelper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 /**
@@ -37,7 +40,7 @@ public class ErrorMeta {
      * @return 返回exception
      */
     public ApiException getException(Object... params) {
-        Locale locale = ZH_CN;
+        Locale locale = getLocale();
         if (params != null && params.length == 1) {
             Object param = params[0];
             if (param instanceof Throwable) {
@@ -50,6 +53,15 @@ public class ErrorMeta {
         }
         Error error = ErrorFactory.getError(this, locale, params);
         return new ApiException(error);
+    }
+
+    protected Locale getLocale() {
+        RequestContext currentContext = RequestContext.getCurrentContext();
+        if (currentContext == null) {
+            return ZH_CN;
+        }
+        HttpServletRequest request = currentContext.getRequest();
+        return request == null ? ZH_CN : request.getLocale();
     }
 
 }

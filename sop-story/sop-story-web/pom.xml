@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>com.gitee.sop</groupId>
-            <artifactId>sop-server-common</artifactId>
+            <artifactId>sop-service-common</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>

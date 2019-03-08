@@ -1,18 +1,34 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
+import com.gitee.sop.gatewaycommon.bean.ServiceRouteRepository;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author tanghc
  */
-public class ZuulRouteRepository implements RouteRepository<Route> {
-    /** key：nameVersion */
-    private Map<String, Route> nameVersionServiceIdMap = new HashMap<>(128);
+public class ZuulRouteRepository implements RouteRepository<ZuulServiceRouteInfo, Route> {
+    /**
+     * key：nameVersion
+     */
+    private Map<String, Route> nameVersionServiceIdMap = new ConcurrentHashMap<>(128);
+
+    private ServiceRouteRepository<ZuulServiceRouteInfo, Route> serviceRouteRepository = new ServiceRouteRepository<ZuulServiceRouteInfo, Route>() {
+        @Override
+        public String getServiceId(ZuulServiceRouteInfo serviceRouteInfo) {
+            return serviceRouteInfo.getAppName();
+        }
+    };
+
+    public List<Route> listAll() {
+        return new ArrayList<>(nameVersionServiceIdMap.values());
+    }
 
     @Override
     public Route get(String id) {
@@ -24,14 +40,17 @@ public class ZuulRouteRepository implements RouteRepository<Route> {
     }
 
     @Override
-    public String add(Route route) {
-        return this.update(route);
+    public String add(ZuulServiceRouteInfo serviceRouteInfo, Route route) {
+        nameVersionServiceIdMap.put(route.getId(), route);
+        serviceRouteRepository.saveRouteDefinition(serviceRouteInfo, route);
+        return null;
     }
 
     @Override
-    public String update(Route route) {
-        nameVersionServiceIdMap.put(route.getId(), route);
-        return null;
+    public void deleteAll(ZuulServiceRouteInfo serviceRouteInfo) {
+        serviceRouteRepository.deleteAll(serviceRouteInfo, route -> {
+            this.delete(route.getId());
+        });
     }
 
     @Override

@@ -45,7 +45,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 工程说明
 
-> 运行环境：JDK8，Maven3，zookeeper
+> 运行环境：JDK8，Maven3，Zookeeper
 
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway

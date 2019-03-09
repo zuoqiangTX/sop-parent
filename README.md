@@ -24,7 +24,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 架构图
 
-待完善
+![SOP架构图](https://images.gitee.com/uploads/images/2019/0309/093312_8afb4789_332975.png "sop.png")
 
 ## 已完成列表
 
@@ -52,6 +52,14 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-story：微服务示例，story服务，同时作为Provider提供服务
 - sop-book：微服务示例，book服务，也是Consumer，调用story提供的服务
 - sop-test：接口调用测试用例
+
+## 快速开始
+
+- IDE打开项目(IDEA下可以打开根pom.xml，然后open as project)
+- 启动注册中心，sop-registry（运行SopRegistryApplication.java）
+- 启动网关：sop-gateway（运行SopGatewayApplication.java）
+- 启动微服务：sop-story-web(运行SopStoryApplication.java)
+- 找到sop-test，打开测试用例，进行接口调用测试，运行com.gitee.sop.AlipayClientPostTest.testPost()
 
 ## 相关文档
 

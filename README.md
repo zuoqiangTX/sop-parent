@@ -45,6 +45,8 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 工程说明
 
+> 运行环境：JDK8，Maven3，zookeeper
+
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-gateway-common：网关公共模块，封装常用功能，包含签名校验、错误处理等功能
@@ -55,6 +57,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 快速开始
 
+- 安装并启动zookeeper，[安装教程](http://zookeeper.apache.org/doc/r3.4.13/zookeeperStarted.html)
 - IDE打开项目(IDEA下可以打开根pom.xml，然后open as project)
 - 启动注册中心，sop-registry（运行SopRegistryApplication.java）
 - 启动网关：sop-gateway（运行SopGatewayApplication.java）

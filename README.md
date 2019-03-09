@@ -60,8 +60,8 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - 安装并启动zookeeper，[安装教程](http://zookeeper.apache.org/doc/r3.4.13/zookeeperStarted.html)
 - IDE打开项目(IDEA下可以打开根pom.xml，然后open as project)
 - 启动注册中心，sop-registry（运行SopRegistryApplication.java）
-- 启动网关：sop-gateway（运行SopGatewayApplication.java）
 - 启动微服务：sop-story-web(运行SopStoryApplication.java)
+- 启动网关：sop-gateway（运行SopGatewayApplication.java）
 - 找到sop-test，打开测试用例，进行接口调用测试，运行com.gitee.sop.AlipayClientPostTest.testPost()
 
 ## 相关文档

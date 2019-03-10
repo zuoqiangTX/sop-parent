@@ -32,7 +32,7 @@ public class SopConstants {
     public static final int BIZ_ERROR_STATUS = 4000;
 
     /**
-     * zookeeper存放接口信息的根目录
+     * zookeeper存放接口路由信息的根目录
      */
-    public static final String SOP_SERVICE_API_PATH = "/sop-service-api";
+    public static final String SOP_SERVICE_ROUTE_PATH = "/sop-service-route";
 }

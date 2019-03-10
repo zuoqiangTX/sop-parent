@@ -96,6 +96,11 @@ public class ApiConfig {
     private boolean ignoreValidate;
 
     /**
+     * 是否对结果进行合并
+     */
+    private boolean mergeResult = true;
+
+    /**
      * 超时时间
      */
     private int timeoutSeconds = 60 * 5;

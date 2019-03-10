@@ -27,6 +27,11 @@ import java.util.List;
 @Setter
 public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
+    /**
+     * zookeeper存放接口路由信息的根目录
+     */
+    public static final String SOP_SERVICE_ROUTE_PATH = "/sop-service-route";
+    public static final String PATH_START_CHAR = "/";
 
     /**
      * NameVersion=alipay.story.get1.0
@@ -35,8 +40,6 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     private static String QUERY_PREDICATE_DEFINITION_TPL = "NameVersion=%s";
 
     private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_" + System.currentTimeMillis() + "_", "/", "0.0");
-
-    private String sopServiceApiPath = "/sop-service-api";
 
     private Environment environment;
 
@@ -97,9 +100,25 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         List<GatewayPredicateDefinition> predicates = Arrays.asList(this.buildNameVersionPredicateDefinition(apiMeta));
         gatewayRouteDefinition.setPredicates(predicates);
         // lb://story-service#/alipay.story.get/
-        String servletPath = "#" + apiMeta.getPath();
-        gatewayRouteDefinition.setUri("lb://" + serviceApiInfo.getAppName() + servletPath);
+        String uri = this.buildUri(serviceApiInfo, apiMeta);
+        gatewayRouteDefinition.setUri(uri);
+        gatewayRouteDefinition.setIgnoreValidate(apiMeta.isIgnoreValidate());
         return gatewayRouteDefinition;
+    }
+
+    protected String buildUri(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
+        String servletPath = getServletPath(serviceApiInfo, apiMeta);
+        if (servletPath == null) {
+            servletPath = PATH_START_CHAR;
+        }
+        if (!servletPath.startsWith(PATH_START_CHAR)) {
+            servletPath = PATH_START_CHAR + servletPath;
+        }
+        return "lb://" + serviceApiInfo.getAppName() + "#" + servletPath;
+    }
+
+    protected String getServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
+        return apiMeta.getPath();
     }
 
     protected GatewayPredicateDefinition buildNameVersionPredicateDefinition(ServiceApiInfo.ApiMeta apiMeta) {
@@ -120,7 +139,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         CuratorFramework client = null;
         try {
             // 保存路径
-            String savePath = sopServiceApiPath + "/" + serviceRouteInfo.getAppName();
+            String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getAppName();
 
             client = CuratorFrameworkFactory.builder()
                     .connectString(zookeeperServerAddr)

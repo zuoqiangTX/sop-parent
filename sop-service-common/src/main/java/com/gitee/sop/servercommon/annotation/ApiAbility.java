@@ -20,4 +20,9 @@ public @interface ApiAbility {
      * 版本号，如：1.0
      */
     String version() default "";
+
+    /**
+     * 忽略验证，业务参数除外
+     */
+    boolean ignoreValidate() default false;
 }

@@ -20,4 +20,6 @@ public class GatewayRouteDefinition {
     private String uri;
     /** 路由执行的顺序 */
     private int order = 0;
+    /** 是否忽略验证，业务参数验证除外 */
+    private boolean ignoreValidate;
 }

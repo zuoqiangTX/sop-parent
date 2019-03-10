@@ -9,6 +9,7 @@ import lombok.Data;
 public class ApiMappingInfo {
     private String name;
     private String version;
+    private boolean ignoreValidate;
 
     public ApiMappingInfo(String name, String version) {
         this.name = name;

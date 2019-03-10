@@ -40,6 +40,12 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
 
     @Override
     public String buildErrorResult(RequestContext request, Throwable throwable) {
+        Error error = getError(throwable);
+        JSONObject jsonObject = (JSONObject) JSON.toJSON(error);
+        return this.merge(request, jsonObject);
+    }
+
+    public static Error getError(Throwable throwable) {
         Error error = null;
         if (throwable instanceof ZuulException) {
             ZuulException ex = (ZuulException) throwable;
@@ -52,8 +58,6 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
         if (error == null) {
             error = ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getError();
         }
-        JSONObject jsonObject = (JSONObject) JSON.toJSON(error);
-        return this.merge(request, jsonObject);
+        return error;
     }
-
 }

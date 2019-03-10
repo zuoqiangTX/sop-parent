@@ -37,7 +37,7 @@ public interface ResultExecutor<T, R> {
      * 合并结果
      * @param request
      * @param serviceResult
-     * @return
+     * @return 返回最终输出结果
      */
     String mergeResult(T request, String serviceResult);
 
@@ -45,7 +45,7 @@ public interface ResultExecutor<T, R> {
      * 合并错误结果
      * @param request
      * @param ex
-     * @return
+     * @return 返回最终输出结果
      */
     R buildErrorResult(T request, Throwable ex);
 }

@@ -1,6 +1,7 @@
 package com.gitee.sop.gateway.config;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.easyopen.EasyopenZuulConfiguration;
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
 import com.gitee.sop.gatewaycommon.zuul.configuration.TaobaoZuulConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -42,4 +43,14 @@ public class ZuulConfig extends AlipayZuulConfiguration {
 //    }
 //}
 
-
+/**
+ * 对接easyopen
+ */
+//@Configuration
+//public class ZuulConfig extends EasyopenZuulConfiguration {
+//    {
+//        Map<String, String> appSecretStore = new HashMap();
+//        appSecretStore.put("easyopen_test", "G9w0BAQEFAAOCAQ8AMIIBCgKCA");
+//        ApiContext.getApiConfig().addAppSecret(appSecretStore);
+//    }
+//}

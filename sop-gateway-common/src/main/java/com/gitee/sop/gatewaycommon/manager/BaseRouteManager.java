@@ -16,7 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_API_PATH;
+import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 
 
 /**
@@ -30,7 +30,7 @@ import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_API_PATH
 @Slf4j
 public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E extends BaseRouteDefinition, T> implements RouteManager {
 
-    protected String sopServiceApiPath = SOP_SERVICE_API_PATH;
+    protected String sopServiceApiPath = SOP_SERVICE_ROUTE_PATH;
 
     protected Environment environment;
 
@@ -93,10 +93,7 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
             String nodeData = new String(childData.getData());
             log.info("\t* 子节点路径：" + childData.getPath() + "，该节点的数据为：" + nodeData);
             R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
-            for (E routeDefinitionItem : serviceRouteInfo.getRouteDefinitionList()) {
-                T routeDefinition = buildRouteDefinition(serviceRouteInfo, routeDefinitionItem);
-                routeRepository.add(serviceRouteInfo, routeDefinition);
-            }
+            saveRouteDefinitionList(serviceRouteInfo);
         }
         // 添加事件监听器
         childrenCache.getListenable().addListener(new PathChildrenCacheListener() {
@@ -110,10 +107,7 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
                         R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
                         // 添加子节点时触发
                         log.info("子节点：{}添加，数据为:{}", event.getData().getPath(), nodeData);
-                        for (E routeDefinitionItem : serviceRouteInfo.getRouteDefinitionList()) {
-                            T routeDefinition = buildRouteDefinition(serviceRouteInfo, routeDefinitionItem);
-                            routeRepository.add(serviceRouteInfo, routeDefinition);
-                        }
+                        saveRouteDefinitionList(serviceRouteInfo);
                     } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(type)) {
                         String nodeData = new String(event.getData().getData());
                         R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
@@ -122,20 +116,31 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
                         // 删除下面所有节点
                         routeRepository.deleteAll(serviceRouteInfo);
                         // 添加新节点
-                        for (E routeDefinitionItem : serviceRouteInfo.getRouteDefinitionList()) {
-                            T routeDefinition = buildRouteDefinition(serviceRouteInfo, routeDefinitionItem);
-                            routeRepository.add(serviceRouteInfo, routeDefinition);
-                        }
+                        saveRouteDefinitionList(serviceRouteInfo);
                     } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
                         String nodeData = new String(event.getData().getData());
                         log.info("子节点：{}删除，数据为:{}", event.getData().getPath(), nodeData);
                         R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
-                        routeRepository.deleteAll(serviceRouteInfo);
+                        deleteRouteDefinitionList(serviceRouteInfo);
                     }
                 }
             }
         });
     }
 
+    protected void saveRouteDefinitionList(R serviceRouteInfo) {
+        for (E routeDefinitionItem : serviceRouteInfo.getRouteDefinitionList()) {
+            RouteDefinitionItemContext.add(routeDefinitionItem);
+            T routeDefinition = buildRouteDefinition(serviceRouteInfo, routeDefinitionItem);
+            routeRepository.add(serviceRouteInfo, routeDefinition);
+        }
+    }
+
+    protected void deleteRouteDefinitionList(R serviceRouteInfo) {
+        for (E routeDefinitionItem : serviceRouteInfo.getRouteDefinitionList()) {
+            RouteDefinitionItemContext.delete(routeDefinitionItem);
+        }
+        routeRepository.deleteAll(serviceRouteInfo);
+    }
 
 }

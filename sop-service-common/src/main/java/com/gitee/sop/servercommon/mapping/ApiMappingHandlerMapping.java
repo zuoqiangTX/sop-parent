@@ -3,6 +3,7 @@ package com.gitee.sop.servercommon.mapping;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
+import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.manager.RequestMappingEvent;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -42,14 +43,17 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
         method.setAccessible(true);
         String name = null;
         String version;
+        boolean ignoreValidate = false;
         ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
         if (apiMapping != null) {
             name = apiMapping.value()[0];
             version = apiMapping.version();
+            ignoreValidate = apiMapping.ignoreValidate();
         } else {
             ApiAbility apiAbility = this.findApiAbilityAnnotation(method);
             if (apiAbility != null) {
                 version = apiAbility.version();
+                ignoreValidate = apiAbility.ignoreValidate();
             } else {
                 return super.getCustomMethodCondition(method);
             }
@@ -58,6 +62,11 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
             version = ServiceConfig.getInstance().getDefaultVersion();
         }
         ApiMappingInfo apiMappingInfo = new ApiMappingInfo(name, version);
+        // 如果是默认配置，则采用全局配置
+        if (!ignoreValidate) {
+            ignoreValidate = ServiceConfig.getInstance().isIgnoreValidate();
+        }
+        apiMappingInfo.setIgnoreValidate(ignoreValidate);
         logger.info("注册接口，method:" + method + "， version:" + version);
         return new ApiMappingRequestCondition(apiMappingInfo);
     }

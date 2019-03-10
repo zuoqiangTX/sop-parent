@@ -47,6 +47,11 @@ public class ServiceConfig {
      */
     private GlobalExceptionHandler globalExceptionHandler = new DefaultGlobalExceptionHandler();
 
+    /**
+     * 设置为true，所有接口不进行校验
+     */
+    private boolean ignoreValidate;
+
     public static ServiceConfig getInstance() {
         return instance;
     }

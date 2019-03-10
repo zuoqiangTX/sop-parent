@@ -2,10 +2,14 @@ package com.gitee.sop.gatewaycommon.result;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.gitee.sop.gatewaycommon.message.Error;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.message.ErrorMeta;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
+import com.netflix.zuul.exception.ZuulException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -45,6 +49,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     @Override
     public String mergeResult(T request, String serviceResult) {
+        boolean isMergeResult = ApiContext.getApiConfig().isMergeResult();
+        if (!isMergeResult) {
+            return serviceResult;
+        }
         serviceResult = wrapResult(serviceResult);
         int responseStatus = this.getBizHeaderCode(request);
         JSONObject jsonObjectService;
@@ -99,4 +107,5 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         ret.put(ParamNames.SIGN_NAME, sign);
         return ret.toJSONString();
     }
+
 }

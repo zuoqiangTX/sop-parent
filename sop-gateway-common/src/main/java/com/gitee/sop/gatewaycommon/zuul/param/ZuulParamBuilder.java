@@ -1,14 +1,17 @@
 package com.gitee.sop.gatewaycommon.zuul.param;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
+import com.gitee.sop.gatewaycommon.param.ApiParamFactory;
 import com.gitee.sop.gatewaycommon.param.ApiUploadContext;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -24,6 +27,7 @@ import java.util.Set;
  *
  * @author tanghc
  */
+@Slf4j
 public class ZuulParamBuilder implements ParamBuilder<RequestContext> {
 
     private static final String CONTENT_TYPE_MULTIPART = MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -33,16 +37,12 @@ public class ZuulParamBuilder implements ParamBuilder<RequestContext> {
 
     @Override
     public ApiParam build(RequestContext ctx) {
-        try {
-            HttpServletRequest request = ctx.getRequest();
-            Map<String, Object> params = this.getJson(request);
-            return new ApiParam(params);
-        } catch (Exception e) {
-            throw ErrorEnum.ISV_INVALID_PARAMETER.getErrorMeta().getException();
-        }
+        HttpServletRequest request = ctx.getRequest();
+        Map<String, Object> params = this.getParams(request);
+        return ApiParamFactory.build(params);
     }
 
-    public Map<String, Object> getJson(HttpServletRequest request) throws Exception {
+    public Map<String, Object> getParams(HttpServletRequest request) {
         // zuul会做一层包装
         if (request instanceof HttpServletRequestWrapper) {
             HttpServletRequestWrapper req = (HttpServletRequestWrapper) request;
@@ -63,7 +63,12 @@ public class ZuulParamBuilder implements ParamBuilder<RequestContext> {
 
             // json或者纯文本形式
             if (contectType.contains(CONTENT_TYPE_JSON) || contectType.contains(CONTENT_TYPE_TEXT)) {
-                String txt = RequestUtil.getText(request);
+                String txt = SopConstants.EMPTY_JSON;
+                try {
+                    txt = RequestUtil.getText(request);
+                } catch (Exception e) {
+                    log.error("获取纯文本内容失败", e);
+                }
                 params = JSON.parseObject(txt);
             } else if (contectType.contains(CONTENT_TYPE_MULTIPART)) {
                 // 上传文件形式

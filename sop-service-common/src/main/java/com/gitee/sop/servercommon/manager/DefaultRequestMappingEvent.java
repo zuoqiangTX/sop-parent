@@ -35,38 +35,11 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
 
     @Override
     public void onRegisterSuccess(ApiMappingHandlerMapping apiMappingHandlerMapping) {
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = apiMappingHandlerMapping.getHandlerMethods();
-        Set<RequestMappingInfo> requestMappingInfos = handlerMethods.keySet();
-        List<String> store = new ArrayList<>(requestMappingInfos.size());
-        List<ServiceApiInfo.ApiMeta> apis = new ArrayList<>(requestMappingInfos.size());
-
-        for (RequestMappingInfo requestMappingInfo : requestMappingInfos) {
-            Set<String> patterns = requestMappingInfo.getPatternsCondition().getPatterns();
-            RequestCondition<?> customCondition = requestMappingInfo.getCustomCondition();
-            if (customCondition instanceof ApiMappingRequestCondition) {
-                ApiMappingRequestCondition condition = (ApiMappingRequestCondition) customCondition;
-                ApiMappingInfo apiMappingInfo = condition.getApiMappingInfo();
-                String name = apiMappingInfo.getName();
-                String version = apiMappingInfo.getVersion();
-                String path = patterns.iterator().next();
-                // 不是ApiMapping注解的接口，name属性是null
-                if (name == null) {
-                    name = buildName(path);
-                }
-                String key = path + version;
-                if (store.contains(key)) {
-                    throw new RuntimeException("重复申明接口，请检查path和version，path:" + path + ", version:" + version);
-                } else {
-                    store.add(key);
-                }
-                apis.add(new ServiceApiInfo.ApiMeta(name, path, version));
-            }
-        }
-
         String appName = environment.getProperty("spring.application.name");
         if (appName == null) {
             throw new RuntimeException("请在application.properties中指定spring.application.name属性");
         }
+        List<ServiceApiInfo.ApiMeta> apis = this.buildApiMetaList(apiMappingHandlerMapping);
         // 排序
         Collections.sort(apis, new Comparator<ServiceApiInfo.ApiMeta>() {
             @Override
@@ -81,6 +54,49 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
         serviceApiInfo.setMd5(getMd5(apis));
 
         apiMetaManager.uploadApi(serviceApiInfo);
+    }
+
+    protected List<ServiceApiInfo.ApiMeta> buildApiMetaList(ApiMappingHandlerMapping apiMappingHandlerMapping) {
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = apiMappingHandlerMapping.getHandlerMethods();
+        Set<RequestMappingInfo> requestMappingInfos = handlerMethods.keySet();
+        List<String> store = new ArrayList<>();
+        List<ServiceApiInfo.ApiMeta> apis = new ArrayList<>(requestMappingInfos.size());
+
+        for (Map.Entry<RequestMappingInfo, HandlerMethod> handlerMethodEntry : handlerMethods.entrySet()) {
+            ServiceApiInfo.ApiMeta apiMeta = this.buildApiMeta(handlerMethodEntry);
+            if (apiMeta == null) {
+                continue;
+            }
+            String key = apiMeta.fetchNameVersion();
+            if (store.contains(key)) {
+                throw new RuntimeException("重复申明接口，请检查path和version，path:" + apiMeta.getPath() + ", version:" + apiMeta.getVersion());
+            } else {
+                store.add(key);
+            }
+            apis.add(apiMeta);
+        }
+        return apis;
+    }
+
+    protected ServiceApiInfo.ApiMeta buildApiMeta(Map.Entry<RequestMappingInfo, HandlerMethod> handlerMethodEntry) {
+        RequestMappingInfo requestMappingInfo = handlerMethodEntry.getKey();
+        Set<String> patterns = requestMappingInfo.getPatternsCondition().getPatterns();
+        RequestCondition<?> customCondition = requestMappingInfo.getCustomCondition();
+        if (customCondition instanceof ApiMappingRequestCondition) {
+            ApiMappingRequestCondition condition = (ApiMappingRequestCondition) customCondition;
+            ApiMappingInfo apiMappingInfo = condition.getApiMappingInfo();
+            String name = apiMappingInfo.getName();
+            String version = apiMappingInfo.getVersion();
+            String path = patterns.iterator().next();
+            // 不是ApiMapping注解的接口，name属性是null
+            if (name == null) {
+                name = buildName(path);
+            }
+            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, version);
+            apiMeta.setIgnoreValidate(apiMappingInfo.isIgnoreValidate());
+            return apiMeta;
+        }
+        return null;
     }
 
     protected String buildName(String path) {

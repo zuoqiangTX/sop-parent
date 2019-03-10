@@ -24,6 +24,8 @@ public class ServiceApiInfo {
         private String path;
         /** 版本号 */
         private String version;
+        /** 是否忽略验证 */
+        private boolean ignoreValidate;
 
         public ApiMeta() {
         }

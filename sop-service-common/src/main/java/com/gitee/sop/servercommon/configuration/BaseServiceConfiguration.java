@@ -4,6 +4,7 @@ import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.interceptor.ServiceContextInterceptor;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
+import com.gitee.sop.servercommon.manager.RequestMappingEvent;
 import com.gitee.sop.servercommon.manager.ServiceZookeeperApiMetaManager;
 import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
@@ -41,9 +42,17 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport {
      */
     @Override
     protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
-        ApiMetaManager apiMetaManager = new ServiceZookeeperApiMetaManager(environment);
-        DefaultRequestMappingEvent requestMappingEvent = new DefaultRequestMappingEvent(apiMetaManager, environment);
+        ApiMetaManager apiMetaManager = getApiMetaManager(environment);
+        RequestMappingEvent requestMappingEvent = getRequestMappingEvent(apiMetaManager, environment);
         return new ApiMappingHandlerMapping(requestMappingEvent);
+    }
+
+    protected RequestMappingEvent getRequestMappingEvent(ApiMetaManager apiMetaManager, Environment environment) {
+        return new DefaultRequestMappingEvent(apiMetaManager, environment);
+    }
+
+    protected ApiMetaManager getApiMetaManager(Environment environment) {
+        return new ServiceZookeeperApiMetaManager(environment);
     }
 
     @Bean

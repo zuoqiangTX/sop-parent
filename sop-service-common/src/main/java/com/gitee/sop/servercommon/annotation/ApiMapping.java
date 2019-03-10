@@ -28,6 +28,11 @@ public @interface ApiMapping {
     String version() default "";
 
     /**
+     * 忽略验证，业务参数除外
+     */
+    boolean ignoreValidate() default false;
+
+    /**
      * 接口名
      * Alias for {@link RequestMapping#value}.
      */

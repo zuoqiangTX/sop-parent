@@ -30,6 +30,9 @@ public class PostResultFilter extends BaseZuulFilter {
 
     @Override
     protected Object doRun(RequestContext requestContext) throws ZuulException {
+        if (requestContext.getResponse().isCommitted()) {
+            return null;
+        }
         InputStream responseDataStream = requestContext.getResponseDataStream();
         ApiConfig apiConfig = ApiContext.getApiConfig();
         ResultExecutor<RequestContext, String> resultExecutor = apiConfig.getZuulResultExecutor();

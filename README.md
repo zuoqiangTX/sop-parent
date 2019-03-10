@@ -35,11 +35,11 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - 秘钥管理
 - 微服务端自动验证（JSR-303）
 - 支持Spring Cloud Gateway
+- 关闭签名校验功能
+- 整合[easyopen](https://gitee.com/durcframework/easyopen)
 
 ## 后期规划
 
-- 关闭签名校验功能
-- 整合[easyopen](https://gitee.com/durcframework/easyopen)
 - 配置中心，Spring Cloud Config（Zookeeper）
 - Admin管理平台，统一管理微服务配置，管理路由信息，微服务上下线，API文档管理等功能
 

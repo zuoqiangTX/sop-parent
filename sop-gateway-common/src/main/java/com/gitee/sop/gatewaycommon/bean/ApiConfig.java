@@ -15,7 +15,7 @@ import com.gitee.sop.gatewaycommon.validate.ApiValidator;
 import com.gitee.sop.gatewaycommon.validate.Encrypter;
 import com.gitee.sop.gatewaycommon.validate.Signer;
 import com.gitee.sop.gatewaycommon.validate.Validator;
-import com.gitee.sop.gatewaycommon.zuul.configuration.BaseZuulController;
+import com.gitee.sop.gatewaycommon.zuul.configuration.ZuulErrorController;
 import com.gitee.sop.gatewaycommon.zuul.param.ZuulParamBuilder;
 import com.gitee.sop.gatewaycommon.zuul.result.ZuulResultExecutor;
 import com.netflix.zuul.context.RequestContext;
@@ -82,7 +82,10 @@ public class ApiConfig {
      */
     private SessionManager sessionManager = new ApiSessionManager();
 
-    private BaseZuulController baseZuulController = new BaseZuulController();
+    /**
+     * zuul网关全局异常处理
+     */
+    private ZuulErrorController zuulErrorController = new ZuulErrorController();
 
     /**
      * 错误模块

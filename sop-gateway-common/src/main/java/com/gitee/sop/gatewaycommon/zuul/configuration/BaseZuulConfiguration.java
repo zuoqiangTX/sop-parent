@@ -76,8 +76,8 @@ public class BaseZuulConfiguration {
     }
 
     @Bean
-    BaseZuulController baseZuulController() {
-        return ApiContext.getApiConfig().getBaseZuulController();
+    ZuulErrorController baseZuulController() {
+        return ApiContext.getApiConfig().getZuulErrorController();
     }
 
     @PostConstruct

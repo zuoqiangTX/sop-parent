@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @Slf4j
-public class BaseZuulController implements ErrorController {
+public class ZuulErrorController implements ErrorController {
 
     public static final String ERROR_PATH = "/error";
 

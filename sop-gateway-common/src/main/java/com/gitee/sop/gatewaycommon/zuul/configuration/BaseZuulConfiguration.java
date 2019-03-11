@@ -36,26 +36,31 @@ public class BaseZuulConfiguration {
     @Autowired
     protected RouteManager apiMetaManager;
 
-    @Bean
-    SopRouteLocator sopRouteLocator(ZuulRouteRepository zuulRouteRepository) {
-        return new SopRouteLocator(zuulRouteRepository);
-    }
-
-    @Bean
-    ZuulZookeeperRouteManager zuulZookeeperRouteManager(Environment environment, ZuulRouteRepository zuulRouteRepository) {
-        return new ZuulZookeeperRouteManager(environment, zuulRouteRepository);
-    }
-
+    /**
+     * 路由存储
+     * @return
+     */
     @Bean
     ZuulRouteRepository zuulRouteRepository() {
         return new ZuulRouteRepository();
     }
 
+    /**
+     * 路由获取
+     * @param zuulRouteRepository
+     * @return
+     */
     @Bean
-    PreValidateFilter preValidateFilter() {
-        return new PreValidateFilter();
+    SopRouteLocator sopRouteLocator(ZuulRouteRepository zuulRouteRepository) {
+        return new SopRouteLocator(zuulRouteRepository);
     }
 
+    /**
+     * 选取路由
+     * @param zuulRouteRepository
+     * @param proxyRequestHelper
+     * @return
+     */
     @Bean
     public PreDecorationFilter preDecorationFilter(ZuulRouteRepository zuulRouteRepository, ProxyRequestHelper proxyRequestHelper) {
         SopRouteLocator routeLocator = new SopRouteLocator(zuulRouteRepository);
@@ -65,16 +70,48 @@ public class BaseZuulConfiguration {
                 proxyRequestHelper);
     }
 
+    /**
+     * 路由管理
+     * @param environment
+     * @param zuulRouteRepository
+     * @return
+     */
+    @Bean
+    ZuulZookeeperRouteManager zuulZookeeperRouteManager(Environment environment, ZuulRouteRepository zuulRouteRepository) {
+        return new ZuulZookeeperRouteManager(environment, zuulRouteRepository);
+    }
+
+    /**
+     * 前置校验
+     * @return
+     */
+    @Bean
+    PreValidateFilter preValidateFilter() {
+        return new PreValidateFilter();
+    }
+
+    /**
+     * 错误处理扩展
+     * @return
+     */
     @Bean
     ErrorFilter errorFilter() {
         return new ErrorFilter();
     }
 
+    /**
+     * 结果返回
+     * @return
+     */
     @Bean
     PostResultFilter postResultFilter() {
         return new PostResultFilter();
     }
 
+    /**
+     * 统一错误处理
+     * @return
+     */
     @Bean
     ZuulErrorController baseZuulController() {
         return ApiContext.getApiConfig().getZuulErrorController();

@@ -1,6 +1,5 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
-import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -12,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 路由定位
  * @author tanghc
  */
 public class SopRouteLocator implements RouteLocator, Ordered {
@@ -32,6 +32,11 @@ public class SopRouteLocator implements RouteLocator, Ordered {
         return zuulRouteRepository.listAll();
     }
 
+    /**
+     * 这里决定使用哪个路由
+     * @param path
+     * @return
+     */
     @Override
     public Route getMatchingRoute(String path) {
         ApiParam param = ZuulContext.getApiParam();

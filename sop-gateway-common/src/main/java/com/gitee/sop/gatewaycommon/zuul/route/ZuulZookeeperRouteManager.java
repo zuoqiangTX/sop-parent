@@ -8,6 +8,7 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.core.env.Environment;
 
 /**
+ * 路由内容管理，新增活修改路由
  * @author tanghc
  */
 @Slf4j

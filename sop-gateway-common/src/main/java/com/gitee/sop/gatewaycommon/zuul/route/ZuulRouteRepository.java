@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 本地存放路由内容的地方
  * @author tanghc
  */
 public class ZuulRouteRepository implements RouteRepository<ZuulServiceRouteInfo, Route> {

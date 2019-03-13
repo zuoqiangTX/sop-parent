@@ -319,7 +319,7 @@ xblock{
 }
 
 .left-nav #nav li .sub-menu{
-    display: none;
+    display: block;
 }
 .left-nav #nav li .opened{
     display: block;

@@ -265,7 +265,7 @@ $(function () {
                 $(this).removeClass('open');
                 $(this).find('.nav_right').html('&#xe697;');
                 $(this).children('.sub-menu').stop().slideUp();
-                $(this).siblings().children('.sub-menu').slideUp();
+                // $(this).siblings().children('.sub-menu').slideUp();
             }else{
                 
 
@@ -278,9 +278,9 @@ $(function () {
                 $(this).addClass('open');
                 $(this).children('a').find('.nav_right').html('&#xe6a6;');
                 $(this).children('.sub-menu').stop().slideDown();
-                $(this).siblings().children('.sub-menu').stop().slideUp();
-                $(this).siblings().find('.nav_right').html('&#xe697;');
-                $(this).siblings().removeClass('open');
+                // $(this).siblings().children('.sub-menu').stop().slideUp();
+                // $(this).siblings().find('.nav_right').html('&#xe697;');
+                // $(this).siblings().removeClass('open');
             }
         }else{
 
@@ -330,13 +330,13 @@ $(function () {
     })
 
     // 左侧菜单记忆功能
-    if(getCookie('left_menu_father')!=null){
+    /*if(getCookie('left_menu_father')!=null){
         $('.left-nav #nav li').eq(getCookie('left_menu_father')).click();
     }
 
     if(getCookie('left_menu_son')!=null){
         $('.left-nav #nav li').eq(getCookie('left_menu_son')).click();
-    }
+    }*/
      
      
      

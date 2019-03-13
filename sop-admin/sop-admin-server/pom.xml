@@ -24,6 +24,12 @@
 	</properties>
 
 	<dependencies>
+		<!-- 将前端页面打包成webjars，然后打开注释
+		<dependency>
+			<groupId>com.gitee.sop</groupId>
+			<artifactId>sop-admin-front</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>-->
 		<!-- easyopen starter -->
 		<dependency>
 			<groupId>net.oschina.durcframework</groupId>

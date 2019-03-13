@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SopAdminServerSpringbootApplication {
+public class SopAdminServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SopAdminServerSpringbootApplication.class, args);
+		SpringApplication.run(SopAdminServerApplication.class, args);
 	}
 }

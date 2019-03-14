@@ -36,6 +36,12 @@
 			<artifactId>easyopen-spring-boot-starter</artifactId>
 			<version>1.16.0</version>
 		</dependency>
+		<!-- zookeeper客户端 -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<version>4.2.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

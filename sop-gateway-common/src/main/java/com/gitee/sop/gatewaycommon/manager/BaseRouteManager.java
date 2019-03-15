@@ -32,7 +32,7 @@ import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PA
  *
  * @param <R> 路由根对象，可以理解为最外面的大json：{....,routeDefinitionList:[]}
  * @param <E> 路由Item对象，对应大json里面的具体路由信息，routeDefinitionList:[]
- * @param <T> 目标路由对象，返回最终的路由对象
+ * @param <T> 目标路由对象
  * @author tanghc
  */
 @Slf4j

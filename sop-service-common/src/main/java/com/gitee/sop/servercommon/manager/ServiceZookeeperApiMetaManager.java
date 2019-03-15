@@ -174,6 +174,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         // 保存路径
         String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getServiceId();
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
+        log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
         this.saveNode(client, savePath, serviceRouteInfoJson.getBytes());
         return savePath;
     }
@@ -190,6 +191,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
             // 父目录/子目录
             String savePath = parentPath + PATH_START_CHAR + routeDefinition.getId();
             String routeDefinitionJson = JSON.toJSONString(routeDefinition);
+            log.info("上传路由配置到zookeeper，路径:{}，路由数据:{}", savePath, routeDefinitionJson);
             this.saveNode(client, savePath, routeDefinitionJson.getBytes());
         }
     }

@@ -1,13 +1,17 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteManager;
+import com.gitee.sop.gatewaycommon.manager.RouteRepository;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
+import com.gitee.sop.gatewaycommon.zuul.route.ZuulTargetRoute;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulZookeeperRouteManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -42,7 +46,9 @@ public class BaseZuulConfiguration {
      */
     @Bean
     ZuulRouteRepository zuulRouteRepository() {
-        return new ZuulRouteRepository();
+        ZuulRouteRepository zuulRouteRepository = new ZuulRouteRepository();
+        RouteRepositoryContext.setRouteRepository(zuulRouteRepository);
+        return zuulRouteRepository;
     }
 
     /**

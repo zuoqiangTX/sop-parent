@@ -7,6 +7,5 @@ import lombok.Data;
 /**
  * @author thc
  */
-@Data
 public class ZuulServiceRouteInfo extends BaseServiceRouteInfo<ZuulRouteDefinition> {
 }

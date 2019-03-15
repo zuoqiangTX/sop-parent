@@ -9,6 +9,7 @@ import org.springframework.core.Ordered;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 路由定位
@@ -29,7 +30,10 @@ public class SopRouteLocator implements RouteLocator, Ordered {
 
     @Override
     public List<Route> getRoutes() {
-        return zuulRouteRepository.listAll();
+        return zuulRouteRepository.listAll()
+                .parallelStream()
+                .map(zuulTargetRoute -> zuulTargetRoute.getTargetRouteDefinition())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -41,7 +45,11 @@ public class SopRouteLocator implements RouteLocator, Ordered {
     public Route getMatchingRoute(String path) {
         ApiParam param = ZuulContext.getApiParam();
         String nameVersion = param.fetchNameVersion();
-        return zuulRouteRepository.get(nameVersion);
+        ZuulTargetRoute zuulTargetRoute = zuulRouteRepository.get(nameVersion);
+        if (zuulTargetRoute == null) {
+            return null;
+        }
+        return zuulTargetRoute.getTargetRouteDefinition();
     }
 
     @Override

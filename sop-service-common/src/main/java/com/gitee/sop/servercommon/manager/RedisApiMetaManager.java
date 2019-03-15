@@ -20,9 +20,9 @@ public class RedisApiMetaManager implements ApiMetaManager {
 
     @Override
     public void uploadApi(ServiceApiInfo serviceApiInfo) {
-        log.info("上传接口信息到Redis，appName：{}, md5：{}, 接口数量：{}", serviceApiInfo.getAppName(), serviceApiInfo.getMd5(), serviceApiInfo.getApis().size());
+        log.info("上传接口信息到Redis，serviceId：{}, 接口数量：{}", serviceApiInfo.getServiceId(), serviceApiInfo.getApis().size());
         String serviceApiInfoJson = JSON.toJSONString(serviceApiInfo);
-        redisTemplate.opsForHash().put(API_STORE_KEY, serviceApiInfo.getAppName(), serviceApiInfoJson);
+        redisTemplate.opsForHash().put(API_STORE_KEY, serviceApiInfo.getServiceId(), serviceApiInfoJson);
         // 发送订阅事件
         redisTemplate.convertAndSend(API_CHANGE_CHANNEL, serviceApiInfoJson);
     }

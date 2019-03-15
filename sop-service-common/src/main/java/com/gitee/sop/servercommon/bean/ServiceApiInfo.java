@@ -1,6 +1,5 @@
 package com.gitee.sop.servercommon.bean;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
 import lombok.Data;
 
@@ -11,8 +10,7 @@ import java.util.List;
  */
 @Data
 public class ServiceApiInfo {
-    private String md5;
-    private String appName;
+    private String serviceId;
     private List<ApiMeta> apis;
     private List<GatewayRouteDefinition> routeDefinitionList;
 

@@ -35,8 +35,8 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
 
     @Override
     public void onRegisterSuccess(ApiMappingHandlerMapping apiMappingHandlerMapping) {
-        String appName = environment.getProperty("spring.application.name");
-        if (appName == null) {
+        String serviceId = environment.getProperty("spring.application.name");
+        if (serviceId == null) {
             throw new RuntimeException("请在application.properties中指定spring.application.name属性");
         }
         List<ServiceApiInfo.ApiMeta> apis = this.buildApiMetaList(apiMappingHandlerMapping);
@@ -49,9 +49,8 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
         });
 
         ServiceApiInfo serviceApiInfo = new ServiceApiInfo();
-        serviceApiInfo.setAppName(appName);
+        serviceApiInfo.setServiceId(serviceId);
         serviceApiInfo.setApis(apis);
-        serviceApiInfo.setMd5(getMd5(apis));
 
         apiMetaManager.uploadApi(serviceApiInfo);
     }
@@ -106,11 +105,4 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
         return path;
     }
 
-    protected String getMd5(List<ServiceApiInfo.ApiMeta> apis) {
-        StringBuilder sb = new StringBuilder();
-        for (ServiceApiInfo.ApiMeta api : apis) {
-            sb.append(api.fetchNameVersion());
-        }
-        return DigestUtils.md5DigestAsHex(sb.toString().getBytes());
-    }
 }

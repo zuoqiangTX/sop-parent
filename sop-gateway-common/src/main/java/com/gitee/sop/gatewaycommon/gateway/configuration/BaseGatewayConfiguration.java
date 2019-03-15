@@ -9,6 +9,7 @@ import com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteRepository;
 import com.gitee.sop.gatewaycommon.gateway.route.NameVersionRoutePredicateFactory;
 import com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory;
 import com.gitee.sop.gatewaycommon.gateway.route.GatewayZookeeperRouteManager;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +98,9 @@ public class BaseGatewayConfiguration {
 
     @Bean
     GatewayRouteRepository gatewayRouteRepository() {
-        return new GatewayRouteRepository();
+        GatewayRouteRepository gatewayRouteRepository = new GatewayRouteRepository();
+        RouteRepositoryContext.setRouteRepository(gatewayRouteRepository);
+        return gatewayRouteRepository;
     }
 
 

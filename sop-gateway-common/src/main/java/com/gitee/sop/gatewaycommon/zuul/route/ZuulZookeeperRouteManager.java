@@ -9,12 +9,13 @@ import org.springframework.core.env.Environment;
 
 /**
  * 路由内容管理，新增活修改路由
+ *
  * @author tanghc
  */
 @Slf4j
-public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRouteInfo, ZuulRouteDefinition, Route> {
+public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRouteInfo, ZuulRouteDefinition, ZuulTargetRoute> {
 
-    public ZuulZookeeperRouteManager(Environment environment, RouteRepository<ZuulServiceRouteInfo, Route> routeRepository) {
+    public ZuulZookeeperRouteManager(Environment environment, RouteRepository<ZuulTargetRoute> routeRepository) {
         super(environment, routeRepository);
     }
 
@@ -24,7 +25,13 @@ public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRoute
     }
 
     @Override
-    protected Route buildRouteDefinition(ZuulServiceRouteInfo serviceRouteInfo, ZuulRouteDefinition routeDefinition) {
-        return new Route(routeDefinition.getId(), RoutePathUtil.findPath(routeDefinition.getUri()), serviceRouteInfo.getAppName(), null, false, null);
+    protected Class<ZuulRouteDefinition> getRouteDefinitionClass() {
+        return ZuulRouteDefinition.class;
+    }
+
+    @Override
+    protected ZuulTargetRoute buildRouteDefinition(ZuulServiceRouteInfo serviceRouteInfo, ZuulRouteDefinition routeDefinition) {
+        Route route = new Route(routeDefinition.getId(), RoutePathUtil.findPath(routeDefinition.getUri()), serviceRouteInfo.getServiceId(), null, false, null);
+        return new ZuulTargetRoute(serviceRouteInfo, routeDefinition, route);
     }
 }

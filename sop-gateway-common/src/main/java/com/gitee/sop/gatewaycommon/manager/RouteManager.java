@@ -6,8 +6,6 @@ package com.gitee.sop.gatewaycommon.manager;
  */
 public interface RouteManager {
 
-    String API_STORE_KEY = "com.gitee.sop.api";
-
     /**
      * 刷新素有的微服务接口信息
      */

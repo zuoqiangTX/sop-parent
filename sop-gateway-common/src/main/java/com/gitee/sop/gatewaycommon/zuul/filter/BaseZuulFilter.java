@@ -87,7 +87,7 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     /**
      * to classify a filter by type. Standard types in Zuul are "pre" for pre-routing filtering,
-     * "route" for routing to an origin, "post" for post-routing filters, "error" for error handling.
+     * "routeDefinition" for routing to an origin, "post" for post-routing filters, "error" for error handling.
      * We also support a "static" type for static responses see  StaticResponseFilter.
      * Any filterType made be created or added and doRun by calling FilterProcessor.runFilters(type)
      */
@@ -95,7 +95,7 @@ public abstract class BaseZuulFilter extends ZuulFilter {
         /** zuul过滤器pre类型 */
         PRE("pre"),
         /** zuul过滤器route类型 */
-        ROUTE("route"),
+        ROUTE("routeDefinition"),
         /** zuul过滤器post类型 */
         POST("post"),
         /** zuul过滤器error类型 */

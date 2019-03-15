@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 上传路由到zookeeper
  * @author tanghc
  */
 @Slf4j
@@ -35,11 +36,11 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     /**
      * NameVersion=alipay.story.get1.0
-     * see com.gitee.sop.gatewaycommon.route.NameVersionRoutePredicateFactory
+     * see com.gitee.sop.gatewaycommon.routeDefinition.NameVersionRoutePredicateFactory
      */
     private static String QUERY_PREDICATE_DEFINITION_TPL = "NameVersion=%s";
 
-    private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_" + System.currentTimeMillis() + "_", "/", "0.0");
+    private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
 
     private Environment environment;
 
@@ -68,27 +69,27 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
             routeDefinitionList.add(gatewayRouteDefinition);
         }
         ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
-        serviceRouteInfo.setAppName(serviceApiInfo.getAppName());
+        serviceRouteInfo.setServiceId(serviceApiInfo.getServiceId());
         serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
-        serviceRouteInfo.setMd5(serviceApiInfo.getMd5());
         return serviceRouteInfo;
     }
 
     /**
-     * 添加com.gitee.sop.gatewaycommon.route.ReadBodyRoutePredicateFactory,解决form表单获取不到问题
+     * 添加com.gitee.sop.gatewaycommon.routeDefinition.ReadBodyRoutePredicateFactory,解决form表单获取不到问题
      *
      * @return
      */
     protected GatewayRouteDefinition buildReadBodyRouteDefinition(ServiceApiInfo serviceApiInfo) {
-        GatewayRouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
+        GatewayRouteDefinition readBodyRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
+        readBodyRouteDefinition.setOrder(Integer.MIN_VALUE);
 
         GatewayPredicateDefinition gatewayPredicateDefinition = new GatewayPredicateDefinition();
         gatewayPredicateDefinition.setName("ReadBody");
         GatewayPredicateDefinition readerBodyPredicateDefinition = this.buildNameVersionPredicateDefinition(FIRST_API_META);
         List<GatewayPredicateDefinition> predicates = Arrays.asList(gatewayPredicateDefinition, readerBodyPredicateDefinition);
-        gatewayRouteDefinition.setPredicates(predicates);
+        readBodyRouteDefinition.setPredicates(predicates);
 
-        return gatewayRouteDefinition;
+        return readBodyRouteDefinition;
     }
 
     protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
@@ -114,7 +115,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         if (!servletPath.startsWith(PATH_START_CHAR)) {
             servletPath = PATH_START_CHAR + servletPath;
         }
-        return "lb://" + serviceApiInfo.getAppName() + "#" + servletPath;
+        return "lb://" + serviceApiInfo.getServiceId() + "#" + servletPath;
     }
 
     protected String getServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
@@ -135,11 +136,10 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         if (StringUtils.isEmpty(zookeeperServerAddr)) {
             throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
         }
-        String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         CuratorFramework client = null;
         try {
             // 保存路径
-            String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getAppName();
+            String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getServiceId();
 
             client = CuratorFrameworkFactory.builder()
                     .connectString(zookeeperServerAddr)
@@ -148,25 +148,59 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
             client.start();
 
-            log.info("上传接口信息到zookeeper，path:{}, appName：{}, md5：{}, 接口数量：{}",
+            log.info("上传接口信息到zookeeper，path:{}, serviceId：{}, 接口数量：{}",
                     savePath,
-                    serviceRouteInfo.getAppName(),
-                    serviceRouteInfo.getMd5(),
+                    serviceRouteInfo.getServiceId(),
                     serviceRouteInfo.getRouteDefinitionList().size());
 
-            client.create()
-                    // 如果节点存在则Curator将会使用给出的数据设置这个节点的值
-                    .orSetData()
-                    // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
-                    .creatingParentContainersIfNeeded()
-                    .forPath(savePath, serviceRouteInfoJson.getBytes());
+            String parentPath = this.uploadFolder(client, serviceRouteInfo);
+            this.uploadRouteItems(client, serviceRouteInfo, parentPath);
         } catch (Exception e) {
-            log.error("更新接口信息到zookeeper失败, appName:{}", serviceRouteInfo.getAppName(), e);
+            log.error("更新接口信息到zookeeper失败, serviceId:{}", serviceRouteInfo.getServiceId(), e);
         } finally {
             if (client != null) {
                 client.close();
             }
         }
+    }
+
+    /**
+     * 上传文件夹内容
+     * @param client
+     * @param serviceRouteInfo
+     * @return 返回文件夹路径
+     */
+    protected String uploadFolder(CuratorFramework client, ServiceRouteInfo serviceRouteInfo) throws Exception {
+        // 保存路径
+        String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getServiceId();
+        String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
+        this.saveNode(client, savePath, serviceRouteInfoJson.getBytes());
+        return savePath;
+    }
+
+    /**
+     * 上传路由信息
+     * @param client
+     * @param serviceRouteInfo
+     * @throws Exception
+     */
+    protected void uploadRouteItems(CuratorFramework client, ServiceRouteInfo serviceRouteInfo, String parentPath) throws Exception {
+        List<GatewayRouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
+        for (GatewayRouteDefinition routeDefinition : routeDefinitionList) {
+            // 父目录/子目录
+            String savePath = parentPath + PATH_START_CHAR + routeDefinition.getId();
+            String routeDefinitionJson = JSON.toJSONString(routeDefinition);
+            this.saveNode(client, savePath, routeDefinitionJson.getBytes());
+        }
+    }
+
+    protected void saveNode(CuratorFramework client, String path, byte[] data) throws Exception {
+        client.create()
+                // 如果节点存在则Curator将会使用给出的数据设置这个节点的值
+                .orSetData()
+                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
+                .creatingParentContainersIfNeeded()
+                .forPath(path, data);
     }
 
 }

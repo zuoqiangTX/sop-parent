@@ -21,9 +21,9 @@ import java.util.List;
  */
 @Getter
 @Slf4j
-public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServiceRouteInfo, GatewayRouteDefinition, RouteDefinition> {
+public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServiceRouteInfo, GatewayRouteDefinition, GatewayTargetRoute> {
 
-    public GatewayZookeeperRouteManager(Environment environment, RouteRepository<GatewayServiceRouteInfo, RouteDefinition> routeRepository) {
+    public GatewayZookeeperRouteManager(Environment environment, RouteRepository<GatewayTargetRoute> routeRepository) {
         super(environment, routeRepository);
     }
 
@@ -33,7 +33,12 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
     }
 
     @Override
-    protected RouteDefinition buildRouteDefinition(GatewayServiceRouteInfo serviceRouteInfo,GatewayRouteDefinition gatewayRouteDefinition) {
+    protected Class<GatewayRouteDefinition> getRouteDefinitionClass() {
+        return GatewayRouteDefinition.class;
+    }
+
+    @Override
+    protected GatewayTargetRoute buildRouteDefinition(GatewayServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
         RouteDefinition routeDefinition = new RouteDefinition();
         routeDefinition.setId(gatewayRouteDefinition.getId());
         routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri()));
@@ -54,7 +59,7 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
 
         routeDefinition.setFilters(filterDefinitionList);
         routeDefinition.setPredicates(predicateDefinitionList);
-        return routeDefinition;
+        return new GatewayTargetRoute(serviceRouteInfo, gatewayRouteDefinition, routeDefinition);
     }
 
 }

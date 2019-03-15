@@ -1,5 +1,6 @@
 package com.gitee.sop.servercommon.route;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.List;
  */
 @Data
 public class ServiceRouteInfo {
-    private String appName;
-    private String md5;
+    /** 服务名称，对应spring.application.name */
+    private String serviceId;
+    @JSONField(serialize = false)
     private List<GatewayRouteDefinition> routeDefinitionList;
 }

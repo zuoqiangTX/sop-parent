@@ -1,6 +1,5 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
-import com.gitee.sop.gatewaycommon.bean.ServiceRouteRepository;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -13,19 +12,23 @@ import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.handler.predicate.RoutePredicateFactory;
 import org.springframework.cloud.gateway.route.InMemoryRouteDefinitionRepository;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.ConfigurationUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.Validator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.synchronizedMap;
 
 /**
  * 路由存储管理，负责动态更新路由
@@ -33,19 +36,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author thc
  */
 @Slf4j
-public class GatewayRouteRepository extends InMemoryRouteDefinitionRepository
-        implements ApplicationEventPublisherAware,
+public class GatewayRouteRepository implements ApplicationEventPublisherAware,
+        RouteDefinitionRepository,
         BeanFactoryAware,
-        RouteRepository<GatewayServiceRouteInfo, RouteDefinition> {
+        RouteRepository<GatewayTargetRoute> {
+
+    private final Map<String, GatewayTargetRoute> routes = synchronizedMap(new LinkedHashMap<>());
 
     private final SpelExpressionParser parser = new SpelExpressionParser();
-
-    private ServiceRouteRepository<GatewayServiceRouteInfo, RouteDefinition> serviceRouteRepository = new ServiceRouteRepository<GatewayServiceRouteInfo, RouteDefinition>() {
-        @Override
-        public String getServiceId(GatewayServiceRouteInfo serviceRouteInfo) {
-            return serviceRouteInfo.getAppName();
-        }
-    };
 
     @Autowired
     private ConversionService conversionService;
@@ -57,31 +55,54 @@ public class GatewayRouteRepository extends InMemoryRouteDefinitionRepository
 
     private BeanFactory beanFactory;
 
+    @Override
+    public Flux<RouteDefinition> getRouteDefinitions() {
+        List<RouteDefinition> list = routes.values().parallelStream()
+                .map(targetRoute -> targetRoute.getTargetRouteDefinition())
+                .collect(Collectors.toList());
+        return Flux.fromIterable(list);
+    }
+
+    @Override
+    public Mono<Void> save(Mono<RouteDefinition> route) {
+        return null;
+    }
+
+    @Override
+    public Mono<Void> delete(Mono<String> routeId) {
+        return null;
+    }
+
     /**
      * 根据ID获取路由
      */
     @Override
-    public RouteDefinition get(String id) {
-        return getRouteDefinitions()
-                .filter(routeDefinition -> {
-                    return routeDefinition.getId().equals(id);
-                }).blockFirst();
+    public GatewayTargetRoute get(String id) {
+        return routes.get(id);
     }
 
     /**
      * 增加路由
      */
     @Override
-    public String add(GatewayServiceRouteInfo serviceRouteInfo, RouteDefinition definition) {
-        super.save(Mono.just(definition)).subscribe();
-        serviceRouteRepository.saveRouteDefinition(serviceRouteInfo, definition);
-        this.initPredicateDefinition(definition);
+    public String add(GatewayTargetRoute targetRoute) {
+        GatewayRouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
+        routes.put(baseRouteDefinition.getId(), targetRoute);
+        this.initPredicateDefinition(targetRoute);
         this.publisher.publishEvent(new RefreshRoutesEvent(this));
         return "success";
     }
 
-    protected void initPredicateDefinition(RouteDefinition definition) {
-        for (PredicateDefinition predicate : definition.getPredicates()) {
+    @Override
+    public void update(GatewayTargetRoute targetRoute) {
+        GatewayRouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
+        routes.put(baseRouteDefinition.getId(), targetRoute);
+    }
+
+    protected void initPredicateDefinition(GatewayTargetRoute targetRoute) {
+        GatewayRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        RouteDefinition targetRouteDefinition = targetRoute.getTargetRouteDefinition();
+        for (PredicateDefinition predicate : targetRouteDefinition.getPredicates()) {
             Map<String, String> args = predicate.getArgs();
             if (!args.isEmpty()) {
                 RoutePredicateFactory<NameVersionRoutePredicateFactory.Config> factory = new NameVersionRoutePredicateFactory();
@@ -89,7 +110,7 @@ public class GatewayRouteRepository extends InMemoryRouteDefinitionRepository
                 Object config = factory.newConfig();
                 ConfigurationUtils.bind(config, properties, factory.shortcutFieldPrefix(), predicate.getName(),
                         validator, conversionService);
-                this.publisher.publishEvent(new PredicateArgsEvent(this, definition.getId(), properties));
+                this.publisher.publishEvent(new PredicateArgsEvent(this, routeDefinition.getId(), properties));
             }
         }
 
@@ -100,15 +121,19 @@ public class GatewayRouteRepository extends InMemoryRouteDefinitionRepository
      */
     @Override
     public void delete(String id) {
-        super.delete(Mono.just(id));
+        routes.remove(id);
         this.publisher.publishEvent(new PredicateArgsEvent(this, id, Collections.emptyMap()));
     }
 
     @Override
-    public void deleteAll(GatewayServiceRouteInfo serviceRouteInfo) {
-        serviceRouteRepository.deleteAll(serviceRouteInfo, routeDefinition -> {
-            this.delete(routeDefinition.getId());
-        });
+    public void deleteAll(String serviceId) {
+        List<String> idList = this.routes.values().stream()
+                .map(zuulTargetRoute -> zuulTargetRoute.getRouteDefinition().getId())
+                .collect(Collectors.toList());
+
+        for (String id : idList) {
+            this.delete(id);
+        }
     }
 
     @Override

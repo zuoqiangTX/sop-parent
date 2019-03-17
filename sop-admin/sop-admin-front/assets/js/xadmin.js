@@ -342,6 +342,7 @@ $(function () {
      
     
 })
+
 var cateIds = [];
 function getCateId(cateId) {
     

@@ -26,4 +26,9 @@ public class BaseRouteDefinition {
      * 是否忽略验证，业务参数验证除外
      */
     private boolean ignoreValidate;
+
+    /**
+     * 是否禁用
+     */
+    private boolean disabled;
 }

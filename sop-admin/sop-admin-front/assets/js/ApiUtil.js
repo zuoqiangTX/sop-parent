@@ -23,9 +23,31 @@ var ApiUtil = (function () {
                 url: url + uri
                 , data: params // 请求参数
                 , callback: function (resp) { // 成功回调
-                    callback(resp);
+                    var code = resp.code
+                    if (!code || code === '-9') {
+                        layer.alert('系统错误');
+                        return
+                    }
+                    if (code === '-100' || code === '18' || code === '21') { // 未登录
+                        ApiUtil.logout()
+                        return
+                    }
+                    if (code === '0') { // 成功
+                        callback(resp)
+                    } else {
+                        layer.alert(resp.msg);
+                    }
                 }
             });
+        }
+        , getUrl: function () {
+            return url;
+        }
+        , createUrl: function (uri) {
+            if (!uri) {
+                throw new Error('name不能为空');
+            }
+            return url + formatUri(uri);
         }
     }
 })();

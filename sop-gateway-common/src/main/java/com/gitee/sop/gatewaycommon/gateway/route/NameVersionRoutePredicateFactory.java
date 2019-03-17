@@ -1,6 +1,8 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +61,14 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             String nameVersion = config.param;
             String name = params.getOrDefault(ParamNames.API_NAME, "");
             String version = params.getOrDefault(ParamNames.VERSION_NAME, "");
-            return (name + version).equals(nameVersion);
+            boolean match = (name + version).equals(nameVersion);
+            if (match) {
+                TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(nameVersion);
+                if (targetRoute != null && targetRoute.getRouteDefinition().isDisabled()) {
+                    return false;
+                }
+            }
+            return match;
         };
     }
 

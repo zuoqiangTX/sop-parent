@@ -16,6 +16,7 @@ public class CuratorTest extends TestCase {
 
     /**
      * 递归删除节点，只能在测试环境用。
+     *
      * @throws Exception
      */
     public void testDel() throws Exception {
@@ -26,6 +27,21 @@ public class CuratorTest extends TestCase {
 
         client.start();
 
-        client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH);
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH);
+        } catch (Exception e) {
+        }
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-default");
+        } catch (Exception e) {
+        }
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-dev");
+        } catch (Exception e) {
+        }
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-test");
+        } catch (Exception e) {
+        }
     }
 }

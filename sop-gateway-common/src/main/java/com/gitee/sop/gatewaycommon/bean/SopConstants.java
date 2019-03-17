@@ -34,5 +34,5 @@ public class SopConstants {
     /**
      * zookeeper存放接口路由信息的根目录
      */
-    public static final String SOP_SERVICE_ROUTE_PATH = "/sop-service-route";
+    public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
 }

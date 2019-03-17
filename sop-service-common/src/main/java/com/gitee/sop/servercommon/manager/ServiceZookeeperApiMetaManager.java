@@ -31,7 +31,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * zookeeper存放接口路由信息的根目录
      */
-    public static final String SOP_SERVICE_ROUTE_PATH = "/sop-service-route";
+    public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
     public static final String PATH_START_CHAR = "/";
 
     /**
@@ -42,10 +42,14 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
 
+    private final String routeRootPath;
+
     private Environment environment;
 
     public ServiceZookeeperApiMetaManager(Environment environment) {
         this.environment = environment;
+        String profile = environment.getProperty("spring.profiles.active", "default");
+        this.routeRootPath = SOP_SERVICE_ROUTE_PATH + "-" + profile;
     }
 
     @Override
@@ -70,6 +74,8 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         }
         ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
         serviceRouteInfo.setServiceId(serviceApiInfo.getServiceId());
+        String description = environment.getProperty("spring.application.description");
+        serviceRouteInfo.setDescription(description);
         serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
         return serviceRouteInfo;
     }
@@ -133,13 +139,14 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     protected void uploadServiceRouteInfoToZookeeper(ServiceRouteInfo serviceRouteInfo) {
         String zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
+        String profile = environment.getProperty("spring.profiles.active", "default");
         if (StringUtils.isEmpty(zookeeperServerAddr)) {
             throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
         }
         CuratorFramework client = null;
         try {
             // 保存路径
-            String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getServiceId();
+            String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
 
             client = CuratorFrameworkFactory.builder()
                     .connectString(zookeeperServerAddr)
@@ -172,7 +179,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     protected String uploadFolder(CuratorFramework client, ServiceRouteInfo serviceRouteInfo) throws Exception {
         // 保存路径
-        String savePath = SOP_SERVICE_ROUTE_PATH + "/" + serviceRouteInfo.getServiceId();
+        String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
         this.saveNode(client, savePath, serviceRouteInfoJson.getBytes());

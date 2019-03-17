@@ -1,4 +1,4 @@
-package com.gitee.sop.adminserver.api.result;
+package com.gitee.sop.adminserver.api.demo.result;
 
 import com.gitee.easyopen.doc.DataType;
 import com.gitee.easyopen.doc.annotation.ApiDocField;

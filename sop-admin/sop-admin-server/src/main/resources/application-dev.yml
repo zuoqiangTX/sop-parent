@@ -1,0 +1,27 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: sop-admin
+
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+      baseSleepTimeMs: 3000
+      maxRetries: 3
+
+easyopen:
+  show-doc: true
+  mono: false
+  ignore-validate: true
+
+sop-admin:
+  profiles: default,prod,dev,test
+
+
+logging:
+  level:
+    com:
+      gitee: debug
+

@@ -1,4 +1,4 @@
-package com.gitee.sop.servercommon.route;
+package com.gitee.sop.adminserver.bean;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class GatewayRouteDefinition {
     /** 路由的Id */
-    private String id;
+    private String id = "";
     /** 路由断言集合配置 */
     private List<GatewayPredicateDefinition> predicates = new ArrayList<>();
     /** 路由过滤器集合配置 */
@@ -22,9 +22,4 @@ public class GatewayRouteDefinition {
     private int order = 0;
     /** 是否忽略验证，业务参数验证除外 */
     private boolean ignoreValidate;
-
-    /**
-     * 是否禁用
-     */
-    private boolean disabled;
 }

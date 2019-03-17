@@ -1,12 +1,12 @@
-package com.gitee.sop.adminserver.api;
+package com.gitee.sop.adminserver.api.demo;
 
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.sop.adminserver.api.param.GoodsParam;
-import com.gitee.sop.adminserver.api.result.Goods;
+import com.gitee.sop.adminserver.api.demo.param.GoodsParam;
+import com.gitee.sop.adminserver.api.demo.result.Goods;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

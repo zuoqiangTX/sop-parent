@@ -1,4 +1,4 @@
-package com.gitee.sop.adminserver.api;
+package com.gitee.sop.adminserver.api.config;
 
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -7,7 +7,8 @@ import com.gitee.easyopen.doc.annotation.ApiDoc;
  * @author tanghc
  */
 @ApiService
-@ApiDoc("路由列表")
-public class RouteListApi {
+@ApiDoc("配置列表")
+public class ConfigListApi {
 
+//    public
 }

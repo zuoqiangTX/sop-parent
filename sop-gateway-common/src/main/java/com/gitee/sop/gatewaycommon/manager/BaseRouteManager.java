@@ -23,7 +23,7 @@ import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PA
 /**
  * 路由管理，采用zookeeper实现，监听路由的增删改，并适时更新到本地。路由的存储格式为：
  * <pre>
- * /sop-service-route  根节点
+ * /com.gitee.sop.route  根节点
  *      /serviceId       服务节点，名字为服务名
  *          /route1      路由节点，名字为：name+version，存放路由信息
  *          /route2
@@ -38,11 +38,11 @@ import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PA
 @Slf4j
 public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E extends BaseRouteDefinition, T extends TargetRoute> implements RouteManager {
 
-    protected String sopRouteRootPath = SOP_SERVICE_ROUTE_PATH;
-
     protected Environment environment;
 
     protected RouteRepository<T> routeRepository;
+
+    protected String routeRootPath;
 
     /**
      * 返回路由根对象class
@@ -70,12 +70,15 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
     public BaseRouteManager(Environment environment, RouteRepository<T> routeRepository) {
         this.environment = environment;
         this.routeRepository = routeRepository;
+        String profile = environment.getProperty("spring.profiles.active", "default");
+        this.routeRootPath = SOP_SERVICE_ROUTE_PATH + "-" + profile;
     }
 
     @Override
     public void refresh() {
         try {
             String zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
+            String profile = environment.getProperty("spring.profiles.active", "default");
             if (StringUtils.isEmpty(zookeeperServerAddr)) {
                 throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
             }
@@ -91,9 +94,9 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
                     .orSetData()
                     // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
                     .creatingParentContainersIfNeeded()
-                    .forPath(sopRouteRootPath, "".getBytes());
+                    .forPath(routeRootPath, "".getBytes());
 
-            this.watchServiceChange(client, sopRouteRootPath);
+            this.watchServiceChange(client, routeRootPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,13 +106,13 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
      * 监听微服务更改
      *
      * @param client
-     * @param sopRouteRootPath
+     * @param rootPath
      * @throws Exception
      */
-    protected void watchServiceChange(CuratorFramework client, String sopRouteRootPath) throws Exception {
+    protected void watchServiceChange(CuratorFramework client, String rootPath) throws Exception {
         // 为子节点添加watcher
         // PathChildrenCache: 监听数据节点的增删改，可以设置触发的事件
-        PathChildrenCache childrenCache = new PathChildrenCache(client, sopRouteRootPath, true);
+        PathChildrenCache childrenCache = new PathChildrenCache(client, rootPath, true);
 
         /**
          * StartMode: 初始化方式
@@ -122,7 +125,7 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
         // 列出子节点数据列表，需要使用BUILD_INITIAL_CACHE同步初始化模式才能获得，异步是获取不到的
         List<ChildData> childDataList = childrenCache.getCurrentData();
         log.info("========== 加载路由信息 ==========");
-        log.info("{}  # 根节点", this.sopRouteRootPath);
+        log.info("{}  # 根节点", rootPath);
         for (ChildData childData : childDataList) {
             String serviceNodeData = new String(childData.getData());
             R serviceRouteInfo = JSON.parseObject(serviceNodeData, getServiceRouteInfoClass());
@@ -130,7 +133,7 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
             log.info("\t{}  # service节点，节点数据:{}", servicePath, serviceNodeData);
             this.loadServiceRouteItem(client, serviceRouteInfo, servicePath);
         }
-        log.info("监听服务节点增删改，rootPath:{}", this.sopRouteRootPath);
+        log.info("监听服务节点增删改，rootPath:{}", rootPath);
         // 监听根节点下面的子节点
         childrenCache.getListenable().addListener(new PathChildrenCacheListener() {
             @Override

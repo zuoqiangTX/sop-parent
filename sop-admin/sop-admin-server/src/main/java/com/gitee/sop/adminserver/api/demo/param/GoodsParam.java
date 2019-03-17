@@ -1,4 +1,4 @@
-package com.gitee.sop.adminserver.api.param;
+package com.gitee.sop.adminserver.api.demo.param;
 
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import org.hibernate.validator.constraints.Length;

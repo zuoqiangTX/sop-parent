@@ -49,6 +49,9 @@ public class SopRouteLocator implements RouteLocator, Ordered {
         if (zuulTargetRoute == null) {
             return null;
         }
+        if (zuulTargetRoute.getRouteDefinition().isDisabled()) {
+            return null;
+        }
         return zuulTargetRoute.getTargetRouteDefinition();
     }
 

@@ -43,11 +43,43 @@
         <div class="layui-btn-group demoTable">
             <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="addRoute">添加路由</button>
         </div>
-        <table class="layui-hide" id="table"></table>
-        <script type="text/html" id="optBar">
+        <table class="layui-hide" id="routeTable" lay-filter="routeTable"></table>
+        <script type="text/html" id="optBar" >
             <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>
         </script>
     </div>
+
+</div>
+
+<div id="updateWin" style="display: none;padding: 20px;">
+    <form class="layui-form" action="" lay-filter="updateWinFilter">
+        <div class="layui-form-item">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input type="text" name="id" readonly="readonly" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">uri</label>
+            <div class="layui-input-block">
+                <input type="text" name="uri" lay-verify="required" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">忽略验证</label>
+            <div class="layui-input-block">
+                <input type="radio" name="ignoreValidate" value="true" title="是">
+                <input type="radio" name="ignoreValidate" value="false" title="否">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="disabled" value="true" title="启用">
+                <input type="radio" name="disabled" value="false" title="<span class='x-red'>禁用</span>">
+            </div>
+        </div>
+    </form>
 </div>
 <script type="text/javascript" src="../../assets/js/lib.js"></script>
 <script type="text/javascript" src="routeManager.js"></script>

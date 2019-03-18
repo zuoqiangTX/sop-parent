@@ -3,8 +3,8 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
     var table = layui.table;
     var currentServiceId;
 
-    var serverTable = table.render({
-        elem: '#table'
+    var routeTable = table.render({
+        elem: '#routeTable'
         , url: ApiUtil.createUrl('route.list')
         , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
         , cols: [[
@@ -26,6 +26,31 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
             }
             , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
         ]]
+    });
+
+    //监听单元格事件
+    table.on('tool(routeTable)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'edit'){
+            //表单初始赋值
+            data.disabled = !data.disabled + '';
+            data.ignoreValidate = data.ignoreValidate + '';
+            form.val('updateWinFilter', data)
+
+            layer.open({
+                type: 1
+                ,title: '修改路由'
+                ,area: ['490px', '360px']
+                ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                ,btn: ['保存', '取消']
+                ,yes: function(index, layero){
+
+                }
+                ,btn2: function(index, layero){
+                    layer.close(index);
+                }
+            });
+        }
     });
 
     $('#profileList').find('li').on('click', function () {
@@ -83,7 +108,7 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
     });
 
     function searchTable(param) {
-        serverTable.reload({
+        routeTable.reload({
             where: {
                 data: JSON.stringify(param)
                 , profile: window.profile

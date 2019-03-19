@@ -17,6 +17,12 @@ public class BaseRouteDefinition {
      * 路由规则转发的目标uri
      */
     private String uri;
+
+    /**
+     * uri后面跟的path
+     */
+    private String path;
+
     /**
      * 路由执行的顺序
      */

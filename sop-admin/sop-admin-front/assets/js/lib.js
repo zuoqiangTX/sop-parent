@@ -14,7 +14,7 @@ var lib = (function () {
         ,'../../assets/lib/layui/layui.js'
         ,'../../assets/lib/easyopen/sdk.js'
         ,'../../assets/js/ApiUtil.js'
-        ,'../../assets/js/common.js'
+        ,'../../assets/js/profile.js'
     ]
 
     var jsArr = [];

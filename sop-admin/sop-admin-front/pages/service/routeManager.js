@@ -2,62 +2,26 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
     var form = layui.form;
     var table = layui.table;
     var currentServiceId;
+    var routeTable;
+    var profile = window.profile;
 
-    var routeTable = table.render({
-        elem: '#routeTable'
-        , url: ApiUtil.createUrl('route.list')
-        , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-        , cols: [[
-            {field: 'id', title: 'id(接口名+版本号)'}
-            , {field: 'uri', title: 'uri'}
-            , {
-                field: 'ignoreValidate', width: 80, title: '忽略验证', templet: function (row) {
-                    return row.ignoreValidate
-                        ? '<span class="x-red">是</span>'
-                        : '<span>否</span>';
-                }
-            }
-            , {
-                field: 'disabled', title: '状态', width: 80, templet: function (row) {
-                    return row.disabled
-                        ? '<span class="x-red">禁用</span>'
-                        : '<span class="x-green">启用</span>';
-                }
-            }
-            , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
-        ]]
+    form.on('submit(searchFilter)', function (data) {
+        var param = data.field;
+        param.serviceId = currentServiceId;
+        searchTable(param)
+        return false;
     });
 
-    //监听单元格事件
-    table.on('tool(routeTable)', function(obj){
-        var data = obj.data;
-        if(obj.event === 'edit'){
-            //表单初始赋值
-            data.disabled = !data.disabled + '';
-            data.ignoreValidate = data.ignoreValidate + '';
-            form.val('updateWinFilter', data)
-
-            layer.open({
-                type: 1
-                ,title: '修改路由'
-                ,area: ['490px', '360px']
-                ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
-                ,btn: ['保存', '取消']
-                ,yes: function(index, layero){
-
-                }
-                ,btn2: function(index, layero){
-                    layer.close(index);
-                }
-            });
-        }
+    //监听提交
+    form.on('submit(updateWinSubmitFilter)', function(data) {
+        ApiUtil.post('route.update', data.field, function (resp) {
+            layer.closeAll();
+            routeTable.reload();
+        })
+        return false;
     });
 
-    $('#profileList').find('li').on('click', function () {
-        initTree($(this).text());
-    })
-
-    function initTree(profile) {
+    function initTree() {
         ApiUtil.post('service.list', {profile: profile}, function (resp) {
             var serviceList = resp.data;
             var children = [];
@@ -68,10 +32,7 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
                     name: serviceInfo.serviceId
                 })
             }
-            // 清空表格
-            reloadRightPart({name: ''})
-            // 清空树
-            $('#leftTree').text('');
+
             layui.tree({
                 elem: '#leftTree' //传入元素选择器
                 , nodes: [{ //节点
@@ -93,6 +54,8 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
      * @param node 树节点
      */
     function reloadRightPart(node) {
+        $('#optTip').hide();
+        $('#rightPart').show();
         var serviceId = node.name;
         currentServiceId = serviceId;
         searchTable({
@@ -100,21 +63,70 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
         });
     }
 
-    form.on('submit(searchFilter)', function (data) {
-        var param = data.field;
-        param.serviceId = currentServiceId;
-        searchTable(param)
-        return false;
-    });
+    /**
+     * 查询表格
+     * @param params
+     */
+    function searchTable(params) {
+        var postData = {
+            data: JSON.stringify(params)
+            , profile: profile
+        };
 
-    function searchTable(param) {
-        routeTable.reload({
-            where: {
-                data: JSON.stringify(param)
-                , profile: window.profile
-            }
-        })
+        if (!routeTable) {
+            routeTable = table.render({
+                elem: '#routeTable'
+                , url: ApiUtil.createUrl('route.list')
+                , where: postData
+                , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    {field: 'id', title: 'id(接口名+版本号)', width: 250}
+                    , {field: 'uri', title: 'uri', width: 200}
+                    , {field: 'path', title: 'path', width: 200}
+                    , {
+                        field: 'ignoreValidate', width: 80, title: '忽略验证', templet: function (row) {
+                            return row.ignoreValidate
+                                ? '<span class="x-red">是</span>'
+                                : '<span>否</span>';
+                        }
+                    }
+                    , {
+                        field: 'disabled', title: '状态', width: 80, templet: function (row) {
+                            return row.disabled
+                                ? '<span class="x-red">禁用</span>'
+                                : '<span class="x-green">启用</span>';
+                        }
+                    }
+                    , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
+                ]]
+            });
+
+            //监听单元格事件
+            table.on('tool(routeTable)', function(obj) {
+                var data = obj.data;
+                if(obj.event === 'edit'){
+                    //表单初始赋值
+                    data.disabled = data.disabled + '';
+                    data.ignoreValidate = data.ignoreValidate + '';
+                    data.serviceId = currentServiceId;
+                    data.profile = profile;
+                    form.val('updateWinFilter', data)
+
+                    layer.open({
+                        type: 1
+                        ,title: '修改路由'
+                        ,area: ['500px', '400px']
+                        ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                    });
+                }
+            });
+        } else {
+            routeTable.reload({
+                where: postData
+            })
+        }
     }
 
-    initTree('default');
+    initTree();
+
 });

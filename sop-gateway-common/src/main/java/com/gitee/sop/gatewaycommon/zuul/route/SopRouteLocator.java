@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
+import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -49,8 +50,9 @@ public class SopRouteLocator implements RouteLocator, Ordered {
         if (zuulTargetRoute == null) {
             return null;
         }
+        // 路由被禁用
         if (zuulTargetRoute.getRouteDefinition().isDisabled()) {
-            return null;
+            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
         return zuulTargetRoute.getTargetRouteDefinition();
     }

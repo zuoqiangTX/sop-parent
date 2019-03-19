@@ -106,26 +106,27 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         gatewayRouteDefinition.setOrder(0);
         List<GatewayPredicateDefinition> predicates = Arrays.asList(this.buildNameVersionPredicateDefinition(apiMeta));
         gatewayRouteDefinition.setPredicates(predicates);
-        // lb://story-service#/alipay.story.get/
         String uri = this.buildUri(serviceApiInfo, apiMeta);
+        String path = this.buildServletPath(serviceApiInfo, apiMeta);
         gatewayRouteDefinition.setUri(uri);
+        gatewayRouteDefinition.setPath(path);
         gatewayRouteDefinition.setIgnoreValidate(apiMeta.isIgnoreValidate());
         return gatewayRouteDefinition;
     }
 
     protected String buildUri(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        String servletPath = getServletPath(serviceApiInfo, apiMeta);
+        return "lb://" + serviceApiInfo.getServiceId();
+    }
+
+    protected String buildServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
+        String servletPath = apiMeta.getPath();
         if (servletPath == null) {
-            servletPath = PATH_START_CHAR;
+            servletPath = "";
         }
         if (!servletPath.startsWith(PATH_START_CHAR)) {
             servletPath = PATH_START_CHAR + servletPath;
         }
-        return "lb://" + serviceApiInfo.getServiceId() + "#" + servletPath;
-    }
-
-    protected String getServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        return apiMeta.getPath();
+        return servletPath;
     }
 
     protected GatewayPredicateDefinition buildNameVersionPredicateDefinition(ServiceApiInfo.ApiMeta apiMeta) {

@@ -7,6 +7,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -66,6 +67,18 @@ public class ZookeeperContext {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static Stat setData(String path, String data) throws Exception {
+        return getClient().setData().forPath(path, data.getBytes());
+    }
+
+    public static String getData(String path) throws Exception {
+        if (!isPathExist(path)) {
+            return null;
+        }
+        byte[] data = getClient().getData().forPath(path);
+        return new String(data);
     }
 
     /**

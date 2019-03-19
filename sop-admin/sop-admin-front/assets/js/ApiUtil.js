@@ -5,6 +5,18 @@ var ApiUtil = (function () {
     // 接口URL,更改此处即可
     var url = 'http://localhost:8082/api';
     var URI_CHAR = '/';
+    var params = {};
+
+    (function () {
+        var aPairs, aTmp;
+        var queryString = window.location.search.toString();
+        queryString = queryString.substring(1, queryString.length); //remove   "?"
+        aPairs = queryString.split("&");
+        for (var i = 0; i < aPairs.length; i++) {
+            aTmp = aPairs[i].split("=");
+            params[aTmp[0]] = decodeURIComponent(aTmp[1]);
+        }
+    })();
 
     function formatUri(uri) {
         if (uri.substring(0, 1) !== URI_CHAR) {
@@ -48,6 +60,9 @@ var ApiUtil = (function () {
                 throw new Error('name不能为空');
             }
             return url + formatUri(uri);
+        }
+        , getParam: function (paramName) {
+            return params[paramName];
         }
     }
 })();

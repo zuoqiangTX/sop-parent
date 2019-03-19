@@ -6,11 +6,13 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
+import com.gitee.sop.adminserver.api.service.param.UpdateRouteParam;
 import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
 import com.gitee.sop.adminserver.bean.SopAdminConstants;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.ChildData;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +54,17 @@ public class RouteListApi {
                 .collect(Collectors.toList());
 
         return routeDefinitionList;
+    }
+
+    @Api(name = "route.update")
+    @ApiDocMethod(description = "修改路由")
+    void updateRoute(UpdateRouteParam param) throws Exception {
+        String serviceIdPath = ZookeeperContext.getSopRouteRootPath(param.getProfile()) + "/" + param.getServiceId();
+        String zookeeperRoutePath = serviceIdPath + "/" + param.getId();
+        String data = ZookeeperContext.getData(zookeeperRoutePath);
+        GatewayRouteDefinition routeDefinition = JSON.parseObject(data, GatewayRouteDefinition.class);
+        BeanUtils.copyProperties(param, routeDefinition);
+        ZookeeperContext.setData(zookeeperRoutePath, JSON.toJSONString(routeDefinition));
     }
 
 }

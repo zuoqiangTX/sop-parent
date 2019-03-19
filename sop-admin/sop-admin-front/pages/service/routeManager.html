@@ -22,37 +22,46 @@
         <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
 <div class="x-body">
-    <div class="layui-tab" style="margin-top: 0px;" lay-filter="docDemoTabBrief">
-        <ul id="profileList" class="layui-tab-title">
-        </ul>
-    </div>
-    <div class="layui-col-md2">
-        <ul id="leftTree"></ul>
-    </div>
-    <div  class="layui-col-md10">
-        <div class="layui-row">
-            <form class="layui-form layui-col-md12 x-so" action="" lay-filter="searchFrm">
-                路由名称：
-                <input name="id" class="layui-input" style="width: 200px;" placeholder="输入接口名或版本号">
-                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchFilter">
-                    <i class="layui-icon layui-icon-search"></i>搜索
-                </button>
-            </form>
-        </div>
+    <div class="layui-row">
 
-        <div class="layui-btn-group demoTable">
-            <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="addRoute">添加路由</button>
-        </div>
-        <table class="layui-hide" id="routeTable" lay-filter="routeTable"></table>
-        <script type="text/html" id="optBar" >
-            <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>
-        </script>
     </div>
+    <div class="layui-row">
+        <div class="layui-col-md2">
+            <ul id="leftTree"></ul>
+        </div>
+        <div id="optTip" class="layui-col-md2" style="margin-top: 20px;">
+            <i class="layui-icon layui-icon-return"></i>点击树节点查看
+        </div>
+        <div id="rightPart" class="layui-col-md10" style="display: none;">
+            <div class="layui-row">
+                <form class="layui-form layui-col-md12 x-so" action="" lay-filter="searchFrm">
+                    路由名称：
+                    <input name="id" class="layui-input" style="width: 200px;" placeholder="输入接口名或版本号">
+                    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchFilter">
+                        <i class="layui-icon layui-icon-search"></i>搜索
+                    </button>
+                </form>
+            </div>
+
+            <div class="layui-btn-group demoTable">
+                <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="addRoute">
+                    <i class="layui-icon layui-icon-add-circle-fine"></i>添加路由
+                </button>
+            </div>
+            <table class="layui-hide" id="routeTable" lay-filter="routeTable"></table>
+            <script type="text/html" id="optBar" >
+                <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>
+            </script>
+        </div>
+    </div>
+
 
 </div>
 
 <div id="updateWin" style="display: none;padding: 20px;">
     <form class="layui-form" action="" lay-filter="updateWinFilter">
+        <input type="hidden" name="serviceId" />
+        <input type="hidden" name="profile" />
         <div class="layui-form-item">
             <label class="layui-form-label">id</label>
             <div class="layui-input-block">
@@ -66,6 +75,12 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">path</label>
+            <div class="layui-input-block">
+                <input type="text" name="path" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">忽略验证</label>
             <div class="layui-input-block">
                 <input type="radio" name="ignoreValidate" value="true" title="是">
@@ -75,8 +90,14 @@
         <div class="layui-form-item">
             <label class="layui-form-label">状态</label>
             <div class="layui-input-block">
-                <input type="radio" name="disabled" value="true" title="启用">
-                <input type="radio" name="disabled" value="false" title="<span class='x-red'>禁用</span>">
+                <input type="radio" name="disabled" value="false" title="启用">
+                <input type="radio" name="disabled" value="true" title="<span class='x-red'>禁用</span>">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="updateWinSubmitFilter">保存</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll()">取消</button>
             </div>
         </div>
     </form>

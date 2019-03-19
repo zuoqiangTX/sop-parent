@@ -10,5 +10,4 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ZuulRouteDefinition extends BaseRouteDefinition {
-    private String path;
 }

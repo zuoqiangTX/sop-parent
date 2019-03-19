@@ -41,7 +41,7 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
     protected GatewayTargetRoute buildRouteDefinition(GatewayServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
         RouteDefinition routeDefinition = new RouteDefinition();
         routeDefinition.setId(gatewayRouteDefinition.getId());
-        routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri()));
+        routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri() + "#" + gatewayRouteDefinition.getPath()));
         routeDefinition.setOrder(gatewayRouteDefinition.getOrder());
         List<FilterDefinition> filterDefinitionList = new ArrayList<>(gatewayRouteDefinition.getFilters().size());
         List<PredicateDefinition> predicateDefinitionList = new ArrayList<>(gatewayRouteDefinition.getPredicates().size());

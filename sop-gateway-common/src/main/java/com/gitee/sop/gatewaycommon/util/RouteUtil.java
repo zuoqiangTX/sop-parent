@@ -1,15 +1,13 @@
 package com.gitee.sop.gatewaycommon.util;
 
-import org.springframework.cloud.gateway.route.Route;
-
-import java.net.URI;
-
 /**
  * @author tanghc
  */
-public class RoutePathUtil {
+public class RouteUtil {
 
     public static final String REGEX = "\\#";
+
+    public static final String PROTOCOL_LOAD_BALANCE = "lb://";
 
     public static String findPath(String uri) {
         // #后面是对应的path
@@ -20,4 +18,12 @@ public class RoutePathUtil {
             return null;
         }
     }
+
+    public static String getZuulLocation(String uri) {
+        if (uri.toLowerCase().startsWith(PROTOCOL_LOAD_BALANCE)) {
+            return uri.substring(PROTOCOL_LOAD_BALANCE.length());
+        }
+        return uri;
+    }
+
 }

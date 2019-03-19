@@ -1,6 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.filter;
 
-import com.gitee.sop.gatewaycommon.util.RoutePathUtil;
+import com.gitee.sop.gatewaycommon.util.RouteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -47,7 +47,7 @@ public class LoadBalancerClientExtFilter implements GlobalFilter, Ordered {
     protected String findPath(Route route) {
         URI routeUri = route.getUri();
         String uriStr = routeUri.toString();
-        return RoutePathUtil.findPath(uriStr);
+        return RouteUtil.findPath(uriStr);
     }
 
 }

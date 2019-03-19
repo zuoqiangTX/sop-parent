@@ -2,7 +2,7 @@ package com.gitee.sop.gatewaycommon.zuul.route;
 
 import com.gitee.sop.gatewaycommon.manager.BaseRouteManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
-import com.gitee.sop.gatewaycommon.util.RoutePathUtil;
+import com.gitee.sop.gatewaycommon.util.RouteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.core.env.Environment;
@@ -31,7 +31,9 @@ public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRoute
 
     @Override
     protected ZuulTargetRoute buildRouteDefinition(ZuulServiceRouteInfo serviceRouteInfo, ZuulRouteDefinition routeDefinition) {
-        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), serviceRouteInfo.getServiceId(), null, false, null);
+        // 路由重试
+        String retry = environment.getProperty("sop.route.retry", "true");
+        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), RouteUtil.getZuulLocation(routeDefinition.getUri()), null, Boolean.valueOf(retry), null);
         return new ZuulTargetRoute(serviceRouteInfo, routeDefinition, route);
     }
 }

@@ -1,5 +1,6 @@
 package com.gitee.sop.adminserver.bean;
 
+import com.gitee.easyopen.exception.ApiException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -69,8 +70,34 @@ public class ZookeeperContext {
         }
     }
 
-    public static Stat setData(String path, String data) throws Exception {
+    /**
+     * 对已存在的path赋值
+     *
+     * @param path 已存在的
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static Stat updatePathData(String path, String data) throws Exception {
+        if (!isPathExist(path)) {
+            throw new ApiException("path " + path + " 不存在");
+        }
         return getClient().setData().forPath(path, data.getBytes());
+    }
+
+    /**
+     * 创建新的path，并赋值
+     * @param path 待创建的path
+     * @param data 值
+     */
+    public static String createNewData(String path, String data) throws Exception {
+        if (isPathExist(path)) {
+            throw new ApiException("path " + path + " 已存在");
+        }
+        return  getClient().create()
+                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
+                .creatingParentContainersIfNeeded()
+                .forPath(path, data.getBytes());
     }
 
     public static String getData(String path) throws Exception {
@@ -83,6 +110,7 @@ public class ZookeeperContext {
 
     /**
      * 获取子节点数据
+     *
      * @param parentPath 父节点
      * @return
      * @throws Exception

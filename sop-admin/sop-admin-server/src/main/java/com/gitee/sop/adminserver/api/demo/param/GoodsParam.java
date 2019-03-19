@@ -2,7 +2,8 @@ package com.gitee.sop.adminserver.api.demo.param;
 
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotEmpty;
 
 public class GoodsParam {
 

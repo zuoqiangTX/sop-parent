@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  * @author tanghc
  */
 @Data
-public class UpdateRouteParam {
+public class RouteParam {
 
     @NotBlank(message = "profile不能为空")
     @ApiDocField(description = "profile")

@@ -17,8 +17,6 @@ import org.springframework.core.env.Environment;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.gitee.sop.adminserver.bean.SopAdminConstants.SOP_SERVICE_ROUTE_PATH;
-
 /**
  * @author tanghc
  */
@@ -37,6 +35,7 @@ public class ServiceApi {
         String routeRootPath = ZookeeperContext.getSopRouteRootPath(param.getProfile());
         List<ChildData> childDataList = ZookeeperContext.getChildrenData(routeRootPath);
         List<ServiceInfo> serviceInfoList = childDataList.stream()
+                .filter(childData -> childData.getData() != null && childData.getData().length > 0)
                 .map(childData -> {
                     String serviceNodeData = new String(childData.getData());
                     ServiceInfo serviceInfo = JSON.parseObject(serviceNodeData, ServiceInfo.class);

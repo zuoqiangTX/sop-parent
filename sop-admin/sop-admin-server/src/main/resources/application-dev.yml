@@ -5,17 +5,20 @@ spring:
   application:
     name: sop-admin
 
+  # zookeeper客户端连接
   cloud:
     zookeeper:
       connect-string: localhost:2181
       baseSleepTimeMs: 3000
       maxRetries: 3
 
+# 固定不用改
 easyopen:
   show-doc: true
   mono: false
   ignore-validate: true
 
+# 默认profile列表，新增可以在后面加
 sop-admin:
   profiles: default,prod,dev,test
 

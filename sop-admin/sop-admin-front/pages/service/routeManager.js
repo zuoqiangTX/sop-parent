@@ -4,6 +4,9 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
     var currentServiceId;
     var routeTable;
     var profile = window.profile;
+    var $updateForm = $('#updateForm');
+    var $addForm = $('#addForm');
+    var smTitle;
 
     form.on('submit(searchFilter)', function (data) {
         var param = data.field;
@@ -12,9 +15,18 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
         return false;
     });
 
-    //监听提交
+    // 监听修改提交
     form.on('submit(updateWinSubmitFilter)', function(data) {
         ApiUtil.post('route.update', data.field, function (resp) {
+            layer.closeAll();
+            routeTable.reload();
+        })
+        return false;
+    });
+
+    // 监听保存提交
+    form.on('submit(addWinSubmitFilter)', function(data) {
+        ApiUtil.post('route.add', data.field, function (resp) {
             layer.closeAll();
             routeTable.reload();
         })
@@ -61,6 +73,7 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
         searchTable({
             serviceId: serviceId
         });
+        smTitle = '[ <strong>profile：</strong>' + profile + '&nbsp;&nbsp;&nbsp;&nbsp;<strong>serviceId：</strong>' + currentServiceId + ' ]';
     }
 
     /**
@@ -74,57 +87,84 @@ lib.use(['element', 'table', 'tree', 'form'], function () {
         };
 
         if (!routeTable) {
-            routeTable = table.render({
-                elem: '#routeTable'
-                , url: ApiUtil.createUrl('route.list')
-                , where: postData
-                , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-                , cols: [[
-                    {field: 'id', title: 'id(接口名+版本号)', width: 250}
-                    , {field: 'uri', title: 'uri', width: 200}
-                    , {field: 'path', title: 'path', width: 200}
-                    , {
-                        field: 'ignoreValidate', width: 80, title: '忽略验证', templet: function (row) {
-                            return row.ignoreValidate
-                                ? '<span class="x-red">是</span>'
-                                : '<span>否</span>';
-                        }
-                    }
-                    , {
-                        field: 'disabled', title: '状态', width: 80, templet: function (row) {
-                            return row.disabled
-                                ? '<span class="x-red">禁用</span>'
-                                : '<span class="x-green">启用</span>';
-                        }
-                    }
-                    , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
-                ]]
-            });
-
-            //监听单元格事件
-            table.on('tool(routeTable)', function(obj) {
-                var data = obj.data;
-                if(obj.event === 'edit'){
-                    //表单初始赋值
-                    data.disabled = data.disabled + '';
-                    data.ignoreValidate = data.ignoreValidate + '';
-                    data.serviceId = currentServiceId;
-                    data.profile = profile;
-                    form.val('updateWinFilter', data)
-
-                    layer.open({
-                        type: 1
-                        ,title: '修改路由'
-                        ,area: ['500px', '400px']
-                        ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
-                    });
-                }
-            });
+            routeTable = initTable(postData);
         } else {
             routeTable.reload({
                 where: postData
             })
         }
+    }
+
+    function initTable(postData) {
+        var routeTable = table.render({
+            elem: '#routeTable'
+            , toolbar: '#toolbar'
+            , url: ApiUtil.createUrl('route.list')
+            , where: postData
+            , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            , cols: [[
+                {field: 'id', title: 'id(接口名+版本号)', width: 250}
+                , {field: 'uri', title: 'uri', width: 200}
+                , {field: 'path', title: 'path', width: 200}
+                , {
+                    field: 'ignoreValidate', width: 80, title: '忽略验证', templet: function (row) {
+                        return row.ignoreValidate
+                            ? '<span class="x-red">是</span>'
+                            : '<span>否</span>';
+                    }
+                }
+                , {
+                    field: 'disabled', title: '状态', width: 80, templet: function (row) {
+                        return row.disabled
+                            ? '<span class="x-red">禁用</span>'
+                            : '<span class="x-green">启用</span>';
+                    }
+                }
+                , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
+            ]]
+        });
+
+        //监听单元格事件
+        table.on('tool(routeTable)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                $updateForm.get(0).reset();
+                //表单初始赋值
+                data.profile = profile;
+                data.serviceId = currentServiceId;
+                data.disabled = data.disabled + '';
+                data.ignoreValidate = data.ignoreValidate + '';
+                form.val('updateWinFilter', data)
+
+                layer.open({
+                    type: 1
+                    ,title: '修改路由' + smTitle
+                    ,area: ['500px', '400px']
+                    ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                });
+            }
+        });
+        table.on('toolbar(routeTable)', function(obj) {
+            if (obj.event === 'add') {
+                $addForm.find('input[name=id]').prop('readonly', false);
+                $addForm.get(0).reset();
+                var data = {};
+                data.profile = profile;
+                data.serviceId = currentServiceId;
+                data.id = '';
+                // 新加的路由先设置成禁用
+                data.disabled = 'true';
+                data.ignoreValidate = 'false';
+                form.val('addWinFilter', data);
+                layer.open({
+                    type: 1
+                    ,title: '添加路由' + smTitle
+                    ,area: ['500px', '400px']
+                    ,content: $('#addWin')
+                });
+            }
+        });
+        return routeTable;
     }
 
     initTree();

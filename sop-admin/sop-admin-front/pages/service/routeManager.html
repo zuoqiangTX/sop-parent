@@ -43,12 +43,14 @@
                 </form>
             </div>
 
-            <div class="layui-btn-group demoTable">
-                <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="addRoute">
-                    <i class="layui-icon layui-icon-add-circle-fine"></i>添加路由
-                </button>
-            </div>
             <table class="layui-hide" id="routeTable" lay-filter="routeTable"></table>
+            <script type="text/html" id="toolbar">
+                <div class="layui-btn-container">
+                    <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="add">
+                        <i class="layui-icon layui-icon-add-1"></i>添加路由
+                    </button>
+                </div>
+            </script>
             <script type="text/html" id="optBar" >
                 <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>
             </script>
@@ -58,8 +60,53 @@
 
 </div>
 
+<div id="addWin" style="display: none;padding: 20px;">
+    <form id="addForm" class="layui-form" action="" lay-filter="addWinFilter">
+        <input type="hidden" name="serviceId" />
+        <input type="hidden" name="profile" />
+        <div class="layui-form-item">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input type="text" name="id" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">uri</label>
+            <div class="layui-input-block">
+                <input type="text" name="uri" lay-verify="required" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">path</label>
+            <div class="layui-input-block">
+                <input type="text" name="path" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">忽略验证</label>
+            <div class="layui-input-block">
+                <input type="radio" name="ignoreValidate" value="true" title="是">
+                <input type="radio" name="ignoreValidate" value="false" title="否">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="disabled" value="false" title="启用">
+                <input type="radio" name="disabled" value="true" title="<span class='x-red'>禁用</span>">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="addWinSubmitFilter">保存</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll()">取消</button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div id="updateWin" style="display: none;padding: 20px;">
-    <form class="layui-form" action="" lay-filter="updateWinFilter">
+    <form id="updateForm" class="layui-form" action="" lay-filter="updateWinFilter">
         <input type="hidden" name="serviceId" />
         <input type="hidden" name="profile" />
         <div class="layui-form-item">

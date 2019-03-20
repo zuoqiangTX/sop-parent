@@ -111,6 +111,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         gatewayRouteDefinition.setUri(uri);
         gatewayRouteDefinition.setPath(path);
         gatewayRouteDefinition.setIgnoreValidate(apiMeta.isIgnoreValidate());
+        gatewayRouteDefinition.setMergeResult(apiMeta.isMergeResult());
         return gatewayRouteDefinition;
     }
 

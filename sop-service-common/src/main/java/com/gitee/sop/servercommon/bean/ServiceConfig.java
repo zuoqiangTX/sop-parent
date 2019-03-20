@@ -22,10 +22,13 @@ public class ServiceConfig {
     private ServiceConfig() {
     }
 
-    /**
-     * 默认版本号
-     */
-    private String defaultVersion = "";
+    public static ServiceConfig getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(ServiceConfig instance) {
+        ServiceConfig.instance = instance;
+    }
 
     /**
      * 错误模块
@@ -48,15 +51,18 @@ public class ServiceConfig {
     private GlobalExceptionHandler globalExceptionHandler = new DefaultGlobalExceptionHandler();
 
     /**
+     * 默认版本号
+     */
+    private String defaultVersion = "";
+
+    /**
      * 设置为true，所有接口不进行校验
      */
     private boolean ignoreValidate;
 
-    public static ServiceConfig getInstance() {
-        return instance;
-    }
+    /**
+     * 是否对结果进行合并
+     */
+    private boolean mergeResult = true;
 
-    public static void setInstance(ServiceConfig instance) {
-        ServiceConfig.instance = instance;
-    }
 }

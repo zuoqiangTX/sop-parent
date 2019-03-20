@@ -10,6 +10,7 @@ public class ApiMappingInfo {
     private String name;
     private String version;
     private boolean ignoreValidate;
+    private boolean mergeResult;
 
     public ApiMappingInfo(String name, String version) {
         this.name = name;

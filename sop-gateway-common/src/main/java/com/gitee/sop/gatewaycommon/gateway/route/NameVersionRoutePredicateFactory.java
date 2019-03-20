@@ -59,7 +59,7 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             }
 
             String nameVersion = config.param;
-            String name = params.getOrDefault(ParamNames.API_NAME, "");
+            String name = params.getOrDefault(ParamNames.API_NAME, String.valueOf(System.currentTimeMillis()));
             String version = params.getOrDefault(ParamNames.VERSION_NAME, "");
             boolean match = (name + version).equals(nameVersion);
             if (match) {

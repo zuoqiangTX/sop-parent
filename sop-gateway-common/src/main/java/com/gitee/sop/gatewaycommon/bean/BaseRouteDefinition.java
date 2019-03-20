@@ -37,4 +37,9 @@ public class BaseRouteDefinition {
      * 是否禁用
      */
     private boolean disabled;
+
+    /**
+     * 是否合并结果
+     */
+    private boolean mergeResult;
 }

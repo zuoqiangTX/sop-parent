@@ -4,12 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
-import com.gitee.sop.gatewaycommon.exception.ApiException;
-import com.gitee.sop.gatewaycommon.message.Error;
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.message.ErrorMeta;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
-import com.netflix.zuul.exception.ZuulException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -49,7 +48,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     @Override
     public String mergeResult(T request, String serviceResult) {
-        boolean isMergeResult = ApiContext.getApiConfig().isMergeResult();
+        boolean isMergeResult = this.isRouteMergeResult(request);
         if (!isMergeResult) {
             return serviceResult;
         }
@@ -76,6 +75,33 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         return this.merge(request, jsonObjectService);
     }
 
+    /**
+     * 该路由是否合并结果
+     * @param request
+     * @return
+     */
+    protected boolean isRouteMergeResult(T request) {
+        boolean defaultSetting = ApiContext.getApiConfig().isMergeResult();
+        boolean isMergeResult = true;
+        Map<String, ?> params = this.getApiParam(request);
+        Object name = params.get(ParamNames.API_NAME);
+        Object version = params.get(ParamNames.VERSION_NAME);
+        if(name == null) {
+            name = System.currentTimeMillis();
+        }
+        TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(String.valueOf(name) + version);
+        if (targetRoute == null) {
+            return defaultSetting;
+        } else {
+            isMergeResult = targetRoute.getRouteDefinition().isMergeResult();
+        }
+        // 如果路由说合并，还得看网关全局设置，网关全局设置优先级最大
+        if (isMergeResult) {
+            isMergeResult = defaultSetting;
+        }
+        return isMergeResult;
+    }
+
     protected String wrapResult(String serviceResult) {
         if (serviceResult == null) {
             serviceResult = "";
@@ -92,7 +118,6 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     public String merge(T exchange, JSONObject jsonObjectService) {
         JSONObject ret = new JSONObject();
-        // 点换成下划线
         Map<String, ?> params = this.getApiParam(exchange);
         Object name = params.get(ParamNames.API_NAME);
         if (name == null) {
@@ -102,6 +127,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         if (sign == null) {
             sign = "";
         }
+        // 点换成下划线
         String method = String.valueOf(name).replace(DOT, UNDERLINE);
         ret.put(method + DATA_SUFFIX, jsonObjectService);
         ret.put(ParamNames.SIGN_NAME, sign);

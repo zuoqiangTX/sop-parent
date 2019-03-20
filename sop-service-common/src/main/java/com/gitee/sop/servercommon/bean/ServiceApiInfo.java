@@ -24,6 +24,8 @@ public class ServiceApiInfo {
         private String version;
         /** 是否忽略验证 */
         private boolean ignoreValidate;
+        /** 是否合并结果 */
+        private boolean mergeResult;
 
         public ApiMeta() {
         }

@@ -93,15 +93,17 @@ public class ApiConfig {
     private List<String> i18nModules = new ArrayList<String>();
 
     // -------- fields ---------
+
     /**
-     * 忽略验证
+     * 忽略验证，设置true，则所有接口不会进行签名校验
      */
     private boolean ignoreValidate;
 
     /**
-     * 是否对结果进行合并
+     * 是否对结果进行合并。<br>
+     * 默认情况下是否合并结果由微服务端决定，一旦指定该值，则由该值决定，不管微服务端如何设置。
      */
-    private boolean mergeResult = true;
+    private Boolean mergeResult;
 
     /**
      * 超时时间

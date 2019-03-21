@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BaseRouteDefinition {
+
     /**
      * 路由的Id
      */
@@ -31,15 +32,19 @@ public class BaseRouteDefinition {
     /**
      * 是否忽略验证，业务参数验证除外
      */
-    private boolean ignoreValidate;
+    private int ignoreValidate;
 
     /**
-     * 是否禁用
+     * 状态，0：待审核，1：启用，2：禁用
      */
-    private boolean disabled;
+    private int status = 1;
 
     /**
      * 是否合并结果
      */
-    private boolean mergeResult;
+    private int mergeResult;
+
+    public boolean enable() {
+        return status == RouteStatus.ENABLE.getStatus();
+    }
 }

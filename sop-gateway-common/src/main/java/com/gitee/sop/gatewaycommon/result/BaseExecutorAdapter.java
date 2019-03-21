@@ -9,6 +9,7 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.message.ErrorMeta;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -48,7 +49,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     @Override
     public String mergeResult(T request, String serviceResult) {
-        boolean isMergeResult = this.isRouteMergeResult(request);
+        boolean isMergeResult = this.isMergeResult(request);
         if (!isMergeResult) {
             return serviceResult;
         }
@@ -80,26 +81,26 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
      * @param request
      * @return
      */
-    protected boolean isRouteMergeResult(T request) {
-        boolean defaultSetting = ApiContext.getApiConfig().isMergeResult();
-        boolean isMergeResult = true;
+    protected boolean isMergeResult(T request) {
+        // 默认全局设置
+        Boolean defaultSetting = ApiContext.getApiConfig().getMergeResult();
+        if (defaultSetting != null) {
+            return defaultSetting;
+        }
         Map<String, ?> params = this.getApiParam(request);
         Object name = params.get(ParamNames.API_NAME);
         Object version = params.get(ParamNames.VERSION_NAME);
         if(name == null) {
+            // 随便生成一个name
             name = System.currentTimeMillis();
         }
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(String.valueOf(name) + version);
         if (targetRoute == null) {
-            return defaultSetting;
+            return true;
         } else {
-            isMergeResult = targetRoute.getRouteDefinition().isMergeResult();
+            int mergeResult = targetRoute.getRouteDefinition().getMergeResult();
+            return BooleanUtils.toBoolean(mergeResult);
         }
-        // 如果路由说合并，还得看网关全局设置，网关全局设置优先级最大
-        if (isMergeResult) {
-            isMergeResult = defaultSetting;
-        }
-        return isMergeResult;
     }
 
     protected String wrapResult(String serviceResult) {

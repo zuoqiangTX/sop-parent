@@ -64,7 +64,7 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             boolean match = (name + version).equals(nameVersion);
             if (match) {
                 TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(nameVersion);
-                if (targetRoute != null && targetRoute.getRouteDefinition().isDisabled()) {
+                if (targetRoute != null && !targetRoute.getRouteDefinition().enable()) {
                     return false;
                 }
             }

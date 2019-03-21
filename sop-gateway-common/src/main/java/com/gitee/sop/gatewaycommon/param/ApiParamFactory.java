@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.Map;
 
@@ -30,7 +31,7 @@ public class ApiParamFactory {
         if (routeDefinition == null) {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
-        apiParam.setIgnoreValidate(routeDefinition.isIgnoreValidate());
+        apiParam.setIgnoreValidate(BooleanUtils.toBoolean(routeDefinition.getIgnoreValidate()));
         return apiParam;
     }
 }

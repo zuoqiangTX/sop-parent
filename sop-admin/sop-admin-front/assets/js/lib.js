@@ -14,6 +14,7 @@ var lib = (function () {
         ,'../../assets/lib/layui/layui.js'
         ,'../../assets/lib/easyopen/sdk.js'
         ,'../../assets/js/ApiUtil.js'
+        ,'../../assets/js/Form.js'
         ,'../../assets/js/profile.js'
     ]
 
@@ -53,7 +54,7 @@ var lib = (function () {
         }
         return jsArr;
     }
-
+    
     return {
         /**
          * 加载js模块

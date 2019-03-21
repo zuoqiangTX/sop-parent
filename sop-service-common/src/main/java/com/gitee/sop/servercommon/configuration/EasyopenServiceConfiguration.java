@@ -1,30 +1,26 @@
 package com.gitee.sop.servercommon.configuration;
 
-import com.gitee.easyopen.ApiContext;
 import com.gitee.easyopen.annotation.Api;
-import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.util.ReflectionUtil;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
 import com.gitee.sop.servercommon.manager.RequestMappingEvent;
 import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * 提供给easyopen项目使用
+ *
  * @author tanghc
  */
 public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
@@ -59,7 +55,7 @@ public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
                     ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta();
                     apiMeta.setName(api.name());
                     apiMeta.setVersion(api.version());
-                    apiMeta.setIgnoreValidate(api.ignoreValidate());
+                    apiMeta.setIgnoreValidate(BooleanUtils.toInteger(api.ignoreValidate()));
                     // /api/goods.get/
                     String servletPath = this.buildPath(api);
                     apiMeta.setPath(servletPath);

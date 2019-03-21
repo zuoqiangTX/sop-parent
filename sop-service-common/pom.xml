@@ -16,6 +16,7 @@
         <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
         <fastjson.version>1.2.15</fastjson.version>
         <zookeeper.version>3.4.12</zookeeper.version>
     </properties>
@@ -48,6 +49,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
 
         <dependency>

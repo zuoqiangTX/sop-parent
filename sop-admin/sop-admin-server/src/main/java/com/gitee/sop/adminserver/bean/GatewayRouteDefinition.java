@@ -43,10 +43,15 @@ public class GatewayRouteDefinition {
     /**
      * 是否忽略验证，业务参数验证除外
      */
-    private boolean ignoreValidate;
+    private int ignoreValidate;
 
     /**
-     * 是否禁用
+     * 状态，0：待审核，1：启用，2：禁用
      */
-    private boolean disabled;
+    private int status = 1;
+
+    /**
+     * 合并结果
+     */
+    private int mergeResult = 1;
 }

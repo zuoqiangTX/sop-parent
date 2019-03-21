@@ -5,8 +5,8 @@ import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
 import lombok.Getter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
@@ -92,8 +92,8 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
                 name = buildName(path);
             }
             ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, version);
-            apiMeta.setIgnoreValidate(apiMappingInfo.isIgnoreValidate());
-            apiMeta.setMergeResult(apiMappingInfo.isMergeResult());
+            apiMeta.setIgnoreValidate(BooleanUtils.toInteger(apiMappingInfo.isIgnoreValidate()));
+            apiMeta.setMergeResult(BooleanUtils.toInteger(apiMappingInfo.isMergeResult()));
             return apiMeta;
         }
         return null;

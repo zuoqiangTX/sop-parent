@@ -45,13 +45,20 @@ public class RouteParam {
      * 是否忽略验证，业务参数验证除外
      */
     @NotNull
-    @ApiDocField(description = "是否忽略验证")
-    private Boolean ignoreValidate;
+    @ApiDocField(description = "是否忽略验证,1：是，0：否")
+    private Integer ignoreValidate;
 
     /**
-     * 是否禁用
+     * 状态
      */
     @NotNull
-    @ApiDocField(description = "是否禁用")
-    private Boolean disabled;
+    @ApiDocField(description = "状态，0：审核，1：启用，2：禁用")
+    private Integer status;
+
+    /**
+     * 状态
+     */
+    @NotNull
+    @ApiDocField(description = "是否合并结果,1：是，0：否")
+    private Integer mergeResult;
 }

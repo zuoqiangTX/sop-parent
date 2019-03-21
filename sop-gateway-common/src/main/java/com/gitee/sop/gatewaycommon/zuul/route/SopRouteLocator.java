@@ -50,8 +50,8 @@ public class SopRouteLocator implements RouteLocator, Ordered {
         if (zuulTargetRoute == null) {
             return null;
         }
-        // 路由被禁用
-        if (zuulTargetRoute.getRouteDefinition().isDisabled()) {
+        // 路由是否启用
+        if (!zuulTargetRoute.getRouteDefinition().enable()) {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
         return zuulTargetRoute.getTargetRouteDefinition();

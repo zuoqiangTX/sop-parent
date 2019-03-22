@@ -32,43 +32,17 @@
         </form>
     </div>
 
-    <table class="layui-hide" id="table"></table>
-    <script type="text/html" id="optBar">
+    <table class="layui-hide" id="treeTable"></table>
+    <script type="text/html" id="optCol">
         <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">下线</a>
     </script>
 
 </div>
 <script type="text/javascript" src="../../assets/js/lib.js"></script>
+<script type="text/javascript" src="serviceList.js"></script>
 <script>
-    lib.use(['element', 'table', 'form'], function () {
-        var table = layui.table;
-        var form = layui.form;
 
-        var serverTable = table.render({
-            elem: '#table'
-            , url: ApiUtil.createUrl('service.list')
-            , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            , cols: [[
-                {field: 'serviceId', title: '服务名称', sort: true}
-                , {field: 'description', title: '描述'}
-                , {field: 'createTime', title: '添加时间', sort: true}
-                , {field: 'updateTime', title: '修改时间', sort: true}
-                , {fixed: 'right', title:'操作', toolbar: '#optBar', width:150}
-            ]]
-        });
-
-        form.on('submit(searchFilter)', function(data){
-            var param = data.field;
-            serverTable.reload({
-                where: {
-                    data: JSON.stringify(param)
-                }
-            })
-            return false;
-        });
-
-    });
 </script>
 </body>
 </html>

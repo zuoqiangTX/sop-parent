@@ -23,6 +23,7 @@
 		<java.version>1.8</java.version>
 		<zookeeper.version>3.4.12</zookeeper.version>
 		<curator-recipes.version>4.0.1</curator-recipes.version>
+		<okhttp.version>3.11.0</okhttp.version>
 	</properties>
 
 	<dependencies>
@@ -63,6 +64,12 @@
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
 		</dependency>
 
 		<dependency>

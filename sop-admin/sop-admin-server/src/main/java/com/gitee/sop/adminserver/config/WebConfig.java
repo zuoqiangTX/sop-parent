@@ -19,6 +19,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //配置映射关系
         registry.addResourceHandler("/conf/**").addResourceLocations("classpath:/META-INF/resources/webjars/sop-admin-front/1.0.0-SNAPSHOT/");
+        registry.addResourceHandler("/opendoc/**").addResourceLocations("classpath:/META-INF/resources/opendoc/");
     }
 
     @Controller

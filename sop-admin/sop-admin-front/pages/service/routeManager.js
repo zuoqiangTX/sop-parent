@@ -1,4 +1,4 @@
-lib.use(['element', 'table', 'tree', 'form'], function () {
+lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'form'], function () {
     var ROUTE_STATUS = {
         '0': '待审核'
         ,'1': '<span class="x-green">已启用</span>'

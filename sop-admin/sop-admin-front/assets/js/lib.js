@@ -13,12 +13,12 @@ var lib = (function () {
         '../../assets/lib/jquery/3.2.1/jquery.min.js'
         ,'../../assets/lib/layui/layui.js'
         ,'../../assets/lib/easyopen/sdk.js'
+        ,'../../assets/lib/layuiext/Form.js'
         ,'../../assets/js/ApiUtil.js'
-        ,'../../assets/js/Form.js'
-        ,'../../assets/js/profile.js'
     ]
 
     var jsArr = [];
+    var layuiConfig, layuiExtend;
 
     /**
      * 加载js
@@ -26,7 +26,7 @@ var lib = (function () {
      * @param require layui依赖模块
      * @param loadSuccess 加载成功后触发
      */
-    function layuiInit(jsArr, require, loadSuccess) {
+    function loadJs(jsArr, loadSuccess) {
         // 接着加载自定义的js
         jsArr = addVersion(jsArr);
 
@@ -36,7 +36,7 @@ var lib = (function () {
             .script(jsArr) // 接着加载自定义的js
             // 全部加载成后执行
             .wait(function () {
-                layui.use(require, loadSuccess);
+                loadSuccess && loadSuccess();
             });
     }
 
@@ -62,16 +62,37 @@ var lib = (function () {
          * @returns {lib}
          */
         importJs: function (jsPath) {
-            jsArr = jsPath || [];
+            if (jsPath) {
+                if (typeof jsPath === 'string') {
+                    jsPath = [jsPath];
+                }
+                jsArr = jsArr.concat(jsPath);
+            }
+            return this;
+        }
+        , config: function (cfg) {
+            layuiConfig = cfg;
+            return this;
+        }
+        , extend: function (ext) {
+            layuiExtend = ext;
             return this;
         }
         /**
          * layui初始化，同layui.use()
          * @param require
-         * @param loadSuccess
+         * @param layuiInitFun
          */
-        , use: function (require, loadSuccess) {
-            layuiInit(jsArr, require, loadSuccess);
+        , use: function (require, layuiInitFun) {
+            loadJs(jsArr, function () {
+                if (layuiConfig) {
+                    layui.config(layuiConfig);
+                }
+                if (layuiExtend) {
+                    layui.extend(layuiExtend);
+                }
+                layui.use(require, layuiInitFun);
+            });
         }
     }
 })();

@@ -15,7 +15,7 @@ public class ServiceInfoVo {
     @ApiDocField(description = "id")
     private Integer id;
 
-    @ApiDocField(description = "服务名称")
+    @ApiDocField(description = "服务名称(serviceId)")
     private String name;
 
     @ApiDocField(description = "instanceId")
@@ -41,6 +41,10 @@ public class ServiceInfoVo {
 
     @ApiDocField(description = "parentId")
     private Integer parentId;
+
+    public String getServiceId() {
+        return this.name;
+    }
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getUpdateTime() {

@@ -644,6 +644,11 @@ table th, table td {
     padding: 0 10px;
 }
 
+.layui-table-cell .layui-btn {
+    height: 27px;
+    line-height: 28px;
+}
+
 .x-admin-sm .layui-btn-lg{
     height: 38px;
     line-height: 38px;

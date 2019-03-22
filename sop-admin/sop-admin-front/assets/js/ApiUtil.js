@@ -55,11 +55,11 @@ var ApiUtil = (function () {
         , getUrl: function () {
             return url;
         }
-        , createUrl: function (uri) {
+        , createUrl: function (uri, params) {
             if (!uri) {
-                throw new Error('name不能为空');
+                throw new Error('uri不能为空');
             }
-            return url + formatUri(uri);
+            return url + formatUri(uri) + (params ? '?data=' + encodeURIComponent(JSON.stringify(params)) : '');
         }
         , getParam: function (paramName) {
             return params[paramName];

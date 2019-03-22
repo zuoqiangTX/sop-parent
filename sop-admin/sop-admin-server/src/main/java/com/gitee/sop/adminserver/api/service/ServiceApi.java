@@ -6,6 +6,7 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.easyopen.exception.ApiException;
+import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
@@ -50,12 +51,8 @@ public class ServiceApi {
     // eureka.client.serviceUrl.defaultZone
 
     @Api(name = "service.list")
-    @ApiDocMethod(description = "服务列表", elementClass = ServiceInfo.class)
+    @ApiDocMethod(description = "服务列表（旧）", elementClass = ServiceInfo.class)
     List<ServiceInfo> listServiceInfo(ServiceSearchParam param) throws Exception {
-        String json = this.requestEurekaServer(EurekaUri.QUERY_APPS);
-        EurekaApps eurekaApps = JSON.parseObject(json, EurekaApps.class);
-
-
         String routeRootPath = ZookeeperContext.getSopRouteRootPath(param.getProfile());
         List<ChildData> childDataList = ZookeeperContext.getChildrenData(routeRootPath);
         List<ServiceInfo> serviceInfoList = childDataList.stream()
@@ -78,7 +75,7 @@ public class ServiceApi {
     }
 
     @Api(name = "service.instance.list")
-    @ApiDocMethod(description = "服务列表", elementClass = ServiceInfo.class)
+    @ApiDocMethod(description = "服务列表", elementClass = ServiceInfoVo.class)
     List<ServiceInfoVo> listService(ServiceSearchParam param) throws Exception {
         String json = this.requestEurekaServer(EurekaUri.QUERY_APPS);
         EurekaApps eurekaApps = JSON.parseObject(json, EurekaApps.class);
@@ -87,6 +84,12 @@ public class ServiceApi {
         List<EurekaApplication> applicationList = eurekaApps.getApplications().getApplication();
         AtomicInteger idGen = new AtomicInteger(1);
         applicationList.stream()
+                .filter(eurekaApplication -> {
+                    if (StringUtils.isBlank(param.getServiceId())) {
+                        return true;
+                    }
+                    return StringUtils.containsIgnoreCase(eurekaApplication.getName(), param.getServiceId());
+                })
                 .forEach(eurekaApplication -> {
                     int pid = idGen.getAndIncrement();
                     String name = eurekaApplication.getName();
@@ -107,27 +110,31 @@ public class ServiceApi {
                         serviceInfoVoList.add(vo);
                     }
                 });
+
         return serviceInfoVoList;
     }
 
-    private String requestEurekaServer(EurekaUri uri) throws IOException {
-        Request request = this.buildRequest(EurekaUri.QUERY_APPS);
+    @Api(name = "service.instance.offline")
+    @ApiDocMethod(description = "服务下线")
+    void serviceOffline(ServiceInstanceParam param) throws IOException {
+        this.requestEurekaServer(EurekaUri.OFFLINE_SERVICE, param.getServiceId(), param.getInstanceId());
+    }
+
+    @Api(name = "service.instance.online")
+    @ApiDocMethod(description = "服务上线")
+    void serviceOnline(ServiceInstanceParam param) throws IOException {
+        this.requestEurekaServer(EurekaUri.ONLINE_SERVICE, param.getServiceId(), param.getInstanceId());
+    }
+
+    private String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
+        Request request = eurekaUri.getRequest(this.eurekaUrl, args);
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {
             return response.body().string();
         } else {
-            return "{}";
+            log.error("操作失败，url:{}, msg:{}, code:{}", eurekaUri.getUri(args), response.message(), response.code());
+            throw new ApiException("操作失败", String.valueOf(response.code()));
         }
-    }
-
-    private Request buildRequest(EurekaUri uri) {
-        String apiUrl = this.eurekaUrl + uri.getUri();
-        Request request = new Request.Builder()
-                .url(apiUrl)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-        return request;
     }
 
     @PostConstruct

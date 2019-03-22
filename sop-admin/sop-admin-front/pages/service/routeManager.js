@@ -128,12 +128,16 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
                         return ROUTE_STATUS[row.status + ''];
                     }
                 }
-                , {fixed: 'right', title: '操作', toolbar: '#optBar', width: 100}
+                , {
+                    fixed: 'right', title: '操作', width: 100, templet: function (row) {
+                        return '<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>';
+                    }
+                }
             ]]
         });
 
         //监听单元格事件
-        table.on('tool(routeTable)', function(obj) {
+        table.on('tool(routeTableFilter)', function(obj) {
             var data = obj.data;
             if(obj.event === 'edit'){
                 //表单初始赋值
@@ -141,8 +145,6 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
                 data.serviceId = currentServiceId;
 
                 updateForm.setData(data);
-
-                // form.val('updateWinFilter', data);
 
                 layer.open({
                     type: 1

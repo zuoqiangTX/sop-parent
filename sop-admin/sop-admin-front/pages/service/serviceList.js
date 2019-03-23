@@ -23,13 +23,24 @@ lib.config({
             page: false,
             cols: [[
                 {type: 'numbers'},
-                {field: 'name', title: '服务名称', width: 200},
+                {field: 'name', title: '服务名称(serviceId)', width: 200},
                 {field: 'instanceId', title: 'instanceId', width: 220},
                 {field: 'ipAddr', title: 'IP地址', width: 150},
                 {field: 'serverPort', title: '端口号', width: 100},
-                {field: 'status', title: 'status', width: 100},
+                {field: 'status', title: '服务状态', width: 100, templet: function (row) {
+                    if (row.parentId > 0) {
+                        var html = [];
+                        if (row.status === 'UP') {
+                            return '<span class="x-green">已上线</span>'
+                        }
+                        if (row.status === 'OUT_OF_SERVICE') {
+                            return '<span class="x-red">已下线</span>'
+                        }
+                    }
+                    return '';
+                }},
                 {field: 'updateTime', title: '最后更新时间', width: 150},
-                {fixed: 'right', title: '操作', width: 200, templet: function (row) {
+                {fixed: 'right', title: '操作', width: 150, templet: function (row) {
                     if (row.parentId > 0) {
                         var html = [];
                         if (row.status === 'UP') {

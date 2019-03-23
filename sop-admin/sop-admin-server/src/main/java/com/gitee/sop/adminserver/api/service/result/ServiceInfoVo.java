@@ -27,7 +27,7 @@ public class ServiceInfoVo {
     @ApiDocField(description = "端口")
     private String serverPort;
 
-    @ApiDocField(description = "status")
+    @ApiDocField(description = "status，服务状态，UP：已上线，OUT_OF_SERVICE：已下线")
     private String status;
 
     @ApiDocField(description = "statusPageUrl")

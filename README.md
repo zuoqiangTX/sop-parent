@@ -37,12 +37,21 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - 支持Spring Cloud Gateway
 - 关闭签名校验功能
 - 整合[easyopen](https://gitee.com/durcframework/easyopen)
-- 配置中心
+- Admin管理平台，统一管理微服务配置，管理路由管理，微服务上下线
 
 ## 后期规划
 
+- 完善admin功能
 - Spring Cloud Config（Zookeeper）
-- Admin管理平台，统一管理微服务配置，管理路由信息，微服务上下线，API文档管理等功能
+- SDK
+
+## admin界面预览
+
+![admin预览](https://images.gitee.com/uploads/images/2019/0323/142555_30a0c87d_332975.png "admin1.png")
+
+![admin预览](https://images.gitee.com/uploads/images/2019/0323/142623_2ce00e69_332975.png "admin2.png")
+
+![admin预览](https://images.gitee.com/uploads/images/2019/0323/142643_6fc1b152_332975.png "admin3.png")
 
 ## 工程说明
 

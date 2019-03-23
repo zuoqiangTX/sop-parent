@@ -10,7 +10,8 @@
 var lib = (function () {
     // 始终需要加载的js
     var alwaysLoadJs = [
-        '../../assets/lib/jquery/3.2.1/jquery.min.js'
+        '../../config/config.js'
+        ,'../../assets/lib/jquery/3.2.1/jquery.min.js'
         ,'../../assets/lib/layui/layui.js'
         ,'../../assets/lib/easyopen/sdk.js'
         ,'../../assets/lib/layuiext/Form.js'

@@ -3,7 +3,7 @@
  */
 var ApiUtil = (function () {
     // 接口URL,更改此处即可
-    var url = 'http://localhost:8082/api';
+    var url = SopConfig.url;
     var URI_CHAR = '/';
     var params = {};
 

@@ -58,7 +58,6 @@ biz_content	String	是		请求参数的集合，最大长度不限，除公共�
         Map<String, String> bizContent = new HashMap<>();
         bizContent.put("id", "1");
         bizContent.put("name", "葫芦娃");
-//        bizContent.put("name", "葫芦娃1234567890葫芦娃1234567890"); // 超出长度
 
         params.put("biz_content", JSON.toJSONString(bizContent));
 

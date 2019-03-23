@@ -154,7 +154,7 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
                 });
             }
         });
-        table.on('toolbar(routeTable)', function(obj) {
+        table.on('toolbar(routeTableFilter)', function(obj) {
             if (obj.event === 'add') {
                 var data = {};
                 data.profile = profile;

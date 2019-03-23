@@ -8,13 +8,17 @@ import com.gitee.sop.gatewaycommon.message.Error;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.result.BaseExecutorAdapter;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
+import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tanghc
@@ -24,9 +28,19 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
 
     @Override
     public int getBizHeaderCode(RequestContext requestContext) {
-        HttpServletResponse response = requestContext.getResponse();
+        // 微服务端返回的head
         int code = HttpStatus.OK.value();
-        String bizErrorCode = response.getHeader(SopConstants.X_BIZ_ERROR_CODE);
+        List<Pair<String, String>> bizHeaders = requestContext.getZuulResponseHeaders();
+        Optional<Pair<String, String>> first = bizHeaders.stream()
+                .filter(header -> {
+                    return SopConstants.X_BIZ_ERROR_CODE.equals(header.first());
+                }).findFirst();
+
+        Pair<String, String> header = first.orElseGet(() -> {
+            return new Pair<String, String>(HttpStatus.OK.name(), String.valueOf(HttpStatus.OK.value()));
+        });
+
+        String bizErrorCode = header.second();
         if (bizErrorCode != null) {
             code = Integer.valueOf(bizErrorCode);
         }

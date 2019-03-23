@@ -44,7 +44,7 @@ public class ServiceParamValidator implements ParamValidator {
     }
 
     private RuntimeException getValidateBizParamException(String errorMsg) {
-        String subCode = ServiceErrorEnum.ISP_PARAM_ERROR.getErrorMeta().getSubCode();
+        String subCode = ServiceErrorEnum.ISV_PARAM_ERROR.getErrorMeta().getSubCode();
         String[] msgToken = errorMsg.split(EQ);
         String msg = msgToken[0];
         if (msg.startsWith(LEFT_TOKEN) && msg.endsWith(RIGHT_TOKEN)) {

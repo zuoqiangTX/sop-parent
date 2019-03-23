@@ -24,7 +24,7 @@ public class DefaultGlobalExceptionHandler implements GlobalExceptionHandler {
     @ResponseBody
     public Object error(HttpServletRequest request, HttpServletResponse response) {
         ServiceResultBuilder serviceResultBuilder = ServiceConfig.getInstance().getServiceResultBuilder();
-        return serviceResultBuilder.buildError(request, response, new RuntimeException("系统繁忙"));
+        return serviceResultBuilder.buildError(request, response, new ServiceException("系统繁忙"));
     }
 
     @ExceptionHandler(ServiceException.class)
@@ -37,7 +37,7 @@ public class DefaultGlobalExceptionHandler implements GlobalExceptionHandler {
     @ResponseBody
     public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception exception) {
         log.error("系统错误", exception);
-        return this.processError(request, response, new RuntimeException("系统错误"));
+        return this.processError(request, response, new ServiceException("系统繁忙"));
     }
 
     /**

@@ -11,6 +11,7 @@
 	<description>一个开放平台解决方案项目，基于Spring Cloud实现，目标是能够让用户快速得搭建起自己的开放平台</description>
 
 	<modules>
+		<module>doc</module>
 		<module>sop-common</module>
 		<module>sop-admin</module>
 		<module>sop-registry</module>

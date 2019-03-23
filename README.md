@@ -57,6 +57,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 > 运行环境：JDK8，Maven3，Zookeeper
 
+- doc：开发文档
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理等功能
@@ -64,14 +65,6 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-book：微服务示例，book服务，也是Consumer，调用story提供的服务
 - sop-test：接口调用测试用例
 
-## 快速开始
-
-- 安装并启动zookeeper，[安装教程](http://zookeeper.apache.org/doc/r3.4.13/zookeeperStarted.html)
-- IDE打开项目(IDEA下可以打开根pom.xml，然后open as project)
-- 启动注册中心，sop-registry（运行SopRegistryApplication.java）
-- 启动微服务：sop-story-web(运行SopStoryApplication.java)
-- 启动网关：sop-gateway（运行SopGatewayApplication.java）
-- 找到sop-test，打开测试用例，进行接口调用测试，运行com.gitee.sop.AlipayClientPostTest.testPost()
 
 ## 相关文档
 

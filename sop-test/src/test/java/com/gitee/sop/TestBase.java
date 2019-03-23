@@ -78,5 +78,12 @@ public class TestBase extends TestCase {
         return null;
     }
 
+    protected String buildParamQuery(Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            sb.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+        }
+        return sb.toString().substring(1);
+    }
 
 }

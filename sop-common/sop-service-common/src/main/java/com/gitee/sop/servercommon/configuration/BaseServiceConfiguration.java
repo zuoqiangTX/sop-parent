@@ -61,12 +61,13 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport {
     }
 
     @PostConstruct
-    public void after() {
+    public final void after() {
+        initMessage();
         doAfter();
     }
 
     protected void doAfter() {
-        initMessage();
+
     }
 
     protected void initMessage() {

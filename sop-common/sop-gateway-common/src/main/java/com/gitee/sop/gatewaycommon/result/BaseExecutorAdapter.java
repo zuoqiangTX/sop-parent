@@ -38,7 +38,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
      * @param t
      * @return
      */
-    public abstract int getBizHeaderCode(T t);
+    public abstract int getResponseStatus(T t);
 
     /**
      * 返回Api参数
@@ -54,7 +54,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return serviceResult;
         }
         serviceResult = wrapResult(serviceResult);
-        int responseStatus = this.getBizHeaderCode(request);
+        int responseStatus = this.getResponseStatus(request);
         JSONObject jsonObjectService;
         if (responseStatus == HttpStatus.OK.value()) {
             // 200正常返回
@@ -88,6 +88,9 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return defaultSetting;
         }
         Map<String, ?> params = this.getApiParam(request);
+        if (params == null) {
+            return true;
+        }
         Object name = params.get(ParamNames.API_NAME);
         Object version = params.get(ParamNames.VERSION_NAME);
         if(name == null) {
@@ -119,17 +122,22 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     public String merge(T exchange, JSONObject jsonObjectService) {
         JSONObject ret = new JSONObject();
+        String name = "error";
+        String sign = "";
         Map<String, ?> params = this.getApiParam(exchange);
-        Object name = params.get(ParamNames.API_NAME);
-        if (name == null) {
-            name = "error";
+        if (params != null) {
+            Object method = params.get(ParamNames.API_NAME);
+            if (method != null) {
+                name = String.valueOf(method);
+            }
+            Object _sign = params.get(ParamNames.SIGN_NAME);
+            if (_sign != null) {
+                sign = String.valueOf(_sign);
+            }
         }
-        Object sign = params.get(ParamNames.SIGN_NAME);
-        if (sign == null) {
-            sign = "";
-        }
+
         // 点换成下划线
-        String method = String.valueOf(name).replace(DOT, UNDERLINE);
+        String method = name.replace(DOT, UNDERLINE);
         ret.put(method + DATA_SUFFIX, jsonObjectService);
         ret.put(ParamNames.SIGN_NAME, sign);
         return ret.toJSONString();

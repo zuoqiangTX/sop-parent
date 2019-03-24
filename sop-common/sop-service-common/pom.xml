@@ -31,7 +31,7 @@
         <dependency>
             <groupId>net.oschina.durcframework</groupId>
             <artifactId>easyopen</artifactId>
-            <version>1.16.0</version>
+            <version>1.16.1</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

@@ -7,7 +7,8 @@ import com.gitee.sop.gatewaycommon.bean.TargetRoute;
  */
 public class RouteRepositoryContext {
 
-    private RouteRepositoryContext(){}
+    private RouteRepositoryContext() {
+    }
 
     private static RouteRepository<? extends TargetRoute> routeRepository;
 
@@ -15,7 +16,7 @@ public class RouteRepositoryContext {
         return routeRepository;
     }
 
-    public static <T extends TargetRoute> void  setRouteRepository(RouteRepository<T> routeRepository) {
+    public static <T extends TargetRoute> void setRouteRepository(RouteRepository<T> routeRepository) {
         RouteRepositoryContext.routeRepository = routeRepository;
     }
 

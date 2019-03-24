@@ -121,13 +121,17 @@ public class BaseZuulConfiguration {
     }
 
     @PostConstruct
-    public void after() {
+    public final void after() {
+        if (RouteRepositoryContext.getRouteRepository() == null) {
+            throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
+        }
+        initMessage();
+        apiMetaManager.refresh();
         doAfter();
     }
 
     protected void doAfter() {
-        initMessage();
-        apiMetaManager.refresh();
+
     }
 
     protected void initMessage() {

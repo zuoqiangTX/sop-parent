@@ -34,9 +34,9 @@ public class JSR303DemoTest extends TestBase {
         // 业务参数
         Map<String, String> bizContent = new HashMap<>();
         // 对应校验规则查看GoodsParam.java
-        bizContent.put("goods_name", "iphone6");
-        bizContent.put("goods_remark", "iphone6");
-        bizContent.put("goods_comment", "1");
+//        bizContent.put("goods_name", "iphone6");
+//        bizContent.put("goods_remark", "iphone6");
+//        bizContent.put("goods_comment", "1");
 
         params.put("biz_content", JSON.toJSONString(bizContent));
 

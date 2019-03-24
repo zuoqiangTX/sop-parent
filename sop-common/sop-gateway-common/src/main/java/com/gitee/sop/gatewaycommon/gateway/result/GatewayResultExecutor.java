@@ -26,7 +26,7 @@ import java.util.Map;
 public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange, GatewayResult> {
 
     @Override
-    public int getBizHeaderCode(ServerWebExchange exchange) {
+    public int getResponseStatus(ServerWebExchange exchange) {
         int responseStatus = HttpStatus.OK.value();
         List<String> errorCodeList = exchange.getResponse().getHeaders().get(SopConstants.X_BIZ_ERROR_CODE);
         if (!CollectionUtils.isEmpty(errorCodeList)) {

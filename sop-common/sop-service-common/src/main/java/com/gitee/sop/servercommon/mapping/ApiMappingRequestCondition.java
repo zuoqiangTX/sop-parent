@@ -1,7 +1,7 @@
 package com.gitee.sop.servercommon.mapping;
 
-import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.bean.ParamNames;
+import com.gitee.sop.servercommon.bean.ServiceConfig;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
@@ -32,6 +32,7 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
     /**
      * 如果版本号跟当前对象中的版本号匹配，则表是命中的对应的方法
      * 否则返回null，表示不匹配
+     *
      * @param request
      * @return 返回ApiMappingRequestCondition
      */
@@ -53,6 +54,7 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
     /**
      * 对两个RequestCondition对象进行比较，这里主要是如果存在两个注册的一样的Mapping，
      * 那么就会对这两个Mapping进行排序，以判断哪个Mapping更适合处理当前request请求
+     *
      * @param other
      * @param request
      * @return 返回-1,0,1

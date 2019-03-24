@@ -12,10 +12,7 @@ import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,24 +24,21 @@ import java.util.Optional;
 public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, String> {
 
     @Override
-    public int getBizHeaderCode(RequestContext requestContext) {
-        // 微服务端返回的head
-        int code = HttpStatus.OK.value();
+    public int getResponseStatus(RequestContext requestContext) {
         List<Pair<String, String>> bizHeaders = requestContext.getZuulResponseHeaders();
-        Optional<Pair<String, String>> first = bizHeaders.stream()
+        Optional<String> first = bizHeaders.stream()
                 .filter(header -> {
                     return SopConstants.X_BIZ_ERROR_CODE.equals(header.first());
+                }).map(header -> {
+                    return header.second();
                 }).findFirst();
 
-        Pair<String, String> header = first.orElseGet(() -> {
-            return new Pair<String, String>(HttpStatus.OK.name(), String.valueOf(HttpStatus.OK.value()));
+        String status = first.orElseGet(() -> {
+            int respStatus = requestContext.getResponseStatusCode();
+            return String.valueOf(respStatus);
         });
 
-        String bizErrorCode = header.second();
-        if (bizErrorCode != null) {
-            code = Integer.valueOf(bizErrorCode);
-        }
-        return code;
+        return Integer.valueOf(status);
     }
 
     @Override

@@ -24,7 +24,7 @@ lib.config({
             cols: [[
                 {type: 'numbers'},
                 {field: 'name', title: '服务名称(serviceId)', width: 200},
-                {field: 'instanceId', title: 'instanceId', width: 220},
+                {field: 'instanceId', title: 'instanceId', width: 250},
                 {field: 'ipAddr', title: 'IP地址', width: 150},
                 {field: 'serverPort', title: '端口号', width: 100},
                 {field: 'status', title: '服务状态', width: 100, templet: function (row) {

@@ -1,5 +1,6 @@
 package com.gitee.sop.servercommon.configuration;
 
+import com.gitee.easyopen.ApiContext;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.util.ReflectionUtil;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
@@ -24,6 +25,10 @@ import java.util.function.Consumer;
  * @author tanghc
  */
 public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
+
+    static {
+        ApiContext.getApiConfig().setIgnoreValidate(false);
+    }
 
     @Override
     protected RequestMappingEvent getRequestMappingEvent(ApiMetaManager apiMetaManager, Environment environment) {
@@ -56,6 +61,8 @@ public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
                     apiMeta.setName(api.name());
                     apiMeta.setVersion(api.version());
                     apiMeta.setIgnoreValidate(BooleanUtils.toInteger(api.ignoreValidate()));
+                    // 对结果不合并
+                    apiMeta.setMergeResult(BooleanUtils.toInteger(false));
                     // /api/goods.get/
                     String servletPath = this.buildPath(api);
                     apiMeta.setPath(servletPath);
@@ -88,11 +95,4 @@ public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
         }
     }
 
-    @Override
-    public void after() {
-        super.after();
-        // 取消验证
-        // todo:需要在easyopen端修改
-        //ApiContext.getApiConfig().setIgnoreValidate(true);
-    }
 }

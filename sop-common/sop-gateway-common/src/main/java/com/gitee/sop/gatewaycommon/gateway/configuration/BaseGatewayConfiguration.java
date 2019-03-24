@@ -105,13 +105,17 @@ public class BaseGatewayConfiguration {
 
 
     @PostConstruct
-    public void after() {
+    protected final void after() {
+        if (RouteRepositoryContext.getRouteRepository() == null) {
+            throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
+        }
+        initMessage();
+        gatewayZookeeperApiMetaManager.refresh();
         doAfter();
     }
 
     protected void doAfter() {
-        initMessage();
-        gatewayZookeeperApiMetaManager.refresh();
+
     }
 
     protected void initMessage() {

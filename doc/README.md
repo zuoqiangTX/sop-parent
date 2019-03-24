@@ -1,5 +1,7 @@
 # 开发文档
 
+文档放在docs/files下，写完文档记得执行下`SidebarTest.main()`方法
+
 配合gitee pages服务使用，gitee pages服务指定docs目录。
 
 ## 本地查看开发文档

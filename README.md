@@ -74,4 +74,4 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 Q群：328419269
 
-> If you like, you can change ☆ → [★](https://gitee.com/durcframework/SOP/star)
+> If you like, you can change ☆ → ★

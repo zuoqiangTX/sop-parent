@@ -33,7 +33,7 @@ public class ZuulConfig extends AlipayZuulConfiguration {
 }
 
 /**
- * 开通支付宝开放平台能力
+ * 开通淘宝开放平台能力
  * @author tanghc
  */
 //@Configuration

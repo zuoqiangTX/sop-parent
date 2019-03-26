@@ -13,11 +13,10 @@
 	<modules>
 		<module>doc</module>
 		<module>sop-common</module>
+		<module>sop-example</module>
 		<module>sop-admin</module>
 		<module>sop-registry</module>
 		<module>sop-gateway</module>
-		<module>sop-story</module>
-		<module>sop-book</module>
 		<module>sop-test</module>
 	</modules>
 </project>

@@ -61,3 +61,5 @@ public class ZuulConfig extends EasyopenZuulConfiguration {
 配置完毕，重启网关服务，可运行测试用例`EasyopenClientPostTest.java`验证
 
 **注：** 配置完成后easyopen签名校验将会关闭，改用网关端来校验；网关对easyopen返回的结果不进行处理，直接返回服务端的结果。
+
+完整配置可查看sop-example/sop-easyopen项目

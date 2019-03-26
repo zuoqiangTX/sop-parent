@@ -1,9 +1,0 @@
-server:
-  port: 3333
-
-eureka:
-  port: 1111
-  host: localhost
-  client:
-    serviceUrl:
-      defaultZone: http://${eureka.host}:${eureka.port}/eureka/

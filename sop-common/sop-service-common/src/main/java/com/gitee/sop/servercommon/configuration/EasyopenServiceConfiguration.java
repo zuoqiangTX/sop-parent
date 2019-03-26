@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
 
     static {
-        ApiContext.getApiConfig().setIgnoreValidate(false);
+        ApiContext.getApiConfig().setIgnoreValidate(true);
     }
 
     @Override

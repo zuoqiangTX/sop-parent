@@ -4,12 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gitee.sop</groupId>
-    <artifactId>sop-book-parent</artifactId>
+    <artifactId>sop-example</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>sop-book-api</module>
-        <module>sop-book-web</module>
+        <module>sop-story</module>
+        <module>sop-book</module>
+		<module>sop-easyopen</module>		
     </modules>
 </project>

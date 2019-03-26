@@ -61,8 +61,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理等功能
-- sop-story：微服务示例，story服务，同时作为Provider提供服务
-- sop-book：微服务示例，book服务，也是Consumer，调用story提供的服务
+- sop-example：微服务示例
 - sop-test：接口调用测试用例
 
 

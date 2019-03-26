@@ -12,6 +12,7 @@ import com.gitee.sop.gatewaycommon.zuul.route.ZuulZookeeperRouteManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.context.annotation.Bean;
@@ -40,16 +41,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * 路由获取
-     * @param zuulRouteRepository
-     * @return
-     */
-    @Bean
-    SopRouteLocator sopRouteLocator(ZuulRouteRepository zuulRouteRepository) {
-        return new SopRouteLocator(zuulRouteRepository);
-    }
-
-    /**
      * 选取路由
      * @param zuulRouteRepository
      * @param proxyRequestHelper
@@ -57,7 +48,8 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      */
     @Bean
     public PreDecorationFilter preDecorationFilter(ZuulRouteRepository zuulRouteRepository, ProxyRequestHelper proxyRequestHelper) {
-        SopRouteLocator routeLocator = new SopRouteLocator(zuulRouteRepository);
+        // 自定义路由
+        RouteLocator routeLocator = new SopRouteLocator(zuulRouteRepository);
         return new PreDecorationFilter(routeLocator,
                 this.server.getServlet().getContextPath(),
                 this.zuulProperties,

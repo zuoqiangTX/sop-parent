@@ -1,9 +1,8 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.manager.RouteManager;
+import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
-import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
@@ -18,24 +17,16 @@ import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
-
 /**
  * @author tanghc
  */
-public class BaseZuulConfiguration {
+public class BaseZuulConfiguration extends AbstractConfiguration {
 
     @Autowired
     protected ZuulProperties zuulProperties;
 
     @Autowired
     protected ServerProperties server;
-
-    @Autowired
-    protected Environment environment;
-
-    @Autowired
-    protected RouteManager apiMetaManager;
 
     /**
      * 路由存储
@@ -118,24 +109,6 @@ public class BaseZuulConfiguration {
     @Bean
     ZuulErrorController baseZuulController() {
         return ApiContext.getApiConfig().getZuulErrorController();
-    }
-
-    @PostConstruct
-    public final void after() {
-        if (RouteRepositoryContext.getRouteRepository() == null) {
-            throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
-        }
-        initMessage();
-        apiMetaManager.refresh();
-        doAfter();
-    }
-
-    protected void doAfter() {
-
-    }
-
-    protected void initMessage() {
-        ErrorFactory.initMessageSource(ApiContext.getApiConfig().getI18nModules());
     }
 
 }

@@ -41,9 +41,10 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 后期规划
 
-- 完善admin功能
-- Spring Cloud Config（Zookeeper）
+- 接入方管理+秘钥管理
+- 接口权限分配
 - SDK
+- Spring Cloud Config（Zookeeper）
 
 ## admin界面预览
 

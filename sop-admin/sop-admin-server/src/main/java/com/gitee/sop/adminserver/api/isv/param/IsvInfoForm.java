@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * @author tanghc
@@ -31,6 +33,6 @@ public class IsvInfoForm {
     @ApiDocField(description = "状态：0：启用，1：禁用")
     private Byte status = 0;
 
-//    @NotEmpty(message = "角色不能为空")
-//    private List<String> roleCode;
+    @NotEmpty(message = "角色不能为空")
+    private List<String> roleCode;
 }

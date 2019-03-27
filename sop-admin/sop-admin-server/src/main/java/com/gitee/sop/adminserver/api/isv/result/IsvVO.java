@@ -33,4 +33,6 @@ public class IsvVO {
 
     /**  数据库字段：gmt_modified */
     private Date gmtModified;
+
+    private List<RoleVO> roleList;
 }

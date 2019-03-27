@@ -39,6 +39,18 @@
 			<artifactId>easyopen-spring-boot-starter</artifactId>
 			<version>1.16.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.oschina.durcframework</groupId>
+			<artifactId>fastmybatis-spring-boot-starter</artifactId>
+			<version>1.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- zookeeper客户端针对zookeeper-3.4.x
 		 如果zookeeper使用3.5.x，可以直接使用curator-recipes最高版本
 		 详情：http://curator.apache.org/zk-compatibility.html

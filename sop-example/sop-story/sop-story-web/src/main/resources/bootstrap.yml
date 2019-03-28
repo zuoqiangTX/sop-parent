@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: story-service
+    description: story服务
+
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181

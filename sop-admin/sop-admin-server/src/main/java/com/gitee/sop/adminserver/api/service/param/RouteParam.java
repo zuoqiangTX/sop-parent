@@ -1,7 +1,8 @@
 package com.gitee.sop.adminserver.api.service.param;
 
 import com.gitee.easyopen.doc.annotation.ApiDocField;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,12 +10,9 @@ import javax.validation.constraints.NotNull;
 /**
  * @author tanghc
  */
-@Data
+@Getter
+@Setter
 public class RouteParam {
-
-    @NotBlank(message = "profile不能为空")
-    @ApiDocField(description = "profile")
-    private String profile;
 
     @NotBlank(message = "serviceId不能为空")
     @ApiDocField(description = "serviceId")

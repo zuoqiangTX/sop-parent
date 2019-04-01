@@ -26,8 +26,8 @@ public class PermIsvRole {
     /**  数据库字段：id */
     private Long id;
 
-    /** isv_info.id, 数据库字段：isv_info_id */
-    private Long isvInfoId;
+    /** isv_info表id, 数据库字段：isv_id */
+    private Long isvId;
 
     /** 角色code, 数据库字段：role_code */
     private String roleCode;

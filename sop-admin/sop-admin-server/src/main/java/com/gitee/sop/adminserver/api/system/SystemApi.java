@@ -17,18 +17,5 @@ import java.util.stream.Stream;
 @ApiDoc("系统接口")
 public class SystemApi {
 
-    @Value("${sop-admin.profiles}")
-    private String profiles;
 
-    private List<String> profileList;
-
-    @ApiDocMethod(description = "获取profile列表")
-    @Api(name = "system.profile.list")
-    public List<String> listProfiles() {
-        if (profileList == null) {
-            String[] arr = profiles.split("\\,");
-            profileList = Stream.of(arr).collect(Collectors.toList());
-        }
-        return profileList;
-    }
 }

@@ -11,7 +11,6 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
  */
 public class CuratorTest extends TestCase {
 
-
     private String zookeeperServerAddr = "127.0.0.1:2181";
 
     /**

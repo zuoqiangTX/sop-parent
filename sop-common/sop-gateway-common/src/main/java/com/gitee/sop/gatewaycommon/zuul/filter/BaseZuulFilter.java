@@ -15,6 +15,8 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
 
+    public static final int PRE_VALIDATE_FILTER_ORDER = -1000;
+
     private Integer filterOrder;
 
     /**

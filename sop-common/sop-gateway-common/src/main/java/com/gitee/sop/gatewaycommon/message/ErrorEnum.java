@@ -93,6 +93,10 @@ public enum ErrorEnum {
     ISV_INSUFFICIENT_ISV_PERMISSIONS(Codes.CODE_ISV_PERM, "isv.insufficient-isv-permissions"),
     /** 代理的商户没有当前接口权限 */
     ISV_INSUFFICIENT_USER_PERMISSIONS(Codes.CODE_ISV_PERM, "isv.insufficient-user-permissions"),
+    /** 没有当前接口权限 */
+    ISV_ROUTE_NO_PERMISSIONS(Codes.CODE_ISV_PERM, "isv.route-no-permissions"),
+    /** 禁止访问 */
+    ISV_ACCESS_FORBIDDEN(Codes.CODE_ISV_PERM, "isv.access-forbidden"),
 
     ;
     private ErrorMeta errorMeta;

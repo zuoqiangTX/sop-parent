@@ -44,6 +44,11 @@ public class BaseRouteDefinition {
      */
     private int mergeResult;
 
+    /**
+     * 接口是否需要授权才能访问
+     */
+    private int permission;
+
     public boolean enable() {
         return status == RouteStatus.ENABLE.getStatus();
     }

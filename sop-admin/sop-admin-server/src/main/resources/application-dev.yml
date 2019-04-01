@@ -1,7 +1,7 @@
 server:
   port: 8082
 
-
+# 不用改
 spring:
   application:
     name: sop-admin
@@ -27,11 +27,7 @@ easyopen:
   mono: false
   ignore-validate: true
 
-# 默认profile列表，新增可以在后面加
-sop-admin:
-  profiles: default,prod,dev,test
-
-# 注册中心地址，这里只是参数，并不会去注册
+# 注册中心地址，根据实际情况改，这里只是参数，并不会去注册
 eureka:
   port: 1111
   host: localhost
@@ -39,8 +35,13 @@ eureka:
     serviceUrl:
       defaultZone: http://${eureka.host}:${eureka.port}/eureka/
 
+# 根据实际情况改
 logging:
   level:
     com:
       gitee: debug
 
+# 不用改
+mybatis:
+  fill: {com.gitee.fastmybatis.core.support.DateFillInsert: gmt_create,
+         com.gitee.fastmybatis.core.support.DateFillUpdate: gmt_modified}

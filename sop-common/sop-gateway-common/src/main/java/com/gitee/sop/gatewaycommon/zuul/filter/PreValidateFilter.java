@@ -22,8 +22,7 @@ public class PreValidateFilter extends BaseZuulFilter {
 
     @Override
     protected int getFilterOrder() {
-        // 在org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter前面
-        return FilterConstants.PRE_DECORATION_FILTER_ORDER - 1;
+        return PRE_VALIDATE_FILTER_ORDER;
     }
 
     @Override

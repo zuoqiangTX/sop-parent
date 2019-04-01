@@ -23,9 +23,6 @@
 </div>
 <div class="x-body">
     <div class="layui-row">
-
-    </div>
-    <div class="layui-row">
         <div class="layui-col-md2">
             <ul id="leftTree"></ul>
         </div>
@@ -57,14 +54,13 @@
 
 </div>
 
-<div id="addWin" style="display: none;padding: 20px;">
+<div id="addWin" class="x-win">
     <form id="addForm" class="layui-form" action="" lay-filter="addWinFilter">
         <input type="hidden" name="serviceId" />
-        <input type="hidden" name="profile" />
         <div class="layui-form-item">
             <label class="layui-form-label">id</label>
             <div class="layui-input-block">
-                <input type="text" name="id" class="layui-input"/>
+                <input type="text" name="id" lay-verify="required" class="layui-input"/>
             </div>
         </div>
         <div class="layui-form-item">
@@ -109,10 +105,9 @@
     </form>
 </div>
 
-<div id="updateWin" style="display: none;padding: 20px;">
+<div id="updateWin" class="x-win">
     <form id="updateForm" class="layui-form" action="" lay-filter="updateWinFilter">
         <input type="hidden" name="serviceId" />
-        <input type="hidden" name="profile" />
         <div class="layui-form-item">
             <label class="layui-form-label">id</label>
             <div class="layui-input-block">
@@ -160,6 +155,29 @@
         </div>
     </form>
 </div>
+
+<div id="authWin" class="x-win">
+    <form id="authForm" style="width: 400px" class="layui-form" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input type="text" name="routeId" class="layui-input" readonly="readonly"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色</label>
+            <div id="roleArea" class="layui-input-block">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="authFormSubmitFilter">保存</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll()">取消</button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <script type="text/javascript" src="../../assets/js/lib.js"></script>
 <script type="text/javascript" src="routeManager.js"></script>
 </body>

@@ -30,7 +30,7 @@ public class PermRolePermission {
     private String roleCode;
 
     /** api_id, 数据库字段：route_id */
-    private Long routeId;
+    private String routeId;
 
     /**  数据库字段：gmt_create */
     private Date gmtCreate;

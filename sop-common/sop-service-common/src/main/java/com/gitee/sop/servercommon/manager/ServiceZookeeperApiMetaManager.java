@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -50,8 +51,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     public ServiceZookeeperApiMetaManager(Environment environment) {
         this.environment = environment;
-        String profile = environment.getProperty("spring.profiles.active", "default");
-        this.routeRootPath = SOP_SERVICE_ROUTE_PATH + "-" + profile;
+        this.routeRootPath = SOP_SERVICE_ROUTE_PATH;
         zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
         if (StringUtils.isEmpty(zookeeperServerAddr)) {
             throw new IllegalArgumentException("未指定spring.cloud.zookeeper.connect-string参数");
@@ -107,17 +107,15 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
         GatewayRouteDefinition gatewayRouteDefinition = new GatewayRouteDefinition();
         // 唯一id规则：接口名 + 版本号
+        BeanUtils.copyProperties(apiMeta, gatewayRouteDefinition);
         gatewayRouteDefinition.setId(apiMeta.fetchNameVersion());
         gatewayRouteDefinition.setFilters(Collections.emptyList());
-        gatewayRouteDefinition.setOrder(0);
         List<GatewayPredicateDefinition> predicates = Arrays.asList(this.buildNameVersionPredicateDefinition(apiMeta));
         gatewayRouteDefinition.setPredicates(predicates);
         String uri = this.buildUri(serviceApiInfo, apiMeta);
         String path = this.buildServletPath(serviceApiInfo, apiMeta);
         gatewayRouteDefinition.setUri(uri);
         gatewayRouteDefinition.setPath(path);
-        gatewayRouteDefinition.setIgnoreValidate(apiMeta.getIgnoreValidate());
-        gatewayRouteDefinition.setMergeResult(apiMeta.getMergeResult());
         return gatewayRouteDefinition;
     }
 

@@ -30,4 +30,9 @@ public @interface ApiAbility {
      * 告诉网关是否对结果进行合并，默认合并。设置为false，客户端将直接收到微服务端的结果。
      */
     boolean mergeResult() default true;
+
+    /**
+     * 指定接口是否需要授权才能访问，可在admin中进行修改
+     */
+    boolean permission() default false;
 }

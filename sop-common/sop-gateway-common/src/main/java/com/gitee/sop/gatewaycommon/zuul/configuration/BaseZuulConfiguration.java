@@ -5,6 +5,7 @@ import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreRoutePermissionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
@@ -74,6 +75,15 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     @Bean
     PreValidateFilter preValidateFilter() {
         return new PreValidateFilter();
+    }
+
+    /**
+     * 权限校验
+     * @return
+     */
+    @Bean
+    PreRoutePermissionFilter preRoutePermissionFilter() {
+        return new PreRoutePermissionFilter();
     }
 
     /**

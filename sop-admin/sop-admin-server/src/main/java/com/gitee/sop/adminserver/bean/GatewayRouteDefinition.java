@@ -54,4 +54,9 @@ public class GatewayRouteDefinition {
      * 合并结果
      */
     private int mergeResult = 1;
+
+    /**
+     * 是否需要授权才能访问
+     */
+    private int permission;
 }

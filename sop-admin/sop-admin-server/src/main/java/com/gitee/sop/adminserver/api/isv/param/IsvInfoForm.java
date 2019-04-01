@@ -5,7 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,11 +13,13 @@ import java.util.List;
  */
 @Data
 public class IsvInfoForm {
+
+    private int signType = 1;
+
     /** secret, 数据库字段：secret */
-    @ApiDocField(description = "secret", required = true)
-    @NotBlank(message = "secret不能为空")
+    @ApiDocField(description = "secret")
     @Length(max = 100,message = "secret长度不能超过100")
-    private String secret;
+    private String secret = "";
 
     /** 公钥, 数据库字段：pub_key */
     @ApiDocField(description = "pubKey", required = true)
@@ -33,6 +35,6 @@ public class IsvInfoForm {
     @ApiDocField(description = "状态：0：启用，1：禁用")
     private Byte status = 0;
 
-    @NotEmpty(message = "角色不能为空")
-    private List<String> roleCode;
+    @ApiDocField(description = "roleCode数组", elementClass = String.class)
+    private List<String> roleCode = Collections.emptyList();
 }

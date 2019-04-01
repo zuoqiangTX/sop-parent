@@ -26,6 +26,8 @@ public class ServiceApiInfo {
         private int ignoreValidate;
         /** 是否合并结果 */
         private int mergeResult;
+        /** 是否需要授权才能访问 */
+        private int permission;
 
         public ApiMeta() {
         }

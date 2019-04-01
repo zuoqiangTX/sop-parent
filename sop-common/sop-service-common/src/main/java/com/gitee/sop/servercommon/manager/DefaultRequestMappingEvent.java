@@ -89,6 +89,7 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
             ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, version);
             apiMeta.setIgnoreValidate(BooleanUtils.toInteger(apiMappingInfo.isIgnoreValidate()));
             apiMeta.setMergeResult(BooleanUtils.toInteger(apiMappingInfo.isMergeResult()));
+            apiMeta.setPermission(BooleanUtils.toInteger(apiMappingInfo.isPermission()));
             return apiMeta;
         }
         return null;

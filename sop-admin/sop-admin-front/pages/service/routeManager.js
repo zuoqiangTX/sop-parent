@@ -1,13 +1,14 @@
-lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'form'], function () {
+lib.importJs('../../assets/js/routerole.js')
+    .use(['element', 'table', 'tree', 'form'], function () {
     var ROUTE_STATUS = {
         '0': '待审核'
         ,'1': '<span class="x-green">已启用</span>'
         ,'2': '<span class="x-red">已禁用</span>'
     }
-    var profile = window.profile;
     var form = layui.form;
     var updateForm = layui.Form('updateForm');
     var addForm = layui.Form('addForm');
+    var authForm = layui.Form('authForm');
     var table = layui.table;
 
     var currentServiceId;
@@ -40,8 +41,18 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
         return false;
     });
 
+    form.on('submit(authFormSubmitFilter)', function(data) {
+        var params = authForm.getData();
+        ApiUtil.post('route.role.update', params, function (resp) {
+            layer.closeAll();
+            routeTable.reload();
+        })
+        return false;
+    });
+
+
     function initTree() {
-        ApiUtil.post('service.list', {profile: profile}, function (resp) {
+        ApiUtil.post('service.list', {}, function (resp) {
             var serviceList = resp.data;
             var children = [];
             for (var i = 0; i < serviceList.length; i++) {
@@ -55,7 +66,7 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
             layui.tree({
                 elem: '#leftTree' //传入元素选择器
                 , nodes: [{ //节点
-                    name: '服务列表(' + profile + ')'
+                    name: '服务列表'
                     , spread: true // 展开
                     , children: children
                 }]
@@ -80,7 +91,7 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
         searchTable({
             serviceId: serviceId
         });
-        smTitle = '[ <strong>profile：</strong>' + profile + '&nbsp;&nbsp;&nbsp;&nbsp;<strong>serviceId：</strong>' + currentServiceId + ' ]';
+        smTitle = '[ <strong>serviceId：</strong>' + currentServiceId + ' ]';
     }
 
     /**
@@ -90,11 +101,9 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
     function searchTable(params) {
         var postData = {
             data: JSON.stringify(params)
-            , profile: profile
         };
-
         if (!routeTable) {
-            routeTable = initTable(postData);
+            routeTable = renderTable(postData);
         } else {
             routeTable.reload({
                 where: postData
@@ -102,7 +111,7 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
         }
     }
 
-    function initTable(postData) {
+    function renderTable(postData) {
         var routeTable = table.render({
             elem: '#routeTable'
             , toolbar: '#toolbar'
@@ -110,9 +119,20 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
             , where: postData
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
-                {field: 'id', title: 'id(接口名+版本号)', width: 250}
+                {field: 'id', title: 'id(接口名+版本号)'}
                 , {field: 'uri', title: 'uri', width: 200}
-                , {field: 'path', title: 'path', width: 200}
+                , {field: 'path', title: 'path'}
+                , {field: 'roles', title: '访问权限', width: 100, templet: function (row) {
+                        if (!row.permission) {
+                            return '（公开）';
+                        }
+                        var html = [];
+                        var roles = row.roles;
+                        for (var i = 0; i < roles.length; i++) {
+                            html.push(roles[i].description);
+                        }
+                        return html.length > 0 ? html.join(', ') : '<span class="x-red">未授权</span>';
+                }}
                 , {
                     field: 'ignoreValidate', width: 80, title: '忽略验证', templet: function (row) {
                         return row.ignoreValidate ? '<span class="x-red">是</span>' : '<span>否</span>';
@@ -129,8 +149,12 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
                     }
                 }
                 , {
-                    fixed: 'right', title: '操作', width: 100, templet: function (row) {
-                        return '<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>';
+                    fixed: 'right', title: '操作', width: 150, templet: function (row) {
+                        var html = ['<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">修改</a>'];
+                        if (row.permission) {
+                            html.push('<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="auth">授权</a>');
+                        }
+                        return html.join('');
                     }
                 }
             ]]
@@ -139,9 +163,9 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
         //监听单元格事件
         table.on('tool(routeTableFilter)', function(obj) {
             var data = obj.data;
-            if(obj.event === 'edit'){
+            var event = obj.event;
+            if(event === 'edit'){
                 //表单初始赋值
-                data.profile = profile;
                 data.serviceId = currentServiceId;
 
                 updateForm.setData(data);
@@ -152,12 +176,29 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
                     ,area: ['500px', '460px']
                     ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                 });
+            } else if (event === 'auth') {
+                ApiUtil.post('route.role.get', {id: data.id}, function (resp) {
+                    var roleList = resp.data;
+                    var roleCode = [];
+                    for (var i = 0; i < roleList.length; i++) {
+                        roleCode.push(roleList[i].roleCode);
+                    }
+                    authForm.setData({
+                        routeId: data.id
+                        , roleCode: roleCode
+                    })
+                    layer.open({
+                        type: 1
+                        ,title: '路由授权'
+                        ,area: ['500px', '260px']
+                        ,content: $('#authWin')
+                    });
+                })
             }
         });
         table.on('toolbar(routeTableFilter)', function(obj) {
             if (obj.event === 'add') {
                 var data = {};
-                data.profile = profile;
                 data.serviceId = currentServiceId;
                 data.id = '';
                 // 新加的路由先设置成禁用
@@ -177,5 +218,7 @@ lib.importJs('../../assets/js/profile.js').use(['element', 'table', 'tree', 'for
     }
 
     initTree();
+
+    RouteRole.loadAllRole(form, 'roleArea');
 
 });

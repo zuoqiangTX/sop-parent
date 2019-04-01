@@ -2,12 +2,12 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.param.UploadContext;
-import com.gitee.sop.gatewaycommon.secret.AppSecretManager;
-import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
+import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +31,7 @@ public class ApiValidator implements Validator {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidator.class);
 
     private static final int MILLISECOND_OF_ONE_SECOND = 1000;
+    public static final int STATUS_FORBIDDEN = 2;
 
 
     private static List<String> FORMAT_LIST = Arrays.asList("json", "xml");
@@ -50,7 +51,7 @@ public class ApiValidator implements Validator {
                 logger.debug("忽略签名验证, name:{}, version:{}", param.fetchName(), param.fetchVersion());
             }
         } else {
-            // 需要验证签名
+            // 需要验证签名,先校验appKey，后校验签名顺序不能变
             checkAppKey(param);
             checkSign(param);
         }
@@ -112,11 +113,16 @@ public class ApiValidator implements Validator {
         if (StringUtils.isEmpty(param.fetchAppKey())) {
             throw ErrorEnum.ISV_MISSING_APP_ID.getErrorMeta().getException();
         }
-        AppSecretManager appSecretManager = ApiContext.getApiConfig().getAppSecretManager();
-        Assert.notNull(appSecretManager, "appSecretManager未初始化");
-        boolean isTrueAppKey = appSecretManager.isValidAppKey(param.fetchAppKey());
-        if (!isTrueAppKey) {
+        IsvManager isvManager = ApiContext.getApiConfig().getIsvManager();
+        Assert.notNull(isvManager, "isvManager未初始化");
+        Isv isv = isvManager.getIsv(param.fetchAppKey());
+        // 没有用户
+        if (isv == null) {
             throw ErrorEnum.ISV_INVALID_APP_ID.getErrorMeta().getException();
+        }
+        // 禁止访问
+        if (isv.getStatus() == null || isv.getStatus() == STATUS_FORBIDDEN) {
+            throw ErrorEnum.ISV_ACCESS_FORBIDDEN.getErrorMeta().getException();
         }
     }
 
@@ -127,9 +133,10 @@ public class ApiValidator implements Validator {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion(), ParamNames.SIGN_NAME);
             }
             ApiConfig apiConfig = ApiContext.getApiConfig();
-            AppSecretManager appSecretManager = apiConfig.getAppSecretManager();
+            IsvManager isvManager = apiConfig.getIsvManager();
             // 根据appId获取秘钥
-            String secret = appSecretManager.getSecret(param.fetchAppKey());
+            Isv isvInfo = isvManager.getIsv(param.fetchAppKey());
+            String secret = isvInfo.getSecretInfo();
             if (StringUtils.isEmpty(secret)) {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();
             }

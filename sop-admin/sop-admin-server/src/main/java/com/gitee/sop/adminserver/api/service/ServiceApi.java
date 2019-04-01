@@ -53,7 +53,7 @@ public class ServiceApi {
     @Api(name = "service.list")
     @ApiDocMethod(description = "服务列表（旧）", elementClass = ServiceInfo.class)
     List<ServiceInfo> listServiceInfo(ServiceSearchParam param) throws Exception {
-        String routeRootPath = ZookeeperContext.getSopRouteRootPath(param.getProfile());
+        String routeRootPath = ZookeeperContext.getSopRouteRootPath();
         List<ChildData> childDataList = ZookeeperContext.getChildrenData(routeRootPath);
         List<ServiceInfo> serviceInfoList = childDataList.stream()
                 .filter(childData -> childData.getData() != null && childData.getData().length > 0)

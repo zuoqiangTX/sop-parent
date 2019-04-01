@@ -21,6 +21,8 @@ import java.lang.annotation.Target;
 @RequestMapping
 public @interface ApiMapping {
 
+    // ------------ 自定义属性 ------------
+
     /**
      * 版本号，默认版本号是""<br>
      *     改默认版本号：<code>ServiceContext.getSopServerConfig().setDefaultVersion("1.0");</code>
@@ -36,6 +38,17 @@ public @interface ApiMapping {
      * 告诉网关是否对结果进行合并，默认合并。设置为false，客户端将直接收到微服务端的结果。
      */
     boolean mergeResult() default true;
+
+    /**
+     * 指定接口是否需要授权才能访问，可在admin中进行修改
+     */
+    boolean permission() default false;
+
+    // ------------ 自定义属性 end ------------
+
+
+
+    // ============ 以下是springmvc自带的属性 ============
 
     /**
      * 接口名

@@ -31,7 +31,10 @@
 <body>
   <div id="app">加载中 ...</div>
   <script>
-    window.$docsify = {      
+    window.$docsify = {
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md?t=' + new Date().getTime()
+      },
       auto2top: true,
       coverpage: false,
       executeScript: true,

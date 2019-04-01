@@ -33,9 +33,11 @@ layui.define(function (exports) {
         , parseForm: function ($form) {
             var that = this;
             this.form = $form[0];
-            this.$els = $form.find('input,select,textarea');
         }
 
+        , getEls: function () {
+            return this.$form.find('input,select,textarea');
+        }
 
         /**
          * 同load(data)
@@ -80,7 +82,7 @@ layui.define(function (exports) {
          * 清除表单中的值,清除错误信息
          */
         , clear: function () {
-            this.$els.each(function () {
+            this.getEls().each(function () {
                 var _$el = $(this);
                 if (_$el.is(':radio') || _$el.is(':checkbox')) {
                     this.checked = false;
@@ -116,7 +118,7 @@ layui.define(function (exports) {
             var that = this;
             var data = {};
 
-            this.$els.each(function () {
+            this.getEls().each(function () {
                 var value = that._getInputVal($(this));
                 if (value) {
                     var name = this.name;
@@ -135,29 +137,6 @@ layui.define(function (exports) {
 
             if (typeof fieldName === 'string') {
                 return data[fieldName];
-            }
-
-            return data;
-        }
-        , getFormData: function ($form) {
-            var data = {};
-            var dataArr = $form.serializeArray();
-            for (var i = 0, len = dataArr.length; i < len; i++) {
-                var item = dataArr[i];
-                var name = item.name;
-                var itemValue = item.value;
-                var dataValue = data[name];
-
-                if (dataValue) {
-                    if ($.isArray(dataValue)) {
-                        dataValue.push(itemValue);
-                    } else {
-                        data[name] = [dataValue, itemValue];
-                    }
-                } else {
-                    data[name] = itemValue;
-                }
-
             }
 
             return data;

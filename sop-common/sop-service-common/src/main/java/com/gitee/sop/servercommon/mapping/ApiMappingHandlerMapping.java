@@ -45,18 +45,21 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
         String version;
         boolean ignoreValidate = false;
         boolean mergeResult = true;
+        boolean permission = false;
         ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
         if (apiMapping != null) {
             name = apiMapping.value()[0];
             version = apiMapping.version();
             ignoreValidate = apiMapping.ignoreValidate();
             mergeResult = apiMapping.mergeResult();
+            permission = apiMapping.permission();
         } else {
             ApiAbility apiAbility = this.findApiAbilityAnnotation(method);
             if (apiAbility != null) {
                 version = apiAbility.version();
                 ignoreValidate = apiAbility.ignoreValidate();
                 mergeResult = apiAbility.mergeResult();
+                permission = apiAbility.permission();
             } else {
                 return super.getCustomMethodCondition(method);
             }
@@ -69,11 +72,17 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
         if (!ignoreValidate) {
             ignoreValidate = ServiceConfig.getInstance().isIgnoreValidate();
         }
+        // 如果是默认配置，则采用全局配置
         if (mergeResult) {
             mergeResult = ServiceConfig.getInstance().isMergeResult();
         }
+        // 如果是默认配置，则采用全局配置
+        if (!permission) {
+            permission =  ServiceConfig.getInstance().isPermission();
+        }
         apiMappingInfo.setIgnoreValidate(ignoreValidate);
         apiMappingInfo.setMergeResult(mergeResult);
+        apiMappingInfo.setPermission(permission);
         logger.info("注册接口，method:" + method + "， version:" + version);
         return new ApiMappingRequestCondition(apiMappingInfo);
     }

@@ -22,6 +22,9 @@ public class AbstractConfiguration {
         if (RouteRepositoryContext.getRouteRepository() == null) {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
         }
+        EnvironmentContext.setEnvironment(environment);
+        ZookeeperContext.setEnvironment(environment);
+
         initMessage();
         apiMetaManager.refresh();
         doAfter();

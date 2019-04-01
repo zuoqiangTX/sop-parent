@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,11 +37,15 @@ public class SidebarTest {
         Map<String, List<FileExt>> menuMap = filesStream
                 .sorted(Comparator.comparing(File::getName))
                 .map(file -> {
+                    if (file.isDirectory()) {
+                        return null;
+                    }
                     FileExt fileExt = new FileExt();
                     fileExt.menu = file.getName().substring(0, 1);
                     fileExt.file = file;
                     return fileExt;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(FileExt::getMenu));
 
         StringBuilder output = new StringBuilder();

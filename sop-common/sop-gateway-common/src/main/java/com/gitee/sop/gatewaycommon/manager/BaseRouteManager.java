@@ -6,18 +6,13 @@ import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.core.env.Environment;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
-
-import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 
 
 /**
@@ -70,37 +65,25 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
     public BaseRouteManager(Environment environment, RouteRepository<T> routeRepository) {
         this.environment = environment;
         this.routeRepository = routeRepository;
-        String profile = environment.getProperty("spring.profiles.active", "default");
-        this.routeRootPath = SOP_SERVICE_ROUTE_PATH + "-" + profile;
+        this.routeRootPath = ZookeeperContext.getRouteRootPath();
     }
 
     @Override
     public void refresh() {
+        this.refreshRouteInfo();
+    }
+
+    protected void refreshRouteInfo() {
         try {
-            String zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
-            String profile = environment.getProperty("spring.profiles.active", "default");
-            if (StringUtils.isEmpty(zookeeperServerAddr)) {
-                throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
-            }
-            CuratorFramework client = CuratorFrameworkFactory.builder()
-                    .connectString(zookeeperServerAddr)
-                    .retryPolicy(new ExponentialBackoffRetry(1000, 3))
-                    .build();
-
-            client.start();
-
-            client.create()
-                    // 如果节点存在则Curator将会使用给出的数据设置这个节点的值
-                    .orSetData()
-                    // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
-                    .creatingParentContainersIfNeeded()
-                    .forPath(routeRootPath, "".getBytes());
-
+            ZookeeperContext.createOrUpdateData(routeRootPath, "");
+            CuratorFramework client = ZookeeperContext.getClient();
             this.watchServiceChange(client, routeRootPath);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("刷新路由配置失败", e);
+            throw new IllegalStateException("刷新路由配置失败");
         }
     }
+
 
     /**
      * 监听微服务更改

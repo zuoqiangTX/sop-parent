@@ -1,5 +1,10 @@
 package com.gitee.sop.adminserver.config;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.gitee.easyopen.ApiConfig;
+import com.gitee.easyopen.ResultSerializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +19,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 public class WebConfig extends WebMvcConfigurationSupport {
 
 
+    @Bean
+    ApiConfig apiConfig() {
+        ApiConfig apiConfig = new ApiConfig();
+        apiConfig.setJsonResultSerializer(obj -> {
+            return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
+        });
+        return apiConfig;
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

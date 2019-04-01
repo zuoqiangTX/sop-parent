@@ -65,4 +65,9 @@ public class ServiceConfig {
      */
     private boolean mergeResult = true;
 
+    /**
+     * 是否需要授权才能访问
+     */
+    private boolean permission;
+
 }

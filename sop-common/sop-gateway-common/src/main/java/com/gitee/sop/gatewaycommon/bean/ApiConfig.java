@@ -2,11 +2,13 @@ package com.gitee.sop.gatewaycommon.bean;
 
 import com.gitee.sop.gatewaycommon.gateway.param.GatewayParamBuilder;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
-import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
+import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
-import com.gitee.sop.gatewaycommon.secret.AppSecretManager;
-import com.gitee.sop.gatewaycommon.secret.CacheAppSecretManager;
+import com.gitee.sop.gatewaycommon.secret.CacheIsvManager;
+import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.session.ApiSessionManager;
 import com.gitee.sop.gatewaycommon.session.SessionManager;
 import com.gitee.sop.gatewaycommon.validate.ApiEncrypter;
@@ -48,9 +50,9 @@ public class ApiConfig {
     private ResultExecutor<RequestContext, String> zuulResultExecutor = new ZuulResultExecutor();
 
     /**
-     * app秘钥管理
+     * isv管理
      */
-    private AppSecretManager appSecretManager = new CacheAppSecretManager();
+    private IsvManager isvManager = new CacheIsvManager();
 
     /**
      * 加密工具
@@ -88,11 +90,17 @@ public class ApiConfig {
     private ZuulErrorController zuulErrorController = new ZuulErrorController();
 
     /**
+     * isv路由权限
+     */
+    private IsvRoutePermissionManager isvRoutePermissionManager = new DefaultIsvRoutePermissionManager();
+
+    // -------- fields ---------
+
+    /**
      * 错误模块
      */
     private List<String> i18nModules = new ArrayList<>();
 
-    // -------- fields ---------
 
     /**
      * 忽略验证，设置true，则所有接口不会进行签名校验
@@ -111,7 +119,9 @@ public class ApiConfig {
     private int timeoutSeconds = 60 * 5;
 
     public void addAppSecret(Map<String, String> appSecretPair) {
-        this.appSecretManager.addAppSecret(appSecretPair);
+        for (Map.Entry<String, String> entry : appSecretPair.entrySet()) {
+            this.isvManager.update(new IsvDefinition(entry.getKey(), entry.getValue()));
+        }
     }
 
     public static ApiConfig getInstance() {

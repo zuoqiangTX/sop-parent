@@ -11,6 +11,7 @@ public class ApiMappingInfo {
     private String version;
     private boolean ignoreValidate;
     private boolean mergeResult;
+    private boolean permission;
 
     public ApiMappingInfo(String name, String version) {
         this.name = name;

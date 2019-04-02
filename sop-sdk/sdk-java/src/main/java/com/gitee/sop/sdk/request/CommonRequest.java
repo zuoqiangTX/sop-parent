@@ -1,0 +1,23 @@
+package com.gitee.sop.sdk.request;
+
+import com.gitee.sop.sdk.response.CommonResponse;
+
+/**
+ * @author tanghc
+ */
+public class CommonRequest extends BaseRequest<CommonResponse> {
+
+    public CommonRequest(String method) {
+        this.setMethod(method);
+    }
+
+    public CommonRequest(String method, String version) {
+        this.setMethod(method);
+        this.setVersion(version);
+    }
+
+    @Override
+    protected String method() {
+        return "";
+    }
+}

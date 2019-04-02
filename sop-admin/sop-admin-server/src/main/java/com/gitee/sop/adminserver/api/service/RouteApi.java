@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -143,7 +144,8 @@ public class RouteApi {
 
     @Api(name = "route.role.update")
     @ApiDocMethod(description = "更新路由对应的角色")
-    void updateRouteRole(RoutePermissionParam param) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateRouteRole(RoutePermissionParam param) {
         String routeId = param.getRouteId();
         // 删除所有数据
         Query delQuery = new Query();

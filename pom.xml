@@ -18,5 +18,6 @@
 		<module>sop-registry</module>
 		<module>sop-gateway</module>
 		<module>sop-test</module>
+		<module>sop-sdk</module>
 	</modules>
 </project>

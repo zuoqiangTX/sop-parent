@@ -129,8 +129,8 @@ public class IsvApi {
 
     @Api(name = "isv.info.add")
     @ApiDocMethod(description = "添加isv")
-    @Transactional
-    void addIsv(IsvInfoFormAdd param) throws Exception {
+    @Transactional(rollbackFor = Exception.class)
+    public void addIsv(IsvInfoFormAdd param) throws Exception {
         if (isvInfoMapper.getByColumn("app_key", param.getAppKey()) != null) {
             throw new ApiException("appKey已存在");
         }
@@ -147,8 +147,8 @@ public class IsvApi {
 
     @Api(name = "isv.info.update")
     @ApiDocMethod(description = "修改isv")
-    @Transactional
-    void updateIsv(IsvInfoFormUpdate param) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateIsv(IsvInfoFormUpdate param) {
         formatForm(param);
         IsvInfo rec = isvInfoMapper.getById(param.getId());
         CopyUtil.copyPropertiesIgnoreNull(param, rec);

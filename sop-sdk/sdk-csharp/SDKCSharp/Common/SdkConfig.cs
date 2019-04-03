@@ -16,7 +16,7 @@ namespace SDKCSharp.Common
 
         public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-        public static String CHARSET = "UTF-8";
+        public static String CHARSET = "GBK";
 
         public static String SIGN_TYPE = "RSA2";
     }

@@ -78,7 +78,7 @@ namespace SDKCSharp.Client
             }
             form[this.openConfig.AppKeyName] = this.appId;
             string content = SopSignature.getSignContent(form);
-            string sign = RSAUtil.EncryptByPrivateKey(content, this.privateKey);
+            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
             form[this.openConfig.SignName] = sign;
 
             string resp = this.doExecute(url, requestForm, header);

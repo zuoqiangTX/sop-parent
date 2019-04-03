@@ -67,12 +67,15 @@
     <Compile Include="Utility\JsonUtil.cs" />
     <Compile Include="Utility\MD5Util.cs" />
     <Compile Include="Utility\RSA.cs" />
-    <Compile Include="Utility\RSAUtil.cs" />
     <Compile Include="Utility\SignUtil.cs" />
     <Compile Include="Common\SopSignature.cs" />
     <Compile Include="Model\GetStoryModel.cs" />
     <Compile Include="Request\GetStoryRequest.cs" />
     <Compile Include="Response\GetStoryResponse.cs" />
+    <Compile Include="Utility\AlipaySignature.cs" />
+    <Compile Include="Common\SopException.cs" />
+    <Compile Include="Utility\RSACryptoServiceProviderExtension.cs" />
+    <Compile Include="Utility\SopUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dll\BouncyCastle.Crypto.dll" />

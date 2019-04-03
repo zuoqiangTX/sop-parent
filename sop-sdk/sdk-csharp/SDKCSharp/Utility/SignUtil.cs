@@ -14,30 +14,17 @@ namespace SDKCSharp.Utility
     {
 
         /// <summary>
-        /// 参数签名
+        /// 构建签名。
         /// </summary>
-        /// <param name="paramsMap">参数</param>
-        /// <param name="secret">秘钥</param>
-        /// <returns>返回sign</returns>
-        public static String CreateSign(Dictionary<string, object> paramsMap, string secret)
+        /// <param name="parameters">参数.</param>
+        /// <param name="privateKeyPem">私钥.</param>
+        /// <param name="charset">字符集.</param>
+        /// <param name="signType">签名类型.</param>
+        /// <returns>返回签名.</returns>
+        public static string CreateSign(IDictionary<string, string> parameters, string privateKeyPem, string charset, string signType)
         {
-            StringBuilder sb = new StringBuilder();
-            ArrayList paramNames = new ArrayList(paramsMap.Keys);
-
-            paramNames.Sort();
-
-            sb.Append(secret);
-            foreach (string paramName in paramNames)
-            {
-                sb.Append(paramName).Append(paramsMap[paramName]);
-            }
-            sb.Append(secret);
-
-            string source = sb.ToString();
-
-            return MD5Util.EncryptToUpper(source);
+            return AlipaySignature.RSASign(parameters, privateKeyPem, charset, false, signType);
         }
-               
 
     }
 }

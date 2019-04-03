@@ -30,6 +30,8 @@ namespace SDKCSharp.Request
         public string BizContent { set => bizContent = value; }
         public object BizModel { set => bizModel = value; }
         public string Version { get => version; set => version = value; }
+        public string Charset { get => charset; set => charset = value; }
+        public string SignType { get => signType; set => signType = value; }
 
         /// <summary>
         /// 返回接口名

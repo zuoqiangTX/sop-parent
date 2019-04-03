@@ -1,6 +1,11 @@
 server:
   port: 8082
 
+# token过期时间，分钟
+admin:
+  access-token:
+    timeout-minutes: 30
+
 # 不用改
 spring:
   application:

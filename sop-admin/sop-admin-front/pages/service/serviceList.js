@@ -9,8 +9,11 @@ lib.config({
     var treetable = layui.treetable;
 
     // 渲染表格
-    var renderTable = function (params) {
+    var renderTable = function (postData) {
         layer.load(2);
+        var params = {
+            data: JSON.stringify(postData || {})
+        };
         treetable.render({
             elem: '#treeTable',
             treeColIndex: 1,
@@ -19,7 +22,9 @@ lib.config({
             treePidName: 'parentId',
             treeDefaultClose: false,
             treeLinkage: false,
-            url: ApiUtil.createUrl('service.instance.list', params),
+            url: ApiUtil.createUrl('service.instance.list'),
+            headers: {access_token: ApiUtil.getAccessToken()},
+            where: params,
             page: false,
             cols: [[
                 {type: 'numbers'},

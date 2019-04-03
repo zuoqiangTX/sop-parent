@@ -11,9 +11,6 @@ lib.use(['element', 'table', 'form'], function () {
 
     // 渲染表格
     var renderTable = function (postData) {
-        var params = {
-            data: JSON.stringify(postData || {})
-        };
         layer.load(2);
         isvTable = table.render({
             elem: '#isvTable'
@@ -25,7 +22,8 @@ lib.use(['element', 'table', 'form'], function () {
                 ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
             }
             , page: true
-            , where: params
+            , headers: {access_token: ApiUtil.getAccessToken()}
+            , where: postData
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
                 {field: 'id', title: 'id', width: 80}
@@ -83,13 +81,30 @@ lib.use(['element', 'table', 'form'], function () {
         });
     };
 
-    renderTable();
-
     form.on('submit(searchFilter)', function(data){
         var param = data.field;
-        renderTable(param)
+        searchTable(param)
         return false;
     });
+
+    /**
+     * 查询表格
+     * @param params
+     */
+    function searchTable(params) {
+        var postData = {
+            data: JSON.stringify(params || {})
+        };
+        if (!isvTable) {
+            isvTable = renderTable(postData);
+        } else {
+            isvTable.reload({
+                where: postData
+            })
+        }
+    }
+
+    searchTable();
 
 
     window.View = {

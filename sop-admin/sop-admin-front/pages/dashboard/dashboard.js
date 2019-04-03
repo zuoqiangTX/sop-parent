@@ -1,4 +1,5 @@
-$(function () {
+lib.use('element', function () {
+    var $ = layui.jquery;
     var $pageFrame = $('#pageFrame');
     var $selectLi = null;
     $('.left-nav').on('click', 'li', function (event) {

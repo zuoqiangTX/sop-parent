@@ -117,6 +117,7 @@ lib.importJs('../../assets/js/routerole.js')
             , toolbar: '#toolbar'
             , url: ApiUtil.createUrl('route.list')
             , where: postData
+            , headers: {access_token: ApiUtil.getAccessToken()}
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
                 {field: 'id', title: 'id(接口名+版本号)'}

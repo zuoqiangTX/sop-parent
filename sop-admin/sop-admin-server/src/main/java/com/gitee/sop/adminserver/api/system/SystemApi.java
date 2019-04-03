@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 public class SystemApi {
 
 
+    public static final int STATUS_FORBIDDEN = 2;
     @Autowired
     AdminUserInfoMapper adminUserInfoMapper;
 
@@ -45,6 +46,9 @@ public class SystemApi {
         if (user == null) {
             throw AdminErrors.ERROR_USERNAME_PWD.getException();
         } else {
+            if (user.getStatus() == STATUS_FORBIDDEN) {
+                throw AdminErrors.USER_FORBIDDEN.getException();
+            }
             SessionManager sessionManager = ApiContext.getSessionManager();
             // 生成一个新session
             HttpSession session = sessionManager.getSession(null);

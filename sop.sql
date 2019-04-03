@@ -61,7 +61,19 @@ CREATE TABLE `perm_role_permission` (
   UNIQUE KEY `uk_role_perm` (`role_code`,`route_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='角色权限表';
 
+DROP TABLE IF EXISTS `admin_user_info`;
 
+
+CREATE TABLE `admin_user_info` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) NOT NULL DEFAULT '' COMMENT '用户名',
+  `password` varchar(128) NOT NULL DEFAULT '' COMMENT '密码',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态，1：启用，2：禁用',
+  `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_username` (`username`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='后台用户表';
 
 
 SET FOREIGN_KEY_CHECKS = @PREVIOUS_FOREIGN_KEY_CHECKS;
@@ -112,7 +124,12 @@ INSERT INTO `perm_role_permission` (`id`, `role_code`, `route_id`, `gmt_create`,
 ALTER TABLE `perm_role_permission` ENABLE KEYS;
 UNLOCK TABLES;
 
-
+LOCK TABLES `admin_user_info` WRITE;
+ALTER TABLE `admin_user_info` DISABLE KEYS;
+INSERT INTO `admin_user_info` (`id`, `username`, `password`, `status`, `gmt_create`, `gmt_modified`) VALUES
+	(1,'admin','14e1b600b1fd579f47433b88e8d85291',1,'2019-04-02 19:55:26','2019-04-02 19:55:26');
+ALTER TABLE `admin_user_info` ENABLE KEYS;
+UNLOCK TABLES;
 
 
 SET FOREIGN_KEY_CHECKS = @PREVIOUS_FOREIGN_KEY_CHECKS;

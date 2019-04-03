@@ -31,5 +31,7 @@ public class AdminErrors {
     public static final ErrorMeta ERROR_OPT = new ErrorMeta(isvModule, "10014", "非法操作");
     
     public static final ErrorMeta NO_USER = new ErrorMeta(isvModule, "10015", "用户不存在");
+
+    public static final ErrorMeta USER_FORBIDDEN = new ErrorMeta(isvModule, "10016", "用户已禁用");
     
 }

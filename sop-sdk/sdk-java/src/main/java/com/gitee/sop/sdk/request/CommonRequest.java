@@ -8,12 +8,11 @@ import com.gitee.sop.sdk.response.CommonResponse;
 public class CommonRequest extends BaseRequest<CommonResponse> {
 
     public CommonRequest(String method) {
-        this.setMethod(method);
+        super(method, null);
     }
 
     public CommonRequest(String method, String version) {
-        this.setMethod(method);
-        this.setVersion(version);
+        super(method, version);
     }
 
     @Override

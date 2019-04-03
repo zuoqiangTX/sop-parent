@@ -1,13 +1,12 @@
 package com.gitee.sop.sdk.request;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
 import com.gitee.sop.sdk.common.SdkConfig;
 import com.gitee.sop.sdk.common.UploadFile;
 import com.gitee.sop.sdk.response.BaseResponse;
 import com.gitee.sop.sdk.util.ClassUtil;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,9 +54,16 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     @SuppressWarnings("unchecked")
     public BaseRequest() {
-        this.method = this.method();
-        this.version = this.version();
+        this.setMethodVersion(this.method(), this.version());
+    }
 
+    protected BaseRequest(String method, String version) {
+        this.setMethodVersion(method, version);
+    }
+
+    private void setMethodVersion(String method, String version) {
+        this.method = method;
+        this.version = version == null ? SdkConfig.DEFAULT_VERSION : version;
         this.responseClass = (Class<T>) ClassUtil.getSuperClassGenricType(this.getClass(), 0);
     }
 
@@ -65,20 +71,20 @@ public abstract class BaseRequest<T extends BaseResponse> {
         return SdkConfig.DEFAULT_VERSION;
     }
 
-    public RequestForm createRequestForm() {
+    public RequestForm createRequestForm(OpenConfig openConfig) {
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();
-        params.put("method", this.method);
-        params.put("format", this.format);
-        params.put("charset", this.charset);
-        params.put("sign_type", this.signType);
-        params.put("timestamp", this.timestamp);
-        params.put("version", this.version);
+        params.put(openConfig.getMethodName(), this.method);
+        params.put(openConfig.getFormatName(), this.format);
+        params.put(openConfig.getCharsetName(), this.charset);
+        params.put(openConfig.getSignTypeName(), this.signType);
+        params.put(openConfig.getTimestampName(), this.timestamp);
+        params.put(openConfig.getVersionName(), this.version);
 
         // 业务参数
         String biz_content = buildBizContent();
 
-        params.put("biz_content", biz_content);
+        params.put(openConfig.getDataName(), biz_content);
 
         RequestForm requestForm = new RequestForm(params);
         requestForm.setFiles(this.files);
@@ -95,10 +101,6 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     public String getMethod() {
         return method;
-    }
-
-    protected void setMethod(String method) {
-        this.method = method;
     }
 
     public void setVersion(String version) {

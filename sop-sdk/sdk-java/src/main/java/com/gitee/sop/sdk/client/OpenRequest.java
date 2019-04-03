@@ -36,7 +36,7 @@ public class OpenRequest {
             if (files != null && files.size() > 0) {
                 return openHttp.postFile(url, form, header, files);
             } else {
-                return openHttp.postJsonBody(url, JsonUtil.toJSONString(form), header);
+                return openHttp.postFormBody(url, form, header);
             }
         } catch (IOException e) {
             return this.causeException(e);

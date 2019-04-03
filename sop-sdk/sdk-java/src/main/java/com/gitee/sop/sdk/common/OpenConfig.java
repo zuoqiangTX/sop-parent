@@ -12,9 +12,11 @@ public class OpenConfig {
     /** 默认版本号 */
     private String defaultVersion = SdkConfig.DEFAULT_VERSION;
     /** 接口属性名 */
-    private String apiName = "method";
+    private String methodName = "method";
     /** 版本号名称 */
     private String versionName = "version";
+    /** 编码名称 */
+    private String charsetName = "charset";
     /** appKey名称 */
     private String appKeyName = "app_id";
     /** data名称 */
@@ -25,9 +27,11 @@ public class OpenConfig {
     private String timestampPattern = "yyyy-MM-dd HH:mm:ss";
     /** 签名串名称 */
     private String signName = "sign";
+    /** 签名类型名称 */
+    private String signTypeName = "sign_type";
     /** 格式化名称 */
     private String formatName = "format";
-    /** 格式类型 */
+    /** 格式类型名称 */
     private String formatType = "json";
     /** accessToken名称 */
     private String accessTokenName = "app_auth_token";
@@ -39,4 +43,6 @@ public class OpenConfig {
     private int connectTimeoutSeconds = 10;
     /** http读取超时时间 */
     private int readTimeoutSeconds = 10;
+    /** http写超时时间 */
+    private int writeTimeoutSeconds = 10;
 }

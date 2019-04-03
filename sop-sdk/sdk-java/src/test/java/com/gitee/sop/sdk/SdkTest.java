@@ -41,7 +41,7 @@ public class SdkTest extends TestCase {
             // 返回结果
             System.out.println(response);
         } else {
-            System.out.println(response);
+            System.out.println("错误，subCode:" + response.getSubCode() + ", subMsg:" + response.getSubMsg());
         }
     }
 
@@ -65,7 +65,7 @@ public class SdkTest extends TestCase {
             JSONObject jsonObject = JSON.parseObject(body);
             System.out.println(jsonObject);
         } else {
-            System.out.println(response);
+            System.out.println("错误，subCode:" + response.getSubCode() + ", subMsg:" + response.getSubMsg());
         }
     }
 

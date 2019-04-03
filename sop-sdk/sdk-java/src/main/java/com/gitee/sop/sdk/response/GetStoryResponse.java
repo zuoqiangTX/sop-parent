@@ -8,5 +8,5 @@ import java.util.Date;
 public class GetStoryResponse extends BaseResponse {
     private Long id;
     private String name;
-    private Date gmtCreate;
+    private Date gmt_create;
 }

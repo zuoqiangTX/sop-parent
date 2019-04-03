@@ -4,6 +4,7 @@ import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.UploadFile;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -13,6 +14,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public class OpenHttp {
         httpClient = new OkHttpClient.Builder()
                 .connectTimeout(openConfig.getConnectTimeoutSeconds(), TimeUnit.SECONDS) // 设置链接超时时间，默认10秒
                 .readTimeout(openConfig.getReadTimeoutSeconds(), TimeUnit.SECONDS)
+                .writeTimeout(openConfig.getWriteTimeoutSeconds(), TimeUnit.SECONDS)
                 .cookieJar(new CookieJar() {
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         cookieStore.put(httpUrl.host(), list);
@@ -69,23 +72,35 @@ public class OpenHttp {
     }
 
     /**
-     * 提交json字符串到请求体
+     * 提交表单
      *
      * @param url
-     * @param json
+     * @param form
      * @param header header内容
      * @return
      * @throws IOException
      */
-    public String postJsonBody(String url, String json, Map<String, String> header) throws IOException {
-        RequestBody body = RequestBody.create(JSON, json);
-        Request.Builder builder = new Request.Builder().url(url).post(body);
+    public String postFormBody(String url, Map<String, String> form, Map<String, String> header) throws IOException {
+        FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            paramBuilder.add(entry.getKey(), entry.getValue());
+        }
+        FormBody formBody = paramBuilder.build();
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(url)
+                .post(formBody);
         // 添加header
-        addHeader(builder, header);
+        addHeader(requestBuilder, header);
 
-        Request request = builder.build();
-        Response response = httpClient.newCall(request).execute();
-        return response.body().string();
+        Request request = requestBuilder.build();
+        Response response = httpClient
+                .newCall(request)
+                .execute();
+        try {
+            return response.body().string();
+        } finally {
+            response.close();
+        }
     }
 
     /**
@@ -125,7 +140,11 @@ public class OpenHttp {
 
         Request request = builder.build();
         Response response = httpClient.newCall(request).execute();
-        return response.body().string();
+        try {
+            return response.body().string();
+        } finally {
+            response.close();
+        }
     }
 
     private void addHeader(Request.Builder builder, Map<String, String> header) {

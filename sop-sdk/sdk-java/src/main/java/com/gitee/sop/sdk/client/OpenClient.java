@@ -27,27 +27,25 @@ public class OpenClient {
 
     private static final char DOT = '.';
     private static final char UNDERLINE = '_';
-    public static final String GATEWAY_CODE_NAME = "code";
-    public static final String GATEWAY_MSG_NAME = "msg";
     public static final String DATA_SUFFIX = "_response";
 
     private String url;
-    private String appKey;
+    private String appId;
     private String privateKey;
 
     private OpenConfig openConfig;
     private OpenRequest openRequest;
 
-    public OpenClient(String url, String appKey, String privateKey) {
-        this(url, appKey, privateKey, DEFAULT_CONFIG);
+    public OpenClient(String url, String appId, String privateKey) {
+        this(url, appId, privateKey, DEFAULT_CONFIG);
     }
 
-    public OpenClient(String url, String appKey, String privateKey, OpenConfig openConfig) {
+    public OpenClient(String url, String appId, String privateKey, OpenConfig openConfig) {
         if (openConfig == null) {
             throw new IllegalArgumentException("openConfig不能为null");
         }
         this.url = url;
-        this.appKey = appKey;
+        this.appId = appId;
         this.privateKey = privateKey;
         this.openConfig = openConfig;
 
@@ -74,13 +72,13 @@ public class OpenClient {
      * @return 返回Response
      */
     public <T extends BaseResponse> T execute(BaseRequest<T> request, String accessToken) {
-        RequestForm requestForm = request.createRequestForm();
+        RequestForm requestForm = request.createRequestForm(this.openConfig);
         // 表单数据
         Map<String, String> form = requestForm.getForm();
         if (accessToken != null) {
             form.put(this.openConfig.getAccessTokenName(), accessToken);
         }
-        form.put(this.openConfig.getAppKeyName(), this.appKey);
+        form.put(this.openConfig.getAppKeyName(), this.appId);
 
         String content = SopSignature.getSignContent(form);
         String sign = null;
@@ -106,7 +104,7 @@ public class OpenClient {
     }
 
     protected String doExecute(String url, RequestForm requestForm, Map<String, String> header) {
-        return openRequest.request(this.url, requestForm, header);
+        return openRequest.request(url, requestForm, header);
     }
 
     protected <T extends BaseResponse> T parseResponse(String resp, BaseRequest<T> request) {

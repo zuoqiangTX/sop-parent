@@ -19,7 +19,7 @@ namespace SDKTest
         static string filePath = "/Users/thc/logs/priKey.txt";
 
         // 声明一个就行
-        static OpenClient client = new OpenClient(url, appId, filePath, true);
+        static OpenClient client = new OpenClient(url, appId, privateKey);
 
         public static void Main(string[] args)
         {

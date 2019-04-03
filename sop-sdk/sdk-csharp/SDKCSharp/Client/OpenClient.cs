@@ -23,29 +23,36 @@ namespace SDKCSharp.Client
 
         private static char DOT = '.';
         private static char UNDERLINE = '_';
-        public static String DATA_SUFFIX = "_response";
+        public static string DATA_SUFFIX = "_response";
 
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
 
-        private String url;
-        private String appId;
-        private String privateKey;
+        private string url;
+        private string appId;
+        private string privateKey;
+        private bool isPriKeyFromFile;
 
         private OpenConfig openConfig;
         private OpenRequest openRequest;
 
 
-        public OpenClient(string url, string appId, string privateKey) : this(url, appId, privateKey, DEFAULT_CONFIG)
+        public OpenClient(string url, string appId, string privateKey) : this(url, appId, privateKey,false, DEFAULT_CONFIG)
         {
             
         }
 
-        public OpenClient(string url, string appId, string privateKey, OpenConfig openConfig)
+        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile) : this(url, appId, privateKey, priKeyFromFile, DEFAULT_CONFIG)
+        {
+
+        }
+
+        public OpenClient(string url, string appId, string privateKey,bool priKeyFromFile, OpenConfig openConfig)
         {
             this.url = url;
             this.appId = appId;
             this.privateKey = privateKey;
+            this.isPriKeyFromFile = priKeyFromFile;
             this.openConfig = openConfig;
             this.openRequest = new OpenRequest(openConfig);
         }
@@ -78,7 +85,7 @@ namespace SDKCSharp.Client
             }
             form[this.openConfig.AppKeyName] = this.appId;
             string content = SopSignature.getSignContent(form);
-            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
+            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, isPriKeyFromFile, request.SignType);
             form[this.openConfig.SignName] = sign;
 
             string resp = this.doExecute(url, requestForm, header);

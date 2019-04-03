@@ -21,9 +21,9 @@ namespace SDKCSharp.Utility
         /// <param name="charset">字符集.</param>
         /// <param name="signType">签名类型.</param>
         /// <returns>返回签名.</returns>
-        public static string CreateSign(IDictionary<string, string> parameters, string privateKeyPem, string charset, string signType)
+        public static string CreateSign(IDictionary<string, string> parameters, string privateKeyPem, string charset, bool isFromFile, string signType)
         {
-            return AlipaySignature.RSASign(parameters, privateKeyPem, charset, false, signType);
+            return AlipaySignature.RSASign(parameters, privateKeyPem, charset, isFromFile, signType);
         }
 
     }

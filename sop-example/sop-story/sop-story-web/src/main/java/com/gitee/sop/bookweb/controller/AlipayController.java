@@ -28,7 +28,7 @@ public class AlipayController {
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;
         storyVO.name = "白雪公主";
-        storyVO.gmtCreate = new Date();
+        storyVO.gmt_create = new Date();
         return storyVO;
     }
 
@@ -41,6 +41,6 @@ public class AlipayController {
     public static class StoryVO {
         private Long id;
         private String name;
-        private Date gmtCreate;
+        private Date gmt_create;
     }
 }

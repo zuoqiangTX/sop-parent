@@ -5,6 +5,7 @@ import com.gitee.sop.gatewaycommon.result.ResultExecutor;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,6 +28,7 @@ public class ZuulErrorController implements ErrorController {
     @ResponseBody
     public Object error() {
         RequestContext ctx = RequestContext.getCurrentContext();
+        ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
         return this.buildResult(throwable);
     }

@@ -19,7 +19,8 @@ namespace SDKTest
         static string filePath = "/Users/thc/logs/priKey.txt";
 
         // 声明一个就行
-        static OpenClient client = new OpenClient(url, appId, privateKey);
+        //static OpenClient client = new OpenClient(url, appId, privateKey);
+        static OpenClient client = new OpenClient(url, appId, filePath, true);
 
         public static void Main(string[] args)
         {
@@ -42,7 +43,7 @@ namespace SDKTest
             if (response.IsSuccess())
             {
                 // 返回结果
-                Console.WriteLine("故事名称:{0}", response.Name);
+                Console.WriteLine("成功！故事名称:{0}", response.Name);
             }
             else
             {

@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography.X509Certificates;
 
 using SDKCSharp.Common;
+using System.Collections.Specialized;
 
 namespace SDKCSharp.Client
 {
@@ -18,6 +19,7 @@ namespace SDKCSharp.Client
     {
         public const string CONTENT_TYPE_JSON = "application/json";
         public const string CONTENT_TYPE_STREAM = "application/octet-stream";
+        public const string CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
         public const string METHOD_POST = "POST";
 
         public CookieContainer cookieContainer = new CookieContainer();
@@ -40,7 +42,7 @@ namespace SDKCSharp.Client
             request.CookieContainer = cookieContainer;
             request.ContinueTimeout = this.openConfig.ConnectTimeoutSeconds * 1000;
             request.ReadWriteTimeout = this.openConfig.ReadTimeoutSeconds * 1000;
-            bindHeader(request, header);
+            BindHeader(request, header);
             return request;
         }
 
@@ -76,7 +78,7 @@ namespace SDKCSharp.Client
         /// <returns></returns>
         public string PostJsonBody(string url, string json, Dictionary<string, string> header)
         {
-            var request = CreateWebRequest(url, header);
+            HttpWebRequest request = CreateWebRequest(url, header);
             request.ContentType = CONTENT_TYPE_JSON;
             request.Method = METHOD_POST;
 
@@ -94,7 +96,29 @@ namespace SDKCSharp.Client
 
         }
 
-        private void bindHeader(HttpWebRequest request, Dictionary<string, string> header)
+        /// <summary>
+        /// 模拟表单提交
+        /// </summary>
+        /// <returns>返回结果.</returns>
+        /// <param name="url">URL.</param>
+        /// <param name="form">Form.</param>
+        /// <param name="header">Header.</param>
+        public string PostFormBody(string url, Dictionary<string, string> form, Dictionary<string, string> header)
+        {
+            WebClient webClient = new WebClient();
+            // 表单参数
+            NameValueCollection postParams = new NameValueCollection();
+            foreach (var item in form)
+            {
+                postParams.Add(item.Key, item.Value);
+            }
+            byte[] byRemoteInfo = webClient.UploadValues(url, METHOD_POST, postParams);
+            return Encoding.UTF8.GetString(byRemoteInfo);
+        }
+
+
+
+        private void BindHeader(HttpWebRequest request, Dictionary<string, string> header)
         {
             if (header == null || header.Count == 0)
             {
@@ -164,7 +188,7 @@ namespace SDKCSharp.Client
                 webRequest.Method = METHOD_POST;
                 webRequest.ContentType = string.Format("multipart/form-data; boundary={0}", boundary);
                 webRequest.ContentLength = postBytes.Length;
-                bindHeader(webRequest, header);
+                BindHeader(webRequest, header);
                 if (Regex.IsMatch(url, "^https://"))
                 {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;

@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SDKCSharp.Utility;
 
 namespace SDKCSharp.Common
 {
     public class SdkConfig
     {
-        public static String SUCCESS_CODE = "10000";
+        public static string SUCCESS_CODE = "10000";
 
-        public static String DEFAULT_VERSION = "1.0";
+        public static string DEFAULT_VERSION = "1.0";
 
-        public static String FORMAT_TYPE = "json";
+        public static string FORMAT_TYPE = "json";
 
-        public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
+        public static string TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-        public static String CHARSET = "GBK";
+        public static Encoding CHARSET = Encoding.UTF8;
 
-        public static String SIGN_TYPE = "RSA2";
+        public static SignType SIGN_TYPE = SignType.RSA2;
     }
 }

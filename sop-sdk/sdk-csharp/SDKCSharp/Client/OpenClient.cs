@@ -10,6 +10,7 @@ using SDKCSharp.Common;
 using SDKCSharp.Request;
 using SDKCSharp.Response;
 using SDKCSharp.Utility;
+using System.IO;
 
 namespace SDKCSharp.Client
 {
@@ -31,7 +32,6 @@ namespace SDKCSharp.Client
         private string url;
         private string appId;
         private string privateKey;
-        private bool isPriKeyFromFile;
 
         private OpenConfig openConfig;
         private OpenRequest openRequest;
@@ -52,9 +52,32 @@ namespace SDKCSharp.Client
             this.url = url;
             this.appId = appId;
             this.privateKey = privateKey;
-            this.isPriKeyFromFile = priKeyFromFile;
             this.openConfig = openConfig;
             this.openRequest = new OpenRequest(openConfig);
+            // 如果是从文件中加载私钥
+            if (priKeyFromFile)
+            {
+                this.privateKey = LoadCertificateFile(privateKey);
+            }
+        }
+
+        /// <summary>
+        /// 加载秘钥文件
+        /// </summary>
+        /// <returns>返回私钥内容.</returns>
+        /// <param name="filename">文件路径.</param>
+        private static string LoadCertificateFile(string filename)
+        {
+            if(!File.Exists(filename))
+            {
+                throw new SopException("文件不存在," + filename);
+            }
+            using (FileStream fs = File.OpenRead(filename))
+            {
+                byte[] data = new byte[fs.Length];
+                fs.Read(data, 0, data.Length);
+                return Encoding.UTF8.GetString(data);
+            }
         }
 
         /// <summary>
@@ -85,7 +108,7 @@ namespace SDKCSharp.Client
             }
             form[this.openConfig.AppKeyName] = this.appId;
             string content = SopSignature.getSignContent(form);
-            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, isPriKeyFromFile, request.SignType);
+            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
             form[this.openConfig.SignName] = sign;
 
             string resp = this.doExecute(url, requestForm, header);

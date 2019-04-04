@@ -37,10 +37,10 @@ namespace SDKCSharp.Client
         /// <returns></returns>
         public string Request(string url, RequestForm requestForm, Dictionary<string, string> header)
         {
-            return this.doPost(url, requestForm, header);
+            return this.DoPost(url, requestForm, header);
         }
 
-        public string doGet(string url, RequestForm requestForm, Dictionary<string, string> header)
+        public string DoGet(string url, RequestForm requestForm, Dictionary<string, string> header)
         {
             StringBuilder queryString = new StringBuilder();
             Dictionary<string, string> form = requestForm.Form;
@@ -57,7 +57,7 @@ namespace SDKCSharp.Client
 
         }
 
-        public string doPost(string url, RequestForm requestForm, Dictionary<string, string> header)
+        public string DoPost(string url, RequestForm requestForm, Dictionary<string, string> header)
         {
             Dictionary<string, string> form = requestForm.Form;
             List<UploadFile> files = requestForm.Files;
@@ -67,16 +67,12 @@ namespace SDKCSharp.Client
             }
             else
             {
-                return this.openHttp.PostJsonBody(url, JsonUtil.ToJSONString(form), header);
+                return this.openHttp.PostFormBody(url, form, header);
             }
         }
 
-        public string PostJsonBody(string url, string json)
-        {
-            return this.openHttp.PostJsonBody(url, json, null);
-        }
-
-        protected string causeException(Exception e)
+       
+        protected string CauseException(Exception e)
         {
             ErrorResponse result = new ErrorResponse();
             result.SubCode = HTTP_ERROR_CODE;
@@ -85,7 +81,6 @@ namespace SDKCSharp.Client
             result.Msg = e.Message;
             return JsonUtil.ToJSONString(result);
         }
-
 
     }
 

@@ -131,11 +131,11 @@ class MainClass
         if (response.IsSuccess())
         {
             // 返回结果
-            Console.WriteLine("故事名称:{0}", response.Name);
+            Console.WriteLine("成功！response:{0}\n响应原始内容:{1}", JsonUtil.ToJSONString(response), response.Body);
         }
         else
         {
-            Console.WriteLine("错误, code:{0}, msg:{1}, subCode:{2}, subMsg:{3}", 
+            Console.WriteLine("错误, code:{0}, msg:{1}, subCode:{2}, subMsg:{3}",
                 response.Code, response.Msg, response.SubCode, response.SubMsg);
         }
     }
@@ -144,12 +144,12 @@ class MainClass
 }
 ```
 
-# 使用方式2(懒人版)
+## 使用方式2(懒人版)
 
 如果不想添加Request,Response,Model。可以用这种方式，返回data部分是Dictionary<string, object>，后续自己处理
 
 ```
-// 懒人版，如果不想添加Request,Response,Model。可以用这种方式，返回全部是String，后续自己处理json
+// 懒人版，如果不想添加Request,Response,Model。可以用这种方式，返回Dictionary<string, object>，后续自己处理
 private static void TestCommon()
 {
     // 创建请求对象

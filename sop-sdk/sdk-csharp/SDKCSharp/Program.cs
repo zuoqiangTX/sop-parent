@@ -55,7 +55,7 @@ namespace SDKTest
             }
         }
 
-        // 懒人版，如果不想添加Request,Response,Model。可以用这种方式，返回全部是String，后续自己处理json
+        // 懒人版，如果不想添加Request,Response,Model。可以用这种方式，返回Dictionary<string, object>，后续自己处理
         private static void TestCommon()
         {
             // 创建请求对象

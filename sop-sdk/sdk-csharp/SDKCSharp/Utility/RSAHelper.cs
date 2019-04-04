@@ -5,6 +5,10 @@ using System.Text;
 
 namespace SDKCSharp.Utility
 {
+    /// <summary>
+    /// .NET Core 使用RSA算法 加密/解密/签名/验证签名
+    /// https://www.cnblogs.com/stulzq/p/7757915.html
+    /// </summary>
     public class RSAHelper
     {
         private readonly RSA _privateKeyRsaProvider;

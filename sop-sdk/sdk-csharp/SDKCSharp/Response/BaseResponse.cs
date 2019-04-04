@@ -36,9 +36,9 @@ namespace SDKCSharp.Response
         public string SubMsg { get; set; }
 
         /// <summary>
-        /// 数据
+        /// 响应原始内容
         /// </summary>
-        [JsonProperty("body")]
+        [JsonIgnore]
         public string Body { get; set; }
 
         /// <summary>

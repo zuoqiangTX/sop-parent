@@ -1,5 +1,10 @@
 # changelog
 
+## 1.2.0
+
+- SOP Admin新增用户登录
+- 新增SDK
+
 ## 1.1.0
 
 - 新增ISV管理 [doc](http://durcframework.gitee.io/sop/#/files/10085_ISV%E7%AE%A1%E7%90%86?t=1554123435621)

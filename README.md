@@ -40,12 +40,12 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - Admin管理平台，统一管理微服务配置，管理路由管理，微服务上下线
 - 接入方管理+秘钥管理
 - 接口权限分配
+- SDK
 
 ## 后期规划
 
-
-- SDK
-- Spring Cloud Config（Zookeeper）
+- 文档整合
+- springmvc项目接入demo
 
 ## admin界面预览
 
@@ -66,6 +66,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理等功能
 - sop-example：微服务示例
+- sop-sdk：基础sdk，含Java、C#版本
 - sop-test：接口调用测试用例
 
 

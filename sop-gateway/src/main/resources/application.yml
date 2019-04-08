@@ -1,7 +1,7 @@
 server:
   port: 8081
 
-
+# 注册中心
 eureka:
   serverAddr: localhost:1111
   client:

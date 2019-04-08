@@ -3,7 +3,7 @@
 ## 1.2.0
 
 - SOP Admin新增用户登录
-- 新增SDK
+- 新增基础SDK(Java,C#) [doc](http://durcframework.gitee.io/sop/#/files/10095_SDK%E5%BC%80%E5%8F%91?t=1554693919597)
 
 ## 1.1.0
 

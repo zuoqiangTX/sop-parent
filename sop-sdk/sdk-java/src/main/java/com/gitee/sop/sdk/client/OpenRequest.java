@@ -1,10 +1,10 @@
 package com.gitee.sop.sdk.client;
 
+import com.alibaba.fastjson.JSON;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
 import com.gitee.sop.sdk.common.UploadFile;
 import com.gitee.sop.sdk.response.BaseResponse;
-import com.gitee.sop.sdk.util.JsonUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,7 +49,7 @@ public class OpenRequest {
         result.setSubCode(HTTP_ERROR_CODE);
         result.setSubMsg(e.getMessage());
         result.setMsg(e.getMessage());
-        return JsonUtil.toJSONString(result);
+        return JSON.toJSONString(result);
     }
 
     static class ErrorResponse extends BaseResponse {

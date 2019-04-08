@@ -39,7 +39,8 @@ public class SdkTest extends TestCase {
 
         if (response.isSuccess()) {
             // 返回结果
-            System.out.println(response);
+            System.out.println(String.format("成功！response:%s\n响应原始内容:%s",
+                    JSON.toJSONString(response), response.getBody()));
         } else {
             System.out.println("错误，subCode:" + response.getSubCode() + ", subMsg:" + response.getSubMsg());
         }

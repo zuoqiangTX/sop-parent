@@ -3,11 +3,11 @@
 
 sdk for java
 
-开放平台对应的sdk，适用于Android。SDK只依赖了三个jar包
+SDK只依赖了三个jar包
 
-- okhttp.jar
-- fastjson-android.jar
-- commons-logging.jar
+- okhttp.jar 用于网络请求
+- fastjson.jar 用于json处理
+- commons-logging.jar 日志处理
 
 ## 接口封装步骤
 

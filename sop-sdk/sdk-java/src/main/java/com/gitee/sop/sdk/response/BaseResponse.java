@@ -28,8 +28,10 @@ public abstract class BaseResponse {
     private String subCode;
     @JSONField(name = "sub_msg")
     private String subMsg;
+    @JSONField(serialize = false)
     private String body;
 
+    @JSONField(serialize = false)
     public boolean isSuccess() {
         return StringUtils.isEmpty(subCode);
     }

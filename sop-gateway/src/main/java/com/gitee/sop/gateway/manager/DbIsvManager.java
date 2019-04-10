@@ -33,7 +33,6 @@ public class DbIsvManager extends CacheIsvManager {
 
     @Override
     public void load(Function<Object, String> secretGetter) {
-        log.info("从数据库读取ISV信息，保存到本地");
         List<IsvInfo> isvInfoList = isvInfoMapper.list(new Query());
         isvInfoList.stream()
                 .forEach(isvInfo -> {

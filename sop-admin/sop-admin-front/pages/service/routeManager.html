@@ -21,37 +21,31 @@
        href="javascript:location.replace(location.href);" title="刷新">
         <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
 </div>
-<div class="x-body">
+<div class="x-body" style="padding-top:5px;">
     <div class="layui-row">
-        <div class="layui-col-md2">
-            <ul id="leftTree"></ul>
+        <div class="layui-tab" lay-filter="serviceTabFilter" style="margin-top: 0;">
+            <ul id="serviceTab" class="layui-tab-title">
+            </ul>
         </div>
-        <div id="optTip" class="layui-col-md2" style="margin-top: 20px;">
-            <i class="layui-icon layui-icon-return"></i>点击树节点查看
+        <div class="layui-row">
+            <form class="layui-form layui-col-md12 x-so" action="" lay-filter="searchFrm">
+                路由名称：
+                <input name="id" class="layui-input" style="width: 200px;" placeholder="输入接口名或版本号">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchFilter">
+                    <i class="layui-icon layui-icon-search"></i>搜索
+                </button>
+            </form>
         </div>
-        <div id="rightPart" class="layui-col-md10" style="display: none;">
-            <div class="layui-row">
-                <form class="layui-form layui-col-md12 x-so" action="" lay-filter="searchFrm">
-                    路由名称：
-                    <input name="id" class="layui-input" style="width: 200px;" placeholder="输入接口名或版本号">
-                    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchFilter">
-                        <i class="layui-icon layui-icon-search"></i>搜索
-                    </button>
-                </form>
+
+        <table class="layui-hide" id="routeTable" lay-filter="routeTableFilter"></table>
+        <script type="text/html" id="toolbar">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="add">
+                    <i class="layui-icon layui-icon-add-1"></i>添加路由
+                </button>
             </div>
-
-            <table class="layui-hide" id="routeTable" lay-filter="routeTableFilter"></table>
-            <script type="text/html" id="toolbar">
-                <div class="layui-btn-container">
-                    <button class="layui-btn layui-btn-ms layui-btn-normal" lay-event="add">
-                        <i class="layui-icon layui-icon-add-1"></i>添加路由
-                    </button>
-                </div>
-            </script>
-        </div>
+        </script>
     </div>
-
-
 </div>
 
 <div id="addWin" class="x-win">
@@ -73,20 +67,6 @@
             <label class="layui-form-label">path</label>
             <div class="layui-input-block">
                 <input type="text" name="path" class="layui-input"/>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">合并结果</label>
-            <div class="layui-input-block">
-                <input type="radio" name="mergeResult" value="1" title="合并">
-                <input type="radio" name="mergeResult" value="0" title="不合并">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">忽略验证</label>
-            <div class="layui-input-block">
-                <input type="radio" name="ignoreValidate" value="1" title="是">
-                <input type="radio" name="ignoreValidate" value="0" title="否">
             </div>
         </div>
         <div class="layui-form-item">
@@ -124,20 +104,6 @@
             <label class="layui-form-label">path</label>
             <div class="layui-input-block">
                 <input type="text" name="path" class="layui-input"/>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">合并结果</label>
-            <div class="layui-input-block">
-                <input type="radio" name="mergeResult" value="1" title="合并">
-                <input type="radio" name="mergeResult" value="0" title="不合并">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">忽略验证</label>
-            <div class="layui-input-block">
-                <input type="radio" name="ignoreValidate" value="1" title="是">
-                <input type="radio" name="ignoreValidate" value="0" title="否">
             </div>
         </div>
         <div class="layui-form-item">

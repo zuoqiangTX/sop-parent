@@ -12,15 +12,15 @@ import java.util.List;
 @Data
 public class IsvVO {
     /**  数据库字段：id */
-    @ApiDocField(description = "id")
+    @ApiDocField(description = "id", example = "1")
     private Long id;
 
     /** appKey, 数据库字段：app_key */
-    @ApiDocField(description = "appKey")
+    @ApiDocField(description = "appKey", example = "aaaa")
     private String appKey;
 
     /** secret, 数据库字段：secret */
-    @ApiDocField(description = "appKey")
+    @ApiDocField(description = "secret", example = "bbbb")
     private String secret;
 
     /** 公钥, 数据库字段：pub_key */

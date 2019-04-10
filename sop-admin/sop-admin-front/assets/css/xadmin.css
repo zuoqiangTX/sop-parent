@@ -676,3 +676,5 @@ table th, table td {
 }
 
 .x-win {display: none;padding: 20px;}
+
+.layui-this{font-weight: bold;}

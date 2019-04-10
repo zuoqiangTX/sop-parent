@@ -6,6 +6,7 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.easyopen.exception.ApiException;
+import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.api.service.param.RouteParam;
@@ -14,23 +15,26 @@ import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
 import com.gitee.sop.adminserver.api.service.result.RouteVO;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfo;
 import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
+import com.gitee.sop.adminserver.bean.RouteConfigDto;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.entity.ConfigRouteBase;
 import com.gitee.sop.adminserver.entity.PermRole;
 import com.gitee.sop.adminserver.entity.PermRolePermission;
+import com.gitee.sop.adminserver.mapper.ConfigRouteBaseMapper;
 import com.gitee.sop.adminserver.mapper.PermRoleMapper;
 import com.gitee.sop.adminserver.mapper.PermRolePermissionMapper;
+import com.gitee.sop.adminserver.service.RouteConfigService;
 import com.gitee.sop.adminserver.service.RoutePermissionService;
+import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,35 +54,23 @@ public class RouteApi {
     PermRoleMapper permRoleMapper;
 
     @Autowired
+    ConfigRouteBaseMapper configRouteBaseMapper;
+
+    @Autowired
     RoutePermissionService routePermissionService;
+
+    @Autowired
+    RouteConfigService routeConfigService;
+
+    @Autowired
+    RouteService routeService;
 
     @Api(name = "route.list")
     @ApiDocMethod(description = "路由列表")
     List<RouteVO> listRoute(RouteSearchParam param) throws Exception {
-        if (StringUtils.isBlank(param.getServiceId())) {
-            return Collections.emptyList();
-        }
-
-        String searchPath = ZookeeperContext.getSopRouteRootPath() + "/" + param.getServiceId();
-
-        List<ChildData> childDataList = ZookeeperContext.getChildrenData(searchPath);
-
-        List<RouteVO> routeDefinitionList = childDataList.stream()
-                .map(childData -> {
-                    String serviceNodeData = new String(childData.getData());
-                    GatewayRouteDefinition routeDefinition = JSON.parseObject(serviceNodeData, GatewayRouteDefinition.class);
-                    return routeDefinition;
-                })
-                .filter(gatewayRouteDefinition -> {
-                    boolean isRoute = gatewayRouteDefinition.getOrder() != Integer.MIN_VALUE;
-                    String id = param.getId();
-                    if (StringUtils.isBlank(id)) {
-                        return isRoute;
-                    } else {
-                        return isRoute && gatewayRouteDefinition.getId().contains(id);
-                    }
-                })
-                .map(gatewayRouteDefinition->{
+        List<RouteVO> routeDefinitionList = routeService.getRouteDefinitionList(param)
+                .stream()
+                .map(gatewayRouteDefinition -> {
                     RouteVO vo = new RouteVO();
                     BeanUtils.copyProperties(gatewayRouteDefinition, vo);
                     vo.setRoles(this.getRouteRole(gatewayRouteDefinition.getId()));
@@ -96,8 +88,10 @@ public class RouteApi {
         String zookeeperRoutePath = serviceIdPath + "/" + param.getId();
         String data = ZookeeperContext.getData(zookeeperRoutePath);
         GatewayRouteDefinition routeDefinition = JSON.parseObject(data, GatewayRouteDefinition.class);
-        BeanUtils.copyProperties(param, routeDefinition);
+        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
         ZookeeperContext.updatePathData(zookeeperRoutePath, JSON.toJSONString(routeDefinition));
+
+        this.updateRouteConfig(param);
     }
 
     @Api(name = "route.add")
@@ -109,7 +103,7 @@ public class RouteApi {
             throw new ApiException("id已存在");
         }
         GatewayRouteDefinition routeDefinition = new GatewayRouteDefinition();
-        BeanUtils.copyProperties(param, routeDefinition);
+        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
         ZookeeperContext.createNewData(zookeeperRoutePath, JSON.toJSONString(routeDefinition));
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setServiceId(param.getServiceId());
@@ -118,6 +112,37 @@ public class RouteApi {
         serviceInfo.setCreateTime(now);
         serviceInfo.setUpdateTime(now);
         ZookeeperContext.updatePathData(serviceIdPath, JSON.toJSONString(serviceInfo));
+
+        this.updateRouteConfig(param);
+    }
+
+    private void updateRouteConfig(RouteParam param) {
+        try {
+            String routeId = param.getId();
+            ConfigRouteBase configRouteBase = configRouteBaseMapper.getByColumn("route_id", routeId);
+            boolean doSave = configRouteBase == null;
+            if (doSave) {
+                configRouteBase = new ConfigRouteBase();
+                configRouteBase.setRouteId(param.getId());
+            }
+            configRouteBase.setStatus(param.getStatus().byteValue());
+
+            int i = doSave ? configRouteBaseMapper.save(configRouteBase)
+                    : configRouteBaseMapper.update(configRouteBase);
+
+            if (i > 0) {
+                this.sendMsg(param);
+            }
+        } catch (Exception e) {
+            log.error("发送msg失败", e);
+        }
+    }
+
+    private void sendMsg(RouteParam param) throws Exception {
+        RouteConfigDto routeConfigDto = new RouteConfigDto();
+        routeConfigDto.setRouteId(param.getId());
+        routeConfigDto.setStatus(param.getStatus());
+        routeConfigService.sendRouteConfigMsg(routeConfigDto);
     }
 
     @Api(name = "route.role.get")
@@ -166,9 +191,10 @@ public class RouteApi {
         }
 
         try {
-            routePermissionService.sendRoutePermissionReloadToZookeeper();
+            routePermissionService.sendRoutePermissionReloadMsg();
         } catch (Exception e) {
-            log.info("消息推送--路由权限(reload)失败",e);
+            log.info("消息推送--路由权限(reload)失败", e);
+            throw new ApiException("修改失败，请查看日志");
         }
     }
 

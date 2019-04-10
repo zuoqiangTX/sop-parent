@@ -5,6 +5,7 @@ lib.importJs('../../assets/js/routerole.js')
         ,'1': '<span class="x-green">已启用</span>'
         ,'2': '<span class="x-red">已禁用</span>'
     }
+    var element = layui.element;
     var form = layui.form;
     var updateForm = layui.Form('updateForm');
     var addForm = layui.Form('addForm');
@@ -50,43 +51,30 @@ lib.importJs('../../assets/js/routerole.js')
         return false;
     });
 
+    element.on('tab(serviceTabFilter)', function(data){
+        loadRouteTable(this.innerHTML);
+    });
 
-    function initTree() {
+
+    function initServiceTab() {
         ApiUtil.post('service.list', {}, function (resp) {
             var serviceList = resp.data;
-            var children = [];
+            var html = [];
             for (var i = 0; i < serviceList.length; i++) {
                 var serviceInfo = serviceList[i];
-                children.push({
-                    id: i + 1,
-                    name: serviceInfo.serviceId
-                })
+                var clazz = i === 0 ? 'class="layui-this"' : '';
+                html.push('<li ' + clazz + '>' + serviceInfo.serviceId + '</li>');
             }
+            $('#serviceTab').html(html.join(''));
 
-            layui.tree({
-                elem: '#leftTree' //传入元素选择器
-                , nodes: [{ //节点
-                    name: '服务列表'
-                    , spread: true // 展开
-                    , children: children
-                }]
-                , click: function (node) {
-                    if (node.id) {
-                        reloadRightPart(node)
-                    }
-                }
-            });
+            if (serviceList.length > 0) {
+                loadRouteTable(serviceList[0].serviceId);
+            }
         });
     }
 
-    /**
-     * 更新右边部分
-     * @param node 树节点
-     */
-    function reloadRightPart(node) {
-        $('#optTip').hide();
-        $('#rightPart').show();
-        var serviceId = node.name;
+
+    function loadRouteTable(serviceId) {
         currentServiceId = serviceId;
         searchTable({
             serviceId: serviceId
@@ -174,7 +162,7 @@ lib.importJs('../../assets/js/routerole.js')
                 layer.open({
                     type: 1
                     ,title: '修改路由' + smTitle
-                    ,area: ['500px', '460px']
+                    ,area: ['500px', '350px']
                     ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                 });
             } else if (event === 'auth') {
@@ -210,7 +198,7 @@ lib.importJs('../../assets/js/routerole.js')
                 layer.open({
                     type: 1
                     ,title: '添加路由' + smTitle
-                    ,area: ['500px', '460px']
+                    ,area: ['500px', '350px']
                     ,content: $('#addWin')
                 });
             }
@@ -218,7 +206,7 @@ lib.importJs('../../assets/js/routerole.js')
         return routeTable;
     }
 
-    initTree();
+    initServiceTab();
 
     RouteRole.loadAllRole(form, 'roleArea');
 

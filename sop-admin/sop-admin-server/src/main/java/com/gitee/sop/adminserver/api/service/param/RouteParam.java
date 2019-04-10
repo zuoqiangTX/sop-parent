@@ -38,14 +38,6 @@ public class RouteParam {
     @ApiDocField(description = "路由path")
     private String path;
 
-
-    /**
-     * 是否忽略验证，业务参数验证除外
-     */
-    @NotNull
-    @ApiDocField(description = "是否忽略验证,1：是，0：否")
-    private Integer ignoreValidate;
-
     /**
      * 状态
      */
@@ -53,10 +45,4 @@ public class RouteParam {
     @ApiDocField(description = "状态，0：审核，1：启用，2：禁用")
     private Integer status;
 
-    /**
-     * 状态
-     */
-    @NotNull
-    @ApiDocField(description = "是否合并结果,1：是，0：否")
-    private Integer mergeResult;
 }

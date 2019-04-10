@@ -1,5 +1,6 @@
 package com.gitee.sop.adminserver.bean;
 
+import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class GatewayRouteDefinition {
     /**
      * 路由的Id
      */
+    @ApiDocField(description = "路由id")
     private String id = "";
 
     /**
@@ -28,11 +30,13 @@ public class GatewayRouteDefinition {
     /**
      * 路由规则转发的目标uri
      */
+    @ApiDocField(description = "uri")
     private String uri;
 
     /**
      * uri后面跟的path
      */
+    @ApiDocField(description = "path")
     private String path;
 
     /**
@@ -43,20 +47,24 @@ public class GatewayRouteDefinition {
     /**
      * 是否忽略验证，业务参数验证除外
      */
+    @ApiDocField(description = "是否忽略验证，业务参数验证除外，1：忽略，0：不忽略")
     private int ignoreValidate;
 
     /**
      * 状态，0：待审核，1：启用，2：禁用
      */
+    @ApiDocField(description = "状态，0：待审核，1：启用，2：禁用")
     private int status = 1;
 
     /**
      * 合并结果
      */
+    @ApiDocField(description = "合并结果，1：合并，2：不合并")
     private int mergeResult = 1;
 
     /**
      * 是否需要授权才能访问
      */
+    @ApiDocField(description = "是否需要授权才能访问，1：是，2：否")
     private int permission;
 }

@@ -13,15 +13,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ManagerInitializer {
     @Autowired
-    private DbIsvManager dbIsvManager;
+    DbIsvManager dbIsvManager;
 
     @Autowired
-    private DbIsvRoutePermissionManager dbIsvRoutePermissionManager;
+    DbIsvRoutePermissionManager dbIsvRoutePermissionManager;
+
+    @Autowired
+    DbRouteConfigManager dbRouteConfigManager;
 
     public void init() {
         ApiConfig apiConfig = ApiConfig.getInstance();
         apiConfig.setIsvManager(dbIsvManager);
         apiConfig.setIsvRoutePermissionManager(dbIsvRoutePermissionManager);
+        apiConfig.setRouteConfigManager(dbRouteConfigManager);
 
         // 从数据库加载isv信息
         log.debug("从数据库加载isv信息");
@@ -32,5 +36,8 @@ public class ManagerInitializer {
 
         log.debug("从数据库加载路由权限信息");
         dbIsvRoutePermissionManager.load();
+
+        log.debug("从数据库加载路由配置信息");
+        dbRouteConfigManager.load();
     }
 }

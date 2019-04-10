@@ -8,10 +8,10 @@ import lombok.Data;
  */
 @Data
 public class IsvFormVO {
-    @ApiDocField(description = "appKey")
+    @ApiDocField(description = "appKey", example = "aaaa")
     private String appKey;
 
-    @ApiDocField(description = "secret")
+    @ApiDocField(description = "secret", example = "bbbb")
     private String secret;
 
     @ApiDocField(description = "pubKey")

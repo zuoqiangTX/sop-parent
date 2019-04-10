@@ -4,6 +4,8 @@ import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * @author tanghc
  */
@@ -11,6 +13,6 @@ import lombok.Setter;
 @Setter
 public class ServiceSearchParam {
 
-    @ApiDocField(description = "serviceId")
+    @ApiDocField(description = "服务名serviceId")
     private String serviceId;
 }

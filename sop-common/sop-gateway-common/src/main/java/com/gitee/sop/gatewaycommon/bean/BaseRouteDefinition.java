@@ -35,11 +35,6 @@ public class BaseRouteDefinition {
     private int ignoreValidate;
 
     /**
-     * 状态，0：待审核，1：启用，2：禁用
-     */
-    private int status = 1;
-
-    /**
      * 是否合并结果
      */
     private int mergeResult;
@@ -48,8 +43,4 @@ public class BaseRouteDefinition {
      * 接口是否需要授权才能访问
      */
     private int permission;
-
-    public boolean enable() {
-        return status == RouteStatus.ENABLE.getStatus();
-    }
 }

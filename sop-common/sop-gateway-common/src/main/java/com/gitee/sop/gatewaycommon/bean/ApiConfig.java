@@ -4,7 +4,9 @@ import com.gitee.sop.gatewaycommon.gateway.param.GatewayParamBuilder;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
 import com.gitee.sop.gatewaycommon.secret.CacheIsvManager;
@@ -93,6 +95,11 @@ public class ApiConfig {
      * isv路由权限
      */
     private IsvRoutePermissionManager isvRoutePermissionManager = new DefaultIsvRoutePermissionManager();
+
+    /**
+     * 路由配置管理
+     */
+    private RouteConfigManager routeConfigManager = new DefaultRouteConfigManager();
 
     // -------- fields ---------
 

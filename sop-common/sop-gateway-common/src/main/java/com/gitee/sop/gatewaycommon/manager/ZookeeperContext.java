@@ -74,6 +74,10 @@ public class ZookeeperContext {
         return SOP_MSG_CHANNEL_PATH + "/isv-route-permission";
     }
 
+    public static String getRouteConfigChannelPath() {
+        return SOP_MSG_CHANNEL_PATH + "/route-conf";
+    }
+
     public static CuratorFramework getClient() {
         return client;
     }

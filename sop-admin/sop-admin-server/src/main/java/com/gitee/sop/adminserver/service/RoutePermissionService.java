@@ -93,7 +93,7 @@ public class RoutePermissionService {
     /**
      * 推送所有路由权限到zookeeper
      */
-    public void sendRoutePermissionReloadToZookeeper() throws Exception {
+    public void sendRoutePermissionReloadMsg() throws Exception {
         ChannelMsg channelMsg = new ChannelMsg("reload", null);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getIsvRoutePermissionChannelPath();

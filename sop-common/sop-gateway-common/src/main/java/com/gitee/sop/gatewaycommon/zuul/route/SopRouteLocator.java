@@ -1,5 +1,8 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
+import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
@@ -51,8 +54,10 @@ public class SopRouteLocator implements RouteLocator, Ordered {
             return null;
         }
         // 路由是否启用
-        if (!zuulTargetRoute.getRouteDefinition().enable()) {
-            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
+        RouteConfigManager routeConfigManager = ApiConfig.getInstance().getRouteConfigManager();
+        RouteConfig routeConfig = routeConfigManager.get(zuulTargetRoute.getRouteDefinition().getId());
+        if (!routeConfig.enable()) {
+            throw ErrorEnum.ISP_API_DISABLED.getErrorMeta().getException();
         }
         return zuulTargetRoute.getTargetRouteDefinition();
     }

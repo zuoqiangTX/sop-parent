@@ -47,11 +47,11 @@
 
 <div id="updateWin" class="x-win">
     <form id="updateForm" class="layui-form" action="" lay-filter="updateWinFilter">
-        <input type="hidden" name="serviceId" />
+        <input type="hidden" name="serviceId">
         <div class="layui-form-item">
             <label class="layui-form-label">id</label>
             <div class="layui-input-block">
-                <input type="text" name="id" readonly="readonly" class="layui-input"/>
+                <input type="text" name="routeId" readonly="readonly" class="layui-input"/>
             </div>
         </div>
         <div class="layui-form-item">
@@ -64,19 +64,19 @@
         <div class="layui-form-item limit-type type1">
             <label class="layui-form-label">每秒可处理请求数</label>
             <div class="layui-input-block">
-                <input type="text" name="execCountPerSecond" lay-verify="required" class="layui-input"/>
+                <input type="text" name="execCountPerSecond" class="layui-input"/>
             </div>
         </div>
         <div class="layui-form-item limit-type type1">
             <label class="layui-form-label">错误码</label>
             <div class="layui-input-block">
-                <input type="text" name="limitCode" lay-verify="required" class="layui-input"/>
+                <input type="text" name="limitCode" class="layui-input"/>
             </div>
         </div>
         <div class="layui-form-item limit-type type1">
             <label class="layui-form-label">错误信息</label>
             <div class="layui-input-block">
-                <input type="text" name="limitMsg" lay-verify="required" class="layui-input"/>
+                <input type="text" name="limitMsg" class="layui-input"/>
             </div>
         </div>
         <div class="layui-form-item limit-type type2">
@@ -85,7 +85,13 @@
                 <input type="text" name="tokenBucketCount" class="layui-input"/>
             </div>
         </div>
-
+        <div class="layui-form-item">
+            <label class="layui-form-label">开启状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="limitStatus" value="1" title="开启">
+                <input type="radio" name="limitStatus" value="0" title="关闭" checked="checked">
+            </div>
+        </div>
         <div class="layui-form-item">
             <div class="layui-input-block">
                 <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="updateWinSubmitFilter">保存</button>

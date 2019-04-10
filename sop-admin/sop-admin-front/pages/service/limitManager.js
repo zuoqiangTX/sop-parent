@@ -30,10 +30,14 @@ lib.importJs('../../assets/js/routerole.js')
 
     // 监听修改提交
     form.on('submit(updateWinSubmitFilter)', function(data) {
-        ApiUtil.post('route.update', data.field, function (resp) {
+        var formData = updateForm.getData();
+        if (!checkUpdateForm(formData)) {
+            return false;
+        }
+        ApiUtil.post('route.limit.update', formData, function (resp) {
             layer.closeAll();
             limitTable.reload();
-        })
+        });
         return false;
     });
 
@@ -45,6 +49,30 @@ lib.importJs('../../assets/js/routerole.js')
     element.on('tab(serviceTabFilter)', function(data){
         loadLimitTable(this.innerHTML);
     });
+
+    function checkUpdateForm(formData) {
+        var type = formData.type;
+        if (type == 1) {
+            if (!/^[1-9]\d*$/.test(formData.execCountPerSecond)) {
+                layer.alert('每秒可处理请求数必须大于0')
+                return false;
+            }
+            if (!formData.limitCode || formData.limitCode.length == 0) {
+                layer.alert('错误码不能为空')
+                return false;
+            }
+            if (!formData.limitMsg || formData.limitMsg.length == 0) {
+                layer.alert('错误信息不能为空')
+                return false;
+            }
+        } else if (type == 2) {
+            if (!/^[1-9]\d*$/.test(formData.tokenBucketCount)) {
+                layer.alert('令牌桶容量必须大于0')
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     function initServiceTab() {
@@ -98,7 +126,7 @@ lib.importJs('../../assets/js/routerole.js')
             , headers: {access_token: ApiUtil.getAccessToken()}
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
-                {field: 'id', title: 'id(接口名+版本号)', width: 200}
+                {field: 'routeId', title: 'id(接口名+版本号)', width: 200}
                 , {
                     field: 'type', title: '限流策略', width: 80, templet: function (row) {
                         return LIMIT_TYPE[row.type + ''];
@@ -106,14 +134,14 @@ lib.importJs('../../assets/js/routerole.js')
                 }
                 , {
                     field: 'info', title: '限流信息', width: 500, templet: function (row) {
-                        if (row.limitStatus == 0) {
+                        if (!row.hasRecord) {
                             return '--'
                         }
                         var html = [];
                         if (row.type == 1) {
                             html.push('每秒可处理请求数：' + row.execCountPerSecond);
-                            html.push('错误码：' + row.limitCode);
-                            html.push('错误信息：' + row.limitMsg);
+                            html.push('subCode：' + row.limitCode);
+                            html.push('subMsg：' + row.limitMsg);
                         } else if(row.type == 2) {
                             html.push('令牌桶容量：' + row.tokenBucketCount);
                         }
@@ -149,7 +177,7 @@ lib.importJs('../../assets/js/routerole.js')
                 layer.open({
                     type: 1
                     ,title: '修改限流' + smTitle
-                    ,area: ['600px', '380px']
+                    ,area: ['600px', '460px']
                     ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                 });
             }

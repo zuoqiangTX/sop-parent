@@ -29,6 +29,9 @@ public class ConfigRouteLimit {
     /** 路由id, 数据库字段：route_id */
     private String routeId;
 
+    /** serviceId, 数据库字段：service_id */
+    private String serviceId;
+
     /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：type */
     private Byte type;
 

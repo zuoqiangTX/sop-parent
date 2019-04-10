@@ -10,8 +10,11 @@ import lombok.Data;
  */
 @Data
 public class LimitVO {
+    @ApiDocField(description = "是否存在记录")
+    private int hasRecord;
+
     @ApiDocField(description = "路由id")
-    private String id;
+    private String routeId;
 
     @ApiDocField(description = "serviceId")
     private String serviceId;

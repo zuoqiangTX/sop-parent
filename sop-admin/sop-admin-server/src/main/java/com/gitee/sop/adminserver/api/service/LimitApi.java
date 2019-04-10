@@ -18,6 +18,7 @@ import com.gitee.sop.adminserver.mapper.ConfigRouteLimitMapper;
 import com.gitee.sop.adminserver.service.RouteConfigService;
 import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,10 +56,12 @@ public class LimitApi {
         List<LimitVO> gatewayRouteDefinitions = routeDefinitionList
                 .stream()
                 .map(gatewayRouteDefinition -> {
+                    String routeId = gatewayRouteDefinition.getId();
                     LimitVO vo = new LimitVO();
-                    CopyUtil.copyProperties(gatewayRouteDefinition, vo);
-                    ConfigRouteLimit configRouteLimit = routeLimitMap.getOrDefault(gatewayRouteDefinition.getId(), getDefaultLimit());
+                    ConfigRouteLimit configRouteLimit = routeLimitMap.getOrDefault(routeId, getDefaultLimit());
                     CopyUtil.copyPropertiesIgnoreNull(configRouteLimit, vo);
+                    vo.setRouteId(routeId);
+                    vo.setHasRecord(BooleanUtils.toInteger(configRouteLimit.getId() != null));
                     return vo;
                 })
                 .collect(Collectors.toList());

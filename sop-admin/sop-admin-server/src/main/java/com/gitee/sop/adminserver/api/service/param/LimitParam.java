@@ -14,8 +14,12 @@ import javax.validation.constraints.NotNull;
 @Data
 public class LimitParam {
     @ApiDocField(description = "routeId")
-    @NotBlank
+    @NotBlank(message = "routeId can not null")
     private String routeId;
+
+    @ApiDocField(description = "serviceId")
+    @NotBlank(message = "serviceId can not null")
+    private String serviceId;
 
     /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：type */
     @ApiDocField(description = "限流策略，1：漏桶策略，2：令牌桶策略")
@@ -40,6 +44,6 @@ public class LimitParam {
 
     /** 1:开启，0关闭, 数据库字段：limit_status */
     @ApiDocField(description = "1:开启，0关闭")
-    @NotNull
+    @NotNull(message = "limitStatus不能为空")
     private Byte limitStatus;
 }

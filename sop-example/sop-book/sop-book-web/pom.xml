@@ -11,7 +11,7 @@
     <groupId>com.gitee.sop</groupId>
     <artifactId>sop-book-web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>sop-story</name>
+    <name>sop-book</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

@@ -16,6 +16,18 @@ public class LimitVO {
     @ApiDocField(description = "路由id")
     private String routeId;
 
+    /**
+     * 接口名
+     */
+    @ApiDocField(description = "接口名")
+    private String name;
+
+    /**
+     * 版本号
+     */
+    @ApiDocField(description = "版本号")
+    private String version;
+
     @ApiDocField(description = "serviceId")
     private String serviceId;
 

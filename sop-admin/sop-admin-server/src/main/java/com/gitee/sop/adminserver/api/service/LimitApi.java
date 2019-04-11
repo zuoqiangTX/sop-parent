@@ -58,6 +58,7 @@ public class LimitApi {
                 .map(gatewayRouteDefinition -> {
                     String routeId = gatewayRouteDefinition.getId();
                     LimitVO vo = new LimitVO();
+                    CopyUtil.copyPropertiesIgnoreNull(gatewayRouteDefinition, vo);
                     ConfigRouteLimit configRouteLimit = routeLimitMap.getOrDefault(routeId, getDefaultLimit());
                     CopyUtil.copyPropertiesIgnoreNull(configRouteLimit, vo);
                     vo.setRouteId(routeId);

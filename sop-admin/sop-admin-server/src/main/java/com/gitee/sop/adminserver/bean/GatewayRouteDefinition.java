@@ -18,6 +18,16 @@ public class GatewayRouteDefinition {
     private String id = "";
 
     /**
+     * 接口名
+     */
+    private String name;
+
+    /**
+     * 版本号
+     */
+    private String version;
+
+    /**
      * 路由断言集合配置
      */
     private List<GatewayPredicateDefinition> predicates = new ArrayList<>();

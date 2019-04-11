@@ -126,7 +126,8 @@ lib.importJs('../../assets/js/routerole.js')
             , headers: {access_token: ApiUtil.getAccessToken()}
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
-                {field: 'routeId', title: 'id(接口名+版本号)', width: 200}
+                {field: 'name', title: '接口名', width: 200}
+                , {field: 'version', title: '版本号', width: 80}
                 , {
                     field: 'type', title: '限流策略', width: 80, templet: function (row) {
                         return LIMIT_TYPE[row.type + ''];

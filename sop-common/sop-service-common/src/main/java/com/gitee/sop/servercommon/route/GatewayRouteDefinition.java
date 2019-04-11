@@ -11,9 +11,19 @@ import java.util.List;
 @Data
 public class GatewayRouteDefinition {
     /**
-     * 路由的Id
+     * 路由的Id（接口名+版本号），确保此id全局唯一
      */
     private String id;
+
+    /**
+     * 接口名
+     */
+    private String name;
+
+    /**
+     * 版本号
+     */
+    private String version;
 
     /**
      * 路由断言集合配置

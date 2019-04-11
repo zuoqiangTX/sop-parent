@@ -108,7 +108,8 @@ lib.importJs('../../assets/js/routerole.js')
             , headers: {access_token: ApiUtil.getAccessToken()}
             , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             , cols: [[
-                {field: 'id', title: 'id(接口名+版本号)'}
+                {field: 'name', title: '接口名', width: 200}
+                , {field: 'version', title: '版本号', width: 80}
                 , {field: 'uri', title: 'uri', width: 200}
                 , {field: 'path', title: 'path'}
                 , {field: 'roles', title: '访问权限', width: 100, templet: function (row) {

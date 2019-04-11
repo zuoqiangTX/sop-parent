@@ -36,21 +36,15 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
         ResultExecutor<ServerWebExchange, GatewayResult> resultExecutor = ApiContext.getApiConfig().getGatewayResultExecutor();
         GatewayResult errorResult = resultExecutor.buildErrorResult(exchange, ex);
 
-        /**
-         * 错误记录
-         */
+        // 错误记录
         ServerHttpRequest request = exchange.getRequest();
         log.error("[全局异常处理]异常请求路径:{}, msg:{}", request.getPath(), ex.getMessage(), ex);
-        /**
-         * 参考AbstractErrorWebExceptionHandler
-         */
+        // 参考AbstractErrorWebExceptionHandler
         if (exchange.getResponse().isCommitted()) {
             return Mono.error(ex);
         }
         ServerRequest newRequest = ServerRequest.create(exchange, this.messageReaders);
-        return RouterFunctions.route(RequestPredicates.all(), (serverRequest) -> {
-            return this.renderErrorResponse(errorResult);
-        }).route(newRequest)
+        return RouterFunctions.route(RequestPredicates.all(), (serverRequest) -> this.renderErrorResponse(errorResult)).route(newRequest)
                 .switchIfEmpty(Mono.error(ex))
                 .flatMap((handler) -> handler.handle(newRequest))
                 .flatMap((response) -> write(exchange, response));
@@ -75,7 +69,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * 参考AbstractErrorWebExceptionHandler
      *
-     * @param messageReaders
+     * @param messageReaders messageReaders
      */
     public void setMessageReaders(List<HttpMessageReader<?>> messageReaders) {
         Assert.notNull(messageReaders, "'messageReaders' must not be null");
@@ -85,7 +79,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * 参考AbstractErrorWebExceptionHandler
      *
-     * @param viewResolvers
+     * @param viewResolvers viewResolvers
      */
     public void setViewResolvers(List<ViewResolver> viewResolvers) {
         this.viewResolvers = viewResolvers;
@@ -94,7 +88,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * 参考AbstractErrorWebExceptionHandler
      *
-     * @param messageWriters
+     * @param messageWriters messageWriters
      */
     public void setMessageWriters(List<HttpMessageWriter<?>> messageWriters) {
         Assert.notNull(messageWriters, "'messageWriters' must not be null");
@@ -105,8 +99,8 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * 参考DefaultErrorWebExceptionHandler
      *
-     * @param result
-     * @return
+     * @param result 返回结果
+     * @return 返回mono
      */
     protected Mono<ServerResponse> renderErrorResponse(GatewayResult result) {
         return ServerResponse
@@ -118,9 +112,9 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     /**
      * 参考AbstractErrorWebExceptionHandler
      *
-     * @param exchange
-     * @param response
-     * @return
+     * @param exchange exchange
+     * @param response response
+     * @return 返回Mono
      */
     private Mono<? extends Void> write(ServerWebExchange exchange,
                                        ServerResponse response) {

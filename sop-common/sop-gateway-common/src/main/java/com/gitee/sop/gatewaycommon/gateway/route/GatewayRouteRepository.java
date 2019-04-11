@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -22,6 +23,7 @@ import org.springframework.validation.Validator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +60,7 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     @Override
     public Flux<RouteDefinition> getRouteDefinitions() {
         List<RouteDefinition> list = routes.values().parallelStream()
-                .map(targetRoute -> targetRoute.getTargetRouteDefinition())
+                .map(TargetRoute::getTargetRouteDefinition)
                 .collect(Collectors.toList());
         return Flux.fromIterable(list);
     }
@@ -79,6 +81,11 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     @Override
     public GatewayTargetRoute get(String id) {
         return routes.get(id);
+    }
+
+    @Override
+    public Collection<GatewayTargetRoute> getAll() {
+        return routes.values();
     }
 
     /**

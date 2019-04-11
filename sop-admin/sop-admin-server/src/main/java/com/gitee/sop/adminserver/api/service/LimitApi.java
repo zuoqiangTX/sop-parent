@@ -88,7 +88,7 @@ public class LimitApi {
 
     private ConfigRouteLimit getDefaultLimit() {
         ConfigRouteLimit configRouteLimit = new ConfigRouteLimit();
-        configRouteLimit.setType(LimitEnum.TYPE_LEAKY_BUCKET.getVal());
+        configRouteLimit.setLimitType(LimitEnum.TYPE_LEAKY_BUCKET.getVal());
         configRouteLimit.setLimitStatus(LimitEnum.STATUS_CLOSE.getVal());
         return configRouteLimit;
     }

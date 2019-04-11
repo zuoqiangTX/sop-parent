@@ -19,15 +19,11 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
     /**
      * key：nameVersion
      */
-    private Map<String, ZuulTargetRoute> nameVersionServiceIdMap = new ConcurrentHashMap<>(128);
-
-    public List<ZuulTargetRoute> listAll() {
-        return new ArrayList<>(nameVersionServiceIdMap.values());
-    }
+    private Map<String, ZuulTargetRoute> nameVersionTargetRouteMap = new ConcurrentHashMap<>(128);
 
     @Override
     public ZuulTargetRoute get(String id) {
-        ZuulTargetRoute route = nameVersionServiceIdMap.get(id);
+        ZuulTargetRoute route = nameVersionTargetRouteMap.get(id);
         if (route == null) {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
@@ -35,19 +31,24 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
     }
 
     @Override
+    public Collection<ZuulTargetRoute> getAll() {
+        return nameVersionTargetRouteMap.values();
+    }
+
+    @Override
     public String add(ZuulTargetRoute targetRoute) {
-        nameVersionServiceIdMap.put(targetRoute.getRouteDefinition().getId(), targetRoute);
-        return null;
+        nameVersionTargetRouteMap.put(targetRoute.getRouteDefinition().getId(), targetRoute);
+        return targetRoute.getRouteDefinition().getId();
     }
 
     @Override
     public void update(ZuulTargetRoute targetRoute) {
-        nameVersionServiceIdMap.put(targetRoute.getRouteDefinition().getId(), targetRoute);
+        nameVersionTargetRouteMap.put(targetRoute.getRouteDefinition().getId(), targetRoute);
     }
 
     @Override
     public void deleteAll(String serviceId) {
-        Collection<ZuulTargetRoute> values = nameVersionServiceIdMap.values();
+        Collection<ZuulTargetRoute> values = nameVersionTargetRouteMap.values();
         List<String> idList = values.stream()
                 .map(zuulTargetRoute -> zuulTargetRoute.getRouteDefinition().getId())
                 .collect(Collectors.toList());
@@ -59,6 +60,6 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
 
     @Override
     public void delete(String id) {
-        nameVersionServiceIdMap.remove(id);
+        nameVersionTargetRouteMap.remove(id);
     }
 }

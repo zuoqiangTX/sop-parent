@@ -29,13 +29,19 @@ public class DefaultRouteConfigManager implements RouteConfigManager {
 
     @Override
     public void update(RouteConfigDto routeConfigDto) {
-        String key = routeConfigDto.getRouteId();
-        RouteConfig routeConfig = routeConfigMap.get(key);
+        this.doUpdate(routeConfigDto.getRouteId(), routeConfigDto);
+    }
+
+    protected void doUpdate(String routeId, Object res) {
+        RouteConfig routeConfig = routeConfigMap.get(routeId);
         if (routeConfig == null) {
             routeConfig = newRouteConfig();
-            routeConfigMap.put(key, routeConfig);
+            routeConfig.setRouteId(routeId);
+            routeConfigMap.put(routeId, routeConfig);
+        } else {
+            MyBeanUtil.copyPropertiesIgnoreNull(res, routeConfig);
         }
-        MyBeanUtil.copyPropertiesIgnoreNull(routeConfigDto, routeConfig);
+        routeConfig.initRateLimiter();
     }
 
     protected RouteConfig newRouteConfig() {

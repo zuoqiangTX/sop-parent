@@ -5,6 +5,7 @@ import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreRoutePermissionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
@@ -48,7 +49,7 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      * @return
      */
     @Bean
-    public PreDecorationFilter preDecorationFilter(ZuulRouteRepository zuulRouteRepository, ProxyRequestHelper proxyRequestHelper) {
+    PreDecorationFilter preDecorationFilter(ZuulRouteRepository zuulRouteRepository, ProxyRequestHelper proxyRequestHelper) {
         // 自定义路由
         RouteLocator routeLocator = new SopRouteLocator(zuulRouteRepository);
         return new PreDecorationFilter(routeLocator,
@@ -61,7 +62,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      * 路由管理
      * @param environment
      * @param zuulRouteRepository
-     * @return
      */
     @Bean
     ZuulZookeeperRouteManager zuulZookeeperRouteManager(Environment environment, ZuulRouteRepository zuulRouteRepository) {
@@ -70,7 +70,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     /**
      * 前置校验
-     * @return
      */
     @Bean
     PreValidateFilter preValidateFilter() {
@@ -78,8 +77,15 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     }
 
     /**
+     * 开启限流
+     */
+    @Bean
+    PreLimitFilter preLimitFilter() {
+        return new PreLimitFilter();
+    }
+
+    /**
      * 权限校验
-     * @return
      */
     @Bean
     PreRoutePermissionFilter preRoutePermissionFilter() {
@@ -88,7 +94,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     /**
      * 错误处理扩展
-     * @return
      */
     @Bean
     ErrorFilter errorFilter() {
@@ -97,7 +102,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     /**
      * 结果返回
-     * @return
      */
     @Bean
     PostResultFilter postResultFilter() {
@@ -106,7 +110,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     /**
      * 统一错误处理
-     * @return
      */
     @Bean
     ZuulErrorController baseZuulController() {

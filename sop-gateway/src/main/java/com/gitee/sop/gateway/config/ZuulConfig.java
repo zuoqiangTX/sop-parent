@@ -9,7 +9,9 @@ import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
 import com.gitee.sop.gatewaycommon.zuul.configuration.TaobaoZuulConfiguration;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
@@ -44,6 +46,7 @@ public class ZuulConfig extends AlipayZuulConfiguration {
     protected void doAfter() {
         managerInitializer.init();
     }
+
 }
 
 /**

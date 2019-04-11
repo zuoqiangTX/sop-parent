@@ -42,14 +42,14 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
     /**
      * 返回路由根对象class
      *
-     * @return
+     * @return 返回R.class
      */
     protected abstract Class<R> getServiceRouteInfoClass();
 
     /**
      * 返回路由Item对象class
      *
-     * @return
+     * @return 返回E.class
      */
     protected abstract Class<E> getRouteDefinitionClass();
 
@@ -58,7 +58,7 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
      *
      * @param serviceRouteInfo
      * @param routeDefinition
-     * @return
+     * @return 返回目标路由对象
      */
     protected abstract T buildRouteDefinition(R serviceRouteInfo, E routeDefinition);
 

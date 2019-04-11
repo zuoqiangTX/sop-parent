@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class LimitVO {
     @ApiDocField(description = "是否存在记录")
-    private int hasRecord;
+    private Integer hasRecord;
 
     @ApiDocField(description = "路由id")
     private String routeId;
@@ -32,10 +32,10 @@ public class LimitVO {
     private String serviceId;
 
     /**
-     * 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：type
+     * 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：limit_type
      */
     @ApiDocField(description = "限流策略，1：漏桶策略，2：令牌桶策略")
-    private Byte type;
+    private Byte limitType;
 
     /**
      * 每秒可处理请求数, 数据库字段：exec_count_per_second

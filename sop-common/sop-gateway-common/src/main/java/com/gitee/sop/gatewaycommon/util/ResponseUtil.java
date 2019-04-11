@@ -40,7 +40,7 @@ public class ResponseUtil {
      * map转成xml
      *
      * @param parameters
-     * @return
+     * @return 返回xml内容
      */
     public static String mapToXml(JSONObject parameters) {
         String content = doMap2xml(parameters);

@@ -28,8 +28,8 @@ public class ConfigRouteLimit {
     /** 路由id, 数据库字段：route_id */
     private String routeId;
 
-    /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：type */
-    private Byte type;
+    /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：limit_type */
+    private Byte limitType;
 
     /** 每秒可处理请求数, 数据库字段：exec_count_per_second */
     private Integer execCountPerSecond;

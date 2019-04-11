@@ -1,6 +1,7 @@
 package com.gitee.sop.gatewaycommon.param;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,6 +28,11 @@ public class ApiParam extends JSONObject implements Param {
     private String restVersion;
 
     private transient ApiUploadContext apiUploadContext;
+
+    @JSONField(serialize = false)
+    public String getRouteId() {
+        return this.fetchNameVersion();
+    }
 
     /**
      * 获取sign，并从param中删除

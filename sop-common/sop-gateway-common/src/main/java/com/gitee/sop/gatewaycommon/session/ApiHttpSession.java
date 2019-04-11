@@ -107,7 +107,7 @@ public class ApiHttpSession implements HttpSession, Serializable {
     }
 
     /**
-     * @return
+     * @return 返回HttpSessionContext。已废弃不能使用
      * @deprecated 已废弃不能使用
      */
     @Override

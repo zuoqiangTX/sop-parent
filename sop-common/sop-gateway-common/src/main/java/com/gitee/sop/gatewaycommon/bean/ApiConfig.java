@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.bean;
 import com.gitee.sop.gatewaycommon.gateway.param.GatewayParamBuilder;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
+import com.gitee.sop.gatewaycommon.limit.DefaultLimitManager;
+import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
@@ -101,6 +103,11 @@ public class ApiConfig {
      */
     private RouteConfigManager routeConfigManager = new DefaultRouteConfigManager();
 
+    /**
+     * 限流管理
+     */
+    private LimitManager limitManager = new DefaultLimitManager();
+
     // -------- fields ---------
 
     /**
@@ -124,6 +131,11 @@ public class ApiConfig {
      * 超时时间
      */
     private int timeoutSeconds = 60 * 5;
+
+    /**
+     * 是否开启限流功能
+     */
+    private boolean openLimit = true;
 
     public void addAppSecret(Map<String, String> appSecretPair) {
         for (Map.Entry<String, String> entry : appSecretPair.entrySet()) {

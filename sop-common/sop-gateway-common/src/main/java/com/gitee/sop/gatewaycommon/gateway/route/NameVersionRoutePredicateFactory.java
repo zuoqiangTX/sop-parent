@@ -1,11 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
-import com.gitee.sop.gatewaycommon.bean.TargetRoute;
-import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
-import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +40,7 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
      * config.param为nameVersion
      *
      * @param config
-     * @return
+     * @return 返回断言
      */
     @Override
     public Predicate<ServerWebExchange> apply(Config config) {
@@ -65,14 +60,6 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             String name = params.getOrDefault(ParamNames.API_NAME, String.valueOf(System.currentTimeMillis()));
             String version = params.getOrDefault(ParamNames.VERSION_NAME, "");
             boolean match = (name + version).equals(nameVersion);
-            if (match) {
-                TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(nameVersion);
-                RouteConfigManager routeConfigManager = ApiConfig.getInstance().getRouteConfigManager();
-                RouteConfig routeConfig = routeConfigManager.get(nameVersion);
-                if (targetRoute != null && !routeConfig.enable()) {
-                    return false;
-                }
-            }
             return match;
         };
     }

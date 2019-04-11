@@ -14,9 +14,9 @@ public abstract class AbstractSigner implements Signer {
     /**
      * 构建服务端签名串
      *
-     * @param params
-     * @param secret
-     * @return
+     * @param params 接口参数
+     * @param secret 秘钥
+     * @return 返回服务端签名串
      */
     protected abstract String buildServerSign(ApiParam params, String secret);
 
@@ -30,7 +30,7 @@ public abstract class AbstractSigner implements Signer {
         return clientSign.equals(serverSign);
     }
 
-    public static String byte2hex(byte[] bytes) {
+    protected static String byte2hex(byte[] bytes) {
         StringBuilder sign = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             String hex = Integer.toHexString(bytes[i] & 0xFF);

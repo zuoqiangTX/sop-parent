@@ -99,7 +99,7 @@ public class ZookeeperContext {
      *
      * @param path 已存在的
      * @param data
-     * @return
+     * @return 返回Stat
      * @throws Exception
      */
     public static Stat updatePathData(String path, String data) throws Exception {
@@ -128,7 +128,7 @@ public class ZookeeperContext {
      * 新建或保存节点
      * @param path
      * @param data
-     * @return
+     * @return 返回path
      * @throws Exception
      */
     public static String createOrUpdateData(String path, String data) throws Exception {
@@ -144,7 +144,7 @@ public class ZookeeperContext {
      * 监听一个节点
      * @param path
      * @param onChange 节点修改后触发
-     * @return
+     * @return 返回path
      * @throws Exception
      */
     public static String listenPath(String path, Consumer<NodeCache> onChange) throws Exception {
@@ -172,7 +172,7 @@ public class ZookeeperContext {
      * 获取子节点数据
      *
      * @param parentPath 父节点
-     * @return
+     * @return 返回子节点数据
      * @throws Exception
      */
     public static List<ChildData> getChildrenData(String parentPath) throws Exception {

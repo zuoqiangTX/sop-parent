@@ -2,8 +2,12 @@ package com.gitee.sop.gatewaycommon.zuul.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
+import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
+import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
+import com.gitee.sop.gatewaycommon.util.RouteUtil;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
@@ -31,6 +35,7 @@ public class PreValidateFilter extends BaseZuulFilter {
         // 解析参数
         ApiParam param = apiConfig.getZuulParamBuilder().build(requestContext);
         ZuulContext.setApiParam(param);
+        RouteUtil.checkEnable(param);
         // 验证操作，这里有负责验证签名参数
         Validator validator = apiConfig.getValidator();
         try {

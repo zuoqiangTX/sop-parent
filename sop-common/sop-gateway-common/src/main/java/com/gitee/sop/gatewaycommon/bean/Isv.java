@@ -7,19 +7,19 @@ public interface Isv {
 
     /**
      * appKey
-     * @return
+     * @return 返回appKey
      */
     String getAppKey();
 
     /**
      * 秘钥
-     * @return
+     * @return 返回秘钥
      */
     String getSecretInfo();
 
     /**
      * 0启用，1禁用
-     * @return
+     * @return 返回状态
      */
     Byte getStatus();
 }

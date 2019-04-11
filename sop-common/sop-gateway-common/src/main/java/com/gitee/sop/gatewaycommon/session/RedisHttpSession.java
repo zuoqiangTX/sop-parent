@@ -60,8 +60,8 @@ public class RedisHttpSession implements HttpSession, Serializable {
     /**
      * 创建新的session
      *
-     * @param servletContext
-     * @param sessionId
+     * @param servletContext  servletContext
+     * @param sessionId sessionId
      * @param sessionTimeout 过期时间，单位秒
      * @param redisTemplate  redis客户端
      * @param keyPrefix      存入的key前缀
@@ -93,8 +93,8 @@ public class RedisHttpSession implements HttpSession, Serializable {
     /**
      * 创建已经存在的session,数据在redis里面
      *
-     * @param sessionId
-     * @param servletContext
+     * @param sessionId sessionId
+     * @param servletContext servletContext
      * @param redisTemplate  redis客户端
      * @param keyPrefix      存入的key前缀
      * @return 返回session
@@ -161,8 +161,8 @@ public class RedisHttpSession implements HttpSession, Serializable {
     }
 
     /**
+     * @return 返回HttpSessionContext。已废弃不能使用
      * @deprecated 已废弃，始终返回null
-     * @return
      */
     @Override
     @Deprecated

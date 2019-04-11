@@ -36,14 +36,14 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 获取业务方约定的返回码
      * @param t
-     * @return
+     * @return 返回返回码
      */
     public abstract int getResponseStatus(T t);
 
     /**
      * 返回Api参数
      * @param t
-     * @return
+     * @return 返回api参数
      */
     public abstract Map<String, ?> getApiParam(T t);
 
@@ -79,7 +79,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 该路由是否合并结果
      * @param request
-     * @return
+     * @return true：需要合并
      */
     protected boolean isMergeResult(T request) {
         // 默认全局设置
@@ -130,9 +130,9 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             if (method != null) {
                 name = String.valueOf(method);
             }
-            Object _sign = params.get(ParamNames.SIGN_NAME);
-            if (_sign != null) {
-                sign = String.valueOf(_sign);
+            Object clientSign = params.get(ParamNames.SIGN_NAME);
+            if (clientSign != null) {
+                sign = String.valueOf(clientSign);
             }
         }
 

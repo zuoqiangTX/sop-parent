@@ -15,7 +15,14 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
 
+    /** 签名验证过滤 */
     public static final int PRE_VALIDATE_FILTER_ORDER = -1000;
+
+    /** 权限验证过滤 */
+    public static final int PRE_ROUTE_PERMISSION_FILTER_ORDER = PRE_VALIDATE_FILTER_ORDER + 1;
+
+    /** 限流过滤 */
+    public static final int PRE_LIMIT_FILTER_ORDER = PRE_ROUTE_PERMISSION_FILTER_ORDER + 1;
 
     private Integer filterOrder;
 
@@ -28,7 +35,7 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     /**
      * 获取过滤器顺序
-     * @return
+     * @return 返回顺序，越小优先执行
      * @see ZuulFilter#filterOrder() filterOrder()
      */
     protected abstract int getFilterOrder();
@@ -36,7 +43,7 @@ public abstract class BaseZuulFilter extends ZuulFilter {
     /**
      * 执行run
      * @param requestContext
-     * @return
+     * @return Some arbitrary artifact may be returned. Current implementation ignores it.
      * @throws ZuulException
      */
     protected abstract Object doRun(RequestContext requestContext) throws ZuulException;

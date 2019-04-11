@@ -21,10 +21,10 @@ public class LimitParam {
     @NotBlank(message = "serviceId can not null")
     private String serviceId;
 
-    /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：type */
+    /** 限流策略，1：漏桶策略，2：令牌桶策略, 数据库字段：limit_type */
     @ApiDocField(description = "限流策略，1：漏桶策略，2：令牌桶策略")
     @NotNull
-    private Byte type;
+    private Byte limitType;
 
     /** 每秒可处理请求数, 数据库字段：exec_count_per_second */
     @ApiDocField(description = "每秒可处理请求数")

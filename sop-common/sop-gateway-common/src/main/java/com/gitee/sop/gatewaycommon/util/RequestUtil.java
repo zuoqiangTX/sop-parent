@@ -26,7 +26,7 @@ public class RequestUtil {
      * 将get类型的参数转换成map，
      *
      * @param query charset=utf-8&biz_content=xxx
-     * @return
+     * @return 返回map参数
      */
     public static Map<String, String> parseQueryToMap(String query) {
         if (query == null) {

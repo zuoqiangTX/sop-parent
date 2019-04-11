@@ -60,6 +60,7 @@ public class ApiValidator implements Validator {
         checkFormat(param);
     }
 
+
     /**
      * 校验上传文件内容
      *

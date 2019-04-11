@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * 获取form表单插件，使用方式：
- *      @Bean
+ *     &#64;Bean
  *     ReadBodyRoutePredicateFactory readBodyRoutePredicateFactory() {
  *         return new ReadBodyRoutePredicateFactory();
  *     }

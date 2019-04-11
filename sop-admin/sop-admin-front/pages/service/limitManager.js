@@ -51,7 +51,7 @@ lib.importJs('../../assets/js/routerole.js')
     });
 
     function checkUpdateForm(formData) {
-        var type = formData.type;
+        var type = formData.limitType;
         if (type == 1) {
             if (!/^[1-9]\d*$/.test(formData.execCountPerSecond)) {
                 layer.alert('每秒可处理请求数必须大于0')
@@ -118,6 +118,8 @@ lib.importJs('../../assets/js/routerole.js')
         }
     }
 
+    var tipType = '<a href="#" onclick="showLimitTypeTip()" title="说明"><i class="layui-icon layui-icon-help"></i></a>'
+
     function renderTable(postData) {
         var limitTable = table.render({
             elem: '#limitTable'
@@ -129,8 +131,8 @@ lib.importJs('../../assets/js/routerole.js')
                 {field: 'name', title: '接口名', width: 200}
                 , {field: 'version', title: '版本号', width: 80}
                 , {
-                    field: 'type', title: '限流策略', width: 80, templet: function (row) {
-                        return LIMIT_TYPE[row.type + ''];
+                    field: 'limitType', title: '限流策略 ' + tipType, width: 100, templet: function (row) {
+                        return LIMIT_TYPE[row.limitType + ''];
                     }
                 }
                 , {
@@ -139,11 +141,11 @@ lib.importJs('../../assets/js/routerole.js')
                             return '--'
                         }
                         var html = [];
-                        if (row.type == 1) {
+                        if (row.limitType == 1) {
                             html.push('每秒可处理请求数：' + row.execCountPerSecond);
                             html.push('subCode：' + row.limitCode);
                             html.push('subMsg：' + row.limitMsg);
-                        } else if(row.type == 2) {
+                        } else if(row.limitType == 2) {
                             html.push('令牌桶容量：' + row.tokenBucketCount);
                         }
                         return html.join('，');
@@ -173,7 +175,7 @@ lib.importJs('../../assets/js/routerole.js')
 
                 updateForm.setData(data);
                 $('.limit-type').hide();
-                $('.type' + data.type).show();
+                $('.type' + data.limitType).show();
 
                 layer.open({
                     type: 1
@@ -192,3 +194,19 @@ lib.importJs('../../assets/js/routerole.js')
     RouteRole.loadAllRole(form, 'roleArea');
 
 });
+
+function showLimitTypeTip() {
+    var leakyRemark = '漏桶策略：每秒处理固定数量的请求，超出请求返回错误信息。';
+    var tokenRemark = '令牌桶策略：每秒放置固定数量的令牌数，不足的令牌数做等待处理，直到拿到令牌为止。';
+    var content = '<div style="font-size: 14px;">'
+        + leakyRemark
+        + '<br>'
+        + tokenRemark
+        + '</div>';
+
+    layer.open({
+        title: '限流策略说明'
+        ,area: ['600px', 'auto']
+        ,content: content
+    });
+}

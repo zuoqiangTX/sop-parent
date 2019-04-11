@@ -33,9 +33,8 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
     /**
      * 自定义异常处理[@@]注册Bean时依赖的Bean，会从容器中直接获取，所以直接注入即可
      *
-     * @param viewResolversProvider
-     * @param serverCodecConfigurer
-     * @return
+     * @param viewResolversProvider viewResolversProvider
+     * @param serverCodecConfigurer serverCodecConfigurer
      */
     @Primary
     @Bean
@@ -52,8 +51,6 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
 
     /**
      * 处理返回结果
-     *
-     * @return
      */
     @Bean
     GatewayModifyResponseGatewayFilter gatewayModifyResponseGatewayFilter() {
@@ -62,8 +59,6 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
 
     /**
      * 读取post请求参数
-     *
-     * @return
      */
     @Bean
     ReadBodyRoutePredicateFactory readBodyRoutePredicateFactory() {

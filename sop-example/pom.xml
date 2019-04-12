@@ -11,6 +11,7 @@
     <modules>
         <module>sop-story</module>
         <module>sop-book</module>
-		<module>sop-easyopen</module>		
+		<module>sop-easyopen</module>
+		<module>sop-springmvc</module>
     </modules>
 </project>

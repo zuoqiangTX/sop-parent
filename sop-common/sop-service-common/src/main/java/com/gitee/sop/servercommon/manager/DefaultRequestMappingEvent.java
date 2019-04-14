@@ -1,19 +1,18 @@
 package com.gitee.sop.servercommon.manager;
 
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
-import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
+import com.gitee.sop.servercommon.mapping.MappingUtil;
 import lombok.Getter;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +33,12 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
     }
 
     @Override
-    public void onRegisterSuccess(ApiMappingHandlerMapping apiMappingHandlerMapping) {
+    public void onRegisterSuccess(RequestMappingHandlerMapping requestMappingHandlerMapping) {
         String serviceId = environment.getProperty("spring.application.name");
         if (serviceId == null) {
             throw new IllegalArgumentException("请在application.properties中指定spring.application.name属性");
         }
-        List<ServiceApiInfo.ApiMeta> apis = this.buildApiMetaList(apiMappingHandlerMapping);
+        List<ServiceApiInfo.ApiMeta> apis = this.buildApiMetaList(requestMappingHandlerMapping);
         // 排序
         apis.sort(Comparator.comparing(ServiceApiInfo.ApiMeta::fetchNameVersion));
 
@@ -50,8 +49,8 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
         apiMetaManager.uploadApi(serviceApiInfo);
     }
 
-    protected List<ServiceApiInfo.ApiMeta> buildApiMetaList(ApiMappingHandlerMapping apiMappingHandlerMapping) {
-        Map<RequestMappingInfo, HandlerMethod> handlerMethods = apiMappingHandlerMapping.getHandlerMethods();
+    protected List<ServiceApiInfo.ApiMeta> buildApiMetaList(RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
         Set<RequestMappingInfo> requestMappingInfos = handlerMethods.keySet();
         List<String> store = new ArrayList<>();
         List<ServiceApiInfo.ApiMeta> apis = new ArrayList<>(requestMappingInfos.size());
@@ -96,10 +95,7 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
     }
 
     protected String buildName(String path) {
-        path = StringUtils.trimLeadingCharacter(path, '/');
-        path = StringUtils.trimTrailingCharacter(path, '/');
-        path = path.replace("/", ".");
-        return path;
+        return MappingUtil.buildApiName(path);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.param;
 
-import com.alibaba.fastjson.JSON;
-import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ApiParamFactory;
 import com.gitee.sop.gatewaycommon.param.ApiUploadContext;
@@ -64,13 +63,7 @@ public class ZuulParamBuilder implements ParamBuilder<RequestContext> {
 
             // json或者纯文本形式
             if (contentType.contains(CONTENT_TYPE_JSON) || contentType.contains(CONTENT_TYPE_TEXT)) {
-                String txt = SopConstants.EMPTY_JSON;
-                try {
-                    txt = RequestUtil.getText(request);
-                } catch (Exception e) {
-                    log.error("获取纯文本内容失败", e);
-                }
-                params = JSON.parseObject(txt);
+                throw ErrorEnum.ISV_INVALID_CONTENT_TYPE.getErrorMeta().getException();
             } else {
                 params = RequestUtil.convertRequestParamsToMap(request);
             }

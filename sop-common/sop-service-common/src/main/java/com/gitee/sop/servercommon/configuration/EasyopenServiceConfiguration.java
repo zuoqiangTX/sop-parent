@@ -7,12 +7,12 @@ import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
 import com.gitee.sop.servercommon.manager.RequestMappingEvent;
-import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
         }
 
         @Override
-        protected List<ServiceApiInfo.ApiMeta> buildApiMetaList(ApiMappingHandlerMapping apiMappingHandlerMapping) {
+        protected List<ServiceApiInfo.ApiMeta> buildApiMetaList(RequestMappingHandlerMapping requestMappingHandlerMapping) {
             ApplicationContext ctx = getApplicationContext();
             String[] apiServiceNames = ReflectionUtil.findApiServiceNames(ctx);
             List<ServiceApiInfo.ApiMeta> apiMetaList = new ArrayList<>();

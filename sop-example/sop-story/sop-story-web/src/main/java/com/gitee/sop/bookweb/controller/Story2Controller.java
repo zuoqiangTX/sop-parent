@@ -3,7 +3,7 @@ package com.gitee.sop.bookweb.controller;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
-import com.gitee.sop.story.api.service.StoryService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +24,7 @@ public class Story2Controller{
     }
 
     // 优先使用方法上@ApiAbility
+    @ApiOperation(value="获取故事信息2", notes = "获取故事信息2的详细信息")
     @ApiAbility(version = "1.4")
     @RequestMapping("getStory4")
     public Story storyget() {

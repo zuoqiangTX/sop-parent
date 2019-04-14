@@ -2,10 +2,10 @@ package com.gitee.sop.bookweb.config;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.configuration.AlipayServiceConfiguration;
-import com.gitee.sop.servercommon.configuration.TaobaoServiceConfiguration;
+import com.gitee.sop.servercommon.swagger.SwaggerSupport;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 使用支付宝开放平台功能
@@ -19,6 +19,24 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
         ServiceConfig.getInstance().getI18nModules().add("i18n/isp/goods_error");
     }
 
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        super.addResourceHandlers(registry);
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    // 开启文档
+    @Configuration
+    @EnableSwagger2
+    public static class Swagger2 extends SwaggerSupport {
+        @Override
+        protected String getDocTitle() {
+            return "故事API";
+        }
+    }
 }
 
 /**

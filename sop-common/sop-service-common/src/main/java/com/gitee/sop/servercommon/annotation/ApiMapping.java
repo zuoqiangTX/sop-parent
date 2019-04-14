@@ -59,7 +59,7 @@ public @interface ApiMapping {
 
 
     @AliasFor(annotation = RequestMapping.class)
-    RequestMethod[] method() default {};
+    RequestMethod[] method() default {RequestMethod.GET, RequestMethod.POST};
 
     /**
      * Alias for {@link RequestMapping#params}.

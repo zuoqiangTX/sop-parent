@@ -19,5 +19,6 @@
 		<module>sop-gateway</module>
 		<module>sop-test</module>
 		<module>sop-sdk</module>
+		<module>sop-website</module>
 	</modules>
 </project>

@@ -17,7 +17,7 @@
 	<listener>
 		<listener-class>com.gitee.app.config.EurekaInitAndRegisterListener</listener-class>
 	</listener>
-
+	
 	<!-- Processes application requests -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>

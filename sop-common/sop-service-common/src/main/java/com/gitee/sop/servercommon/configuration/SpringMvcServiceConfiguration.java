@@ -1,7 +1,7 @@
 package com.gitee.sop.servercommon.configuration;
 
+import com.gitee.sop.servercommon.bean.EnvironmentContext;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
-import com.gitee.sop.servercommon.interceptor.ServiceContextInterceptor;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
 import com.gitee.sop.servercommon.manager.RequestMappingEvent;
@@ -10,56 +10,42 @@ import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.Executors;
 
 /**
+ * 提供给springmvc工程
  * @author tanghc
  */
 @Slf4j
-public class BaseServiceConfiguration extends WebMvcConfigurationSupport
-        implements ApplicationRunner {
+public class SpringMvcServiceConfiguration {
 
-    public BaseServiceConfiguration() {
+    public SpringMvcServiceConfiguration() {
         ServiceConfig.getInstance().getI18nModules().add("i18n/isp/bizerror");
     }
+
+    private ApiMappingHandlerMapping apiMappingHandlerMapping = new ApiMappingHandlerMapping();
 
     @Autowired
     private Environment environment;
 
-    private ApiMappingHandlerMapping apiMappingHandlerMapping = new ApiMappingHandlerMapping();
-
-
-    @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
-        // 添加拦截器
-        registry.addInterceptor(new ServiceContextInterceptor());
-        super.addInterceptors(registry);
-    }
 
     /**
      * 自定义Mapping，详见@ApiMapping
+     *
      * @return 返回RequestMappingHandlerMapping
      */
-    @Override
-    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+    @Bean
+    @Primary
+    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
         return apiMappingHandlerMapping;
     }
 
-    protected RequestMappingEvent getRequestMappingEvent(ApiMetaManager apiMetaManager, Environment environment) {
-        return new DefaultRequestMappingEvent(apiMetaManager, environment);
-    }
-
-    protected ApiMetaManager getApiMetaManager(Environment environment) {
-        return new ServiceZookeeperApiMetaManager(environment);
-    }
 
     @Bean
     GlobalExceptionHandler globalExceptionHandler() {
@@ -69,32 +55,25 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     @PostConstruct
     public final void after() {
         log.info("-----spring容器加载完毕-----");
+        EnvironmentContext.setEnvironment(environment);
+        Executors.newSingleThreadExecutor().execute(()->{
+            uploadRouteToZookeeper();
+        });
         initMessage();
         doAfter();
     }
 
-    // springboot启动完成后执行
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        log.info("-----服务器启动完毕-----");
-        ApiMetaManager apiMetaManager = getApiMetaManager(environment);
-        RequestMappingEvent requestMappingEvent = getRequestMappingEvent(apiMetaManager, environment);
+    private void uploadRouteToZookeeper() {
+        ApiMetaManager apiMetaManager = new ServiceZookeeperApiMetaManager(environment);
+        RequestMappingEvent requestMappingEvent = new DefaultRequestMappingEvent(apiMetaManager, environment);
         requestMappingEvent.onRegisterSuccess(apiMappingHandlerMapping);
-        this.onStartup(args);
     }
+
 
     /**
      * spring容器加载完毕后执行
      */
     protected void doAfter() {
-
-    }
-
-    /**
-     * 启动完毕后执行
-     * @param args
-     */
-    protected void onStartup(ApplicationArguments args) {
 
     }
 

@@ -1,10 +1,8 @@
 package com.gitee.sop.servercommon.mapping;
 
-import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
+import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
-import com.gitee.sop.servercommon.bean.ServiceContext;
-import com.gitee.sop.servercommon.manager.RequestMappingEvent;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringValueResolver;
@@ -20,12 +18,6 @@ import java.lang.reflect.Method;
 public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping implements PriorityOrdered {
 
     private static StringValueResolver stringValueResolver = new ApiMappingStringValueResolver();
-
-    private RequestMappingEvent requestMappingEvent;
-
-    public ApiMappingHandlerMapping(RequestMappingEvent requestMappingEvent) {
-        this.requestMappingEvent = requestMappingEvent;
-    }
 
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
@@ -83,7 +75,7 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
         apiMappingInfo.setIgnoreValidate(ignoreValidate);
         apiMappingInfo.setMergeResult(mergeResult);
         apiMappingInfo.setPermission(permission);
-        logger.info("注册接口，method:" + method + "， version:" + version);
+        logger.info("注册接口，name:" + method + "， version:" + version);
         return new ApiMappingRequestCondition(apiMappingInfo);
     }
 
@@ -94,11 +86,5 @@ public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping imple
             apiAbility = AnnotationUtils.findAnnotation(controllerClass, ApiAbility.class);
         }
         return apiAbility;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        super.afterPropertiesSet();
-        this.requestMappingEvent.onRegisterSuccess(this);
     }
 }

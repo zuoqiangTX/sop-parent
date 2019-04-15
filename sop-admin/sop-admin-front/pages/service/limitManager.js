@@ -197,7 +197,7 @@ lib.importJs('../../assets/js/routerole.js')
 
 function showLimitTypeTip() {
     var leakyRemark = '漏桶策略：每秒处理固定数量的请求，超出请求返回错误信息。';
-    var tokenRemark = '令牌桶策略：每秒放置固定数量的令牌数，不足的令牌数做等待处理，直到拿到令牌为止。';
+    var tokenRemark = '令牌桶策略：每秒放置固定数量的令牌数，每个请求进来后先去拿令牌，拿到了令牌才能继续，拿不到则等候令牌重新生成了再拿。';
     var content = '<div style="font-size: 14px;">'
         + leakyRemark
         + '<br>'

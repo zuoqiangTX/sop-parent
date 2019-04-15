@@ -58,6 +58,8 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ![admin预览](https://images.gitee.com/uploads/images/2019/0401/202931_14cc7248_332975.png "admin7.png")
 
+![admin预览](https://images.gitee.com/uploads/images/2019/0415/204659_f0dc8057_332975.png "admin8.png")
+
 ## 工程说明
 
 > 运行环境：JDK8，Maven3，Zookeeper

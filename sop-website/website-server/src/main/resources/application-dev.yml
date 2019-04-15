@@ -20,4 +20,5 @@ api:
   # 测试地址
   url-test: http://api-test.yourdomain.com/api
   # 正式地址
-  url-prod: http://api.yourdomain.com/api
+  url-prod: http://open.yourdomain.com/api
+  pwd: doc#123

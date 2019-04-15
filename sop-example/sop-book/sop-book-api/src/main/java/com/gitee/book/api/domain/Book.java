@@ -1,4 +1,4 @@
-package com.hhdd.book.api.domain;
+package com.gitee.book.api.domain;
 
 import lombok.Data;
 

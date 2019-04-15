@@ -1,7 +1,9 @@
 package com.gitee.sop.bookweb.config;
 
 import com.gitee.sop.servercommon.configuration.AlipayServiceConfiguration;
+import com.gitee.sop.servercommon.swagger.SwaggerSupport;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 使用支付宝开放平台功能
@@ -9,7 +11,15 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OpenServiceConfig extends AlipayServiceConfiguration {
-
+    // 开启文档
+    @Configuration
+    @EnableSwagger2
+    public static class Swagger2 extends SwaggerSupport {
+        @Override
+        protected String getDocTitle() {
+            return "图书API";
+        }
+    }
 }
 
 /**

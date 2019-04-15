@@ -5,6 +5,7 @@ import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.manager.DocManager;
 import com.gitee.sop.websiteserver.vo.DocBaseInfoVO;
 import com.gitee.sop.websiteserver.vo.DocModuleVO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,9 @@ public class DocController {
 
     @Value("${api.url-prod}")
     String urlProd;
+
+    @Value("${api.pwd}")
+    String pwd;
 
     @GetMapping("/getDocBaseInfo")
     public DocBaseInfoVO getDocBaseInfo() {
@@ -60,4 +64,11 @@ public class DocController {
         return docManager.get(method, version);
     }
 
+
+    @GetMapping("/doc/reload")
+    public void reload(String pwd) {
+        if (StringUtils.equals(this.pwd, pwd)) {
+            docManager.load();
+        }
+    }
 }

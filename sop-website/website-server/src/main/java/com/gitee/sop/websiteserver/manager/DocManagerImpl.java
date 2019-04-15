@@ -3,8 +3,8 @@ package com.gitee.sop.websiteserver.manager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.bean.DocItem;
+import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.bean.DocParameter;
 import com.gitee.sop.websiteserver.bean.EurekaApplication;
 import com.gitee.sop.websiteserver.bean.EurekaApps;
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -61,6 +62,7 @@ public class DocManagerImpl implements DocManager {
     public void load() {
         try {
             Map<String, List<ServiceInfoVO>> listMap = this.getAllServiceList();
+            log.info("服务列表：{}", JSON.toJSONString(listMap.keySet()));
             // {"STORY-SERVICE":[{"ipAddr":"10.1.30.54","name":"STORY-SERVICE","serverPort":"2222"}],"API-GATEWAY":[{"ipAddr":"10.1.30.54","name":"API-GATEWAY","serverPort":"8081"}]}
             for (Map.Entry<String, List<ServiceInfoVO>> entry : listMap.entrySet()) {
                 ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
@@ -79,10 +81,16 @@ public class DocManagerImpl implements DocManager {
 
     private void loadDocInfo(ServiceInfoVO serviceInfoVo) {
         String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs";
-        ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
-        String docInfoJson = entity.getBody();
-        DocModule docDefinition = this.parseDocJson(docInfoJson);
-        docDefinitionMap.put(docDefinition.getModule(), docDefinition);
+        try {
+            ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
+            String docInfoJson = entity.getBody();
+            DocModule docDefinition = this.parseDocJson(docInfoJson);
+            docDefinitionMap.put(docDefinition.getModule(), docDefinition);
+        } catch (RestClientException e) {
+            // 这里报错可能是因为有些微服务没有配置swagger文档，导致404访问不到
+            // 这里catch跳过即可
+            log.warn("读取文档失败, url:{}", url, e);
+        }
     }
 
     private DocModule parseDocJson(String docInfoJson) {

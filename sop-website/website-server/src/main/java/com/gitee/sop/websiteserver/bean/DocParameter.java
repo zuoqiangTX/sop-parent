@@ -1,5 +1,6 @@
 package com.gitee.sop.websiteserver.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 /**
@@ -13,5 +14,8 @@ public class DocParameter {
     private boolean required;
     private String description;
     private String example = "";
+
+    @JSONField(name = "x-example")
+    private String x_example = "";
 
 }

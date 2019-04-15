@@ -41,12 +41,11 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - 接入方管理+秘钥管理
 - 接口权限分配
 - SDK
+- 接口限流
+- 文档整合
 
 ## 后期规划
 
-- 文档整合
-- springmvc项目接入demo
-- 限流
 - 监控
 
 ## admin界面预览
@@ -66,10 +65,11 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - doc：开发文档
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
-- sop-common：公共模块，封装常用功能，包含签名校验、错误处理等功能
-- sop-example：微服务示例
+- sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能
+- sop-example：微服务示例，含springboot,springmvc示例
 - sop-sdk：基础sdk，含Java、C#版本
 - sop-test：接口调用测试用例
+- sop-website：开放平台对应网站，提供文档API等内容
 
 
 ## 相关文档

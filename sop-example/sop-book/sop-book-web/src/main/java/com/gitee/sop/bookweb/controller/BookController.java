@@ -4,7 +4,7 @@ import com.gitee.book.api.domain.Book;
 import com.gitee.sop.bookweb.consumer.StoryServiceConsumer;
 import com.gitee.sop.bookweb.param.BookParam;
 import com.gitee.sop.story.api.domain.Story;
-import com.hhdd.book.api.service.BookService;
+import com.gitee.book.api.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

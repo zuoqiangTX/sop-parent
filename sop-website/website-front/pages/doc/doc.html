@@ -2,7 +2,7 @@
 <head>
     <script src="https://www.googletagservices.com/activeview/js/current/osd.js?cb=%2Fr20100101"></script>
     <meta charset="utf-8">
-    <title>滑块文档 - layui</title>
+    <title>文档中心</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -12,15 +12,9 @@
 
     <link rel="stylesheet" href="../../assets/lib/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="../../assets/css/global.css" media="all">
-    <!--<script src="https://pagead2.googlesyndication.com/pub-config/r20160913/ca-pub-6111334333458862.js"></script>-->
-    <!--<script src="https://pagead2.googlesyndication.com/pagead/js/r20190408/r20190131/show_ads_impl.js" id="google_shimpl"></script>-->
-    <!--<script src="https://hm.baidu.com/hm.js?d214947968792b839fd669a4decaaffc"></script>-->
-    <!--<link rel="preload" href="https://adservice.google.com/adsid/integrator.js?domain=www.layui.com" as="script">-->
-    <!--<script type="text/javascript" src="https://adservice.google.com/adsid/integrator.js?domain=www.layui.com"></script>-->
     <link id="layuicss-skincodecss" rel="stylesheet" href="../../assets/lib/layui/css/modules/code.css" media="all">
     <link id="layuicss-layer" rel="stylesheet" href="../../assets/lib/layui/css/modules/layer/default/layer.css?v=3.1.1"
           media="all">
-    <!--<link rel="preload" href="https://pagead2.googlesyndication.com/pagead/js/r20190408/r20190131/show_ads_impl.js" as="script">-->
     <style type="text/css">
         .layui-table {
             word-wrap: break-word;
@@ -30,9 +24,11 @@
         .layui-table th {
             white-space: nowrap !important;
         }
+
         .prop-name {
             width: 105px;
         }
+
         .prop-type {
             width: 50px;
         }
@@ -47,7 +43,7 @@
         </a>
         <ul class="layui-nav">
             <li class="layui-nav-item layui-this">
-                <a href="/">文档中心<!--  --></a>
+                <a href="doc.html">文档中心<!--  --></a>
             </li>
 
             <span class="layui-nav-bar" style="left: 162px; top: 55px; width: 0px; opacity: 0;"></span>
@@ -80,16 +76,19 @@
     </div>
 
     <div class="site-content">
-        <h1 class="site-h1"><i class="layui-icon layui-icon-slider"></i> <span class="sop-name"></span>(<span class="sop-summary"></span>)
+        <h1 class="site-h1"><i class="layui-icon layui-icon-slider"></i> <span class="sop-name"></span>(<span
+                class="sop-summary"></span>)
         </h1>
         <blockquote class="layui-elem-quote layui-text sop-description">
         </blockquote>
 
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">公共参数</a></legend>
-        </fieldset>
-        <div class="site-text" data-find="_2">
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">公共参数</a></legend>
+            </fieldset>
+        </div>
+        <div class="site-text">
             <h3>请求地址</h3>
             <table class="layui-table">
                 <thead>
@@ -171,7 +170,7 @@
                     <td>String</td>
                     <td>是</td>
                     <td>344</td>
-                    <td>商户请求参数的签名串，详见<a href="#" target="_blank">签名</a></td>
+                    <td>商户请求参数的签名串，详见<a href="sign.html" target="_blank">签名</a></td>
                     <td>详见示例</td>
                 </tr>
 
@@ -189,7 +188,7 @@
                     <td>String</td>
                     <td>是</td>
                     <td>3</td>
-                    <td> 调用的接口版本，固定为：1.0</td>
+                    <td>调用的接口版本，固定为：1.0</td>
                     <td>1.0</td>
                 </tr>
 
@@ -223,9 +222,11 @@
             </table>
         </div>
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">请求参数</a></legend>
-        </fieldset>
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">请求参数</a></legend>
+            </fieldset>
+        </div>
         <div class="site-text">
             <table class="layui-table">
                 <thead>
@@ -243,9 +244,11 @@
             </table>
         </div>
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">公共响应参数</a></legend>
-        </fieldset>
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">公共响应参数</a></legend>
+            </fieldset>
+        </div>
         <div class="site-text">
             <table class="layui-table">
                 <thead>
@@ -264,7 +267,7 @@
                     <td>String</td>
                     <td>是</td>
                     <td>-</td>
-                    <td>网关返回码,<a href="#" target="_blank">详见文档</a></td>
+                    <td>网关返回码,<a href="code.html" target="_blank">详见文档</a></td>
                     <td>40004</td>
                 </tr>
                 <tr>
@@ -272,7 +275,7 @@
                     <td>String</td>
                     <td>是</td>
                     <td>-</td>
-                    <td>网关返回码描述,<a href="#" target="_blank">详见文档</a></td>
+                    <td>网关返回码描述,<a href="code.html" target="_blank">详见文档</a></td>
                     <td>Business Failed</td>
                 </tr>
                 <tr>
@@ -296,7 +299,7 @@
                     <td>String</td>
                     <td>是</td>
                     <td>-</td>
-                    <td>签名,<a href="#" target="_blank">详见文档</a></td>
+                    <td>签名,<a href="sign.html" target="_blank">详见文档</a></td>
                     <td>xxx</td>
                 </tr>
                 </tbody>
@@ -304,9 +307,11 @@
         </div>
 
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">响应参数</a></legend>
-        </fieldset>
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">响应参数</a></legend>
+            </fieldset>
+        </div>
         <div class="site-text">
             <table class="layui-table">
                 <thead>
@@ -324,22 +329,25 @@
             </table>
         </div>
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">响应示例</a></legend>
-        </fieldset>
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">响应示例</a></legend>
+            </fieldset>
+        </div>
         <div class="site-text">
 <pre id="responseExampleJson">
 </pre>
         </div>
 
-        <fieldset class="layui-elem-field layui-field-title site-title">
-            <legend><a name="use">异常示例</a></legend>
-        </fieldset>
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend><a name="use">异常示例</a></legend>
+            </fieldset>
+        </div>
         <div class="site-text">
 <pre id="responseErrorJson">
 </pre>
         </div>
-
 
 
     </div>

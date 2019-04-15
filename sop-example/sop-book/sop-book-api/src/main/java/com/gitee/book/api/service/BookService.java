@@ -1,4 +1,4 @@
-package com.hhdd.book.api.service;
+package com.gitee.book.api.service;
 
 import com.gitee.book.api.domain.Book;
 import org.springframework.web.bind.annotation.RequestMapping;

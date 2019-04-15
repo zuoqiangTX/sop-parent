@@ -1,5 +1,8 @@
 layui.use(['element', 'form'], function(){ //加载code模块
     var form = layui.form;
+
+    // key:module
+    var docItemStore = {};
     
     function initDocModules() {
         $.getJSON(SopConfig.url + '/doc/getDocBaseInfo', function (baseInfo) {
@@ -26,6 +29,7 @@ layui.use(['element', 'form'], function(){ //加载code模块
             var html = ['<li><h2>' + docModule + '</h2></li>'];
             for (var i = 0; i < docItems.length; i++) {
                 var docItem = docItems[i];
+                docItemStore[docItem.nameVersion] = docItem;
                 /*
                 <li class="site-tree-noicon layui-this">
                 <a href="/">
@@ -35,12 +39,12 @@ layui.use(['element', 'form'], function(){ //加载code模块
                  */
                 var selectedClass = i === 0 ? 'layui-this' : '';
                 html.push('<li class="site-tree-noicon ' + selectedClass + '">');
-                html.push('<a href="#" sopname="'+docItem.name+'" sopversion="'+docItem.version+'"><cite>'+docItem.summary+'</cite></a>')
+                html.push('<a href="#" nameversion="'+docItem.nameVersion+'"><cite>'+docItem.summary+'</cite></a>')
             }
             $('#docItemTree').html(html.join(''));
             if (docItems && docItems.length > 0) {
                 var firstItem = docItems[0];
-                selectDocItem(firstItem.name, firstItem.version)
+                selectDocItem(firstItem.nameVersion);
             }
         })
     }
@@ -51,22 +55,21 @@ layui.use(['element', 'form'], function(){ //加载code模块
         })
         $('#docItemTree').on('click', 'a', function () {
             var $tagA = $(this);
-            selectDocItem($tagA.attr('sopname'), $tagA.attr('sopversion'));
+            selectDocItem($tagA.attr('nameversion'));
             $tagA.parent().addClass('layui-this').siblings().removeClass('layui-this');
         })
     }
 
-    function selectDocItem(name, version) {
-        $.getJSON(SopConfig.url + '/doc/item/' + name + '/' + version + '/', function (docItem) {
-            $('.sop-name').text(docItem.name);
-            $('.sop-version').text(docItem.version);
-            $('.sop-summary').text(docItem.summary);
-            $('.sop-description').text(docItem.description || docItem.summary);
+    function selectDocItem(nameVersion) {
+        var docItem = docItemStore[nameVersion];
+        $('.sop-name').text(docItem.name);
+        $('.sop-version').text(docItem.version);
+        $('.sop-summary').text(docItem.summary);
+        $('.sop-description').text(docItem.description || docItem.summary);
 
-            createRequestParameter(docItem);
-            createResponseParameter(docItem);
-            createResponseCode(docItem);
-        })
+        createRequestParameter(docItem);
+        createResponseParameter(docItem);
+        createResponseCode(docItem);
     }
 
     function createRequestParameter(docItem) {
@@ -99,7 +102,7 @@ layui.use(['element', 'form'], function(){ //加载code模块
                 ' <th>'+(parameter.required ? '<span style="color:red;">是</span>' : '否')+'</th>\n' +
                 ' <th>-</th>\n' +
                 ' <th class="prop-desc">'+parameter.description+'</th>\n' +
-                ' <th class="prop-example">' + parameter.example +'</th>\n' +
+                ' <th class="prop-example">' + (parameter.example || parameter['x-example']) +'</th>\n' +
                 '</tr>')
         }
         return html.join('');

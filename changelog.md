@@ -1,5 +1,11 @@
 # changelog
 
+## 1.3.0
+
+- 新增接口限流功能
+- 新增文档整合功能
+- 新增springmvc项目接入demo
+
 ## 1.2.0
 
 - SOP Admin新增用户登录

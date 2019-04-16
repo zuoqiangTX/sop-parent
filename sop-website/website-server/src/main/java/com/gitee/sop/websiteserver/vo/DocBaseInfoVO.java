@@ -11,5 +11,5 @@ import java.util.List;
 public class DocBaseInfoVO {
     private String urlTest;
     private String urlProd;
-    private List<DocModuleVO> docModuleVOList;
+    private List<DocInfoVO> docInfoList;
 }

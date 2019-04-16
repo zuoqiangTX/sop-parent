@@ -1,27 +1,19 @@
 package com.gitee.sop.gateway.config;
 
-import com.gitee.sop.gateway.entity.IsvInfo;
-import com.gitee.sop.gateway.manager.ManagerInitializer;
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
-import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.easyopen.EasyopenZuulConfiguration;
-import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
-import com.gitee.sop.gatewaycommon.secret.IsvManager;
-import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
-import com.gitee.sop.gatewaycommon.zuul.configuration.TaobaoZuulConfiguration;
-import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 使用Spring Cloud Zuul，推荐使用
  *
  * 注意：下面两个只能使用一个
  */
+
+import com.gitee.sop.gateway.manager.ManagerInitializer;
+import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 开通支付宝开放平台能力

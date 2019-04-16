@@ -1,11 +1,9 @@
 package com.gitee.sop.websiteserver.manager;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
-import com.gitee.sop.websiteserver.bean.DocModule;
-import com.gitee.sop.websiteserver.bean.DocParameter;
 import com.gitee.sop.websiteserver.bean.EurekaApplication;
 import com.gitee.sop.websiteserver.bean.EurekaApps;
 import com.gitee.sop.websiteserver.bean.EurekaInstance;
@@ -30,9 +28,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +37,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DocManagerImpl implements DocManager {
 
-    // key:module
-    Map<String, DocModule> docDefinitionMap = new HashMap<>();
+    // key:title
+    Map<String, DocInfo> docDefinitionMap = new HashMap<>();
 
     // key: name+version
     Map<String, DocItem> docItemMap = new HashMap<>();
@@ -52,6 +47,9 @@ public class DocManagerImpl implements DocManager {
     OkHttpClient client = new OkHttpClient();
 
     RestTemplate restTemplate = new RestTemplate();
+
+    DocParser swaggerDocParser = new SwaggerDocParser();
+    DocParser easyopenDocParser = new EasyopenDocParser();
 
     @Autowired
     private Environment environment;
@@ -68,97 +66,46 @@ public class DocManagerImpl implements DocManager {
                 ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
                 loadDocInfo(serviceInfoVo);
             }
-            Map<String, DocItem> itemMap = docDefinitionMap.values()
-                    .stream()
-                    .map(DocModule::getDocItems)
-                    .flatMap(docItems -> docItems.stream())
-                    .collect(Collectors.toMap(DocItem::getNameVersion, Function.identity()));
-            this.docItemMap.putAll(itemMap);
+//            Map<String, DocItem> itemMap = docDefinitionMap.values()
+//                    .stream()
+//                    .map(DocInfo::getDocModuleList)
+//                    .map(list->{
+//                        for (DocModule docModule : list) {
+//
+//                        }
+//                    })
+//                    .map(DocModule::getDocItems)
+//                    .flatMap(docItems -> docItems.stream())
+//                    .collect(Collectors.toMap(DocItem::getNameVersion, Function.identity()));
+//            this.docItemMap.putAll(itemMap);
         } catch (IOException e) {
             log.error("加载失败", e);
         }
     }
 
-    private void loadDocInfo(ServiceInfoVO serviceInfoVo) {
+    protected void loadDocInfo(ServiceInfoVO serviceInfoVo) {
         String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs";
         try {
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
             String docInfoJson = entity.getBody();
-            DocModule docDefinition = this.parseDocJson(docInfoJson);
-            docDefinitionMap.put(docDefinition.getModule(), docDefinition);
+            JSONObject docRoot = JSON.parseObject(docInfoJson);
+            DocParser docParser = this.buildDocParser(docRoot);
+            DocInfo docInfo = docParser.parseJson(docRoot);
+            docDefinitionMap.put(docInfo.getTitle(), docInfo);
         } catch (RestClientException e) {
             // 这里报错可能是因为有些微服务没有配置swagger文档，导致404访问不到
             // 这里catch跳过即可
-            log.warn("读取文档失败, url:{}", url, e);
+            log.warn("读取文档失败, url:{}, msg:{}", url, e.getMessage());
         }
     }
 
-    private DocModule parseDocJson(String docInfoJson) {
-        JSONObject docRoot = JSON.parseObject(docInfoJson);
-        String title = docRoot.getJSONObject("info").getString("title");
-        List<DocItem> docItems = new ArrayList<>();
-
-        JSONObject paths = docRoot.getJSONObject("paths");
-        Set<String> pathNameSet = paths.keySet();
-        for (String pathName : pathNameSet) {
-            JSONObject pathInfo = paths.getJSONObject(pathName);
-            Set<String> pathSet = pathInfo.keySet();
-            Optional<String> first = pathSet.stream().findFirst();
-            if (first.isPresent()) {
-                String path = first.get();
-                JSONObject docInfo = pathInfo.getJSONObject(path);
-                DocItem docItem = buildDocItem(docInfo, docRoot);
-                docItems.add(docItem);
-            }
+    protected DocParser buildDocParser(JSONObject rootDoc) {
+        Object easyopen = rootDoc.get("easyopen");
+        if (easyopen != null) {
+            return easyopenDocParser;
+        } else {
+            return swaggerDocParser;
         }
-
-        DocModule docDefinition = new DocModule();
-        docDefinition.setModule(title);
-        docDefinition.setDocItems(docItems);
-        return docDefinition;
-    }
-
-    private DocItem buildDocItem(JSONObject docInfo, JSONObject docRoot) {
-        DocItem docItem = new DocItem();
-        docItem.setName(docInfo.getString("sop_name"));
-        docItem.setVersion(docInfo.getString("sop_version"));
-        docItem.setSummary(docInfo.getString("summary"));
-        docItem.setDescription(docInfo.getString("description"));
-        Optional<JSONArray> parametersOptional = Optional.ofNullable(docInfo.getJSONArray("parameters"));
-        JSONArray parameters = parametersOptional.orElse(new JSONArray());
-        List<DocParameter> docParameterList = parameters.toJavaList(DocParameter.class);
-        docItem.setRequestParameters(docParameterList);
-
-        List<DocParameter> responseParameterList = this.buildResponseParameterList(docInfo, docRoot);
-        docItem.setResponseParameters(responseParameterList);
-
-        return docItem;
-    }
-
-    private List<DocParameter> buildResponseParameterList(JSONObject docInfo, JSONObject docRoot) {
-        String responseRef = getResponseRef(docInfo);
-        List<DocParameter> respParameterList = new ArrayList<>();
-        if (StringUtils.isNotBlank(responseRef)) {
-            JSONObject responseObject = docRoot.getJSONObject("definitions").getJSONObject(responseRef);
-            JSONObject properties = responseObject.getJSONObject("properties");
-            Set<String> fieldNames = properties.keySet();
-            for (String fieldName : fieldNames) {
-                JSONObject fieldInfo = properties.getJSONObject(fieldName);
-                DocParameter respParam = fieldInfo.toJavaObject(DocParameter.class);
-                respParam.setName(fieldName);
-                respParameterList.add(respParam);
-            }
-        }
-        return respParameterList;
-    }
-
-    private String getResponseRef(JSONObject docInfo) {
-        String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("200")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("schema")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getString("originalRef")))
-                .orElse("");
-        return ref;
     }
 
     @Override
@@ -167,12 +114,12 @@ public class DocManagerImpl implements DocManager {
     }
 
     @Override
-    public DocModule getByTitle(String title) {
+    public DocInfo getByTitle(String title) {
         return docDefinitionMap.get(title);
     }
 
     @Override
-    public Collection<DocModule> listAll() {
+    public Collection<DocInfo> listAll() {
         return docDefinitionMap.values();
     }
 
@@ -200,7 +147,7 @@ public class DocManagerImpl implements DocManager {
         return listMap;
     }
 
-    private String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
+    protected String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
         Request request = eurekaUri.getRequest(this.eurekaUrl, args);
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {

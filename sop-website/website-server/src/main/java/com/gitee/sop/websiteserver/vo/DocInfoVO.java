@@ -6,6 +6,6 @@ import lombok.Data;
  * @author tanghc
  */
 @Data
-public class DocModuleVO {
-    private String module;
+public class DocInfoVO {
+    private String title;
 }

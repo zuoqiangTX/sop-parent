@@ -3,6 +3,7 @@ package com.gitee.sop.bookweb.controller;
 import com.gitee.sop.bookweb.controller.param.StoryParam;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @author tanghc
  */
 @RestController
+@Api(tags = "故事接口")
 public class AlipayController {
 
     @ApiMapping(value = "alipay.story.get")

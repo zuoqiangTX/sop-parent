@@ -1,10 +1,10 @@
 package com.gitee.sop.websiteserver.controller;
 
+import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
-import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.manager.DocManager;
 import com.gitee.sop.websiteserver.vo.DocBaseInfoVO;
-import com.gitee.sop.websiteserver.vo.DocModuleVO;
+import com.gitee.sop.websiteserver.vo.DocInfoVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +38,11 @@ public class DocController {
 
     @GetMapping("/getDocBaseInfo")
     public DocBaseInfoVO getDocBaseInfo() {
-        List<DocModuleVO> docModuleVOList = docManager.listAll()
+        List<DocInfoVO> docInfoList = docManager.listAll()
                 .stream()
-                .map(docModule -> {
-                    DocModuleVO vo = new DocModuleVO();
-                    BeanUtils.copyProperties(docModule, vo);
+                .map(docInfo -> {
+                    DocInfoVO vo = new DocInfoVO();
+                    BeanUtils.copyProperties(docInfo, vo);
                     return vo;
                 })
                 .collect(Collectors.toList());
@@ -50,13 +50,13 @@ public class DocController {
         DocBaseInfoVO baseInfoVO = new DocBaseInfoVO();
         baseInfoVO.setUrlTest(urlTest);
         baseInfoVO.setUrlProd(urlProd);
-        baseInfoVO.setDocModuleVOList(docModuleVOList);
+        baseInfoVO.setDocInfoList(docInfoList);
         return baseInfoVO;
     }
 
-    @GetMapping("/module/{module}")
-    public DocModule getDocModule(@PathVariable("module") String module) {
-        return docManager.getByTitle(module);
+    @GetMapping("/docinfo/{title}")
+    public DocInfo getDocModule(@PathVariable("title") String title) {
+        return docManager.getByTitle(title);
     }
 
     @GetMapping("/item/{method}/{version}/")

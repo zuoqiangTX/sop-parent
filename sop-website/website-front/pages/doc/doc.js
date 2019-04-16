@@ -7,43 +7,53 @@ layui.use(['element', 'form'], function(){ //加载code模块
     function initDocModules() {
         $.getJSON(SopConfig.url + '/doc/getDocBaseInfo', function (baseInfo) {
             var html = [];
-            var modules = baseInfo.docModuleVOList;
-            for (var i = 0; i < modules.length; i++) {
-                var docDefinition = modules[i];
-                var module = docDefinition.module;
+            var docInfoList = baseInfo.docInfoList;
+            for (var i = 0; i < docInfoList.length; i++) {
+                var docInfo = docInfoList[i];
                 var selected = i === 0 ? 'selected="selected"' : '';
-                html.push('<option value="' + module + '" ' + selected + '>' + module + '</option>');
+                var title = docInfo.title;
+                html.push('<option value="' + title + '" ' + selected + '>' + title + '</option>');
             }
             $('#moduleList').html(html.join(''));
-            form.render('select');
-            if (modules && modules.length > 0) {
-                selectModule(modules[0].module);
-            }
             $('.url-prod').text(baseInfo.urlProd);
+            form.render('select');
+
+            if (docInfoList && docInfoList.length > 0) {
+                selectDocInfo(docInfoList[0].title);
+            }
         })
     }
     
-    function selectModule(docModule) {
-        $.getJSON(SopConfig.url + '/doc/module/' + docModule, function (module) {
-            var docItems = module.docItems;
-            var html = ['<li><h2>' + docModule + '</h2></li>'];
-            for (var i = 0; i < docItems.length; i++) {
-                var docItem = docItems[i];
-                docItemStore[docItem.nameVersion] = docItem;
-                /*
-                <li class="site-tree-noicon layui-this">
-                <a href="/">
-                    <cite>统一收单交易退款查询</cite>
-                </a>
-            </li>
-                 */
-                var selectedClass = i === 0 ? 'layui-this' : '';
-                html.push('<li class="site-tree-noicon ' + selectedClass + '">');
-                html.push('<a href="#" nameversion="'+docItem.nameVersion+'"><cite>'+docItem.summary+'</cite></a>')
+    function selectDocInfo(title) {
+        $.getJSON(SopConfig.url + '/doc/docinfo/' + title, function (docInfo) {
+            var moduleList = docInfo.docModuleList;
+            var html = [];
+            var firstItem;
+            for (var j = 0; j < moduleList.length; j++) {
+                var module = moduleList[j];
+                var docItems = module.docItems;
+                html.push('<li><h2>' + module.module + '</h2></li>');
+                for (var i = 0; i < docItems.length; i++) {
+                    var docItem = docItems[i];
+                    var first = j == 0 && j == 0;
+                    if (first) {
+                        firstItem = docItem;
+                    }
+                    docItemStore[docItem.nameVersion] = docItem;
+                    /*
+                    <li class="site-tree-noicon layui-this">
+                    <a href="/">
+                        <cite>统一收单交易退款查询</cite>
+                    </a>
+                </li>
+                     */
+                    html.push('<li class="site-tree-noicon" nameversion="'+docItem.nameVersion+'">');
+                    html.push('<a href="#"><cite>'+docItem.summary+'</cite></a>')
+                }
             }
+
             $('#docItemTree').html(html.join(''));
-            if (docItems && docItems.length > 0) {
-                var firstItem = docItems[0];
+            if (firstItem) {
                 selectDocItem(firstItem.nameVersion);
             }
         })
@@ -51,12 +61,11 @@ layui.use(['element', 'form'], function(){ //加载code模块
 
     function initEvent() {
         form.on('select(moduleListFilter)', function (data) {
-            selectModule(data.value);
+            selectDocInfo(data.value);
         })
-        $('#docItemTree').on('click', 'a', function () {
-            var $tagA = $(this);
-            selectDocItem($tagA.attr('nameversion'));
-            $tagA.parent().addClass('layui-this').siblings().removeClass('layui-this');
+        $('#docItemTree').on('click', 'li', function () {
+            var $li = $(this);
+            selectDocItem($li.attr('nameversion'));
         })
     }
 
@@ -70,6 +79,9 @@ layui.use(['element', 'form'], function(){ //加载code模块
         createRequestParameter(docItem);
         createResponseParameter(docItem);
         createResponseCode(docItem);
+
+        var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
+        $li.addClass('layui-this').siblings().removeClass('layui-this');
     }
 
     function createRequestParameter(docItem) {

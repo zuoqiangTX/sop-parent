@@ -29,7 +29,6 @@ spring:
 # 固定不用改
 easyopen:
   show-doc: true
-  mono: false
   ignore-validate: true
 
 # 注册中心地址，根据实际情况改，这里只是参数，并不会去注册

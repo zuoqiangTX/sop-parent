@@ -1,0 +1,19 @@
+server:
+  port: 2222
+
+spring:
+  application:
+    name: story-service
+    description: story服务
+
+  cloud:
+    zookeeper:
+      connect-string: localhost:2181
+
+# 注册中心
+eureka:
+  port: 1111
+  host: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.host}:${eureka.port}/eureka/

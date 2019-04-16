@@ -1,26 +1,3 @@
-server:
-  port: 2121
-
-
-
-# 指定注册中心
-eureka:
-  port: 1111
-  host: localhost
-  client:
-    serviceUrl:
-      defaultZone: http://${eureka.host}:${eureka.port}/eureka/
-
 spring:
-  application:
-    # 指定服务名
-    name: easyopen-service
-
-  # 指定zookeeper
-  cloud:
-    zookeeper:
-      connect-string: localhost:2181
-
-# 指定接口路径
-easyopen:
-  prefix-path: /api
+  profiles:
+    active: dev

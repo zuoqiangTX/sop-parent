@@ -2,8 +2,8 @@
 
 ## 1.3.0
 
-- 新增接口限流功能
-- 新增文档整合功能
+- 新增接口限流功能 [doc](http://durcframework.gitee.io/sop/#/files/10092_%E6%8E%A5%E5%8F%A3%E9%99%90%E6%B5%81?t=1555378655699)
+- 新增文档整合功能 [doc](http://durcframework.gitee.io/sop/#/files/10041_%E7%BC%96%E5%86%99%E6%96%87%E6%A1%A3?t=1555378655698)
 - 新增springmvc项目接入demo
 
 ## 1.2.0

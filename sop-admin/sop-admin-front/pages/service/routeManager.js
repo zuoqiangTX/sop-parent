@@ -153,11 +153,10 @@ lib.importJs('../../assets/js/routerole.js')
         //监听单元格事件
         table.on('tool(routeTableFilter)', function(obj) {
             var data = obj.data;
+            data.serviceId = currentServiceId;
             var event = obj.event;
             if(event === 'edit'){
                 //表单初始赋值
-                data.serviceId = currentServiceId;
-
                 updateForm.setData(data);
 
                 layer.open({
@@ -186,7 +185,8 @@ lib.importJs('../../assets/js/routerole.js')
                     });
                 })
             }
-        });
+        });// routeTableFilter end
+
         table.on('toolbar(routeTableFilter)', function(obj) {
             if (obj.event === 'add') {
                 var data = {};
@@ -204,7 +204,7 @@ lib.importJs('../../assets/js/routerole.js')
                     ,content: $('#addWin')
                 });
             }
-        });
+        });// routeTableFilter end
         return routeTable;
     }
 

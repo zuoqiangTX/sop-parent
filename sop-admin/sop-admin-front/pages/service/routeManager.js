@@ -167,14 +167,15 @@ lib.importJs('../../assets/js/routerole.js')
                     ,content: $('#updateWin') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                 });
             } else if (event === 'auth') {
-                ApiUtil.post('route.role.get', {id: data.id}, function (resp) {
+                var searchData = {id: data.id, serviceId: currentServiceId};
+                ApiUtil.post('route.role.get', searchData, function (resp) {
                     var roleList = resp.data;
                     var roleCode = [];
                     for (var i = 0; i < roleList.length; i++) {
                         roleCode.push(roleList[i].roleCode);
                     }
                     authForm.setData({
-                        routeId: data.id
+                        routeId: searchData.id
                         , roleCode: roleCode
                     })
                     layer.open({

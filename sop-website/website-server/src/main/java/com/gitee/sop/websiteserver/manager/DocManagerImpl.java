@@ -154,9 +154,9 @@ public class DocManagerImpl implements DocManager {
 
     private String getResponseRef(JSONObject docInfo) {
         String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("200")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("schema")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getString("originalRef")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getString("originalRef")))
                 .orElse("");
         return ref;
     }

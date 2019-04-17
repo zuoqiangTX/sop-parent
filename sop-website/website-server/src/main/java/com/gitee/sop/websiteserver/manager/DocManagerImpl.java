@@ -16,9 +16,10 @@ import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +50,10 @@ public class DocManagerImpl implements DocManager {
     RestTemplate restTemplate = new RestTemplate();
 
     DocParser swaggerDocParser = new SwaggerDocParser();
+
     DocParser easyopenDocParser = new EasyopenDocParser();
+
+    private String secret = "b749a2ec000f4f29p";
 
     @Autowired
     private Environment environment;
@@ -72,19 +76,30 @@ public class DocManagerImpl implements DocManager {
     }
 
     protected void loadDocInfo(ServiceInfoVO serviceInfoVo) {
-        String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs";
+        String query = this.buildQuery();
+        String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs" + query;
         try {
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
+            if (entity.getStatusCode() != HttpStatus.OK) {
+                throw new IllegalAccessException("无权访问");
+            }
             String docInfoJson = entity.getBody();
             JSONObject docRoot = JSON.parseObject(docInfoJson);
             DocParser docParser = this.buildDocParser(docRoot);
             DocInfo docInfo = docParser.parseJson(docRoot);
             docDefinitionMap.put(docInfo.getTitle(), docInfo);
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             // 这里报错可能是因为有些微服务没有配置swagger文档，导致404访问不到
             // 这里catch跳过即可
             log.warn("读取文档失败, url:{}, msg:{}", url, e.getMessage());
         }
+    }
+
+    protected String buildQuery() {
+        String time = String.valueOf(System.currentTimeMillis());
+        String source = secret + time + secret;
+        String sign = DigestUtils.md5DigestAsHex(source.getBytes());
+        return "?time=" + time + "&sign=" + sign;
     }
 
     protected DocParser buildDocParser(JSONObject rootDoc) {

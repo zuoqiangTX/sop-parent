@@ -30,6 +30,11 @@ public abstract class SwaggerSupport {
                 .build();
     }
 
+    @Bean
+    public SwaggerSecurityFilter swaggerSecurityFilter() {
+        return new SwaggerSecurityFilter();
+    }
+
     protected ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title(getDocTitle())

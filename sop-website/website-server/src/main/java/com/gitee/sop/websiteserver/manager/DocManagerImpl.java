@@ -66,18 +66,6 @@ public class DocManagerImpl implements DocManager {
                 ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
                 loadDocInfo(serviceInfoVo);
             }
-//            Map<String, DocItem> itemMap = docDefinitionMap.values()
-//                    .stream()
-//                    .map(DocInfo::getDocModuleList)
-//                    .map(list->{
-//                        for (DocModule docModule : list) {
-//
-//                        }
-//                    })
-//                    .map(DocModule::getDocItems)
-//                    .flatMap(docItems -> docItems.stream())
-//                    .collect(Collectors.toMap(DocItem::getNameVersion, Function.identity()));
-//            this.docItemMap.putAll(itemMap);
         } catch (IOException e) {
             log.error("加载失败", e);
         }

@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * 解析swagger的json内容
+ *
  * @author tanghc
  */
 public class SwaggerDocParser implements DocParser {
@@ -103,10 +105,11 @@ public class SwaggerDocParser implements DocParser {
 
     protected String getResponseRef(JSONObject docInfo) {
         String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("200")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getJSONObject("schema")))
-                .flatMap(jsonObject -> Optional.of(jsonObject.getString("originalRef")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
+                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getString("originalRef")))
                 .orElse("");
         return ref;
     }
+
 }

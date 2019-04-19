@@ -30,6 +30,19 @@ public abstract class SwaggerSupport {
                 .build();
     }
 
+    @Bean
+    public SwaggerSecurityFilter swaggerSecurityFilter() {
+        return new SwaggerSecurityFilter(swaggerAccessProtected());
+    }
+
+    /**
+     * swagger访问是否加密保护
+     * @return
+     */
+    protected boolean swaggerAccessProtected() {
+        return true;
+    }
+
     protected ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title(getDocTitle())

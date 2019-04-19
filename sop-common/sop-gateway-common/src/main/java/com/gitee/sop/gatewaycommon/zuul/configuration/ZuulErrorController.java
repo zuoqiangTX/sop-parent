@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 处理网关自身异常
  *
@@ -26,8 +28,11 @@ public class ZuulErrorController implements ErrorController {
      */
     @RequestMapping(ERROR_PATH)
     @ResponseBody
-    public Object error() {
+    public Object error(HttpServletResponse response) {
         RequestContext ctx = RequestContext.getCurrentContext();
+        if (ctx.getResponse() == null) {
+            ctx.setResponse(response);
+        }
         ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
         return this.buildResult(throwable);

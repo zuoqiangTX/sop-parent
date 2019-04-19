@@ -5,14 +5,9 @@ import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.springframework.core.env.Environment;
-
-import java.util.List;
 
 
 /**
@@ -64,8 +59,10 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
 
     public BaseRouteManager(Environment environment, RouteRepository<T> routeRepository) {
         this.environment = environment;
+        ZookeeperContext.setEnvironment(environment);
         this.routeRepository = routeRepository;
         this.routeRootPath = ZookeeperContext.getRouteRootPath();
+        this.createRouteRootPath(this.routeRootPath);
     }
 
     @Override
@@ -75,73 +72,64 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
 
     protected void refreshRouteInfo() {
         try {
-            ZookeeperContext.createOrUpdateData(routeRootPath, "");
-            CuratorFramework client = ZookeeperContext.getClient();
-            this.watchServiceChange(client, routeRootPath);
+            this.watchServiceChange(routeRootPath);
         } catch (Exception e) {
             log.error("刷新路由配置失败", e);
             throw new IllegalStateException("刷新路由配置失败");
         }
     }
 
+    protected void createRouteRootPath(String routeRootPath) {
+        try {
+            ZookeeperContext.createPath(routeRootPath, "");
+        } catch (Exception e) {
+            log.error("创建路由根节点失败", e);
+            throw new IllegalStateException("创建路由根节点失败");
+        }
+    }
 
     /**
      * 监听微服务更改
      *
-     * @param client
      * @param rootPath
      * @throws Exception
      */
-    protected void watchServiceChange(CuratorFramework client, String rootPath) throws Exception {
-        // 为子节点添加watcher
-        // PathChildrenCache: 监听数据节点的增删改，可以设置触发的事件
-        PathChildrenCache childrenCache = new PathChildrenCache(client, rootPath, true);
-
-        /**
-         * StartMode: 初始化方式
-         * POST_INITIALIZED_EVENT：异步初始化，初始化之后会触发事件
-         * NORMAL：异步初始化
-         * BUILD_INITIAL_CACHE：同步初始化
-         */
-        childrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
-
-        // 列出子节点数据列表，需要使用BUILD_INITIAL_CACHE同步初始化模式才能获得，异步是获取不到的
-        List<ChildData> childDataList = childrenCache.getCurrentData();
-        log.info("========== 加载路由信息 ==========");
-        log.info("{}  # 根节点", rootPath);
-        for (ChildData childData : childDataList) {
-            String serviceNodeData = new String(childData.getData());
-            R serviceRouteInfo = JSON.parseObject(serviceNodeData, getServiceRouteInfoClass());
-            String servicePath = childData.getPath();
-            log.info("\t{}  # service节点，节点数据:{}", servicePath, serviceNodeData);
-            this.loadServiceRouteItem(client, serviceRouteInfo, servicePath);
-        }
-        log.info("监听服务节点增删改，rootPath:{}", rootPath);
-        // 监听根节点下面的子节点
-        childrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-            @Override
-            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-                PathChildrenCacheEvent.Type type = event.getType();
-                synchronized (type) {
-                    // 通过判断event type的方式来实现不同事件的触发
-                    if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
-                        String serviceNodeData = new String(event.getData().getData());
-                        R serviceRouteInfo = JSON.parseObject(serviceNodeData, getServiceRouteInfoClass());
-                        // 添加子节点时触发
-                        String servicePath = event.getData().getPath();
-                        log.info("新增serviceId节点：{}，节点数据:{}", servicePath, serviceNodeData);
-                        loadServiceRouteItem(client, serviceRouteInfo, servicePath);
-                    } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(type)) {
-                        // 修改子节点数据时触发，暂时没有什么操作
-                        String nodeData = new String(event.getData().getData());
-                        log.info("修改serviceId节点：{}，节点数据:{}", event.getData().getPath(), nodeData);
-                    } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
-                        // 删除service节点
-                        String nodeData = new String(event.getData().getData());
-                        log.info("删除serviceId节点：{}，节点数据:{}", event.getData().getPath(), nodeData);
-                        R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
-                        routeRepository.deleteAll(serviceRouteInfo.getServiceId());
-                    }
+    protected void watchServiceChange(String rootPath) throws Exception {
+        ZookeeperContext.getChildrenAndListen(rootPath, childDataList -> {
+            log.info("========== 加载路由信息 ==========");
+            log.info("{}  # 路由根节点", rootPath);
+            for (ChildData childData : childDataList) {
+                String serviceNodeData = new String(childData.getData());
+                R serviceRouteInfo = JSON.parseObject(serviceNodeData, getServiceRouteInfoClass());
+                String servicePath = childData.getPath();
+                log.info("\t{}  # service节点，节点数据:{}", servicePath, serviceNodeData);
+                try {
+                    this.loadServiceRouteItem(serviceRouteInfo, servicePath);
+                } catch (Exception e) {
+                    log.error("加载路由信息失败，servicePath:{}", servicePath, e);
+                }
+            }
+        }, (client, event) -> {
+            PathChildrenCacheEvent.Type type = event.getType();
+            synchronized (type) {
+                // 通过判断event type的方式来实现不同事件的触发
+                if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
+                    String serviceNodeData = new String(event.getData().getData());
+                    R serviceRouteInfo = JSON.parseObject(serviceNodeData, getServiceRouteInfoClass());
+                    // 添加子节点时触发
+                    String servicePath = event.getData().getPath();
+                    log.info("新增serviceId节点：{}，节点数据:{}", servicePath, serviceNodeData);
+                    this.watchRouteItems(serviceRouteInfo, servicePath);
+                } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(type)) {
+                    // 修改子节点数据时触发，暂时没有什么操作
+                    String nodeData = new String(event.getData().getData());
+                    log.info("修改serviceId节点：{}，节点数据:{}", event.getData().getPath(), nodeData);
+                } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
+                    // 删除service节点
+                    String nodeData = new String(event.getData().getData());
+                    log.info("删除serviceId节点：{}，节点数据:{}", event.getData().getPath(), nodeData);
+                    R serviceRouteInfo = JSON.parseObject(nodeData, getServiceRouteInfoClass());
+                    routeRepository.deleteAll(serviceRouteInfo.getServiceId());
                 }
             }
         });
@@ -152,54 +140,48 @@ public abstract class BaseRouteManager<R extends BaseServiceRouteInfo<E>, E exte
      *
      * @param servicePath
      */
-    protected void loadServiceRouteItem(CuratorFramework client, R serviceRouteInfo, String servicePath) throws Exception {
-        // 获取service节点下所有的路由节点，里面保存的是路由名称，前面没有斜杠"/"
-        List<String> pathNameList = client.getChildren().forPath(servicePath);
-        for (String pathName : pathNameList) {
-            // 完整的路径
-            String routeItemPath = servicePath + "/" + pathName;
-            byte[] routeItemData = client.getData().forPath(routeItemPath);
-            String routeDataJson = buildZookeeperData(routeItemData);
-            log.info("\t\t{}  # 路由节点，节点数据:{}", routeItemPath, routeDataJson);
-            this.saveRouteItem(serviceRouteInfo, routeDataJson);
-        }
-        this.watchRouteItems(client, serviceRouteInfo, servicePath);
+    protected void loadServiceRouteItem(R serviceRouteInfo, String servicePath) throws Exception {
+        ZookeeperContext.getChildrenData(servicePath, childDataList -> {
+            for (ChildData childData : childDataList) {
+                String routeItemPath = childData.getPath();
+                byte[] routeItemData = childData.getData();
+                String routeDataJson = buildZookeeperData(routeItemData);
+                log.info("\t\t{}  # 路由节点，节点数据:{}", routeItemPath, routeDataJson);
+                this.saveRouteItem(serviceRouteInfo, routeDataJson);
+            }
+        });
+        this.watchRouteItems(serviceRouteInfo, servicePath);
     }
+
 
     /**
      * 监听serviceId目录下面的子节点
      *
-     * @param client
      * @param serviceRouteInfo
      * @param servicePath      serviceId节点
      */
-    protected void watchRouteItems(CuratorFramework client, R serviceRouteInfo, String servicePath) throws Exception {
-        log.info("监听路由节点增删改，servicePath:{}", servicePath);
-        PathChildrenCache childrenCache = new PathChildrenCache(client, servicePath, true);
-        childrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
+    protected void watchRouteItems(R serviceRouteInfo, String servicePath) throws Exception {
+        log.info("监听{}下子节点增删改", servicePath);
         // 添加事件监听器
-        childrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-            @Override
-            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-                PathChildrenCacheEvent.Type type = event.getType();
-                synchronized (type) {
-                    // 通过判断event type的方式来实现不同事件的触发
-                    if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
-                        // 新增单个路由
-                        String routeDataJson = buildZookeeperData(event.getData().getData());
-                        log.info("新增单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
-                        saveRouteItem(serviceRouteInfo, routeDataJson);
-                    } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(type)) {
-                        // 修改单个路由
-                        String routeDataJson = buildZookeeperData(event.getData().getData());
-                        log.info("修改单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
-                        updateRouteItem(serviceRouteInfo, routeDataJson);
-                    } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
-                        // 删除单个路由
-                        String routeDataJson = buildZookeeperData(event.getData().getData());
-                        log.info("删除单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
-                        deleteRouteItem(serviceRouteInfo, routeDataJson);
-                    }
+        ZookeeperContext.listenChildren(servicePath, (client, event) -> {
+            PathChildrenCacheEvent.Type type = event.getType();
+            synchronized (type) {
+                // 通过判断event type的方式来实现不同事件的触发
+                if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
+                    // 新增单个路由
+                    String routeDataJson = buildZookeeperData(event.getData().getData());
+                    log.info("新增单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
+                    saveRouteItem(serviceRouteInfo, routeDataJson);
+                } else if (PathChildrenCacheEvent.Type.CHILD_UPDATED.equals(type)) {
+                    // 修改单个路由
+                    String routeDataJson = buildZookeeperData(event.getData().getData());
+                    log.info("修改单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
+                    updateRouteItem(serviceRouteInfo, routeDataJson);
+                } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
+                    // 删除单个路由
+                    String routeDataJson = buildZookeeperData(event.getData().getData());
+                    log.info("删除单个路由，serviceId:{}, 路由数据:{}", serviceRouteInfo.getServiceId(), routeDataJson);
+                    deleteRouteItem(serviceRouteInfo, routeDataJson);
                 }
             }
         });

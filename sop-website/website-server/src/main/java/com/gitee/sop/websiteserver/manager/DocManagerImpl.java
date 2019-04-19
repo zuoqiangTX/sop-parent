@@ -1,26 +1,27 @@
 package com.gitee.sop.websiteserver.manager;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
-import com.gitee.sop.websiteserver.bean.DocModule;
-import com.gitee.sop.websiteserver.bean.DocParameter;
 import com.gitee.sop.websiteserver.bean.EurekaApplication;
 import com.gitee.sop.websiteserver.bean.EurekaApps;
 import com.gitee.sop.websiteserver.bean.EurekaInstance;
 import com.gitee.sop.websiteserver.bean.EurekaUri;
+import com.gitee.sop.websiteserver.bean.ZookeeperContext;
 import com.gitee.sop.websiteserver.vo.ServiceInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -30,9 +31,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +45,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DocManagerImpl implements DocManager {
 
-    // key:module
-    Map<String, DocModule> docDefinitionMap = new HashMap<>();
+    // key:title
+    Map<String, DocInfo> docDefinitionMap = new HashMap<>();
 
     // key: name+version
     Map<String, DocItem> docItemMap = new HashMap<>();
@@ -53,10 +56,22 @@ public class DocManagerImpl implements DocManager {
 
     RestTemplate restTemplate = new RestTemplate();
 
+    DocParser swaggerDocParser = new SwaggerDocParser();
+
+    DocParser easyopenDocParser = new EasyopenDocParser();
+
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    DelayQueue<Msg> queue = new DelayQueue<>();
+
+    private String secret = "b749a2ec000f4f29";
+
     @Autowired
     private Environment environment;
 
     private String eurekaUrl;
+
+    private volatile boolean listenInited;
 
     @Override
     public void load() {
@@ -68,97 +83,45 @@ public class DocManagerImpl implements DocManager {
                 ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
                 loadDocInfo(serviceInfoVo);
             }
-            Map<String, DocItem> itemMap = docDefinitionMap.values()
-                    .stream()
-                    .map(DocModule::getDocItems)
-                    .flatMap(docItems -> docItems.stream())
-                    .collect(Collectors.toMap(DocItem::getNameVersion, Function.identity()));
-            this.docItemMap.putAll(itemMap);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("加载失败", e);
         }
     }
 
-    private void loadDocInfo(ServiceInfoVO serviceInfoVo) {
-        String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs";
+    protected void loadDocInfo(ServiceInfoVO serviceInfoVo) {
+        String query = this.buildQuery();
+        String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs" + query;
         try {
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
+            if (entity.getStatusCode() != HttpStatus.OK) {
+                throw new IllegalAccessException("无权访问");
+            }
             String docInfoJson = entity.getBody();
-            DocModule docDefinition = this.parseDocJson(docInfoJson);
-            docDefinitionMap.put(docDefinition.getModule(), docDefinition);
-        } catch (RestClientException e) {
+            JSONObject docRoot = JSON.parseObject(docInfoJson);
+            DocParser docParser = this.buildDocParser(docRoot);
+            DocInfo docInfo = docParser.parseJson(docRoot);
+            docDefinitionMap.put(docInfo.getTitle(), docInfo);
+        } catch (Exception e) {
             // 这里报错可能是因为有些微服务没有配置swagger文档，导致404访问不到
             // 这里catch跳过即可
-            log.warn("读取文档失败, url:{}", url, e);
+            log.warn("读取文档失败, url:{}, msg:{}", url, e.getMessage());
         }
     }
 
-    private DocModule parseDocJson(String docInfoJson) {
-        JSONObject docRoot = JSON.parseObject(docInfoJson);
-        String title = docRoot.getJSONObject("info").getString("title");
-        List<DocItem> docItems = new ArrayList<>();
+    protected String buildQuery() {
+        String time = String.valueOf(System.currentTimeMillis());
+        String source = secret + time + secret;
+        String sign = DigestUtils.md5DigestAsHex(source.getBytes());
+        return "?time=" + time + "&sign=" + sign;
+    }
 
-        JSONObject paths = docRoot.getJSONObject("paths");
-        Set<String> pathNameSet = paths.keySet();
-        for (String pathName : pathNameSet) {
-            JSONObject pathInfo = paths.getJSONObject(pathName);
-            Set<String> pathSet = pathInfo.keySet();
-            Optional<String> first = pathSet.stream().findFirst();
-            if (first.isPresent()) {
-                String path = first.get();
-                JSONObject docInfo = pathInfo.getJSONObject(path);
-                DocItem docItem = buildDocItem(docInfo, docRoot);
-                docItems.add(docItem);
-            }
+    protected DocParser buildDocParser(JSONObject rootDoc) {
+        Object easyopen = rootDoc.get("easyopen");
+        if (easyopen != null) {
+            return easyopenDocParser;
+        } else {
+            return swaggerDocParser;
         }
-
-        DocModule docDefinition = new DocModule();
-        docDefinition.setModule(title);
-        docDefinition.setDocItems(docItems);
-        return docDefinition;
-    }
-
-    private DocItem buildDocItem(JSONObject docInfo, JSONObject docRoot) {
-        DocItem docItem = new DocItem();
-        docItem.setName(docInfo.getString("sop_name"));
-        docItem.setVersion(docInfo.getString("sop_version"));
-        docItem.setSummary(docInfo.getString("summary"));
-        docItem.setDescription(docInfo.getString("description"));
-        Optional<JSONArray> parametersOptional = Optional.ofNullable(docInfo.getJSONArray("parameters"));
-        JSONArray parameters = parametersOptional.orElse(new JSONArray());
-        List<DocParameter> docParameterList = parameters.toJavaList(DocParameter.class);
-        docItem.setRequestParameters(docParameterList);
-
-        List<DocParameter> responseParameterList = this.buildResponseParameterList(docInfo, docRoot);
-        docItem.setResponseParameters(responseParameterList);
-
-        return docItem;
-    }
-
-    private List<DocParameter> buildResponseParameterList(JSONObject docInfo, JSONObject docRoot) {
-        String responseRef = getResponseRef(docInfo);
-        List<DocParameter> respParameterList = new ArrayList<>();
-        if (StringUtils.isNotBlank(responseRef)) {
-            JSONObject responseObject = docRoot.getJSONObject("definitions").getJSONObject(responseRef);
-            JSONObject properties = responseObject.getJSONObject("properties");
-            Set<String> fieldNames = properties.keySet();
-            for (String fieldName : fieldNames) {
-                JSONObject fieldInfo = properties.getJSONObject(fieldName);
-                DocParameter respParam = fieldInfo.toJavaObject(DocParameter.class);
-                respParam.setName(fieldName);
-                respParameterList.add(respParam);
-            }
-        }
-        return respParameterList;
-    }
-
-    private String getResponseRef(JSONObject docInfo) {
-        String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
-                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
-                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
-                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getString("originalRef")))
-                .orElse("");
-        return ref;
     }
 
     @Override
@@ -167,12 +130,12 @@ public class DocManagerImpl implements DocManager {
     }
 
     @Override
-    public DocModule getByTitle(String title) {
+    public DocInfo getByTitle(String title) {
         return docDefinitionMap.get(title);
     }
 
     @Override
-    public Collection<DocModule> listAll() {
+    public Collection<DocInfo> listAll() {
         return docDefinitionMap.values();
     }
 
@@ -186,11 +149,13 @@ public class DocManagerImpl implements DocManager {
                 .forEach(eurekaApplication -> {
                     List<EurekaInstance> instanceList = eurekaApplication.getInstance();
                     for (EurekaInstance instance : instanceList) {
-                        ServiceInfoVO vo = new ServiceInfoVO();
-                        vo.setName(eurekaApplication.getName());
-                        vo.setIpAddr(instance.getIpAddr());
-                        vo.setServerPort(instance.fetchPort());
-                        serviceInfoVoList.add(vo);
+                        if ("UP".equals(instance.getStatus())) {
+                            ServiceInfoVO vo = new ServiceInfoVO();
+                            vo.setName(eurekaApplication.getName());
+                            vo.setIpAddr(instance.getIpAddr());
+                            vo.setServerPort(instance.fetchPort());
+                            serviceInfoVoList.add(vo);
+                        }
                     }
                 });
 
@@ -200,7 +165,7 @@ public class DocManagerImpl implements DocManager {
         return listMap;
     }
 
-    private String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
+    protected String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
         Request request = eurekaUri.getRequest(this.eurekaUrl, args);
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {
@@ -212,7 +177,7 @@ public class DocManagerImpl implements DocManager {
     }
 
     @PostConstruct
-    protected void after() {
+    protected void after() throws Exception {
         String eurekaUrls = environment.getProperty("eureka.client.serviceUrl.defaultZone");
         if (StringUtils.isBlank(eurekaUrls)) {
             throw new IllegalArgumentException("未指定eureka.client.serviceUrl.defaultZone参数");
@@ -222,5 +187,82 @@ public class DocManagerImpl implements DocManager {
             url = eurekaUrls.substring(0, eurekaUrls.length() - 1);
         }
         this.eurekaUrl = url;
+
+        this.listenServiceId();
+    }
+
+    /**
+     * 监听serviceId更改
+     *
+     * @throws Exception
+     */
+    protected void listenServiceId() throws Exception {
+
+        executorService.execute(new Consumer(queue, this));
+
+        ZookeeperContext.setEnvironment(environment);
+        String routeRootPath = ZookeeperContext.getRouteRootPath();
+        // 如果节点内容有变化则自动更新文档
+        ZookeeperContext.listenChildren(routeRootPath, 1, (client, event) -> {
+            if (listenInited) {
+                long id = System.currentTimeMillis();
+                // 延迟20秒执行
+                queue.offer(new Msg(id, 1000 * 20));
+            }
+            TreeCacheEvent.Type type = event.getType();
+            if (type == TreeCacheEvent.Type.INITIALIZED) {
+                listenInited = true;
+            }
+        });
+    }
+
+    static class Msg implements Delayed {
+        private long id;
+        private long delay;
+
+        // 自定义实现比较方法返回 1 0 -1三个参数
+
+
+        public Msg(long id, long delay) {
+            this.id = id;
+            this.delay = delay + System.currentTimeMillis();
+        }
+
+        @Override
+        public int compareTo(Delayed delayed) {
+            Msg msg = (Msg) delayed;
+            return Long.valueOf(this.id) > Long.valueOf(msg.id) ? 1
+                    : (Long.valueOf(this.id) < Long.valueOf(msg.id) ? -1 : 0);
+        }
+
+        // 延迟任务是否到时就是按照这个方法判断如果返回的是负数则说明到期否则还没到期
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return unit.convert(this.delay - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Slf4j
+    static class Consumer implements Runnable {
+        private DelayQueue<Msg> queue;
+        private DocManager docManager;
+
+        public Consumer(DelayQueue<Msg> queue, DocManager docManager) {
+            this.queue = queue;
+            this.docManager = docManager;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    queue.take();
+                    log.info("延迟队列触发--重新加载文档信息");
+                    docManager.load();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

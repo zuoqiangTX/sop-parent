@@ -1,5 +1,11 @@
 # changelog
 
+## 1.4.0
+
+- 新增文档分组显示
+- 支持easyopen文档注解
+- BUG修复
+
 ## 1.3.0
 
 - 新增接口限流功能 [doc](http://durcframework.gitee.io/sop/#/files/10092_%E6%8E%A5%E5%8F%A3%E9%99%90%E6%B5%81?t=1555378655699)

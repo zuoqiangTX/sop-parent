@@ -3,6 +3,7 @@ package com.gitee.sop.bookweb.controller;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ApiAbility // 放在这里，下面所有的接口都具备接口提供能力
 @RestController
 @RequestMapping("story2")
+@Api(tags = "故事接口2")
 public class Story2Controller{
 
     @RequestMapping("getStory4")

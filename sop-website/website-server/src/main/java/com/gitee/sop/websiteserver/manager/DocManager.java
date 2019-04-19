@@ -1,6 +1,6 @@
 package com.gitee.sop.websiteserver.manager;
 
-import com.gitee.sop.websiteserver.bean.DocModule;
+import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ public interface DocManager {
 
     DocItem get(String method, String version);
 
-    DocModule getByTitle(String title);
+    DocInfo getByTitle(String title);
 
-    Collection<DocModule> listAll();
+    Collection<DocInfo> listAll();
 }

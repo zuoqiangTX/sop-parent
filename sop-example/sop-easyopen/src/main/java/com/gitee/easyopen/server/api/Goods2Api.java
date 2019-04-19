@@ -15,11 +15,11 @@ import java.math.BigDecimal;
  * @author tanghc
  */
 @ApiService
-@ApiDoc("商品接口")
-public class GoodsApi {
+@ApiDoc("库存接口")
+public class Goods2Api {
 
-    @Api(name = "goods.get")
-    @ApiDocMethod(description = "获取商品")
+    @Api(name = "store.get")
+    @ApiDocMethod(description = "获取库存")
     Goods getGoods(GoodsParam param) {
         Goods goods = new Goods();
         goods.setId(1L);

@@ -11,7 +11,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
  */
 public class CuratorTest extends TestCase {
 
-    private String zookeeperServerAddr = "127.0.0.1:2181";
+    private String zookeeperServerAddr = "localhost:2181";
 
     /**
      * 递归删除节点，只能在测试环境用。
@@ -28,18 +28,6 @@ public class CuratorTest extends TestCase {
 
         try {
             client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH);
-        } catch (Exception e) {
-        }
-        try {
-            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-default");
-        } catch (Exception e) {
-        }
-        try {
-            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-dev");
-        } catch (Exception e) {
-        }
-        try {
-            client.delete().deletingChildrenIfNeeded().forPath(SopConstants.SOP_SERVICE_ROUTE_PATH + "-test");
         } catch (Exception e) {
         }
     }

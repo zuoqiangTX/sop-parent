@@ -2,15 +2,15 @@ package com.gitee.sop.servercommon.manager;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
+import com.gitee.sop.servercommon.bean.ServiceConstants;
+import com.gitee.sop.servercommon.bean.ZookeeperTool;
 import com.gitee.sop.servercommon.route.GatewayPredicateDefinition;
 import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
@@ -33,7 +33,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * zookeeper存放接口路由信息的根目录
      */
-    public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
+    public static final String SOP_SERVICE_ROUTE_PATH = ServiceConstants.SOP_SERVICE_ROUTE_PATH;
     public static final String PATH_START_CHAR = "/";
 
     /**
@@ -44,24 +44,56 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
 
-    private final String routeRootPath;
+    private final String routeRootPath = SOP_SERVICE_ROUTE_PATH;
     private final String zookeeperServerAddr;
 
     private Environment environment;
 
+    private ZookeeperTool zookeeperTool;
+
+    private String serviceId;
+
     public ServiceZookeeperApiMetaManager(Environment environment) {
         this.environment = environment;
-        this.routeRootPath = SOP_SERVICE_ROUTE_PATH;
+        serviceId = environment.getProperty("spring.application.name");
+        if (StringUtils.isEmpty(serviceId)) {
+            throw new IllegalArgumentException("请在application.properties中指定spring.application.name属性");
+        }
         zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
         if (StringUtils.isEmpty(zookeeperServerAddr)) {
             throw new IllegalArgumentException("未指定spring.cloud.zookeeper.connect-string参数");
+        }
+        this.zookeeperTool = new ZookeeperTool(environment);
+
+        this.uploadServiceId(environment);
+    }
+
+    /**
+     * 上传serviceId目录
+     *
+     * @param environment
+     */
+    protected void uploadServiceId(Environment environment) {
+        try {
+            ServiceRouteInfo serviceRouteInfo = this.buildServiceRouteInfo();
+            // 保存路径
+            String savePath = routeRootPath + "/" + serviceId;
+            String nodeData = JSON.toJSONString(serviceRouteInfo);
+            log.info("zookeeper创建serviceId路径，path:{}, nodeData:{}", savePath, nodeData);
+            this.zookeeperTool.createPath(savePath, nodeData);
+        } catch (Exception e) {
+            throw new IllegalStateException("zookeeper操作失败");
         }
     }
 
     @Override
     public void uploadApi(ServiceApiInfo serviceApiInfo) {
-        ServiceRouteInfo serviceRouteInfo = this.buildServiceGatewayInfo(serviceApiInfo);
-        this.uploadServiceRouteInfoToZookeeper(serviceRouteInfo);
+        try {
+            ServiceRouteInfo serviceRouteInfo = this.buildServiceGatewayInfo(serviceApiInfo);
+            this.uploadServiceRouteInfoToZookeeper(serviceRouteInfo);
+        } finally {
+            IOUtils.closeQuietly(zookeeperTool);
+        }
     }
 
     /**
@@ -78,11 +110,16 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
             GatewayRouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
             routeDefinitionList.add(gatewayRouteDefinition);
         }
+        ServiceRouteInfo serviceRouteInfo = this.buildServiceRouteInfo();
+        serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
+        return serviceRouteInfo;
+    }
+
+    protected ServiceRouteInfo buildServiceRouteInfo() {
         ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
-        serviceRouteInfo.setServiceId(serviceApiInfo.getServiceId());
+        serviceRouteInfo.setServiceId(serviceId);
         String description = environment.getProperty("spring.application.description");
         serviceRouteInfo.setDescription(description);
-        serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
         return serviceRouteInfo;
     }
 
@@ -144,75 +181,51 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      * @param serviceRouteInfo
      */
     protected void uploadServiceRouteInfoToZookeeper(ServiceRouteInfo serviceRouteInfo) {
-        CuratorFramework client = null;
         try {
             // 保存路径
             String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
-
-            client = CuratorFrameworkFactory.builder()
-                    .connectString(zookeeperServerAddr)
-                    .retryPolicy(new ExponentialBackoffRetry(1000, 3))
-                    .build();
-
-            client.start();
-
             log.info("上传接口信息到zookeeper，path:{}, serviceId：{}, 接口数量：{}",
                     savePath,
                     serviceRouteInfo.getServiceId(),
                     serviceRouteInfo.getRouteDefinitionList().size());
 
-            String parentPath = this.uploadFolder(client, serviceRouteInfo);
-            this.uploadRouteItems(client, serviceRouteInfo, parentPath);
+            String parentPath = this.uploadFolder(serviceRouteInfo);
+            this.uploadRouteItems(serviceRouteInfo, parentPath);
         } catch (Exception e) {
             log.error("更新接口信息到zookeeper失败, serviceId:{}", serviceRouteInfo.getServiceId(), e);
-        } finally {
-            if (client != null) {
-                client.close();
-            }
         }
     }
 
     /**
      * 上传文件夹内容
      *
-     * @param client
      * @param serviceRouteInfo
      * @return 返回文件夹路径
      */
-    protected String uploadFolder(CuratorFramework client, ServiceRouteInfo serviceRouteInfo) throws Exception {
+    protected String uploadFolder(ServiceRouteInfo serviceRouteInfo) throws Exception {
         // 保存路径
         String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
-        this.saveNode(client, savePath, serviceRouteInfoJson.getBytes());
+        this.zookeeperTool.createOrUpdateData(savePath, serviceRouteInfoJson);
         return savePath;
     }
 
     /**
      * 上传路由信息
      *
-     * @param client
      * @param serviceRouteInfo
      * @throws Exception
      */
-    protected void uploadRouteItems(CuratorFramework client, ServiceRouteInfo serviceRouteInfo, String parentPath) throws Exception {
+    protected void uploadRouteItems(ServiceRouteInfo serviceRouteInfo, String parentPath) throws Exception {
         List<GatewayRouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
         for (GatewayRouteDefinition routeDefinition : routeDefinitionList) {
             // 父目录/子目录
             String savePath = parentPath + PATH_START_CHAR + routeDefinition.getId();
             String routeDefinitionJson = JSON.toJSONString(routeDefinition);
             log.info("上传路由配置到zookeeper，路径:{}，路由数据:{}", savePath, routeDefinitionJson);
-            this.saveNode(client, savePath, routeDefinitionJson.getBytes());
+            this.zookeeperTool.createOrUpdateData(savePath, routeDefinitionJson);
         }
-    }
-
-    protected void saveNode(CuratorFramework client, String path, byte[] data) throws Exception {
-        client.create()
-                // 如果节点存在则Curator将会使用给出的数据设置这个节点的值
-                .orSetData()
-                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
-                .creatingParentContainersIfNeeded()
-                .forPath(path, data);
     }
 
 }

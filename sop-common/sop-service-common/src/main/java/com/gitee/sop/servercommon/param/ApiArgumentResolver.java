@@ -10,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
- * 解析request参数中的业务参数，隐射到方法参数上
+ * 解析request参数中的业务参数，绑定到方法参数上
  *
  * @author tanghc
  */

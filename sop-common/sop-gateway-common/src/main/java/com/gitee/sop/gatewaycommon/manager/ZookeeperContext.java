@@ -9,19 +9,17 @@ import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.data.Stat;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_MSG_CHANNEL_PATH;
-import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_ROUTE_PERMISSION_PATH;
+import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 
 /**
  * @author tanghc
@@ -86,46 +84,9 @@ public class ZookeeperContext {
         ZookeeperContext.client = client;
     }
 
-    public static boolean isPathExist(String path) {
-        try {
-            return client.checkExists().forPath(path) != null;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * 对已存在的path赋值。如果path不存在抛异常
-     *
-     * @param path 已存在的
-     * @param data
-     * @return 返回Stat
-     * @throws Exception
-     */
-    public static Stat updatePathData(String path, String data) throws Exception {
-        if (!isPathExist(path)) {
-            throw new IllegalStateException("path " + path + " 不存在");
-        }
-        return getClient().setData().forPath(path, data.getBytes());
-    }
-
-    /**
-     * 创建新的path，并赋值。如果path已存在抛异常
-     * @param path 待创建的path
-     * @param data 值
-     */
-    public static String createNewData(String path, String data) throws Exception {
-        if (isPathExist(path)) {
-            throw new IllegalStateException("path " + path + " 已存在");
-        }
-        return  getClient().create()
-                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
-                .creatingParentContainersIfNeeded()
-                .forPath(path, data.getBytes());
-    }
-
     /**
      * 新建或保存节点
+     *
      * @param path
      * @param data
      * @return 返回path
@@ -141,7 +102,34 @@ public class ZookeeperContext {
     }
 
     /**
+     * 创建path，如果path存在不报错，静默返回path名称
+     *
+     * @param path
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String createPath(String path, String data) throws Exception {
+        if (isPathExist(path)) {
+            return path;
+        }
+        return getClient().create()
+                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
+                .creatingParentContainersIfNeeded()
+                .forPath(path, data.getBytes());
+    }
+
+    public static boolean isPathExist(String path) {
+        try {
+            return client.checkExists().forPath(path) != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 监听一个节点
+     *
      * @param path
      * @param onChange 节点修改后触发
      * @return 返回path
@@ -160,39 +148,82 @@ public class ZookeeperContext {
         return ret;
     }
 
-    public static String getData(String path) throws Exception {
-        if (!isPathExist(path)) {
-            return null;
-        }
-        byte[] data = getClient().getData().forPath(path);
-        return new String(data);
+    /**
+     * 获取子节点信息并监听子节点
+     *
+     * @param parentPath   父节点路径
+     * @param listConsumer 子节点数据
+     * @param listener     监听事件
+     * @throws Exception
+     */
+    public static void getChildrenAndListen(String parentPath, Consumer<List<ChildData>> listConsumer, PathChildrenCacheListener listener) throws Exception {
+        // 为子节点添加watcher
+        // PathChildrenCache: 监听数据节点的增删改，可以设置触发的事件
+        PathChildrenCache childrenCache = new PathChildrenCache(client, parentPath, true);
+
+        /**
+         * StartMode: 初始化方式
+         * POST_INITIALIZED_EVENT：异步初始化，初始化之后会触发事件
+         * NORMAL：异步初始化
+         * BUILD_INITIAL_CACHE：同步初始化
+         */
+        childrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
+
+        // 列出子节点数据列表，需要使用BUILD_INITIAL_CACHE同步初始化模式才能获得，异步是获取不到的
+        List<ChildData> childDataList = childrenCache.getCurrentData();
+        listConsumer.accept(childDataList);
+        log.info("监听子节点增删改，监听路径:{}", parentPath);
+        // 监听根节点下面的子节点
+        childrenCache.getListenable().addListener(listener);
     }
 
     /**
-     * 获取子节点数据
+     * 获取子节点信息
      *
-     * @param parentPath 父节点
-     * @return 返回子节点数据
+     * @param parentPath   父节点路径
+     * @param listConsumer 子节点数据
      * @throws Exception
      */
-    public static List<ChildData> getChildrenData(String parentPath) throws Exception {
-        PathChildrenCache pathChildrenCache = buildPathChildrenCache(parentPath);
-        if (pathChildrenCache == null) {
-            return Collections.emptyList();
-        }
-        return pathChildrenCache.getCurrentData();
+    public static void getChildrenData(String parentPath, Consumer<List<ChildData>> listConsumer) throws Exception {
+        // 为子节点添加watcher
+        // PathChildrenCache: 监听数据节点的增删改，可以设置触发的事件
+        PathChildrenCache childrenCache = new PathChildrenCache(client, parentPath, true);
+
+        /**
+         * StartMode: 初始化方式
+         * POST_INITIALIZED_EVENT：异步初始化，初始化之后会触发事件
+         * NORMAL：异步初始化
+         * BUILD_INITIAL_CACHE：同步初始化
+         */
+        childrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
+
+        // 列出子节点数据列表，需要使用BUILD_INITIAL_CACHE同步初始化模式才能获得，异步是获取不到的
+        List<ChildData> childDataList = childrenCache.getCurrentData();
+        listConsumer.accept(childDataList);
+        childrenCache.close();
     }
 
-    public static PathChildrenCache buildPathChildrenCache(String path) throws Exception {
-        if (!isPathExist(path)) {
-            return null;
-        }
+    /**
+     * 监听子节点的增删改
+     *
+     * @param parentPath 父节点路径
+     * @param listener
+     * @throws Exception
+     */
+    public static void listenChildren(String parentPath, PathChildrenCacheListener listener) throws Exception {
+        // 为子节点添加watcher
         // PathChildrenCache: 监听数据节点的增删改，可以设置触发的事件
-        // 且第三个参数要设置为true，不然ChildData对象中的getData返回null
-        PathChildrenCache childrenCache = new PathChildrenCache(client, path, true);
-        // 列出子节点数据列表，需要使用BUILD_INITIAL_CACHE同步初始化模式才能获得，异步是获取不到的
+        PathChildrenCache childrenCache = new PathChildrenCache(client, parentPath, true);
+
+        /**
+         * StartMode: 初始化方式
+         * POST_INITIALIZED_EVENT：异步初始化，初始化之后会触发事件
+         * NORMAL：异步初始化
+         * BUILD_INITIAL_CACHE：同步初始化
+         */
         childrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE);
-        return childrenCache;
+        // 监听根节点下面的子节点
+        childrenCache.getListenable().addListener(listener);
     }
 
 }

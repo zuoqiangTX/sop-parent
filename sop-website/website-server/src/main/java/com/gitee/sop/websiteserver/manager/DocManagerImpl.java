@@ -8,12 +8,14 @@ import com.gitee.sop.websiteserver.bean.EurekaApplication;
 import com.gitee.sop.websiteserver.bean.EurekaApps;
 import com.gitee.sop.websiteserver.bean.EurekaInstance;
 import com.gitee.sop.websiteserver.bean.EurekaUri;
+import com.gitee.sop.websiteserver.bean.ZookeeperContext;
 import com.gitee.sop.websiteserver.vo.ServiceInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -53,12 +60,18 @@ public class DocManagerImpl implements DocManager {
 
     DocParser easyopenDocParser = new EasyopenDocParser();
 
-    private String secret = "b749a2ec000f4f29p";
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    DelayQueue<Msg> queue = new DelayQueue<>();
+
+    private String secret = "b749a2ec000f4f29";
 
     @Autowired
     private Environment environment;
 
     private String eurekaUrl;
+
+    private volatile boolean listenInited;
 
     @Override
     public void load() {
@@ -70,7 +83,7 @@ public class DocManagerImpl implements DocManager {
                 ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
                 loadDocInfo(serviceInfoVo);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("加载失败", e);
         }
     }
@@ -136,11 +149,13 @@ public class DocManagerImpl implements DocManager {
                 .forEach(eurekaApplication -> {
                     List<EurekaInstance> instanceList = eurekaApplication.getInstance();
                     for (EurekaInstance instance : instanceList) {
-                        ServiceInfoVO vo = new ServiceInfoVO();
-                        vo.setName(eurekaApplication.getName());
-                        vo.setIpAddr(instance.getIpAddr());
-                        vo.setServerPort(instance.fetchPort());
-                        serviceInfoVoList.add(vo);
+                        if ("UP".equals(instance.getStatus())) {
+                            ServiceInfoVO vo = new ServiceInfoVO();
+                            vo.setName(eurekaApplication.getName());
+                            vo.setIpAddr(instance.getIpAddr());
+                            vo.setServerPort(instance.fetchPort());
+                            serviceInfoVoList.add(vo);
+                        }
                     }
                 });
 
@@ -162,7 +177,7 @@ public class DocManagerImpl implements DocManager {
     }
 
     @PostConstruct
-    protected void after() {
+    protected void after() throws Exception {
         String eurekaUrls = environment.getProperty("eureka.client.serviceUrl.defaultZone");
         if (StringUtils.isBlank(eurekaUrls)) {
             throw new IllegalArgumentException("未指定eureka.client.serviceUrl.defaultZone参数");
@@ -172,5 +187,82 @@ public class DocManagerImpl implements DocManager {
             url = eurekaUrls.substring(0, eurekaUrls.length() - 1);
         }
         this.eurekaUrl = url;
+
+        this.listenServiceId();
+    }
+
+    /**
+     * 监听serviceId更改
+     *
+     * @throws Exception
+     */
+    protected void listenServiceId() throws Exception {
+
+        executorService.execute(new Consumer(queue, this));
+
+        ZookeeperContext.setEnvironment(environment);
+        String routeRootPath = ZookeeperContext.getRouteRootPath();
+        // 如果节点内容有变化则自动更新文档
+        ZookeeperContext.listenChildren(routeRootPath, 1, (client, event) -> {
+            if (listenInited) {
+                long id = System.currentTimeMillis();
+                // 延迟20秒执行
+                queue.offer(new Msg(id, 1000 * 20));
+            }
+            TreeCacheEvent.Type type = event.getType();
+            if (type == TreeCacheEvent.Type.INITIALIZED) {
+                listenInited = true;
+            }
+        });
+    }
+
+    static class Msg implements Delayed {
+        private long id;
+        private long delay;
+
+        // 自定义实现比较方法返回 1 0 -1三个参数
+
+
+        public Msg(long id, long delay) {
+            this.id = id;
+            this.delay = delay + System.currentTimeMillis();
+        }
+
+        @Override
+        public int compareTo(Delayed delayed) {
+            Msg msg = (Msg) delayed;
+            return Long.valueOf(this.id) > Long.valueOf(msg.id) ? 1
+                    : (Long.valueOf(this.id) < Long.valueOf(msg.id) ? -1 : 0);
+        }
+
+        // 延迟任务是否到时就是按照这个方法判断如果返回的是负数则说明到期否则还没到期
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return unit.convert(this.delay - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Slf4j
+    static class Consumer implements Runnable {
+        private DelayQueue<Msg> queue;
+        private DocManager docManager;
+
+        public Consumer(DelayQueue<Msg> queue, DocManager docManager) {
+            this.queue = queue;
+            this.docManager = docManager;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    queue.take();
+                    log.info("延迟队列触发--重新加载文档信息");
+                    docManager.load();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

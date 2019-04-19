@@ -65,10 +65,13 @@ public class DocController {
     }
 
 
-    @GetMapping("/doc/reload")
-    public void reload(String pwd) {
-        if (StringUtils.equals(this.pwd, pwd)) {
+    // 后门地址，可手动更新文档内容，一般情况下用不到
+    @GetMapping("/reload")
+    public String reload(String pwd) {
+        boolean correct = StringUtils.equals(this.pwd, pwd);
+        if (correct) {
             docManager.load();
         }
+        return String.valueOf(correct);
     }
 }

@@ -32,7 +32,15 @@ public abstract class SwaggerSupport {
 
     @Bean
     public SwaggerSecurityFilter swaggerSecurityFilter() {
-        return new SwaggerSecurityFilter();
+        return new SwaggerSecurityFilter(swaggerAccessProtected());
+    }
+
+    /**
+     * swagger访问是否加密保护
+     * @return
+     */
+    protected boolean swaggerAccessProtected() {
+        return true;
     }
 
     protected ApiInfo apiInfo() {

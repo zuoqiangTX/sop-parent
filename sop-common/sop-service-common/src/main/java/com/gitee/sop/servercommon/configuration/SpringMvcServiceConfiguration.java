@@ -1,6 +1,5 @@
 package com.gitee.sop.servercommon.configuration;
 
-import com.gitee.sop.servercommon.bean.EnvironmentContext;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
@@ -55,7 +54,6 @@ public class SpringMvcServiceConfiguration {
     @PostConstruct
     public final void after() {
         log.info("-----spring容器加载完毕-----");
-        EnvironmentContext.setEnvironment(environment);
         Executors.newSingleThreadExecutor().execute(()->{
             uploadRouteToZookeeper();
         });

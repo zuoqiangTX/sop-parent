@@ -35,7 +35,6 @@ import static java.util.stream.Collectors.toList;
  *
  * @author tanghc
  */
-@Component
 @Slf4j
 public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager {
 

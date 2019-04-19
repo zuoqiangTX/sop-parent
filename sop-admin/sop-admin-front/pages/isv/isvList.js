@@ -8,6 +8,10 @@ lib.use(['element', 'table', 'form'], function () {
         '1': '<span class="x-green">已启用</span>'
         ,'2': '<span class="x-red">已禁用</span>'
     }
+    var SIGN_TYPE_ENUM = {
+        '1': 'RSA2'
+        ,'2': 'MD5'
+    }
 
     // 渲染表格
     var renderTable = function (postData) {
@@ -29,10 +33,21 @@ lib.use(['element', 'table', 'form'], function () {
                 {field: 'id', title: 'id', width: 80}
                 , {field: 'appKey', title: 'appKey', width: 250}
                 , {field: 'secret', title: 'secret', width: 80, templet: function (row) {
-                    return '<button class="layui-btn layui-btn-xs" onclick="View.secret(\''+row.secret+'\')">查看</button>';
+                        if (row.signType == 2) {
+                            return '<button class="layui-btn layui-btn-xs" onclick="View.secret(\'' + row.secret + '\')">查看</button>';
+                        } else {
+                            return '';
+                        }
                 }}
                 , {field: '', title: '公私钥', width: 80, templet: function (row) {
-                        return '<button class="layui-btn layui-btn-xs" onclick="View.pubPriKey(\''+row.pubKey+'\', \''+row.priKey+'\')">查看</button>';
+                        if (row.signType == 1) {
+                            return '<button class="layui-btn layui-btn-xs" onclick="View.pubPriKey(\'' + row.pubKey + '\', \'' + row.priKey + '\')">查看</button>';
+                        } else {
+                            return '';
+                        }
+                }}
+                , {field: 'signType', title: '签名类型', width: 80, templet: function (row) {
+                        return SIGN_TYPE_ENUM[row.signType+''] || 'unknown';
                     }}
                 , {field: 'roleList', title: '角色', templet: function (row) {
                         var html = [];

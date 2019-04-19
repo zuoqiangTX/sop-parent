@@ -35,6 +35,9 @@ public class IsvVO {
     @ApiDocField(description = "状态：0启用，1禁用")
     private Byte status;
 
+    @ApiDocField(description = "签名类型：1:RSA2,2:MD5")
+    private Byte signType;
+
     /**  数据库字段：gmt_create */
     @ApiDocField(description = "添加时间")
     private Date gmtCreate;

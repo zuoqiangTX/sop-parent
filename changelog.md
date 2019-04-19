@@ -2,6 +2,11 @@
 
 ## 1.4.0
 
+- admin新增signType字段
+- 修复easyopen接入无法访问BUG
+
+## 1.4.0
+
 - 新增文档分组显示
 - 支持easyopen文档注解
 - BUG修复

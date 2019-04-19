@@ -15,7 +15,6 @@ import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -23,7 +22,6 @@ import java.util.Collection;
 /**
  * @author tanghc
  */
-@Component
 @Slf4j
 public class DbRouteConfigManager extends DefaultRouteConfigManager {
 

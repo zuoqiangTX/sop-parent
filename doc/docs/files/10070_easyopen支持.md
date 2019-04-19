@@ -49,11 +49,8 @@ public class SopConfig extends EasyopenServiceConfiguration {
 ```java
 @Configuration
 public class ZuulConfig extends EasyopenZuulConfiguration {
-    {
-        Map<String, String> appSecretStore = new HashMap();
-        // 秘钥键值对
-        appSecretStore.put("easyopen_test", "G9w0BAQEFAAOCAQ8AMIIBCgKCA");
-        ApiContext.getApiConfig().addAppSecret(appSecretStore);
+    static {
+        new ManagerInitializer();
     }
 }
 ```

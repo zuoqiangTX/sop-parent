@@ -8,11 +8,11 @@ import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.IsvDefinition;
 import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import com.gitee.sop.gatewaycommon.secret.CacheIsvManager;
+import com.gitee.sop.gatewaycommon.secret.SecretContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -21,7 +21,6 @@ import java.util.function.Function;
 /**
  * @author tanghc
  */
-@Component
 @Slf4j
 public class DbIsvManager extends CacheIsvManager {
 
@@ -31,14 +30,16 @@ public class DbIsvManager extends CacheIsvManager {
     @Autowired
     Environment environment;
 
+
     @Override
-    public void load(Function<Object, String> secretGetter) {
+    public void load() {
         List<IsvInfo> isvInfoList = isvInfoMapper.list(new Query());
+        Function<IsvDefinition, String> secretGetter = SecretContext.getSecretGetter();
         isvInfoList.stream()
                 .forEach(isvInfo -> {
                     IsvDefinition isvDefinition = new IsvDefinition();
                     BeanUtils.copyProperties(isvInfo, isvDefinition);
-                    String secret = secretGetter.apply(isvInfo);
+                    String secret = secretGetter.apply(isvDefinition);
                     isvDefinition.setSecret(secret);
                     this.getIsvCache().put(isvDefinition.getAppKey(), isvDefinition);
                 });

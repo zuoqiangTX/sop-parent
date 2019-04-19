@@ -2,13 +2,12 @@ package com.gitee.sop.adminserver.entity;
 
 import lombok.Data;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 
 /**
@@ -38,8 +37,11 @@ public class IsvInfo {
     /** 私钥, 数据库字段：pri_key */
     private String priKey;
 
-    /** 0启用，1禁用, 数据库字段：status */
+    /** 1启用，2禁用, 数据库字段：status */
     private Byte status;
+
+    /** 1:RSA2,2:MD5, 数据库字段：sign_type */
+    private Byte signType;
 
     /**  数据库字段：gmt_create */
     private Date gmtCreate;

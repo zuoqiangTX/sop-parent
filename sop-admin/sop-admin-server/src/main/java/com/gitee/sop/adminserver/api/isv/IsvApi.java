@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class IsvApi {
 
+    public static final int SIGN_TYPE_RSA2 = 1;
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
@@ -159,7 +160,7 @@ public class IsvApi {
     }
 
     private void formatForm(IsvInfoForm form) {
-        if (form.getSignType() == 1) {
+        if (form.getSignType() == SIGN_TYPE_RSA2) {
             form.setSecret("");
         } else {
             form.setPubKey("");

@@ -4,8 +4,6 @@ import com.gitee.sop.gatewaycommon.bean.IsvDefinition;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author tanghc
@@ -18,7 +16,7 @@ public class CacheIsvManager implements IsvManager<IsvDefinition> {
     private Map<String, IsvDefinition> isvCache = new ConcurrentHashMap<>(64);
 
     @Override
-    public void load(Function<Object, String> secretGetter) {
+    public void load() {
 
     }
 

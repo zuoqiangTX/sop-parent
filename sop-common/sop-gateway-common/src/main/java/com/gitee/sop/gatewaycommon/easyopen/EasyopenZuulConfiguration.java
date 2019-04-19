@@ -3,12 +3,17 @@ package com.gitee.sop.gatewaycommon.easyopen;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
+import com.gitee.sop.gatewaycommon.secret.SecretContext;
 import com.gitee.sop.gatewaycommon.zuul.configuration.BaseZuulConfiguration;
 
 /**
  * @author tanghc
  */
 public class EasyopenZuulConfiguration extends BaseZuulConfiguration {
+
+    static {
+        SecretContext.setSecretGetter((isvDefinition)-> isvDefinition.getSecret());
+    }
 
     public EasyopenZuulConfiguration() {
         ApiConfig apiConfig = ApiContext.getApiConfig();

@@ -1,16 +1,12 @@
 package com.gitee.sop.gatewaycommon.manager;
 
+import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.bean.IsvRoutePermission;
 
 /**
  * @author tanghc
  */
-public interface IsvRoutePermissionManager {
-
-    /**
-     * 加载路由权限信息
-     */
-    void load();
+public interface IsvRoutePermissionManager extends BeanInitializer {
 
     /**
      * 加载权限

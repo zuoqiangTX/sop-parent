@@ -1,8 +1,6 @@
 server:
   port: 2121
 
-
-
 # 指定注册中心
 eureka:
   port: 1111

@@ -1,6 +1,6 @@
 # changelog
 
-## 1.4.0
+## 1.5.0
 
 - admin新增signType字段
 - 修复easyopen接入无法访问BUG

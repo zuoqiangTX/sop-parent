@@ -45,7 +45,6 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
 
     private final String routeRootPath = SOP_SERVICE_ROUTE_PATH;
-    private final String zookeeperServerAddr;
 
     private Environment environment;
 
@@ -58,10 +57,6 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         serviceId = environment.getProperty("spring.application.name");
         if (StringUtils.isEmpty(serviceId)) {
             throw new IllegalArgumentException("请在application.properties中指定spring.application.name属性");
-        }
-        zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
-        if (StringUtils.isEmpty(zookeeperServerAddr)) {
-            throw new IllegalArgumentException("未指定spring.cloud.zookeeper.connect-string参数");
         }
         this.zookeeperTool = new ZookeeperTool(environment);
 

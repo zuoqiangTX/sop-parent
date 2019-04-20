@@ -1,5 +1,11 @@
-layui.use(['element', 'form'], function(){ //加载code模块
+layui.config({
+    base: '../../assets/lib/layuiext/module/'
+}).extend({
+    treetable: 'treetable-lay/treetable'
+}).use(['element', 'form', 'treetable'], function(){ //加载code模块
     var form = layui.form;
+    var treetable = layui.treetable;
+    var $ = layui.jquery;
 
     // key:module
     var docItemStore = {};
@@ -85,39 +91,56 @@ layui.use(['element', 'form'], function(){ //加载code模块
     }
 
     function createRequestParameter(docItem) {
-        var html = createParameterBody(docItem.requestParameters);
-        $('#requestTbody').html(html);
+        var data = buildTreeData(docItem.requestParameters);
+        createTreeTable('treeTableReq', data);
     }
 
     function createResponseParameter(docItem) {
-        var html = createParameterBody(docItem.responseParameters);
-        $('#responseTbody').html(html);
+        var data = buildTreeData(docItem.responseParameters);
+        createTreeTable('treeTableResp', data);
     }
 
-    function createParameterBody(parameters) {
-        /*
-        <tr>
-                    <th class="prop-name">参数</th>
-                    <th class="prop-type">类型</th>
-                    <th>是否必填</th>
-                    <th>最大长度</th>
-                    <th class="prop-desc">描述</th>
-                    <th class="prop-example">示例值</th>
-                </tr>
-         */
-        var html = [];
+    function buildTreeData(parameters, parentId) {
+        var data = [];
+        parentId = parentId || 0;
         for (var i = 0; i < parameters.length; i++) {
             var parameter = parameters[i];
-            html.push('<tr>\n' +
-                ' <th class="prop-name">'+parameter.name+'</th>\n' +
-                ' <th class="prop-type">'+parameter.type+'</th>\n' +
-                ' <th>'+(parameter.required ? '<span style="color:red;">是</span>' : '否')+'</th>\n' +
-                ' <th>-</th>\n' +
-                ' <th class="prop-desc">'+parameter.description+'</th>\n' +
-                ' <th class="prop-example">' + (parameter.example || parameter['x-example']) +'</th>\n' +
-                '</tr>')
+            parameter.id = parentId * 100 + (i + 1);
+            parameter.parentId = parentId;
+            data.push(parameter);
+            var refs = parameter.refs;
+            if (refs && refs.length > 0) {
+                var childData = buildTreeData(refs, parameter.id);
+                data = data.concat(childData);
+            }
         }
-        return html.join('');
+        return data;
+    }
+
+    function createTreeTable(id, data) {
+        var el = '#' + id;
+        $(el).text('');
+        treetable.render({
+            elem: el,
+            treeColIndex: 0,
+            treeSpid: 0,
+            treeIdName: 'id',
+            treePidName: 'parentId',
+            treeDefaultClose: false,
+            treeLinkage: false,
+            data: data,
+            page: false,
+            cols: [[
+                {field: 'name', title: '参数'}
+                ,{field: 'type', title: '类型', width: 80}
+                ,{field: 'required', title: '是否必填', width: 100, templet:function (row) {
+                        return row.required ? '<span style="color: red;">是</span>' : '否';
+                    }}
+                ,{field: 'maxLength', title: '最大长度', width: 100}
+                ,{field: 'description', title: '描述', width: 200}
+                ,{field: 'paramExample', title: '示例值', width: 200}
+            ]]
+        });
     }
 
     function createResponseCode(docItem) {

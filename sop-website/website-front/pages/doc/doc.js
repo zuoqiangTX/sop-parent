@@ -144,14 +144,9 @@ layui.config({
     }
 
     function createResponseCode(docItem) {
-        var responseParameters = docItem.responseParameters;
         var method = docItem.name.replace(/\./g, '_');
-        var result = [];
-        for (var i = 0; i < responseParameters.length; i++) {
-            var responseParameter = responseParameters[i];
-            result.push('\"'+responseParameter.name+'\": \"' + responseParameter.example + '\"')
-        }
-        var bizResult = result.join(",");
+        var responseParameters = docItem.responseParameters;
+        var bizResult = buildResult(responseParameters);
         var json = '{\n' +
             '    "'+method+'_response": {\n' +
             '        "code": "10000",\n' +
@@ -174,6 +169,24 @@ layui.config({
             '}';
         errorJson = formatJson(errorJson);
         $('#responseErrorJson').text(errorJson);
+    }
+
+    function buildResult(parameters) {
+        var result = [];
+        for (var i = 0; i < parameters.length; i++) {
+            var parameter = parameters[i];
+            result.push('\"'+parameter.name+'\": ' + buildExample(parameter))
+        }
+        return result.join(",");
+    }
+
+    function buildExample(parameter) {
+        var refs = parameter.refs;
+        if (refs) {
+            return '{' + buildResult(refs) + '}';
+        } else {
+            return '\"' + parameter.example + '\"';
+        }
     }
 
     initDocModules();

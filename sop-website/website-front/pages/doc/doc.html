@@ -32,6 +32,22 @@
         .prop-type {
             width: 50px;
         }
+
+        .treeTable-empty{margin-left: 20px;}
+
+        /** 修改文件夹图标：未展开 */
+        .treeTable-icon .layui-icon-layer:before {
+            content: "";
+        }
+
+        /** 修改文件夹图标：展开 */
+        .treeTable-icon.open .layui-icon-layer:before {
+            content: "";
+        }
+        /* 修改文件图标：*/
+        .treeTable-icon .layui-icon-file:before {
+            content: "";
+        }
     </style>
 </head>
 <body data-find="_5">
@@ -228,20 +244,7 @@
             </fieldset>
         </div>
         <div class="site-text">
-            <table class="layui-table">
-                <thead>
-                <tr>
-                    <th class="prop-name">参数</th>
-                    <th class="prop-type">类型</th>
-                    <th>是否必填</th>
-                    <th>最大长度</th>
-                    <th class="prop-desc">描述</th>
-                    <th class="prop-example">示例值</th>
-                </tr>
-                </thead>
-                <tbody id="requestTbody">
-                </tbody>
-            </table>
+            <table id="treeTableReq"></table>
         </div>
 
         <div class="site-title">
@@ -313,20 +316,7 @@
             </fieldset>
         </div>
         <div class="site-text">
-            <table class="layui-table">
-                <thead>
-                <tr>
-                    <th class="prop-name">参数</th>
-                    <th class="prop-type">类型</th>
-                    <th>是否必填</th>
-                    <th>最大长度</th>
-                    <th class="prop-desc">描述</th>
-                    <th class="prop-example">示例值</th>
-                </tr>
-                </thead>
-                <tbody id="responseTbody">
-                </tbody>
-            </table>
+            <table id="treeTableResp"></table>
         </div>
 
         <div class="site-title">

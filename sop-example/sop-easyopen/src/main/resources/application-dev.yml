@@ -14,10 +14,9 @@ spring:
     # 指定服务名
     name: easyopen-service
 
-  # 指定zookeeper
   cloud:
     zookeeper:
-      connect-string: localhost:2181
+      connect-string: 10.1.31.126:2181
 
 # 指定接口路径
 easyopen:

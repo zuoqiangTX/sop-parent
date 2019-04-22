@@ -7,7 +7,8 @@ spring:
 
   cloud:
     zookeeper:
-      connect-string: localhost:2181
+      # zookeeper配置
+      connect-string: 10.1.31.126:2181
 
 eureka:
   port: 1111

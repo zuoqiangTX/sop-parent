@@ -11,10 +11,9 @@ spring:
   application:
     name: sop-admin
 
-  # zookeeper客户端连接
   cloud:
     zookeeper:
-      connect-string: localhost:2181
+      connect-string: 10.1.31.126:2181
       baseSleepTimeMs: 3000
       maxRetries: 3
 

@@ -18,7 +18,7 @@ spring:
 
   cloud:
     zookeeper:
-      connect-string: 10.1.31.126:2181
+      connect-string: localhost:2181
 
     gateway: # Spring Cloud Gateway配置，如果用了zuul，这段配置没有效果
       discovery:

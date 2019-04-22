@@ -16,7 +16,7 @@ spring:
 
   cloud:
     zookeeper:
-      connect-string: 10.1.31.126:2181
+      connect-string: localhost:2181
 
 # 指定接口路径
 easyopen:

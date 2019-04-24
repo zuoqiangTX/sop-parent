@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb.config;
+package com.gitee.sop.storyweb.config;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.configuration.AlipayServiceConfiguration;

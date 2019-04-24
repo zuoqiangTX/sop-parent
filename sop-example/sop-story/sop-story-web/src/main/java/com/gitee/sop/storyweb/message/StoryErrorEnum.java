@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb.message;
+package com.gitee.sop.storyweb.message;
 
 import com.gitee.sop.servercommon.message.ServiceErrorMeta;
 

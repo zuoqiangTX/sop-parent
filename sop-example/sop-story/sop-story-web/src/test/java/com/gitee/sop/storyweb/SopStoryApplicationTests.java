@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb;
+package com.gitee.sop.storyweb;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb.controller;
+package com.gitee.sop.storyweb.controller;
 
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;

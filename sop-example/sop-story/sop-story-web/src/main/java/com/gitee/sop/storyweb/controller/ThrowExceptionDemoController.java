@@ -1,7 +1,7 @@
-package com.gitee.sop.bookweb.controller;
+package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.bookweb.controller.param.GoodsUpdateParam;
-import com.gitee.sop.bookweb.message.GoodsErrorEnum;
+import com.gitee.sop.storyweb.controller.param.GoodsUpdateParam;
+import com.gitee.sop.storyweb.message.GoodsErrorEnum;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;

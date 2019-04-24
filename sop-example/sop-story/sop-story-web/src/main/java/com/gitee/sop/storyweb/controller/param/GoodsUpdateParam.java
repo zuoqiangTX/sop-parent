@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb.controller.param;
+package com.gitee.sop.storyweb.controller.param;
 
 import lombok.Data;
 

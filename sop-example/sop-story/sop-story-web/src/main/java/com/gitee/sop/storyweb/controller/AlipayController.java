@@ -1,6 +1,6 @@
-package com.gitee.sop.bookweb.controller;
+package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.bookweb.controller.param.StoryParam;
+import com.gitee.sop.storyweb.controller.param.StoryParam;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
 import io.swagger.annotations.Api;

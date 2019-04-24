@@ -1,6 +1,6 @@
-package com.gitee.sop.bookweb.controller;
+package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.bookweb.controller.param.GoodsParam;
+import com.gitee.sop.storyweb.controller.param.GoodsParam;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import org.springframework.web.bind.annotation.RestController;
 

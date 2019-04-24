@@ -1,4 +1,4 @@
-package com.gitee.sop.bookweb;
+package com.gitee.sop.storyweb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

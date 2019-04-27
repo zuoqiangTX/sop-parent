@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>sop-auth</module>
         <module>sop-story</module>
         <module>sop-book</module>
 		<module>sop-easyopen</module>

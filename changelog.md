@@ -1,5 +1,9 @@
 # changelog
 
+## 1.6.0
+
+- 新增应用授权
+
 ## 1.5.0
 
 - admin新增signType字段

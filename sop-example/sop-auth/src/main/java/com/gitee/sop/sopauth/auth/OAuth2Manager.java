@@ -4,7 +4,6 @@ package com.gitee.sop.sopauth.auth;
 import com.gitee.sop.sopauth.auth.exception.LoginErrorException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * 认证服务，需要自己实现
@@ -68,7 +67,7 @@ public interface OAuth2Manager {
     OpenUser getUserByAuthCode(String authCode);
 
     /**
-     * 根据access token获取用户名
+     * 根据access token获取用户
      * 
      * @param accessToken
      *            token值
@@ -76,13 +75,6 @@ public interface OAuth2Manager {
      */
     OpenUser getUserByAccessToken(String accessToken);
     
-    /**
-     * 返回accessToken中追加的参数
-     * @param user
-     * @return 返回追加的参数
-     */
-    Map<String, String> getParam(OpenUser user);
-
     /**
      * 用户登录，需判断是否已经登录
      * @param request

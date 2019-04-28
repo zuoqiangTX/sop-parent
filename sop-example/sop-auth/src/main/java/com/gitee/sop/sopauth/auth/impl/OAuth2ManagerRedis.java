@@ -15,15 +15,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 
  * oauth2管理redis实现，这个类跟OAuth2ManagerCache类只能用一个，
- * 如果要用这个类，注释掉OAuth2ManagerCache的@Service
- * 启用这个类的@Service
+ * 如果要用这个类，
+ * 1、注释掉OAuth2ManagerCache的@Service。
+ * 2、打开yml中redis部分
+ * 3、启用这个类的@Service
  */
 //@Service
 public class OAuth2ManagerRedis implements OAuth2Manager {
@@ -31,8 +31,6 @@ public class OAuth2ManagerRedis implements OAuth2Manager {
     private static String CODE_PREFIX = "com.gitee.sop.oauth2_code:";
     private static String ACCESS_TOKEN_PREFIX = "com.gitee.sop.oauth2_access_token:";
     private static String REFRESH_TOKEN_PREFIX = "com.gitee.sop.oauth2_refresh_token:";
-    
-    private int codeTimeoutSeconds = OAuth2Config.getInstance().getCodeTimeoutSeconds();
     
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -54,6 +52,7 @@ public class OAuth2ManagerRedis implements OAuth2Manager {
 
     @Override
     public void addAuthCode(String authCode, OpenUser authUser) {
+        long codeTimeoutSeconds = OAuth2Config.getInstance().getCodeTimeoutSeconds();
         redisTemplate.opsForValue().set(getCodeKey(authCode),
                 JSON.toJSONString(authUser), 
                 codeTimeoutSeconds, 
@@ -90,6 +89,7 @@ public class OAuth2ManagerRedis implements OAuth2Manager {
     public void removeAccessToken(String accessToken) {
         String accessTokenKey = getAccessTokenKey(accessToken);
         int afterRefreshExpiresIn = OAuth2Config.getInstance().getAfterRefreshExpiresIn();
+        // 刷新令牌后，保证老的app_auth_token从刷新开始10分钟内可继续使用
         redisTemplate.expire(accessTokenKey, afterRefreshExpiresIn, TimeUnit.SECONDS);
     }
 
@@ -139,12 +139,6 @@ public class OAuth2ManagerRedis implements OAuth2Manager {
         return JSON.parseObject(json, UserInfo.class);
     }
 
-    @Override
-    public Map<String, String> getParam(OpenUser user) {
-        Map<String, String> map = new HashMap<>();
-        map.put("username", user.getUsername());
-        return map;
-    }
 
     @Override
     public OpenUser login(HttpServletRequest request) throws LoginErrorException {

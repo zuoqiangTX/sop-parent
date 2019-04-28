@@ -16,7 +16,6 @@ import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
-import org.apache.oltu.oauth2.as.response.OAuthASResponse.OAuthTokenResponseBuilder;
 import org.apache.oltu.oauth2.common.OAuth;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -32,9 +31,6 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * oauth2服务端默认实现
@@ -259,26 +255,6 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         fetchTokenResult.setExpires_in(auth2Config.getAccessTokenExpiresIn());
         fetchTokenResult.setRe_expires_in(auth2Config.getRefreshTokenExpiresIn());
         return fetchTokenResult;
-    }
-
-    private OAuthResponse buildAccessTokenResponse(TokenPair tokenPair, long expiresIn, OpenUser user) throws OAuthSystemException {
-        OAuthTokenResponseBuilder resp = OAuthASResponse.tokenResponse(HttpServletResponse.SC_OK);
-
-        Map<String, String> param = oauth2Manager.getParam(user);
-        if (param != null) {
-            Set<Entry<String, String>> entrySet = param.entrySet();
-            for (Entry<String, String> entry : entrySet) {
-                resp.setParam(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return resp
-                .setAccessToken(tokenPair.getAccessToken())
-                .setRefreshToken(tokenPair.getRefreshToken())
-                .setTokenType(TOKEN_TYPE)
-                .setExpiresIn(String.valueOf(expiresIn))
-                .buildJSONMessage();
-
     }
 
 }

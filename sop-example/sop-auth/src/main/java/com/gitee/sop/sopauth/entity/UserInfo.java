@@ -1,5 +1,6 @@
 package com.gitee.sop.sopauth.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.gitee.sop.sopauth.auth.OpenUser;
 import lombok.Data;
 
@@ -30,6 +31,7 @@ public class UserInfo implements OpenUser {
     private String username;
 
     /** 密码, 数据库字段：password */
+    @JSONField(serialize = false)
     private String password;
 
     /** 昵称, 数据库字段：nickname */

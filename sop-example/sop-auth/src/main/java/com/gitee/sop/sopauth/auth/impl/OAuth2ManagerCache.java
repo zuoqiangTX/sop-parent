@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * oauth2管理，默认谷歌缓存实现，跟redis实现只能用一个。正式环境推荐使用redis保存
+ * oauth2管理，默认谷歌缓存实现，跟redis实现只能用一个。
+ * 这里为了演示，使用本地缓存，正式环境请使用redis保存
+ * @see OAuth2ManagerRedis OAuth2ManagerRedis
  * @author tanghc
  *
  */
@@ -102,13 +102,6 @@ public class OAuth2ManagerCache implements OAuth2Manager {
     @Override
     public OpenUser getUserByAccessToken(String accessToken) {
         return accessTokenCache.getIfPresent(accessToken);
-    }
-
-    @Override
-    public Map<String, String> getParam(OpenUser user) {
-        Map<String, String> map = new HashMap<>();
-        map.put("username", user.getUsername());
-        return map;
     }
 
     @Override

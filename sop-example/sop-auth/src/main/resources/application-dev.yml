@@ -29,6 +29,13 @@ spring:
   thymeleaf:
     cache: false
 
+  # redis设置
+#  redis:
+#    host: localhost
+#    database: 0
+
+
+
 logging:
   level:
     com:

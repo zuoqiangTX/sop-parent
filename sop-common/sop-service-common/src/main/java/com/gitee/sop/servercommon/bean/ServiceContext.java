@@ -31,7 +31,11 @@ public class ServiceContext extends ConcurrentHashMap<String, Object> {
     }
 
     public Locale getLocale() {
-        return getRequest().getLocale();
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return Locale.SIMPLIFIED_CHINESE;
+        }
+        return request.getLocale();
     }
 
     /**

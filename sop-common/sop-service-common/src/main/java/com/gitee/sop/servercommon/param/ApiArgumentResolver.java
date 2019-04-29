@@ -23,9 +23,6 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        if (methodParameter == null) {
-            return false;
-        }
         boolean hasAnnotation = methodParameter.getMethodAnnotation(ApiMapping.class) != null
                 || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
         // 有注解

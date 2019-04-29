@@ -29,10 +29,10 @@ public class AlipayController {
         return story;
     }
 
-    @ApiOperation(value="获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
+    @ApiOperation(value = "获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
     @ApiMapping(value = "alipay.story.find")
     // 参数必须封装在类中
-    public StoryVO getStory2(StoryParam story /* 业务参数必须放在第一位对应biz_content */, HttpServletRequest request) {
+    public StoryVO getStory2(StoryParam story, HttpServletRequest request) {
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;
         storyVO.name = "白雪公主";

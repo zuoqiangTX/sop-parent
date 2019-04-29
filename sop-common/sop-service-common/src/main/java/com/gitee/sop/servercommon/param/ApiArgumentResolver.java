@@ -28,9 +28,8 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
         }
         boolean hasAnnotation = methodParameter.getMethodAnnotation(ApiMapping.class) != null
                 || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
-        boolean isFirstParameter = methodParameter.getParameterIndex() == 0;
-        // 有注解，并且是第一个参数
-        return hasAnnotation && isFirstParameter;
+        // 有注解
+        return hasAnnotation;
     }
 
     @Override

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 public class JSR303DemoController {
 
     @ApiMapping(value = "goods.add")
-    public Object addGoods(GoodsParam param/* 业务参数必须放在第一位对应biz_content */, HttpServletRequest request) {
+    public Object addGoods(GoodsParam param, HttpServletRequest request) {
         System.out.println(request.getParameter("method"));
         return param;
     }

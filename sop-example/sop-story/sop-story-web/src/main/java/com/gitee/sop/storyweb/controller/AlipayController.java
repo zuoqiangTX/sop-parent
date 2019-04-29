@@ -1,14 +1,15 @@
 package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.storyweb.controller.param.StoryParam;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
+import com.gitee.sop.storyweb.controller.param.StoryParam;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -31,7 +32,7 @@ public class AlipayController {
     @ApiOperation(value="获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
     @ApiMapping(value = "alipay.story.find")
     // 参数必须封装在类中
-    public StoryVO getStory2(StoryParam story) {
+    public StoryVO getStory2(StoryParam story /* 业务参数必须放在第一位对应biz_content */, HttpServletRequest request) {
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;
         storyVO.name = "白雪公主";

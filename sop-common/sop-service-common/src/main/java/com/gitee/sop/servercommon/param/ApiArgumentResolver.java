@@ -1,6 +1,8 @@
 package com.gitee.sop.servercommon.param;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.sop.servercommon.annotation.ApiAbility;
+import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ParamNames;
 import lombok.Data;
 import org.springframework.core.MethodParameter;
@@ -21,7 +23,14 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return methodParameter != null;
+        if (methodParameter == null) {
+            return false;
+        }
+        boolean hasAnnotation = methodParameter.getMethodAnnotation(ApiMapping.class) != null
+                || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
+        boolean isFirstParameter = methodParameter.getParameterIndex() == 0;
+        // 有注解，并且是第一个参数
+        return hasAnnotation && isFirstParameter;
     }
 
     @Override

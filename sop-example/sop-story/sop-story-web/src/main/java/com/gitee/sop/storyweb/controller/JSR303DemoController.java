@@ -4,6 +4,8 @@ import com.gitee.sop.storyweb.controller.param.GoodsParam;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 演示参数验证
  * @author tanghc
@@ -12,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class JSR303DemoController {
 
     @ApiMapping(value = "goods.add")
-    public Object addGoods(GoodsParam param) {
+    public Object addGoods(GoodsParam param/* 业务参数必须放在第一位对应biz_content */, HttpServletRequest request) {
+        System.out.println(request.getParameter("method"));
         return param;
     }
 }

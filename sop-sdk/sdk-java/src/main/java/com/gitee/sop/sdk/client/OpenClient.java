@@ -2,12 +2,13 @@ package com.gitee.sop.sdk.client;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.gitee.sop.sdk.common.DataNameBuilder;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
-import com.gitee.sop.sdk.sign.SopSignException;
+import com.gitee.sop.sdk.exception.SdkException;
 import com.gitee.sop.sdk.request.BaseRequest;
 import com.gitee.sop.sdk.response.BaseResponse;
-import com.gitee.sop.sdk.exception.SdkException;
+import com.gitee.sop.sdk.sign.SopSignException;
 import com.gitee.sop.sdk.sign.SopSignature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,16 +26,13 @@ public class OpenClient {
 
     private static final OpenConfig DEFAULT_CONFIG = new OpenConfig();
 
-    private static final char DOT = '.';
-    private static final char UNDERLINE = '_';
-    public static final String DATA_SUFFIX = "_response";
-
     private String url;
     private String appId;
     private String privateKey;
 
     private OpenConfig openConfig;
     private OpenRequest openRequest;
+    private DataNameBuilder dataNameBuilder;
 
     public OpenClient(String url, String appId, String privateKey) {
         this(url, appId, privateKey, DEFAULT_CONFIG);
@@ -50,6 +48,7 @@ public class OpenClient {
         this.openConfig = openConfig;
 
         this.openRequest = new OpenRequest(openConfig);
+        this.dataNameBuilder = openConfig.getDataNameBuilder();
     }
 
     /**
@@ -109,7 +108,7 @@ public class OpenClient {
 
     protected <T extends BaseResponse> T parseResponse(String resp, BaseRequest<T> request) {
         String method = request.getMethod();
-        String dataName = method.replace(DOT, UNDERLINE) + DATA_SUFFIX;
+        String dataName = dataNameBuilder.build(method);
         JSONObject jsonObject = JSON.parseObject(resp);
         JSONObject data = jsonObject.getJSONObject(dataName);
         T t = data.toJavaObject(request.getResponseClass());

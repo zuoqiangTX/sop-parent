@@ -2,6 +2,7 @@ package com.gitee.sop.gatewaycommon.result;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
@@ -23,11 +24,8 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     private static final ErrorMeta ISP_UNKNOW_ERROR_META = ErrorEnum.ISP_UNKNOW_ERROR.getErrorMeta();
     private static final ErrorMeta ISP_BIZ_ERROR = ErrorEnum.BIZ_ERROR.getErrorMeta();
 
-    private static final char DOT = '.';
-    private static final char UNDERLINE = '_';
     public static final String GATEWAY_CODE_NAME = "code";
     public static final String GATEWAY_MSG_NAME = "msg";
-    public static final String DATA_SUFFIX = "_response";
     public static final String ARRAY_START = "[";
     public static final String ARRAY_END = "]";
     public static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
@@ -137,8 +135,9 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         }
 
         // 点换成下划线
-        String method = name.replace(DOT, UNDERLINE);
-        ret.put(method + DATA_SUFFIX, jsonObjectService);
+        DataNameBuilder dataNameBuilder = ApiConfig.getInstance().getDataNameBuilder();
+        String method = dataNameBuilder.build(name);
+        ret.put(method, jsonObjectService);
         ret.put(ParamNames.SIGN_NAME, sign);
         return ret.toJSONString();
     }

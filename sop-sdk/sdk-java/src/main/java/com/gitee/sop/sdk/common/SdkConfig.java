@@ -13,4 +13,6 @@ public class SdkConfig {
 	public static String CHARSET = "UTF-8";
 
 	public static String SIGN_TYPE = "RSA2";
+
+	public static volatile DataNameBuilder dataNameBuilder = new DefaultDataNameBuilder();
 }

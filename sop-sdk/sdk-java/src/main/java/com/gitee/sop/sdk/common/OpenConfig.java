@@ -45,4 +45,9 @@ public class OpenConfig {
     private int readTimeoutSeconds = 10;
     /** http写超时时间 */
     private int writeTimeoutSeconds = 10;
+
+    /**
+     * 构建数据节点名称
+     */
+    private DataNameBuilder dataNameBuilder = SdkConfig.dataNameBuilder;
 }

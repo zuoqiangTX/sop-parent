@@ -22,10 +22,6 @@ namespace SDKCSharp.Client
 
         private static OpenConfig DEFAULT_CONFIG = new OpenConfig();
 
-        private static char DOT = '.';
-        private static char UNDERLINE = '_';
-        public static string DATA_SUFFIX = "_response";
-
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
 
@@ -35,6 +31,7 @@ namespace SDKCSharp.Client
 
         private OpenConfig openConfig;
         private OpenRequest openRequest;
+        private DataNameBuilder dataNameBuilder;
 
 
         public OpenClient(string url, string appId, string privateKey) : this(url, appId, privateKey,false, DEFAULT_CONFIG)
@@ -59,6 +56,7 @@ namespace SDKCSharp.Client
             {
                 this.privateKey = LoadCertificateFile(privateKey);
             }
+            this.dataNameBuilder = openConfig.DataNameBuilder;
         }
 
         /// <summary>
@@ -111,9 +109,9 @@ namespace SDKCSharp.Client
             string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
             form[this.openConfig.SignName] = sign;
 
-            string resp = this.doExecute(url, requestForm, header);
+            string resp = this.DoExecute(url, requestForm, header);
 
-            return this.parseResponse<T>(resp, request);
+            return this.ParseResponse<T>(resp, request);
         }
 
         /// <summary>
@@ -123,7 +121,7 @@ namespace SDKCSharp.Client
         /// <param name="requestForm">请求内容</param>
         /// <param name="header">请求header</param>
         /// <returns>返回服务器响应内容</returns>
-        protected virtual String doExecute(String url, RequestForm requestForm, Dictionary<string, string> header)
+        protected virtual String DoExecute(String url, RequestForm requestForm, Dictionary<string, string> header)
         {
             return openRequest.Request(this.url, requestForm, header);
         }
@@ -135,9 +133,9 @@ namespace SDKCSharp.Client
         /// <param name="resp">服务器响应内容</param>
         /// <param name="request">请求Request</param>
         /// <returns>返回Response</returns>
-        protected virtual T parseResponse<T>(string resp, BaseRequest<T> request) where T: BaseResponse {
+        protected virtual T ParseResponse<T>(string resp, BaseRequest<T> request) where T: BaseResponse {
             string method = request.Method;
-            string dataName = method.Replace(DOT, UNDERLINE) + DATA_SUFFIX;
+            string dataName = this.dataNameBuilder.Build(method);
             Dictionary<string, object> jsonObject = JsonUtil.ParseToDictionary(resp);
             object data = jsonObject[dataName];
             string jsonData = data == null ? "{}" : data.ToString();           

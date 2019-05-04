@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using SDKCSharp.Client;
+using SDKCSharp.Common;
 using SDKCSharp.Model;
 using SDKCSharp.Request;
 using SDKCSharp.Response;

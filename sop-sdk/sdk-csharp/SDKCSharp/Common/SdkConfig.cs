@@ -20,5 +20,7 @@ namespace SDKCSharp.Common
         public static Encoding CHARSET = Encoding.UTF8;
 
         public static SignType SIGN_TYPE = SignType.RSA2;
+
+        public static DataNameBuilder dataNameBuilder = new DefaultDataNameBuilder();
     }
 }

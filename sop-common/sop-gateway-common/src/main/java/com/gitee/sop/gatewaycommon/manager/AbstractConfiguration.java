@@ -7,7 +7,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
 
@@ -26,6 +30,36 @@ public class AbstractConfiguration implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         applicationContext = ctx;
+    }
+
+    /**
+     * 跨域过滤器
+     *
+     * @return
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration());
+        return new CorsFilter(source);
+    }
+
+    protected CorsFilter createCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        this.registerCorsConfiguration(source);
+        return new CorsFilter(source);
+    }
+
+    protected void registerCorsConfiguration(UrlBasedCorsConfigurationSource source) {
+        source.registerCorsConfiguration("/**", corsConfiguration());
+    }
+
+    protected CorsConfiguration corsConfiguration() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        return corsConfiguration;
     }
 
     @PostConstruct

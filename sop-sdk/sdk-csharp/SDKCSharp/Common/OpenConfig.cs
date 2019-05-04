@@ -12,7 +12,7 @@ namespace SDKCSharp.Common
     {
 
         private String successCode = SdkConfig.SUCCESS_CODE;
-        
+
         /// <summary>
         /// 返回码成功值
         /// </summary>
@@ -186,6 +186,11 @@ namespace SDKCSharp.Common
         public string SignTypeName { get => signTypeName; set => signTypeName = value; }
 
 
-
+        private DataNameBuilder dataNameBuilder = SdkConfig.dataNameBuilder;
+        /// <summary>
+        /// 节点名称构造器
+        /// </summary>
+        /// <value>The data name builder.</value>
+        public DataNameBuilder DataNameBuilder { get => dataNameBuilder; set => dataNameBuilder = value; }
     }
 }

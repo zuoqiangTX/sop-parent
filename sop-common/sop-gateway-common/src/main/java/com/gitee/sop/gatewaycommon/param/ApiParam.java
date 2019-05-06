@@ -208,4 +208,12 @@ public class ApiParam extends JSONObject implements Param {
     public int hashCode() {
         return super.hashCode();
     }
+
+    public void setRestName(String restName) {
+        this.restName = restName;
+    }
+
+    public void setRestVersion(String restVersion) {
+        this.restVersion = restVersion;
+    }
 }

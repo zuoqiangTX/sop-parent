@@ -31,9 +31,10 @@ public class CallbackController {
      */
     @GetMapping("oauth2callback")
     @ResponseBody
-    public String callback(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public OpenAuthTokenAppResponse callback(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         String app_id = servletRequest.getParameter("app_id");
         String code = servletRequest.getParameter("code");
+        log.info("app_id:{}, code:{}", app_id, code);
 
         OpenAuthTokenAppRequest request = new OpenAuthTokenAppRequest();
         OpenAuthTokenAppModel model = new OpenAuthTokenAppModel();
@@ -48,7 +49,6 @@ public class CallbackController {
             // 后续使用token进行接口访问
             log.info("授权成功，body:{}", response.getBody());
         }
-        System.out.println(response.getBody());
-        return response.getBody();
+        return response;
     }
 }

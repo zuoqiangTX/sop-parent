@@ -14,16 +14,26 @@ import java.util.Map;
  * @author tanghc
  */
 @Slf4j
-public class ApiParamFactory {
+public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
 
-    private ApiParamFactory(){}
+    public abstract Map<String, String> buildRequestParams(T ctx);
 
-    public static ApiParam build(Map<String, ?> params) {
-        ApiParam apiParam = new ApiParam();
-        for (Map.Entry<String, ?> entry : params.entrySet()) {
+    @Override
+    public ApiParam build(T ctx) {
+        ApiParam apiParam = this.newApiParam(ctx);
+        Map<String, String> requestParams = this.buildRequestParams(ctx);
+        for (Map.Entry<String, ?> entry : requestParams.entrySet()) {
             apiParam.put(entry.getKey(), entry.getValue());
         }
+        this.initOtherProperty(apiParam);
+        return apiParam;
+    }
 
+    protected ApiParam newApiParam(T ctx) {
+        return new ApiParam();
+    }
+
+    protected void initOtherProperty(ApiParam apiParam) {
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
@@ -35,6 +45,6 @@ public class ApiParamFactory {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
         apiParam.setIgnoreValidate(BooleanUtils.toBoolean(routeDefinition.getIgnoreValidate()));
-        return apiParam;
     }
+
 }

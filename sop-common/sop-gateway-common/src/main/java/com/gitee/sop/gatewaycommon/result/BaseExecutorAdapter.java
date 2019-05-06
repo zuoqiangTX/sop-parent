@@ -91,9 +91,8 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         }
         Object name = params.get(ParamNames.API_NAME);
         Object version = params.get(ParamNames.VERSION_NAME);
-        if(name == null) {
-            // 随便生成一个name
-            name = System.currentTimeMillis();
+        if(name == null || version == null) {
+            return true;
         }
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(String.valueOf(name) + version);
         if (targetRoute == null) {

@@ -43,6 +43,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
 
     private static final String TOKEN_TYPE = "Bearer";
+    public static final String APP_ID_NAME = "app_id";
 
     private OAuthIssuer oauthIssuer = new OAuthIssuerImpl(new MD5Generator());
 
@@ -96,6 +97,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                     HttpServletResponse.SC_FOUND);
             // 设置授权码
             builder.setCode(authorizationCode);
+            builder.setParam(APP_ID_NAME, clientId);
             // 得到到客户端重定向地址
             String redirectURI = oauthRequest.getParam(OAuth.OAUTH_REDIRECT_URI);
 

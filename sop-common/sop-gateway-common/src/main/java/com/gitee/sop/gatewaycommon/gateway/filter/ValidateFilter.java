@@ -2,11 +2,8 @@ package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
-import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
-import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.util.RouteUtil;
 import com.gitee.sop.gatewaycommon.validate.Validator;

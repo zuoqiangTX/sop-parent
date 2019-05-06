@@ -15,6 +15,10 @@ public class SopConstants {
     public static final String DEFAULT_SIGN_METHOD = "md5";
     public static final String EMPTY_JSON = "{}";
 
+    public static final String REDIRECT_METHOD_KEY = "r-method";
+
+    public static final String REDIRECT_VERSION_KEY = "r-version";
+
     /**
      * 在拦截器中调用获取参数：
      * String cachedBody = (String)exchange.getAttribute(SopConstants.CACHE_REQUEST_BODY_OBJECT_KEY);

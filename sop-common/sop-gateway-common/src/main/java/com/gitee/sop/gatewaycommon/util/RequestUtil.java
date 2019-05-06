@@ -55,27 +55,24 @@ public class RequestUtil {
      * @param request request对象
      * @return 返回参数键值对
      */
-    public static Map<String, Object> convertRequestParamsToMap(HttpServletRequest request) {
+    public static Map<String, String> convertRequestParamsToMap(HttpServletRequest request) {
         Map<String, String[]> paramMap = request.getParameterMap();
         if(paramMap == null || paramMap.isEmpty()) {
             return Collections.emptyMap();
         }
-        Map<String, Object> retMap = new HashMap<>(paramMap.size());
+        Map<String, String> retMap = new HashMap<>(paramMap.size());
 
         Set<Map.Entry<String, String[]>> entrySet = paramMap.entrySet();
 
         for (Map.Entry<String, String[]> entry : entrySet) {
             String name = entry.getKey();
             String[] values = entry.getValue();
-            if (values.length == 1) {
+            if (values.length >= 1) {
                 retMap.put(name, values[0]);
-            } else if (values.length > 1) {
-                retMap.put(name, values);
             } else {
                 retMap.put(name, "");
             }
         }
-
         return retMap;
     }
 

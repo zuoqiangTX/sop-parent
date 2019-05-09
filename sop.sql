@@ -48,7 +48,7 @@ CREATE TABLE `config_route_limit` (
   `service_id` varchar(64) NOT NULL DEFAULT '',
   `limit_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '限流策略，1：漏桶策略，2：令牌桶策略',
   `exec_count_per_second` int(11) DEFAULT NULL COMMENT '每秒可处理请求数',
-  `limit_code` varchar(20) DEFAULT NULL COMMENT '返回的错误码',
+  `limit_code` varchar(64) DEFAULT NULL COMMENT '返回的错误码',
   `limit_msg` varchar(100) DEFAULT NULL COMMENT '返回的错误信息',
   `token_bucket_count` int(11) DEFAULT NULL COMMENT '令牌桶容量',
   `limit_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '限流开启状态，1:开启，0关闭',

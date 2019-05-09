@@ -21,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -50,6 +52,9 @@ public class LimitApi {
     @ApiDocMethod(description = "限流列表", elementClass = LimitVO.class)
     List<LimitVO> listLimit(RouteSearchParam param) throws Exception {
         List<GatewayRouteDefinition> routeDefinitionList = routeService.getRouteDefinitionList(param);
+        if (CollectionUtils.isEmpty(routeDefinitionList)) {
+            return Collections.emptyList();
+        }
         List<String> routeIdList = getRouteIdList(routeDefinitionList);
         // key：routeId
         Map<String, ConfigRouteLimit> routeLimitMap = getStoreConfigRouteLimit(routeIdList);

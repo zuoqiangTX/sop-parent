@@ -3,6 +3,7 @@ package com.gitee.sop.bookweb.config;
 import com.gitee.sop.servercommon.configuration.AlipayServiceConfiguration;
 import com.gitee.sop.servercommon.swagger.SwaggerSupport;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -11,6 +12,16 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 public class OpenServiceConfig extends AlipayServiceConfiguration {
+
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        super.addResourceHandlers(registry);
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
     // 开启文档
     @Configuration
     @EnableSwagger2

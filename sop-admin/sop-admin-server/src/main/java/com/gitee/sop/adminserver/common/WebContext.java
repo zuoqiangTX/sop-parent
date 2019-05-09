@@ -1,9 +1,11 @@
 package com.gitee.sop.adminserver.common;
 
-import com.gitee.easyopen.ApiContext;
 import com.gitee.sop.adminserver.entity.AdminUserInfo;
 
 import javax.servlet.http.HttpSession;
+
+import static com.gitee.easyopen.ApiContext.getSessionId;
+import static com.gitee.easyopen.ApiContext.getSessionManager;
 
 public class WebContext {
     private static WebContext INSTANCE = new WebContext();
@@ -23,8 +25,12 @@ public class WebContext {
      * @return
      */
     public AdminUserInfo getLoginUser() {
-        HttpSession session = ApiContext.getManagedSession();
+        String sessionId = getSessionId();
+        HttpSession session = getSessionManager().getSession(sessionId);
         if (session == null) {
+            return null;
+        }
+        if (!session.getId().equals(sessionId)) {
             return null;
         }
         return (AdminUserInfo) session.getAttribute(S_USER);

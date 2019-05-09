@@ -46,7 +46,7 @@
             width="200"
           >
             <template slot-scope="scope">
-              {{ scope.row.name + ' (' + scope.row.version + ')' }}
+              {{ scope.row.name + (scope.row.version ? ' (' + scope.row.version + ')' : '') }}
             </template>
           </el-table-column>
           <el-table-column

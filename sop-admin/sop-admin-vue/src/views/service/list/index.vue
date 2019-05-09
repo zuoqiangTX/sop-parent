@@ -5,7 +5,7 @@
         <el-input v-model="searchFormData.serviceId" :clearable="true" placeholder="serviceId" size="mini" style="width: 250px;" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" prefix-icon="el-icon-search" size="mini" @click="onSearchTable">查询</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="onSearchTable">查询</el-button>
       </el-form-item>
     </el-form>
     <el-table

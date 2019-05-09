@@ -65,6 +65,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 > 运行环境：JDK8，Maven3，Zookeeper
 
 - doc：开发文档
+- sop-admin：后台管理
 - sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能

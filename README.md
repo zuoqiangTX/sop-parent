@@ -52,15 +52,13 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## admin界面预览
 
-![admin预览](https://images.gitee.com/uploads/images/2019/0323/142555_30a0c87d_332975.png "admin1.png")
+![预览界面](https://images.gitee.com/uploads/images/2019/0509/140139_e99ab644_332975.png "admin_new1.png")
 
-![admin预览](https://images.gitee.com/uploads/images/2019/0323/142623_2ce00e69_332975.png "admin2.png")
+![预览界面](https://images.gitee.com/uploads/images/2019/0509/140154_c181db76_332975.png "admin_new2.png")
 
-![admin预览](https://images.gitee.com/uploads/images/2019/0323/142643_6fc1b152_332975.png "admin3.png")
+![预览界面](https://images.gitee.com/uploads/images/2019/0509/140203_0ed411a3_332975.png "admin_new3.png")
 
-![admin预览](https://images.gitee.com/uploads/images/2019/0401/202931_14cc7248_332975.png "admin7.png")
-
-![admin预览](https://images.gitee.com/uploads/images/2019/0415/204659_f0dc8057_332975.png "admin8.png")
+![预览界面](https://images.gitee.com/uploads/images/2019/0509/140220_1110f153_332975.png "admin_new4.png")
 
 ## 工程说明
 

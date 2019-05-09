@@ -15,10 +15,10 @@ npm install --registry=https://registry.npm.taobao.org
 npm run dev
 
 # 打包发布
-npm run build
+npm run build:prod
 
 # Build for production and view the bundle analyzer report
-npm run build --report
+npm run build:prod --report
 ```
 
 - 修改端口号：打开`vue.config.js`，找到`port`属性
@@ -27,7 +27,5 @@ npm run build --report
 
 如果想要把vue打包放到服务端，步骤如下：
 
-- 打开`vue.config.js`，找到`build`下的`assetsPublicPath`参数，设置成'./'
-- 打开`.env.production`，配置`VUE_APP_BASE_API`参数，设置成'/api'
-- 执行`npm run build`进行打包，结果在dest下
+- 执行`npm run build:prod`进行打包，结果在dest下
 - 打包完成后，把dest中的所有文件，放到`sop-admin-server/src/main/resources/public`下

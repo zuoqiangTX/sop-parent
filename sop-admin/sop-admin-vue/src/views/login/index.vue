@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
 import md5 from 'js-md5'
 import { setToken } from '@/utils/auth'
 
@@ -56,8 +55,8 @@ export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
+      if (value.length === 0) {
+        callback(new Error('请输入用户名'))
       } else {
         callback()
       }

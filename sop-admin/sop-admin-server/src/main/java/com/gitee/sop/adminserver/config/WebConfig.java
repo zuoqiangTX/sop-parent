@@ -14,10 +14,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author thc
  */
 @Configuration
-public class WebConfig extends WebMvcConfigurationSupport {
+public class WebConfig {
 
     public static final String HEADER_TOKEN_NAME = ParamNames.ACCESS_TOKEN_NAME;
 
@@ -62,27 +58,4 @@ public class WebConfig extends WebMvcConfigurationSupport {
         return apiConfig;
     }
 
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        //配置映射关系
-        registry.addResourceHandler("/conf/**").addResourceLocations("classpath:/META-INF/resources/webjars/sop-admin-front/1.0.0-SNAPSHOT/");
-        registry.addResourceHandler("/opendoc/**").addResourceLocations("classpath:/META-INF/resources/opendoc/");
-    }
-
-    @Controller
-    public static class ConfController {
-
-        private static final String REDIRECT_INDEX = "redirect:/conf/index.html";
-
-        @GetMapping("/")
-        public String index() {
-            return REDIRECT_INDEX;
-        }
-
-        @GetMapping("/conf")
-        public String conf() {
-            return REDIRECT_INDEX;
-        }
-    }
 }

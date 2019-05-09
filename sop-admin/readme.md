@@ -1,7 +1,5 @@
 # 后台admin
 
-主要功能：
-
-- 配置管理
-- 服务管理
-- 路由管理
+- sop-admin-front: admin前端layui实现
+- sop-admin-server: admin服务端
+- sop-admin-vue: admin前端vue实现

@@ -41,7 +41,9 @@
       >
         <template slot-scope="scope">
           <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="success">已上线</el-tag>
-          <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'OUT_OF_SERVICE'" type="danger">已下线</el-tag>
+          <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'STARTING'" type="info">正在启动</el-tag>
+          <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'UNKNOWN'">未知</el-tag>
+          <el-tag v-if="scope.row.parentId > 0 && (scope.row.status === 'OUT_OF_SERVICE' || scope.row.status === 'DOWN')" type="danger">已下线</el-tag>
         </template>
       </el-table-column>
       <el-table-column

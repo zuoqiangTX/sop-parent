@@ -25,7 +25,7 @@ public class PreRoutePermissionFilter extends BaseZuulFilter {
     @Override
     protected int getFilterOrder() {
         // 放在签名验证后面
-        return PRE_VALIDATE_FILTER_ORDER + 1;
+        return PRE_ROUTE_PERMISSION_FILTER_ORDER;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.sop.gatewaycommon.result.ApiResult;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;

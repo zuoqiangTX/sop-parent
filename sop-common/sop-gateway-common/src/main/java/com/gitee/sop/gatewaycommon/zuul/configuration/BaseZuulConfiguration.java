@@ -1,12 +1,8 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
-import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
-import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
-import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
@@ -120,18 +116,4 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
         return ApiContext.getApiConfig().getZuulErrorController();
     }
 
-    @Bean
-    IsvManager isvManager() {
-        return ApiConfig.getInstance().getIsvManager();
-    }
-
-    @Bean
-    IsvRoutePermissionManager isvRoutePermissionManager() {
-        return ApiConfig.getInstance().getIsvRoutePermissionManager();
-    }
-
-    @Bean
-    RouteConfigManager routeConfigManager() {
-        return ApiConfig.getInstance().getRouteConfigManager();
-    }
 }

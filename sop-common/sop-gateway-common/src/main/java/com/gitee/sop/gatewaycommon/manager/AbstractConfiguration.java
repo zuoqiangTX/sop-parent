@@ -1,8 +1,10 @@
 package com.gitee.sop.gatewaycommon.manager;
 
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
+import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -32,6 +34,21 @@ public class AbstractConfiguration implements ApplicationContextAware {
         applicationContext = ctx;
     }
 
+    @Bean
+    IsvManager isvManager() {
+        return ApiConfig.getInstance().getIsvManager();
+    }
+
+    @Bean
+    IsvRoutePermissionManager isvRoutePermissionManager() {
+        return ApiConfig.getInstance().getIsvRoutePermissionManager();
+    }
+
+    @Bean
+    RouteConfigManager routeConfigManager() {
+        return ApiConfig.getInstance().getRouteConfigManager();
+    }
+
     /**
      * 跨域过滤器
      *
@@ -39,9 +56,7 @@ public class AbstractConfiguration implements ApplicationContextAware {
      */
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration());
-        return new CorsFilter(source);
+        return createCorsFilter();
     }
 
     protected CorsFilter createCorsFilter() {

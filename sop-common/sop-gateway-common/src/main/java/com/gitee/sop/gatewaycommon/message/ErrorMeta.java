@@ -1,6 +1,7 @@
 package com.gitee.sop.gatewaycommon.message;
 
 import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.gitee.sop.gatewaycommon.gateway.configuration.BaseGatewayConfiguration;
 import com.netflix.zuul.context.RequestContext;
 import lombok.Getter;
 
@@ -54,6 +55,9 @@ public class ErrorMeta {
     }
 
     protected Locale getLocale() {
+        if (BaseGatewayConfiguration.USE_GATEWAY) {
+            return ZH_CN;
+        }
         RequestContext currentContext = RequestContext.getCurrentContext();
         if (currentContext == null) {
             return ZH_CN;

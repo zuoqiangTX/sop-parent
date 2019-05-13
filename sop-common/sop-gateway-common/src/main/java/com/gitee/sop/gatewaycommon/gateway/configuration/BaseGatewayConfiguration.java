@@ -30,6 +30,11 @@ import java.util.List;
  */
 public class BaseGatewayConfiguration extends AbstractConfiguration {
 
+    public static boolean USE_GATEWAY;
+    static {
+        USE_GATEWAY = true;
+    }
+
     /**
      * 自定义异常处理[@@]注册Bean时依赖的Bean，会从容器中直接获取，所以直接注入即可
      *

@@ -31,7 +31,8 @@ import java.util.List;
 public class BaseGatewayConfiguration extends AbstractConfiguration {
 
     public static boolean USE_GATEWAY;
-    static {
+
+    public BaseGatewayConfiguration() {
         USE_GATEWAY = true;
     }
 

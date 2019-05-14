@@ -3,15 +3,23 @@ package com.gitee.sop.sdk;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.sdk.client.OpenClient;
+import com.gitee.sop.sdk.common.UploadFile;
+import com.gitee.sop.sdk.model.DemoFileUploadModel;
 import com.gitee.sop.sdk.model.GetStoryModel;
 import com.gitee.sop.sdk.request.CommonRequest;
+import com.gitee.sop.sdk.request.DemoFileUploadRequest;
 import com.gitee.sop.sdk.request.GetStoryRequest;
 import com.gitee.sop.sdk.response.CommonResponse;
+import com.gitee.sop.sdk.response.DemoFileUploadResponse;
 import com.gitee.sop.sdk.response.GetStoryResponse;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SdkTest extends TestCase {
@@ -68,6 +76,37 @@ public class SdkTest extends TestCase {
         } else {
             System.out.println("错误，subCode:" + response.getSubCode() + ", subMsg:" + response.getSubMsg());
         }
+    }
+
+    // 文件上传
+    @Test
+    public void testUpload() throws IOException {
+        DemoFileUploadRequest request = new DemoFileUploadRequest();
+
+        DemoFileUploadModel model = new DemoFileUploadModel();
+        model.setRemark("上传文件参数");
+        request.setBizModel(model);
+
+        List<UploadFile> files = new ArrayList<>();
+        String root = System.getProperty("user.dir");
+        System.out.println(root);
+        files.add(new UploadFile("file1", new File(root + "/src/main/resources/file1.txt")));
+        files.add(new UploadFile("file2", new File(root + "/src/main/resources/file2.txt")));
+        request.setFiles(files);
+
+        DemoFileUploadResponse response = client.execute(request);
+
+        System.out.println("--------------------");
+        if (response.isSuccess()) {
+            List<DemoFileUploadResponse.FileMeta> responseFiles = response.getFiles();
+            System.out.println("您上传的文件信息：");
+            responseFiles.stream().forEach(file->{
+                System.out.println(file);
+            });
+        } else {
+            System.out.println("errorCode:" + response.getCode() + ",errorMsg:" + response.getMsg());
+        }
+        System.out.println("--------------------");
     }
 
 }

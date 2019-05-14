@@ -6,7 +6,6 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,8 +25,6 @@ import java.util.concurrent.TimeUnit;
  * @author tanghc
  */
 public class OpenHttp {
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
     private Map<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
     private OkHttpClient httpClient;

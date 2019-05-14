@@ -34,6 +34,9 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     }
 
     protected void initOtherProperty(ApiParam apiParam) {
+        if (apiParam.size() == 0) {
+            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
+        }
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");

@@ -3,6 +3,8 @@ package com.gitee.sop.sdk.common;
 
 import com.gitee.sop.sdk.util.FileUtil;
 import com.gitee.sop.sdk.util.MD5Util;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.io.Serializable;
  * 文件上传类
  * @author tanghc
  */
+@Getter
+@Setter
 public class UploadFile implements Serializable {
     private static final long serialVersionUID = -1100614660944996398L;
 
@@ -52,37 +56,5 @@ public class UploadFile implements Serializable {
     private String fileName;
     private byte[] fileData;
     private String md5;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public byte[] getFileData() {
-        return fileData;
-    }
-
-    public void setFileData(byte[] fileData) {
-        this.fileData = fileData;
-    }
-
-    public String getMd5() {
-        return md5;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
-    }
 
 }

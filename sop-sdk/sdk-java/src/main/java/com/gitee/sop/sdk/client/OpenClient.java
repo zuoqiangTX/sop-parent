@@ -25,6 +25,7 @@ public class OpenClient {
     private static final Log log = LogFactory.getLog(OpenClient.class);
 
     private static final OpenConfig DEFAULT_CONFIG = new OpenConfig();
+    public static final String ERROR_RESPONSE_KEY = "error_response";
 
     private String url;
     private String appId;
@@ -110,6 +111,10 @@ public class OpenClient {
         String method = request.getMethod();
         String dataName = dataNameBuilder.build(method);
         JSONObject jsonObject = JSON.parseObject(resp);
+        boolean errorResponse = jsonObject.containsKey(ERROR_RESPONSE_KEY);
+        if (errorResponse) {
+            dataName = ERROR_RESPONSE_KEY;
+        }
         JSONObject data = jsonObject.getJSONObject(dataName);
         T t = data.toJavaObject(request.getResponseClass());
         t.setBody(data.toJSONString());

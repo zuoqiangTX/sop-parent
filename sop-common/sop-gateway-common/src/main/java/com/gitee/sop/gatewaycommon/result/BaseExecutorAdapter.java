@@ -132,12 +132,17 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
                 sign = String.valueOf(clientSign);
             }
         }
-
+        ApiConfig apiConfig = ApiConfig.getInstance();
         // 点换成下划线
-        DataNameBuilder dataNameBuilder = ApiConfig.getInstance().getDataNameBuilder();
+        DataNameBuilder dataNameBuilder = apiConfig.getDataNameBuilder();
         String method = dataNameBuilder.build(name);
         ret.put(method, jsonObjectService);
+        // 先隐藏返回签名字段
         ret.put(ParamNames.SIGN_NAME, sign);
+        ResultAppender resultAppender = apiConfig.getResultAppender();
+        if (resultAppender != null) {
+            resultAppender.append(ret, params);
+        }
         return ret.toJSONString();
     }
 

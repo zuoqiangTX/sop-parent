@@ -12,6 +12,7 @@ import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.DefaultDataNameBuilder;
+import com.gitee.sop.gatewaycommon.result.ResultAppender;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
 import com.gitee.sop.gatewaycommon.secret.CacheIsvManager;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
@@ -114,6 +115,11 @@ public class ApiConfig {
      * 构建数据节点名称
      */
     private DataNameBuilder dataNameBuilder = new DefaultDataNameBuilder();
+
+    /**
+     * 追加结果
+     */
+    private ResultAppender resultAppender;
 
     // -------- fields ---------
 

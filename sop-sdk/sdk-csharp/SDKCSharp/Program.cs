@@ -28,9 +28,9 @@ namespace SDKTest
 
         public static void Main(string[] args)
         {
-            //TestGet();
+            TestGet();
             //TestCommon();
-            TestUpload();
+            //TestUpload();
         }
 
         // 标准用法

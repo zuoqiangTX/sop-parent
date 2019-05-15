@@ -21,6 +21,7 @@ namespace SDKCSharp.Client
     {
 
         private static OpenConfig DEFAULT_CONFIG = new OpenConfig();
+        private const String ERROR_RESPONSE_KEY = "error_response";
 
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
@@ -137,6 +138,11 @@ namespace SDKCSharp.Client
             string method = request.Method;
             string dataName = this.dataNameBuilder.Build(method);
             Dictionary<string, object> jsonObject = JsonUtil.ParseToDictionary(resp);
+            bool errorResponse = jsonObject.ContainsKey(ERROR_RESPONSE_KEY);
+            if (errorResponse)
+            {
+                dataName = ERROR_RESPONSE_KEY;
+            }
             object data = jsonObject[dataName];
             string jsonData = data == null ? "{}" : data.ToString();           
             T t = JsonUtil.ParseObject<T>(jsonData);

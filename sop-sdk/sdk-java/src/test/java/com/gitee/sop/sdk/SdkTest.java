@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,12 +86,11 @@ public class SdkTest extends TestCase {
         model.setRemark("上传文件参数");
         request.setBizModel(model);
 
-        List<UploadFile> files = new ArrayList<>();
         String root = System.getProperty("user.dir");
         System.out.println(root);
-        files.add(new UploadFile("file1", new File(root + "/src/main/resources/file1.txt")));
-        files.add(new UploadFile("file2", new File(root + "/src/main/resources/file2.txt")));
-        request.setFiles(files);
+        // 这里演示将resources下的两个文件上传到服务器
+        request.addFile(new UploadFile("file1", new File(root + "/src/main/resources/file1.txt")));
+        request.addFile(new UploadFile("file2", new File(root + "/src/main/resources/file2.txt")));
 
         DemoFileUploadResponse response = client.execute(request);
 

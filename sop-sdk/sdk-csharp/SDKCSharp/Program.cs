@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using SDKCSharp.Client;
 using SDKCSharp.Common;
 using SDKCSharp.Model;
@@ -27,8 +28,9 @@ namespace SDKTest
 
         public static void Main(string[] args)
         {
-            TestGet();
-            TestCommon();
+            //TestGet();
+            //TestCommon();
+            TestUpload();
         }
 
         // 标准用法
@@ -88,6 +90,42 @@ namespace SDKTest
             {
                 Console.WriteLine("错误, code:{0}, msg:{1}, subCode:{2}, subMsg:{3}",
                     response.Code, response.Msg, response.SubCode, response.SubMsg);
+            }
+        }
+
+        private static void TestUpload()
+        {
+            DemoFileUploadRequest request = new DemoFileUploadRequest();
+
+            DemoFileUploadModel model = new DemoFileUploadModel
+            {
+                Remark = "上传文件参数"
+            };
+            request.BizModel = model;
+
+            string root = Environment.CurrentDirectory;
+            Console.WriteLine("当前目录{0}", root);
+
+            // 文件上传
+            // 将当前目录下的两个文件上传到服务器
+            request.AddFile(new UploadFile("file1", root + "/file1.txt"));
+            request.AddFile(new UploadFile("file2", root + "/file2.txt"));
+
+            DemoFileUploadResponse response = client.Execute(request);
+            if (response.IsSuccess())
+            {
+                List<DemoFileUploadResponse.FileMeta> responseFiles = response.Files;
+                Console.WriteLine("您上传的文件信息：");
+                responseFiles.ForEach(file =>
+                {
+                    Console.WriteLine("上传的文件名：{0}，文件大小：{1}，文件内容：{2}", file.Filename, file.Size, file.Content);
+                }
+                );
+            }
+            else
+            {
+                Console.WriteLine("错误, code:{0}, msg:{1}, subCode:{2}, subMsg:{3}",
+                     response.Code, response.Msg, response.SubCode, response.SubMsg);
             }
         }
     }

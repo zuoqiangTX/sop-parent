@@ -7,10 +7,13 @@ import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ParamNames;
 import lombok.Data;
 import org.springframework.core.MethodParameter;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import java.util.Map;
 
@@ -49,8 +52,9 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
         String bizContent = nativeWebRequest.getParameter(ParamNames.BIZ_CONTENT_NAME);
         Class<?> parameterType = methodParameter.getParameterType();
+        Object bizObj = null;
         if (bizContent != null) {
-            return JSON.parseObject(bizContent, parameterType);
+            bizObj = JSON.parseObject(bizContent, parameterType);
         } else {
             Map<String, String[]> parameterMap = nativeWebRequest.getParameterMap();
             JSONObject result = new JSONObject();
@@ -60,10 +64,33 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
                 }
             });
             if (result.size() > 0) {
-                return result.toJavaObject(parameterType);
+                bizObj = result.toJavaObject(parameterType);
             }
         }
-        return null;
+        this.bindUploadFile(bizObj, nativeWebRequest);
+        return bizObj;
+    }
+
+    /**
+     * 将文件绑定到
+     * @param bizObj 业务参数
+     * @param nativeWebRequest
+     */
+    protected void bindUploadFile(Object bizObj, NativeWebRequest nativeWebRequest) {
+        if (bizObj == null) {
+            return;
+        }
+        Object nativeRequest = nativeWebRequest.getNativeRequest();
+        if (nativeRequest instanceof StandardMultipartHttpServletRequest) {
+            StandardMultipartHttpServletRequest request = (StandardMultipartHttpServletRequest) nativeRequest;
+            Class<?> bizClass = bizObj.getClass();
+            ReflectionUtils.doWithFields(bizClass, field -> {
+                ReflectionUtils.makeAccessible(field);
+                String name = field.getName();
+                MultipartFile multipartFile = request.getFile(name);
+                ReflectionUtils.setField(field, bizObj, multipartFile);
+            }, field -> field.getType() == MultipartFile.class);
+        }
     }
 
 }

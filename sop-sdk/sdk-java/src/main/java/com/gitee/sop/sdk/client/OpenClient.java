@@ -25,7 +25,7 @@ public class OpenClient {
     private static final Log log = LogFactory.getLog(OpenClient.class);
 
     private static final OpenConfig DEFAULT_CONFIG = new OpenConfig();
-    public static final String ERROR_RESPONSE_KEY = "error_response";
+    private static final String ERROR_RESPONSE_KEY = "error_response";
 
     private String url;
     private String appId;

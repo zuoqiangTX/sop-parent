@@ -60,6 +60,18 @@ namespace SDKCSharp.Request
             this.version = version == null ? SdkConfig.DEFAULT_VERSION : version;
         }
 
+        /// <summary>
+        /// 添加上传文件
+        /// </summary>
+        /// <param name="file">File.</param>
+        public void AddFile(UploadFile file)
+        {
+            if(this.files == null)
+            {
+                this.files = new List<UploadFile>();
+            }
+            this.files.Add(file);
+        }
 
         /// <summary>
         /// 创建请求表单

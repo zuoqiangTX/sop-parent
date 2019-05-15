@@ -16,7 +16,11 @@ public class FormBodyWrapperFilterExt extends FormBodyWrapperFilter {
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        // 不是上传文件请求，则进行包装
-        return !RequestUtil.isMultipart(request);
+        // 如果是文件上传请求，不需要包装
+        if (RequestUtil.isMultipart(request)) {
+            return false;
+        } else {
+            return super.shouldFilter();
+        }
     }
 }

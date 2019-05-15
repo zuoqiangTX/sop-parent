@@ -131,6 +131,7 @@ namespace SDKCSharp.Client
             }
         }
 
+
         /// <summary>
         /// post请求，并且文件上传
         /// </summary>
@@ -141,77 +142,126 @@ namespace SDKCSharp.Client
         /// <returns></returns>
         public string PostFile(string url, Dictionary<string, string> form, Dictionary<string, string> header, List<UploadFile> files)
         {
-            Encoding ENCODING_UTF8 = Encoding.UTF8;
+            HttpWebRequest request = CreateWebRequest(url, header);
+            request.Method = METHOD_POST;
+            // 分隔符
+            string boundary = "----" + DateTime.Now.Ticks.ToString("x");
+            request.ContentType = string.Format("multipart/form-data; boundary={0}", boundary);
 
-            using (MemoryStream memoryStream = new MemoryStream())
+            // 请求流
+            var postStream = new MemoryStream();
+            #region 处理Form表单请求内容
+            // 文件数据模板
+            string fileFormdataTemplate =
+                "\r\n--" + boundary +
+                "\r\nContent-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"" +
+                "\r\nContent-Type: application/octet-stream" +
+                "\r\n\r\n";
+            // 文本数据模板
+            string dataFormdataTemplate =
+                "\r\n--" + boundary +
+                "\r\nContent-Disposition: form-data; name=\"{0}\"" +
+                "\r\n\r\n{1}";
+
+            // 是否有上传文件
+            bool hasFile = files != null && files.Count > 0;
+            if (hasFile)
             {
-                // 1.分界线
-                string boundary = string.Format("----{0}", DateTime.Now.Ticks.ToString("x")),       // 分界线可以自定义参数
-                    appendBoundary = string.Format("--{0}\r\n", boundary),
-                    endBoundary = string.Format("\r\n--{0}--\r\n", boundary);
-
-                byte[] beginBoundaryBytes = ENCODING_UTF8.GetBytes(appendBoundary),
-                    endBoundaryBytes = ENCODING_UTF8.GetBytes(endBoundary);
-
-
-                StringBuilder payload = new StringBuilder();
-
-                // 2.组装 上传文件附加携带的参数 到内存流中
-                if (form != null && form.Count > 0)
+                // 处理上传文件
+                foreach (var fileItem in files)
                 {
-                    ICollection<string> keys = form.Keys;
-                    foreach (string key in keys)
+                    string formdata = null;
+                    // 上传文件
+                    formdata = string.Format(
+                        fileFormdataTemplate,
+                        fileItem.Name, //表单键
+                        fileItem.FileName);
+
+                    byte[] formdataBytes = null;
+                    // 第一行不需要换行
+                    if (postStream.Length == 0)
                     {
-                        string boundaryBlock = string.Format("{0}Content-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}\r\n", appendBoundary, key, form[key]);
-                        byte[] boundaryBlockBytes = ENCODING_UTF8.GetBytes(boundaryBlock);
-                        memoryStream.Write(boundaryBlockBytes, 0, boundaryBlockBytes.Length);
+                        formdataBytes = Encoding.UTF8.GetBytes(formdata.Substring(2, formdata.Length - 2));
+                    }
+                    else
+                    {
+                        formdataBytes = Encoding.UTF8.GetBytes(formdata);
+                    }
+                    postStream.Write(formdataBytes, 0, formdataBytes.Length);
+
+                    // 写入文件内容
+                    if (fileItem.FileData != null && fileItem.FileData.Length > 0)
+                    {
+                        postStream.Write(fileItem.FileData, 0, fileItem.FileData.Length);
                     }
                 }
-
-                // 3.组装文件头数据体 到内存流中
-                foreach (UploadFile uploadFile in files)
+            }
+            // 处理文本字段
+            foreach (var fieldItem in form)
+            {
+                string formdata = null;
                 {
-                    string boundaryBlock = string.Format("{0}Content-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: application/octet-stream\r\n\r\n", appendBoundary, uploadFile.Name, uploadFile.FileName);
-                    byte[] boundaryBlockBytes = ENCODING_UTF8.GetBytes(boundaryBlock);
-                    memoryStream.Write(boundaryBlockBytes, 0, boundaryBlockBytes.Length);
-                    memoryStream.Write(uploadFile.FileData, 0, uploadFile.FileData.Length);
+                    // 上传文本
+                    formdata = string.Format(
+                        dataFormdataTemplate,
+                        fieldItem.Key,
+                        fieldItem.Value);
                 }
 
-                // 4.组装结束分界线数据体 到内存流中
-                memoryStream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
-
-                // 5.获取二进制数据,最终需要发送给服务器的数据
-                byte[] postBytes = memoryStream.ToArray();
-
-                // 6.HttpWebRequest 组装
-                HttpWebRequest webRequest = CreateWebRequest(url, header);
-                webRequest.Method = METHOD_POST;
-                webRequest.ContentType = string.Format("multipart/form-data; boundary={0}", boundary);
-                webRequest.ContentLength = postBytes.Length;
-                BindHeader(webRequest, header);
-                if (Regex.IsMatch(url, "^https://"))
+                byte[] formdataBytes = null;
+                // 第一行不需要换行
+                if (postStream.Length == 0)
                 {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
-                    ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
+                    formdataBytes = Encoding.UTF8.GetBytes(formdata.Substring(2, formdata.Length - 2));
+                }
+                else
+                {
+                    formdataBytes = Encoding.UTF8.GetBytes(formdata);
+                }
+                postStream.Write(formdataBytes, 0, formdataBytes.Length);
+            }
+            // 结尾
+            var footer = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+            postStream.Write(footer, 0, footer.Length);
+            #endregion
+
+            request.ContentLength = postStream.Length;
+
+            #region 输入二进制流
+            if (postStream != null)
+            {
+                postStream.Position = 0;
+                // 直接写入流
+                Stream requestStream = request.GetRequestStream();
+
+                byte[] buffer = new byte[1024];
+                int bytesRead = 0;
+                while ((bytesRead = postStream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    requestStream.Write(buffer, 0, bytesRead);
                 }
 
-                // 7.写入上传请求数据
-                using (Stream requestStream = webRequest.GetRequestStream())
-                {
-                    requestStream.Write(postBytes, 0, postBytes.Length);
-                }
-                // 8.获取响应
-                using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
-                {
-                    using (StreamReader reader = new StreamReader(webResponse.GetResponseStream(), ENCODING_UTF8))
-                    {
-                        string body = reader.ReadToEnd();
-                        return body;
-                    }
-                }
+                ////debug
+                //postStream.Seek(0, SeekOrigin.Begin);
+                //StreamReader sr = new StreamReader(postStream);
+                //var postStr = sr.ReadToEnd();
+                postStream.Close();//关闭文件访问
+            }
+            #endregion
 
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            if (cookieContainer != null)
+            {
+                response.Cookies = cookieContainer.GetCookies(response.ResponseUri);
             }
 
+            using (Stream responseStream = response.GetResponseStream())
+            {
+                using (StreamReader myStreamReader = new StreamReader(responseStream, Encoding.UTF8))
+                {
+                    return myStreamReader.ReadToEnd();
+                }
+            }
         }
 
         static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)

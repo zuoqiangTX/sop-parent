@@ -9,6 +9,7 @@ import com.gitee.sop.sdk.response.BaseResponse;
 import com.gitee.sop.sdk.util.ClassUtil;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +70,17 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     protected String version() {
         return SdkConfig.DEFAULT_VERSION;
+    }
+
+    /**
+     * 添加上传文件
+     * @param file
+     */
+    public void addFile(UploadFile file) {
+        if (this.files == null) {
+            this.files = new ArrayList<>();
+        }
+        this.files.add(file);
     }
 
     public RequestForm createRequestForm(OpenConfig openConfig) {

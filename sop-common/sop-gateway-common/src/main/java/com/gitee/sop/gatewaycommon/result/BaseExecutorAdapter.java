@@ -120,16 +120,11 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     public String merge(T exchange, JSONObject jsonObjectService) {
         JSONObject ret = new JSONObject();
         String name = "error";
-        String sign = "";
         Map<String, ?> params = this.getApiParam(exchange);
         if (params != null) {
             Object method = params.get(ParamNames.API_NAME);
             if (method != null) {
                 name = String.valueOf(method);
-            }
-            Object clientSign = params.get(ParamNames.SIGN_NAME);
-            if (clientSign != null) {
-                sign = String.valueOf(clientSign);
             }
         }
         ApiConfig apiConfig = ApiConfig.getInstance();
@@ -137,13 +132,30 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         DataNameBuilder dataNameBuilder = apiConfig.getDataNameBuilder();
         String method = dataNameBuilder.build(name);
         ret.put(method, jsonObjectService);
-        // 先隐藏返回签名字段
-        ret.put(ParamNames.SIGN_NAME, sign);
+        this.appendReturnSign(apiConfig, params, ret);
         ResultAppender resultAppender = apiConfig.getResultAppender();
         if (resultAppender != null) {
             resultAppender.append(ret, params);
         }
         return ret.toJSONString();
+    }
+
+    protected void appendReturnSign(ApiConfig apiConfig, Map<String, ?> params, JSONObject ret) {
+        if (apiConfig.isShowReturnSign() && params != null) {
+            Object appKey = params.get(ParamNames.APP_KEY_NAME);
+            String sign = this.createReturnSign(String.valueOf(appKey));
+            ret.put(ParamNames.SIGN_NAME, sign);
+        }
+    }
+
+    /**
+     * 这里需要使用平台的私钥生成一个sign，需要配置两套公私钥。目前暂未实现
+     * @param appKey
+     * @return
+     */
+    protected String createReturnSign(String appKey) {
+        // TODO: 返回sign
+        return null;
     }
 
 }

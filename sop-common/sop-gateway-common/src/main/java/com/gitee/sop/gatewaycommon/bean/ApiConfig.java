@@ -150,6 +150,11 @@ public class ApiConfig {
      */
     private boolean openLimit = true;
 
+    /**
+     * 显示返回sign
+     */
+    private boolean showReturnSign = true;
+
     public void addAppSecret(Map<String, String> appSecretPair) {
         for (Map.Entry<String, String> entry : appSecretPair.entrySet()) {
             this.isvManager.update(new IsvDefinition(entry.getKey(), entry.getValue()));

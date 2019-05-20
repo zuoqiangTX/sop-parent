@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="searchFormData" class="demo-form-inline">
+    <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
       <el-form-item label="serviceId">
-        <el-input v-model="searchFormData.serviceId" :clearable="true" placeholder="serviceId" size="mini" style="width: 250px;" />
+        <el-input v-model="searchFormData.serviceId" :clearable="true" placeholder="serviceId" style="width: 250px;" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="onSearchTable">查询</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="onSearchTable">查询</el-button>
       </el-form-item>
     </el-form>
     <el-table

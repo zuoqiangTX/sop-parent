@@ -49,6 +49,10 @@ public class AbstractConfiguration implements ApplicationContextAware {
         return ApiConfig.getInstance().getRouteConfigManager();
     }
 
+    @Bean
+    LimitConfigManager limitConfigManager() {
+        return ApiConfig.getInstance().getLimitConfigManager();
+    }
     /**
      * 跨域过滤器
      *

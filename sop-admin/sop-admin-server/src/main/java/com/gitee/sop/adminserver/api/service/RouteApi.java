@@ -81,6 +81,21 @@ public class RouteApi {
         return routeDefinitionList;
     }
 
+    @Api(name = "route.list", version = "1.2")
+    @ApiDocMethod(description = "路由列表1.2")
+    List<RouteVO> listRoute2(RouteSearchParam param) throws Exception {
+        List<RouteVO> routeDefinitionList = routeService.getRouteDefinitionList(param)
+                .stream()
+                .map(gatewayRouteDefinition -> {
+                    RouteVO vo = new RouteVO();
+                    BeanUtils.copyProperties(gatewayRouteDefinition, vo);
+                    return vo;
+                })
+                .collect(Collectors.toList());
+
+        return routeDefinitionList;
+    }
+
     @Api(name = "route.update")
     @ApiDocMethod(description = "修改路由")
     void updateRoute(RouteParam param) throws Exception {

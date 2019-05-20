@@ -1,20 +1,19 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="searchFormData" class="demo-form-inline">
+    <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
       <el-form-item label="appKey">
-        <el-input v-model="searchFormData.appKey" :clearable="true" placeholder="appKey" size="mini" style="width: 250px;" />
+        <el-input v-model="searchFormData.appKey" :clearable="true" placeholder="appKey" style="width: 250px;" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="onSearchTable">查询</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="onSearchTable">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-button type="primary" size="mini" icon="el-icon-plus" @click="onAdd">新增ISV</el-button>
+    <el-button type="primary" size="mini" icon="el-icon-plus" style="margin-bottom: 10px;" @click="onAdd">新增ISV</el-button>
     <el-table
       :data="pageInfo.list"
       border
       fit
       highlight-current-row
-      style="margin-top: 20px;"
     >
       <el-table-column
         prop="id"
@@ -110,34 +109,40 @@
       :close-on-click-modal="false"
       @close="onIsvDialogClose"
     >
-      <el-form ref="isvForm" :rules="rulesIsvForm" :model="isvDialogFormData">
-        <el-form-item label="" :label-width="formLabelWidth">
+      <el-form
+        ref="isvForm"
+        :rules="rulesIsvForm"
+        :model="isvDialogFormData"
+        label-width="120px"
+        size="mini"
+      >
+        <el-form-item label="">
           <el-button size="mini" @click="onDataGen">一键生成数据</el-button>
         </el-form-item>
-        <el-form-item prop="appKey" label="appKey" :label-width="formLabelWidth">
+        <el-form-item prop="appKey" label="appKey">
           <el-input v-model="isvDialogFormData.appKey" size="mini" />
         </el-form-item>
-        <el-form-item prop="signType" label="签名方式" :label-width="formLabelWidth">
+        <el-form-item prop="signType" label="签名方式">
           <el-radio-group v-model="isvDialogFormData.signType">
             <el-radio :label="1" name="status">RSA2</el-radio>
             <el-radio :label="2" name="status">MD5</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 2" prop="secret" label="secret" :label-width="formLabelWidth">
+        <el-form-item v-show="isvDialogFormData.signType === 2" prop="secret" label="secret">
           <el-input v-model="isvDialogFormData.secret" size="mini" />
         </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 1" prop="pubKey" label="公钥" :label-width="formLabelWidth">
+        <el-form-item v-show="isvDialogFormData.signType === 1" prop="pubKey" label="公钥">
           <el-input v-model="isvDialogFormData.pubKey" type="textarea" />
         </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 1" prop="priKey" label="私钥" :label-width="formLabelWidth">
+        <el-form-item v-show="isvDialogFormData.signType === 1" prop="priKey" label="私钥">
           <el-input v-model="isvDialogFormData.priKey" type="textarea" />
         </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth">
+        <el-form-item label="角色">
           <el-checkbox-group v-model="isvDialogFormData.roleCode">
             <el-checkbox v-for="item in roles" :key="item.roleCode" :label="item.roleCode">{{ item.description }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth">
+        <el-form-item label="状态">
           <el-radio-group v-model="isvDialogFormData.status">
             <el-radio :label="1" name="status">启用</el-radio>
             <el-radio :label="2" name="status">禁用</el-radio>
@@ -175,7 +180,6 @@ export default {
       callback()
     }
     return {
-      formLabelWidth: '120px',
       searchFormData: {
         appKey: ''
       },

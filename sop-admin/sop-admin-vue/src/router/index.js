@@ -76,7 +76,7 @@ export const constantRoutes = [
       {
         path: 'limit',
         name: 'Limit',
-        component: () => import('@/views/service/limit/index'),
+        component: () => import('@/views/service/limit/index2'),
         meta: { title: '限流管理' }
       }
     ]

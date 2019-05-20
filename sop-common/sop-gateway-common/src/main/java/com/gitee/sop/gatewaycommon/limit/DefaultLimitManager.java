@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.limit;
 
+import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
@@ -14,24 +15,24 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultLimitManager implements LimitManager {
 
     @Override
-    public double acquireToken(RouteConfig routeConfig) {
+    public double acquireToken(ConfigLimitDto routeConfig) {
         if (routeConfig.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
             return 0;
         }
         if (LimitType.LEAKY_BUCKET.getType() == routeConfig.getLimitType().byteValue()) {
-            throw new IllegalStateException("漏桶策略无法调用此方法");
+            return 0;
         }
         return routeConfig.fetchRateLimiter().acquire();
     }
 
 
     @Override
-    public boolean acquire(RouteConfig routeConfig) {
+    public boolean acquire(ConfigLimitDto routeConfig) {
         if (routeConfig.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
             return true;
         }
         if (LimitType.TOKEN_BUCKET.getType() == routeConfig.getLimitType().byteValue()) {
-            throw new IllegalStateException("令牌桶策略无法调用此方法");
+            return true;
         }
         int execCountPerSecond = routeConfig.getExecCountPerSecond();
         long currentSeconds = System.currentTimeMillis() / 1000;

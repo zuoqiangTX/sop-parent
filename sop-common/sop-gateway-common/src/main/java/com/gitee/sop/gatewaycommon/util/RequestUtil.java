@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -126,4 +128,31 @@ public class RequestUtil {
         return IOUtils.toString(request.getInputStream(), UTF8);
     }
 
+    public static String getIP(HttpServletRequest request) {
+        String ipAddress = request.getHeader("x-forwarded-for");
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+            if ("127.0.0.1".equals(ipAddress)) {
+                try {
+                    InetAddress inet = InetAddress.getLocalHost();
+                    ipAddress = inet.getHostAddress();
+                } catch (UnknownHostException var3) {
+                }
+            }
+        }
+
+        if (ipAddress != null && ipAddress.length() > 15 && ipAddress.indexOf(",") > 0) {
+            ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+        }
+
+        return ipAddress;
+    }
 }

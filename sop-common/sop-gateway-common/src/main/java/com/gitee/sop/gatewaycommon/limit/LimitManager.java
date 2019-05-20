@@ -1,6 +1,6 @@
 package com.gitee.sop.gatewaycommon.limit;
 
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
 
 /**
  * 限流管理
@@ -15,7 +15,7 @@ public interface LimitManager {
      * @param routeConfig 路由配置
      * @return 返回耗时时间，秒
      */
-    double acquireToken(RouteConfig routeConfig);
+    double acquireToken(ConfigLimitDto routeConfig);
 
     /**
      * 是否需要限流，如果使用{@link LimitType#LEAKY_BUCKET
@@ -24,6 +24,6 @@ public interface LimitManager {
      * @param routeConfig 路由配置
      * @return 如果返回true，表示可以执行业务代码，返回false则需要限流
      */
-    boolean acquire(RouteConfig routeConfig);
+    boolean acquire(ConfigLimitDto routeConfig);
 
 }

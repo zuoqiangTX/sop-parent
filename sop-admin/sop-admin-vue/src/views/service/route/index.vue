@@ -27,12 +27,12 @@
         </el-tree>
       </el-aside>
       <el-main style="padding-top:0">
-        <el-form :inline="true" :model="searchFormData" class="demo-form-inline">
+        <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
           <el-form-item label="路由名称">
-            <el-input v-model="searchFormData.id" placeholder="输入接口名或版本号" size="mini" />
+            <el-input v-model="searchFormData.id" placeholder="输入接口名或版本号" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="onSearchTable">查询</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="onSearchTable">查询</el-button>
           </el-form-item>
         </el-form>
         <el-table
@@ -111,17 +111,21 @@
         </el-table>
         <!-- route dialog -->
         <el-dialog title="修改路由" :visible.sync="routeDialogVisible" :close-on-click-modal="false">
-          <el-form :model="routeDialogFormData">
-            <el-form-item label="id" :label-width="formLabelWidth">
+          <el-form
+            :model="routeDialogFormData"
+            label-width="120px"
+            size="mini"
+          >
+            <el-form-item label="id">
               <el-input v-model="routeDialogFormData.id" readonly="readonly" />
             </el-form-item>
-            <el-form-item label="uri" :label-width="formLabelWidth">
+            <el-form-item label="uri">
               <el-input v-model="routeDialogFormData.uri" />
             </el-form-item>
-            <el-form-item label="path" :label-width="formLabelWidth">
+            <el-form-item label="path">
               <el-input v-model="routeDialogFormData.path" />
             </el-form-item>
-            <el-form-item label="状态" :label-width="formLabelWidth">
+            <el-form-item label="状态">
               <el-radio-group v-model="routeDialogFormData.status">
                 <el-radio :label="1" name="status">启用</el-radio>
                 <el-radio :label="2" name="status" style="color:#F56C6C">禁用</el-radio>
@@ -134,12 +138,16 @@
           </div>
         </el-dialog>
         <!-- auth dialog -->
-        <el-dialog title="修改路由" :visible.sync="authDialogVisible" :close-on-click-modal="false">
-          <el-form :model="authDialogFormData">
-            <el-form-item label="id" :label-width="formLabelWidth">
+        <el-dialog title="路由授权" :visible.sync="authDialogVisible" :close-on-click-modal="false">
+          <el-form
+            :model="authDialogFormData"
+            label-width="120px"
+            size="mini"
+          >
+            <el-form-item label="id">
               <el-input v-model="authDialogFormData.routeId" readonly="readonly" />
             </el-form-item>
-            <el-form-item label="角色" :label-width="formLabelWidth">
+            <el-form-item label="角色">
               <el-checkbox-group v-model="authDialogFormData.roleCode">
                 <el-checkbox v-for="item in roles" :key="item.roleCode" :label="item.roleCode">{{ item.description }}</el-checkbox>
               </el-checkbox-group>
@@ -172,9 +180,7 @@ export default {
       routeDialogFormData: {
         status: 1
       },
-      formLabelWidth: '120px',
       routeDialogVisible: false,
-
       roles: [],
       authDialogFormData: {
         routeId: '',

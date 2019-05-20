@@ -76,6 +76,10 @@ public class ZookeeperContext {
         return SOP_MSG_CHANNEL_PATH + "/route-conf";
     }
 
+    public static String getLimitConfigChannelPath() {
+        return SOP_MSG_CHANNEL_PATH + "/limit-conf";
+    }
+
     public static CuratorFramework getClient() {
         return client;
     }

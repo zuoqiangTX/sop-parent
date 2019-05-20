@@ -6,8 +6,10 @@ import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
 import com.gitee.sop.gatewaycommon.limit.DefaultLimitManager;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultLimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
@@ -105,6 +107,11 @@ public class ApiConfig {
      * 路由配置管理
      */
     private RouteConfigManager routeConfigManager = new DefaultRouteConfigManager();
+
+    /**
+     * 限流配置
+     */
+    private LimitConfigManager limitConfigManager = new DefaultLimitConfigManager();
 
     /**
      * 限流管理

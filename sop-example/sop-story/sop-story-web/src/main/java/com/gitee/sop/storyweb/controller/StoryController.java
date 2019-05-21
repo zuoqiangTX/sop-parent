@@ -1,9 +1,11 @@
 package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
+import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
 import com.gitee.sop.story.api.service.StoryService;
+import lombok.Data;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,7 +64,7 @@ public class StoryController implements StoryService {
     // http://localhost:2222/story/getStory2
     // 遗留接口具备开放平台能力
     @ApiAbility
-    @RequestMapping("getStory2")
+    @GetMapping("getStory2")
     public Story getStory2_0() {
         Story story = new Story();
         story.setId(1);
@@ -81,5 +83,31 @@ public class StoryController implements StoryService {
         return story;
     }
 
+    // 测试参数绑定
+    @ApiAbility
+    @GetMapping("getStory3")
+    public Story getStory3(String id) {
+        System.out.println(id);
+        Story story = new Story();
+        story.setId(1);
+        story.setName("海底小纵队(默认版本号)");
+        return story;
+    }
+
+    // 测试参数绑定，http://localhost:2222/story/getStory4?biz_content={"id":1, "name":"aaaa"}
+    @ApiAbility
+    @GetMapping("getStory4")
+    public Story getStory4(Story param, P p2) {
+        System.out.println(param + ", p2=" + p2);
+        Story story = new Story();
+        story.setId(1);
+        story.setName("海底小纵队(默认版本号)");
+        return story;
+    }
+
+    @Data
+    public static class P {
+        private String name;
+    }
 
 }

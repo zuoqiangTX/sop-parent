@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultLimitConfigManager implements LimitConfigManager {
 
+    public static final int LIMIT_STATUS_CLOSED = 0;
     /**
      * key: limitKey
      */
@@ -25,9 +26,12 @@ public class DefaultLimitConfigManager implements LimitConfigManager {
 
     @Override
     public void update(ConfigLimitDto configLimitDto) {
-        configLimitDto.initRateLimiter();
         Long id = configLimitDto.getId();
         this.remove(id);
+        if (configLimitDto.getLimitStatus().intValue() == LIMIT_STATUS_CLOSED) {
+            return;
+        }
+        configLimitDto.initRateLimiter();
         Set<String> keys = this.buildKeys(configLimitDto);
         idKeyMap.put(id, keys);
         for (String key : keys) {

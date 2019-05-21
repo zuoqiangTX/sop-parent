@@ -93,6 +93,12 @@
             width="80"
           />
           <el-table-column
+            prop="remark"
+            label="备注"
+            width="150"
+            :show-overflow-tooltip="true"
+          />
+          <el-table-column
             prop="gmtCreate"
             label="创建时间"
             width="160"
@@ -115,9 +121,9 @@
         <el-pagination
           background
           style="margin-top: 5px"
-          :current-page="pageInfo.pageIndex"
+          :current-page="searchFormData.pageIndex"
+          :page-size="searchFormData.pageSize"
           :page-sizes="[5, 10, 20, 40]"
-          :page-size="pageInfo.pageSize"
           :total="pageInfo.total"
           layout="total, sizes, prev, pager, next"
           @size-change="onSizeChange"
@@ -198,6 +204,9 @@
             <el-form-item v-show="isTokenType()" label="令牌桶容量" prop="tokenBucketCount" :rules="isTokenType() ? rulesLimit.tokenBucketCount : []">
               <el-input-number v-model="limitDialogFormData.tokenBucketCount" controls-position="right" :min="1" />
             </el-form-item>
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="limitDialogFormData.remark" type="textarea" :rows="2" />
+            </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="limitDialogVisible = false">取 消</el-button>
@@ -217,11 +226,12 @@ export default {
       treeData: [],
       tableData: [],
       serviceId: '',
-      searchFormData: {},
+      searchFormData: {
+        pageIndex: 1,
+        pageSize: 5
+      },
       pageInfo: {
         list: [],
-        pageIndex: 1,
-        pageSize: 10,
         total: 0
       },
       routeList: [],
@@ -245,6 +255,7 @@ export default {
         limitStatus: 0, // 0: 停用，1：启用
         limitType: 1,
         orderIndex: 0,
+        remark: '',
         typeKey: []
       },
       rulesLimit: {
@@ -281,6 +292,9 @@ export default {
         ],
         orderIndex: [
           { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        remark: [
+          { max: 128, message: '长度不能超过128字符', trigger: 'blur' }
         ]
       }
 
@@ -459,21 +473,19 @@ export default {
     limitRender: function(row) {
       const html = []
       const val = []
-      html.push('(')
       if (row.routeId) {
         val.push(row.routeId)
         html.push('路由ID')
       }
       if (row.appKey) {
-        val.push(' + ' + row.appKey)
-        html.push(' + AppKey')
+        val.push(row.appKey)
+        html.push('AppKey')
       }
       if (row.limitIp) {
-        val.push(' + ' + row.limitIp)
-        html.push(' + IP')
+        val.push(row.limitIp)
+        html.push('IP')
       }
-      html.push(')')
-      return val.join('') + '<br>' + html.join('')
+      return val.join(' + ') + '<br>(' + html.join(' + ') + ')'
     }
   }
 }

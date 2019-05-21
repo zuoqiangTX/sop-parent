@@ -3,6 +3,7 @@ package com.gitee.sop.adminserver.api.service.param;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import com.gitee.fastmybatis.core.query.Operator;
 import com.gitee.fastmybatis.core.query.annotation.Condition;
+import com.gitee.fastmybatis.core.query.param.PageParam;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +12,10 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LimitNewParam extends ServiceSearchParam {
+public class LimitNewParam extends PageParam {
+    @ApiDocField(description = "服务名serviceId")
+    private String serviceId;
+
     @ApiDocField(description = "路由id")
     @Condition(operator = Operator.like)
     private String routeId;

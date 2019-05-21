@@ -3,10 +3,10 @@ package com.gitee.sop.servercommon.bean;
 import com.gitee.sop.servercommon.configuration.DefaultGlobalExceptionHandler;
 import com.gitee.sop.servercommon.configuration.GlobalExceptionHandler;
 import com.gitee.sop.servercommon.param.ApiArgumentResolver;
+import com.gitee.sop.servercommon.param.SopHandlerMethodArgumentResolver;
 import com.gitee.sop.servercommon.result.DefaultServiceResultBuilder;
 import com.gitee.sop.servercommon.result.ServiceResultBuilder;
 import lombok.Data;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ServiceConfig {
     /**
      * 解析业务参数
      */
-    private HandlerMethodArgumentResolver methodArgumentResolver = new ApiArgumentResolver();
+    private SopHandlerMethodArgumentResolver methodArgumentResolver = new ApiArgumentResolver();
 
     /**
      * 返回结果处理

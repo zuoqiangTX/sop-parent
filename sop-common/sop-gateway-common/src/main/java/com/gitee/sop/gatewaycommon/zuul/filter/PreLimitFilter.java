@@ -25,6 +25,9 @@ import java.util.List;
  * @author tanghc
  */
 public class PreLimitFilter extends BaseZuulFilter {
+
+    public static final int LIMIT_STATUS_OPEN = 1;
+
     @Override
     protected FilterType getFilterType() {
         return FilterType.PRE;
@@ -73,20 +76,27 @@ public class PreLimitFilter extends BaseZuulFilter {
         String appKey = apiParam.fetchAppKey();
         String ip = RequestUtil.getIP(request);
 
+        // 最多7种情况
         String[] limitKeys = new String[]{
-                routeId,
-                appKey,
-                routeId + appKey,
+                routeId, // 根据路由ID限流
+                appKey, // 根据appKey限流
+                routeId + appKey, // 根据路由ID + appKey限流
 
-                ip + routeId,
-                ip + appKey,
-                ip + routeId + appKey,
+                ip, // 根据ip限流
+                ip + routeId, // 根据ip+路由id限流
+                ip + appKey, // 根据ip+appKey限流
+                ip + routeId + appKey, // 根据ip+路由id+appKey限流
         };
 
         List<ConfigLimitDto> limitConfigList = new ArrayList<>();
         for (String limitKey : limitKeys) {
             ConfigLimitDto configLimitDto = limitConfigManager.get(limitKey);
-            limitConfigList.add(configLimitDto);
+            if (configLimitDto == null) {
+                continue;
+            }
+            if (configLimitDto.getLimitStatus().intValue() == LIMIT_STATUS_OPEN) {
+                limitConfigList.add(configLimitDto);
+            }
         }
         if (limitConfigList.isEmpty()) {
             return null;

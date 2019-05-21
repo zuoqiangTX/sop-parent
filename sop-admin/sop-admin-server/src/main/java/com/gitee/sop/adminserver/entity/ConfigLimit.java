@@ -58,6 +58,9 @@ public class ConfigLimit {
     /** 顺序，值小的优先执行, 数据库字段：order_index */
     private Integer orderIndex;
 
+    /** 备注, 数据库字段：remark */
+    private String remark;
+
     /**  数据库字段：gmt_create */
     private Date gmtCreate;
 

@@ -1,11 +1,9 @@
 package com.gitee.sop.servercommon.param;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ParamNames;
-import lombok.Data;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -15,17 +13,29 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 解析request参数中的业务参数，绑定到方法参数上
  *
  * @author tanghc
  */
-@Data
-public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
+public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
-    private ParamValidator paramValidator = new ServiceParamValidator();
+    private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
+            new ConcurrentHashMap<>(256);
+
+    private final ParamValidator paramValidator = new ServiceParamValidator();
+
+    private List<HandlerMethodArgumentResolver> argumentResolvers = Collections.emptyList();
+
+    @Override
+    public void setResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        this.argumentResolvers = resolvers;
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -38,13 +48,22 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
         Object paramObj = this.getParamObject(methodParameter, nativeWebRequest);
-        // JSR-303验证
-        paramValidator.validateBizParam(paramObj);
-        return paramObj;
+        if (paramObj != null) {
+            // JSR-303验证
+            paramValidator.validateBizParam(paramObj);
+            return paramObj;
+        } else {
+            HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
+            if (resolver != null) {
+                return resolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+            }
+            return null;
+        }
     }
 
     /**
      * 获取参数对象，将request中的参数绑定到实体对象中去
+     *
      * @param methodParameter
      * @param nativeWebRequest
      * @return
@@ -55,17 +74,6 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
         Object bizObj = null;
         if (bizContent != null) {
             bizObj = JSON.parseObject(bizContent, parameterType);
-        } else {
-            Map<String, String[]> parameterMap = nativeWebRequest.getParameterMap();
-            JSONObject result = new JSONObject();
-            parameterMap.forEach((key, values) -> {
-                if (values.length > 0) {
-                    result.put(key, values[0]);
-                }
-            });
-            if (result.size() > 0) {
-                bizObj = result.toJavaObject(parameterType);
-            }
         }
         this.bindUploadFile(bizObj, nativeWebRequest);
         return bizObj;
@@ -73,7 +81,8 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
 
     /**
      * 将文件绑定到
-     * @param bizObj 业务参数
+     *
+     * @param bizObj           业务参数
      * @param nativeWebRequest
      */
     protected void bindUploadFile(Object bizObj, NativeWebRequest nativeWebRequest) {
@@ -91,6 +100,23 @@ public class ApiArgumentResolver implements HandlerMethodArgumentResolver {
                 ReflectionUtils.setField(field, bizObj, multipartFile);
             }, field -> field.getType() == MultipartFile.class);
         }
+    }
+
+    protected HandlerMethodArgumentResolver getOtherArgumentResolver(MethodParameter parameter) {
+        HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
+        if (result == null) {
+            for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
+                if (methodArgumentResolver instanceof SopHandlerMethodArgumentResolver) {
+                    continue;
+                }
+                if (methodArgumentResolver.supportsParameter(parameter)) {
+                    result = methodArgumentResolver;
+                    this.argumentResolverCache.put(parameter, result);
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
 }

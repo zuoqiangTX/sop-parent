@@ -94,9 +94,9 @@
     <el-pagination
       background
       style="margin-top: 5px"
-      :current-page="pageInfo.pageIndex"
+      :current-page="searchFormData.pageIndex"
+      :page-size="searchFormData.pageSize"
       :page-sizes="[5, 10, 20, 40]"
-      :page-size="pageInfo.pageSize"
       :total="pageInfo.total"
       layout="total, sizes, prev, pager, next"
       @size-change="onSizeChange"
@@ -181,12 +181,12 @@ export default {
     }
     return {
       searchFormData: {
-        appKey: ''
+        appKey: '',
+        pageIndex: 1,
+        pageSize: 10
       },
       pageInfo: {
         list: [],
-        pageIndex: 1,
-        pageSize: 10,
         total: 0
       },
       roles: [],

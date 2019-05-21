@@ -1,7 +1,10 @@
 package com.gitee.sop.servercommon.configuration;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
+import com.gitee.sop.servercommon.param.SopHandlerMethodArgumentResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.util.List;
 
@@ -16,9 +19,21 @@ public class AlipayServiceConfiguration extends BaseServiceConfiguration {
         ServiceConfig.getInstance().setDefaultVersion("1.0");
     }
 
+    @Autowired
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+
     @Override
     protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(ServiceConfig.getInstance().getMethodArgumentResolver());
+        super.addArgumentResolvers(argumentResolvers);
+        SopHandlerMethodArgumentResolver sopHandlerMethodArgumentResolver = ServiceConfig.getInstance().getMethodArgumentResolver();
+        argumentResolvers.add(sopHandlerMethodArgumentResolver);
     }
 
+    @Override
+    protected void doAfter() {
+        super.doAfter();
+        SopHandlerMethodArgumentResolver sopHandlerMethodArgumentResolver = ServiceConfig.getInstance().getMethodArgumentResolver();
+        List<HandlerMethodArgumentResolver> defaultArgumentResolvers = requestMappingHandlerAdapter.getArgumentResolvers();
+        sopHandlerMethodArgumentResolver.setResolvers(defaultArgumentResolvers);
+    }
 }

@@ -2,6 +2,7 @@ package com.gitee.sop.adminserver.api.service.param;
 
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -59,4 +60,8 @@ public class LimitNewAddParam {
     @NotNull(message = "orderIndex不能为空")
     @Min(value = 0, message = "orderIndex必须大于等于0")
     private Integer orderIndex;
+
+    @ApiDocField(description = "备注")
+    @Length(max = 128, message = "备注不能超过128")
+    private String remark;
 }

@@ -145,9 +145,9 @@
           >
             <el-form-item label="限流维度" prop="typeKey">
               <el-checkbox-group v-model="limitDialogFormData.typeKey">
-                <el-checkbox v-model="limitDialogFormData.typeKey[0]" :label="1" name="typeKey" @change="checked=>onLimitKeyTypeChange(checked, 'routeId')">路由ID</el-checkbox>
-                <el-checkbox v-model="limitDialogFormData.typeKey[1]" :label="2" name="typeKey" @change="checked=>onLimitKeyTypeChange(checked, 'appKey')">AppKey</el-checkbox>
-                <el-checkbox v-model="limitDialogFormData.typeKey[2]" :label="3" name="typeKey" @change="checked=>onLimitKeyTypeChange(checked, 'limitIp')">IP</el-checkbox>
+                <el-checkbox v-model="limitDialogFormData.typeKey[0]" :label="1" name="typeKey">路由ID</el-checkbox>
+                <el-checkbox v-model="limitDialogFormData.typeKey[1]" :label="2" name="typeKey">AppKey</el-checkbox>
+                <el-checkbox v-model="limitDialogFormData.typeKey[2]" :label="3" name="typeKey">IP</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
             <el-form-item v-show="checkTypeKey(1)" prop="routeId" label="路由ID" :rules="checkTypeKey(1) ? rulesLimit.routeId : []">
@@ -429,6 +429,7 @@ export default {
     onLimitDialogSave: function() {
       this.$refs['limitDialogForm'].validate((valid) => {
         if (valid) {
+          this.cleanCheckboxData()
           this.limitDialogFormData.serviceId = this.serviceId
           const uri = this.limitDialogFormData.id ? 'config.limit.update' : 'config.limit.add'
           this.post(uri, this.limitDialogFormData, function(resp) {
@@ -437,6 +438,18 @@ export default {
           })
         }
       })
+    },
+    cleanCheckboxData: function() {
+      // 如果没有勾选则清空
+      if (!this.checkTypeKey(1)) {
+        this.limitDialogFormData.routeId = ''
+      }
+      if (!this.checkTypeKey(2)) {
+        this.limitDialogFormData.appKey = ''
+      }
+      if (!this.checkTypeKey(3)) {
+        this.limitDialogFormData.limitIp = ''
+      }
     },
     onLimitTypeTipClick: function() {
       const leakyRemark = '漏桶策略：每秒处理固定数量的请求，超出请求返回错误信息。'
@@ -453,11 +466,6 @@ export default {
     onPageIndexChange: function(pageIndex) {
       this.searchFormData.pageIndex = pageIndex
       this.loadTable()
-    },
-    onLimitKeyTypeChange: function(checked, name) {
-      if (!checked) {
-        this.limitDialogFormData[name] = ''
-      }
     },
     checkTypeKey: function(val) {
       return this.limitDialogFormData.typeKey.find((value, index, arr) => {

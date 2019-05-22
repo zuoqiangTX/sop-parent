@@ -19,7 +19,7 @@ CREATE TABLE `config_limit` (
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='限流配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='限流配置';
 
 INSERT INTO `config_limit` (`id`, `route_id`, `app_key`, `limit_ip`, `service_id`, `limit_type`, `exec_count_per_second`, `limit_code`, `limit_msg`, `token_bucket_count`, `limit_status`, `order_index`, `remark`, `gmt_create`, `gmt_modified`) VALUES
 	(1,'alipay.story.get1.0','','192.168.1.1,172.2.2.3','story-service',2,5,'','',6,1,3,NULL,'2019-05-17 19:21:35','2019-05-21 09:12:15'),

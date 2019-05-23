@@ -64,7 +64,7 @@
               限流策略 <i class="el-icon-question" style="cursor: pointer" @click="onLimitTypeTipClick"></i>
             </template>
             <template slot-scope="scope">
-              <span v-if="scope.row.limitType === 1">漏桶策略</span>
+              <span v-if="scope.row.limitType === 1">窗口策略</span>
               <span v-if="scope.row.limitType === 2">令牌桶策略</span>
             </template>
           </el-table-column>
@@ -171,7 +171,7 @@
             </el-form-item>
             <el-form-item label="限流策略">
               <el-radio-group v-model="limitDialogFormData.limitType">
-                <el-radio :label="1">漏桶策略</el-radio>
+                <el-radio :label="1">窗口策略</el-radio>
                 <el-radio :label="2">令牌桶策略</el-radio>
               </el-radio-group>
               <i class="el-icon-question limit-tip" @click="onLimitTypeTipClick"></i>
@@ -192,13 +192,13 @@
                 <i class="el-icon-question limit-tip"></i>
               </el-tooltip>
             </el-form-item>
-            <el-form-item v-show="isLeakyType()" label="每秒可处理请求数" prop="execCountPerSecond" :rules="isLeakyType() ? rulesLimit.execCountPerSecond : []">
+            <el-form-item v-show="isWindowType()" label="每秒可处理请求数" prop="execCountPerSecond" :rules="isWindowType() ? rulesLimit.execCountPerSecond : []">
               <el-input-number v-model="limitDialogFormData.execCountPerSecond" controls-position="right" :min="1" />
             </el-form-item>
-            <el-form-item v-show="isLeakyType()" label="错误码" prop="limitCode" :rules="isLeakyType() ? rulesLimit.limitCode : []">
+            <el-form-item v-show="isWindowType()" label="错误码" prop="limitCode" :rules="isWindowType() ? rulesLimit.limitCode : []">
               <el-input v-model="limitDialogFormData.limitCode" />
             </el-form-item>
-            <el-form-item v-show="isLeakyType()" label="错误信息" prop="limitMsg" :rules="isLeakyType() ? rulesLimit.limitMsg : []">
+            <el-form-item v-show="isWindowType()" label="错误信息" prop="limitMsg" :rules="isWindowType() ? rulesLimit.limitMsg : []">
               <el-input v-model="limitDialogFormData.limitMsg" />
             </el-form-item>
             <el-form-item v-show="isTokenType()" label="令牌桶容量" prop="tokenBucketCount" :rules="isTokenType() ? rulesLimit.tokenBucketCount : []">
@@ -274,7 +274,7 @@ export default {
           { required: true, message: '不能为空', trigger: 'blur' },
           { min: 1, max: 500, message: '长度在 1 到 500 个字符', trigger: 'blur' }
         ],
-        // leaky
+        // window
         execCountPerSecond: [
           { required: true, message: '不能为空', trigger: 'blur' }
         ],
@@ -452,9 +452,9 @@ export default {
       }
     },
     onLimitTypeTipClick: function() {
-      const leakyRemark = '漏桶策略：每秒处理固定数量的请求，超出请求返回错误信息。'
+      const windowRemark = '窗口策略：每秒处理固定数量的请求，超出请求数量返回错误信息。'
       const tokenRemark = '令牌桶策略：每秒放置固定数量的令牌数，每个请求进来后先去拿令牌，拿到了令牌才能继续，拿不到则等候令牌重新生成了再拿。'
-      const content = leakyRemark + '<br>' + tokenRemark
+      const content = windowRemark + '<br>' + tokenRemark
       this.$alert(content, '限流策略', {
         dangerouslyUseHTMLString: true
       })
@@ -472,7 +472,7 @@ export default {
         return value === val
       })
     },
-    isLeakyType: function() {
+    isWindowType: function() {
       return this.limitDialogFormData.limitType === 1
     },
     isTokenType: function() {

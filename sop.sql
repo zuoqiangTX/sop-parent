@@ -20,7 +20,7 @@ CREATE TABLE `admin_user_info` (
   `password` varchar(128) NOT NULL DEFAULT '' COMMENT '密码',
   `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态，1：启用，2：禁用',
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_username` (`username`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='后台用户表';

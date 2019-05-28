@@ -8,33 +8,33 @@ namespace SDKCSharp.Common
 {
     public class RequestForm
     {
-        
-        private Dictionary<string, string> form;
 
         /// <summary>
         /// 请求表单内容
         /// </summary>
-        public Dictionary<string, string> Form
-        {
-            get { return form; }
-            set { form = value; }
-        }
-
-        private List<UploadFile> files;
+        public Dictionary<string, string> Form { get; set; }
 
         /// <summary>
         /// 上传文件
         /// </summary>
-        public List<UploadFile> Files
-        {
-            get { return files; }
-            set { files = value; }
-        }
+        public List<UploadFile> Files { get; set; }
+
+        /// <summary>
+        /// 指定或者设置字符集
+        /// </summary>
+        /// <value>The charset.</value>
+        public Encoding Charset { get; set; }
+
+        /// <summary>
+        /// 指定或设置HTTP请求method
+        /// </summary>
+        /// <value>The request method.</value>
+        public RequestMethod RequestMethod { get; set; } = RequestMethod.POST;
 
         public RequestForm(Dictionary<string, string> form)
         {
-            this.form = form;
+            this.Form = form;
         }
-
+         
     }
 }

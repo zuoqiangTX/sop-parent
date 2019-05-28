@@ -48,6 +48,15 @@ namespace SDKCSharp.Request
             return SdkConfig.DEFAULT_VERSION;
         }
 
+        /// <summary>
+        /// 指定HTTP请求method,默认POST
+        /// </summary>
+        /// <returns>The request method.</returns>
+        public virtual RequestMethod GetRequestMethod()
+        {
+            return RequestMethod.POST;
+        }
+
         public BaseRequest()
         {
             this.method = this.GetMethod();
@@ -93,6 +102,8 @@ namespace SDKCSharp.Request
             dict[openConfig.DataName] = biz_content;
 
             RequestForm requestForm = new RequestForm(dict);
+            requestForm.Charset = this.charset;
+            requestForm.RequestMethod = GetRequestMethod();
             requestForm.Files = this.files;
             return requestForm;
         }

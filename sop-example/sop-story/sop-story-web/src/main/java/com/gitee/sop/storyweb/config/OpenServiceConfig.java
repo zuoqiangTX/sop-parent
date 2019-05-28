@@ -39,7 +39,7 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
 
         @Override
         protected boolean swaggerAccessProtected() {
-            return false;
+            return true;
         }
     }
 }

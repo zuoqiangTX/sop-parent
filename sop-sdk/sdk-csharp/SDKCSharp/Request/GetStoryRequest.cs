@@ -1,4 +1,5 @@
 ﻿using System;
+using SDKCSharp.Common;
 using SDKCSharp.Response;
 
 namespace SDKCSharp.Request

@@ -13,10 +13,7 @@ namespace SDKCSharp.Client
 {
     public class OpenRequest
     {
-        private const string AND = "&";
-        private const string EQ = "=";
-        private const string UTF8 = "UTF-8";
-
+       
         private const string HTTP_ERROR_CODE = "-400";
 
         private OpenConfig openConfig;
@@ -37,28 +34,6 @@ namespace SDKCSharp.Client
         /// <returns></returns>
         public string Request(string url, RequestForm requestForm, Dictionary<string, string> header)
         {
-            return this.DoPost(url, requestForm, header);
-        }
-
-        public string DoGet(string url, RequestForm requestForm, Dictionary<string, string> header)
-        {
-            StringBuilder queryString = new StringBuilder();
-            Dictionary<string, string> form = requestForm.Form;
-            Dictionary<string, string>.KeyCollection keys = form.Keys;
-            foreach (string keyName in keys)
-            {
-                queryString.Append(AND).Append(keyName).Append(EQ)
-                        .Append(HttpUtility.UrlEncode(form[keyName].ToString(), Encoding.UTF8));
-            }
-
-            string requestUrl = url + "?" + queryString.ToString().Substring(1);
-
-            return this.openHttp.Get(requestUrl);
-
-        }
-
-        public string DoPost(string url, RequestForm requestForm, Dictionary<string, string> header)
-        {
             Dictionary<string, string> form = requestForm.Form;
             List<UploadFile> files = requestForm.Files;
             if (files != null && files.Count > 0)
@@ -67,11 +42,39 @@ namespace SDKCSharp.Client
             }
             else
             {
-                return this.openHttp.PostFormBody(url, form, header);
+                RequestMethod requestMethod = requestForm.RequestMethod;
+                if (requestMethod == RequestMethod.GET)
+                {
+                    string query = this.BuildGetQueryString(form, requestForm.Charset);
+                    if (!string.IsNullOrEmpty(query))
+                    {
+                        url = url + "?" + query;
+                    }
+                    return openHttp.Get(url, header);
+                }
+                return this.openHttp.RequestFormBody(url, form, header);
             }
         }
 
-       
+        public string BuildGetQueryString(Dictionary<string, string> form, Encoding charset)
+        {
+            StringBuilder queryString = new StringBuilder();
+            Dictionary<string, string>.KeyCollection keys = form.Keys;
+            int i = 0;
+            foreach (string keyName in keys)
+            {
+                if (i++ > 0)
+                {
+                    queryString.Append("&");
+                }
+                queryString.Append(keyName).Append("=")
+                        .Append(HttpUtility.UrlEncode(form[keyName], charset));
+            }
+            return queryString.ToString();
+        }
+
+
+
         protected string CauseException(Exception e)
         {
             ErrorResponse result = new ErrorResponse();

@@ -21,6 +21,7 @@ namespace SDKCSharp.Client
         public const string CONTENT_TYPE_STREAM = "application/octet-stream";
         public const string CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
         public const string METHOD_POST = "POST";
+        public const string METHOD_GET = "GET";
 
         public CookieContainer cookieContainer = new CookieContainer();
 
@@ -54,6 +55,7 @@ namespace SDKCSharp.Client
         public string Get(string url, Dictionary<string, string> header)
         {
             var request = CreateWebRequest(url, header);
+            request.Method = METHOD_GET;
             var response = (HttpWebResponse)request.GetResponse();
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             return responseString;
@@ -103,7 +105,8 @@ namespace SDKCSharp.Client
         /// <param name="url">URL.</param>
         /// <param name="form">Form.</param>
         /// <param name="header">Header.</param>
-        public string PostFormBody(string url, Dictionary<string, string> form, Dictionary<string, string> header)
+        /// <param name="method">method，默认POST</param>
+        public string RequestFormBody(string url, Dictionary<string, string> form, Dictionary<string, string> header, string method = "POST")
         {
             WebClient webClient = new WebClient();
             // 表单参数
@@ -112,7 +115,15 @@ namespace SDKCSharp.Client
             {
                 postParams.Add(item.Key, item.Value);
             }
-            byte[] byRemoteInfo = webClient.UploadValues(url, METHOD_POST, postParams);
+            if (header != null)
+            {
+                ICollection<string> keys = header.Keys;
+                foreach (string key in keys)
+                {
+                    webClient.Headers.Add(key, header[key]);
+                }
+            }
+            byte[] byRemoteInfo = webClient.UploadValues(url, method, postParams);
             return Encoding.UTF8.GetString(byRemoteInfo);
         }
 
@@ -264,9 +275,5 @@ namespace SDKCSharp.Client
             }
         }
 
-        static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
-        {
-            return true;
-        }
     }
 }

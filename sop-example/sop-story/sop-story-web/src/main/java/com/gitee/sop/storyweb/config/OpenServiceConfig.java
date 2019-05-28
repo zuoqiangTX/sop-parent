@@ -36,6 +36,11 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
         protected String getDocTitle() {
             return "故事API";
         }
+
+        @Override
+        protected boolean swaggerAccessProtected() {
+            return false;
+        }
     }
 }
 

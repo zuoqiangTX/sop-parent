@@ -71,13 +71,14 @@ public class OpenHttp {
     /**
      * 提交表单
      *
-     * @param url
-     * @param form
-     * @param header header内容
+     * @param url url
+     * @param form 参数
+     * @param header header
+     * @param method 请求方式，post，get等
      * @return
      * @throws IOException
      */
-    public String postFormBody(String url, Map<String, String> form, Map<String, String> header) throws IOException {
+    public String requestFormBody(String url, Map<String, String> form, Map<String, String> header, String method) throws IOException {
         FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
         for (Map.Entry<String, String> entry : form.entrySet()) {
             paramBuilder.add(entry.getKey(), entry.getValue());
@@ -85,7 +86,7 @@ public class OpenHttp {
         FormBody formBody = paramBuilder.build();
         Request.Builder requestBuilder = new Request.Builder()
                 .url(url)
-                .post(formBody);
+                .method(method, formBody);
         // 添加header
         addHeader(requestBuilder, header);
 
@@ -110,7 +111,7 @@ public class OpenHttp {
      * @return
      * @throws IOException
      */
-    public String postFile(String url, Map<String, String> form, Map<String, String> header, List<UploadFile> files)
+    public String requestFile(String url, Map<String, String> form, Map<String, String> header, List<UploadFile> files)
             throws IOException {
         // 创建MultipartBody.Builder，用于添加请求的数据
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();

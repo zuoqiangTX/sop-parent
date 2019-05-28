@@ -7,4 +7,5 @@ public class GetStoryRequest extends BaseRequest<GetStoryResponse> {
     protected String method() {
         return "alipay.story.find";
     }
+
 }

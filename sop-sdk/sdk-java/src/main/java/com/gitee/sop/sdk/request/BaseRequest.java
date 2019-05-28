@@ -3,6 +3,7 @@ package com.gitee.sop.sdk.request;
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
+import com.gitee.sop.sdk.common.RequestMethod;
 import com.gitee.sop.sdk.common.SdkConfig;
 import com.gitee.sop.sdk.common.UploadFile;
 import com.gitee.sop.sdk.response.BaseResponse;
@@ -99,6 +100,8 @@ public abstract class BaseRequest<T extends BaseResponse> {
         params.put(openConfig.getDataName(), biz_content);
 
         RequestForm requestForm = new RequestForm(params);
+        requestForm.setRequestMethod(getRequestMethod());
+        requestForm.setCharset(this.charset);
         requestForm.setFiles(this.files);
         return requestForm;
     }
@@ -115,6 +118,10 @@ public abstract class BaseRequest<T extends BaseResponse> {
         return method;
     }
 
+    /**
+     * 指定版本号
+     * @param version
+     */
     public void setVersion(String version) {
         this.version = version;
     }
@@ -133,5 +140,13 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     public Class<T> getResponseClass() {
         return responseClass;
+    }
+
+    /**
+     * 指定HTTP请求method,默认POST
+     * @return
+     */
+    protected RequestMethod getRequestMethod() {
+        return RequestMethod.POST;
     }
 }

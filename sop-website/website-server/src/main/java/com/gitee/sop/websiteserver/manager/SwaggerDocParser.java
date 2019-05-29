@@ -154,13 +154,17 @@ public class SwaggerDocParser implements DocParser {
             DocParameter respParam = fieldInfo.toJavaObject(DocParameter.class);
             respParam.setName(fieldName);
             docParameterList.add(respParam);
-            String originalRef = getRef(fieldInfo);
+            String originalRef = isArray(fieldInfo) ? getRef(fieldInfo.getJSONObject(fieldName)) : getRef(fieldInfo);
             if (StringUtils.isNotBlank(originalRef)) {
                 List<DocParameter> refs = buildDocParameters(originalRef, docRoot);
                 respParam.setRefs(refs);
             }
         }
         return docParameterList;
+    }
+
+    protected boolean isArray(JSONObject fieldInfo) {
+        return "array".equalsIgnoreCase(fieldInfo.getString("type"));
     }
 
     private String getRef(JSONObject fieldInfo) {

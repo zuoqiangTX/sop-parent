@@ -183,7 +183,13 @@ layui.config({
     function buildExample(parameter) {
         var refs = parameter.refs;
         if (refs) {
-            return '{' + buildResult(refs) + '}';
+            // {...}
+            var content = '{' + buildResult(refs) + '}';
+            if (parameter.type == 'array') {
+                // [{...}]
+                content = '[' + content + ']';
+            }
+            return content;
         } else {
             return '\"' + parameter.example + '\"';
         }

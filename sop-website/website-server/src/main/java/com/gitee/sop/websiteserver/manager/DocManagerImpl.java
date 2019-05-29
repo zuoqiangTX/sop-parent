@@ -2,6 +2,7 @@ package com.gitee.sop.websiteserver.manager;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.bean.EurekaApplication;
@@ -76,13 +77,17 @@ public class DocManagerImpl implements DocManager {
     @Override
     public void load() {
         try {
+            // {"STORY-SERVICE":[{"ipAddr":"10.1.30.54","name":"STORY-SERVICE","serverPort":"2222"}],"API-GATEWAY":[{"ipAddr":"10.1.30.54","name":"API-GATEWAY","serverPort":"8081"}]}
             Map<String, List<ServiceInfoVO>> listMap = this.getAllServiceList();
             log.info("服务列表：{}", JSON.toJSONString(listMap.keySet()));
-            // {"STORY-SERVICE":[{"ipAddr":"10.1.30.54","name":"STORY-SERVICE","serverPort":"2222"}],"API-GATEWAY":[{"ipAddr":"10.1.30.54","name":"API-GATEWAY","serverPort":"8081"}]}
-            for (Map.Entry<String, List<ServiceInfoVO>> entry : listMap.entrySet()) {
-                ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
-                loadDocInfo(serviceInfoVo);
-            }
+            listMap.entrySet()
+                    .stream()
+                    // 网关没有文档提供，需要排除
+                    .filter(entry -> !"API-GATEWAY".equalsIgnoreCase(entry.getKey()))
+                    .forEach(entry -> {
+                        ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
+                        loadDocInfo(serviceInfoVo);
+                    });
         } catch (Exception e) {
             log.error("加载失败", e);
         }
@@ -97,7 +102,7 @@ public class DocManagerImpl implements DocManager {
                 throw new IllegalAccessException("无权访问");
             }
             String docInfoJson = entity.getBody();
-            JSONObject docRoot = JSON.parseObject(docInfoJson);
+            JSONObject docRoot = JSON.parseObject(docInfoJson, Feature.OrderedField);
             DocParser docParser = this.buildDocParser(docRoot);
             DocInfo docInfo = docParser.parseJson(docRoot);
             docDefinitionMap.put(docInfo.getTitle(), docInfo);

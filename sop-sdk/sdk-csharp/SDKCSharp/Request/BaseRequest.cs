@@ -97,7 +97,7 @@ namespace SDKCSharp.Request
             dict[openConfig.VersionName] = this.version;
 
             // 业务参数
-            String biz_content = buildBizContent();
+            String biz_content = BuildBizContent();
 
             dict[openConfig.DataName] = biz_content;
 
@@ -108,7 +108,7 @@ namespace SDKCSharp.Request
             return requestForm;
         }
 
-        protected string buildBizContent()
+        protected string BuildBizContent()
         {
             if (bizModel != null)
             {

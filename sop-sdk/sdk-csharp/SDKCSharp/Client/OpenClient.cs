@@ -21,7 +21,7 @@ namespace SDKCSharp.Client
     {
 
         private static OpenConfig DEFAULT_CONFIG = new OpenConfig();
-        private const String ERROR_RESPONSE_KEY = "error_response";
+        private const string ERROR_RESPONSE_KEY = "error_response";
 
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
@@ -122,7 +122,7 @@ namespace SDKCSharp.Client
         /// <param name="requestForm">请求内容</param>
         /// <param name="header">请求header</param>
         /// <returns>返回服务器响应内容</returns>
-        protected virtual String DoExecute(String url, RequestForm requestForm, Dictionary<string, string> header)
+        protected virtual string DoExecute(string url, RequestForm requestForm, Dictionary<string, string> header)
         {
             return openRequest.Request(this.url, requestForm, header);
         }

@@ -152,8 +152,7 @@ layui.config({
             '        "code": "10000",\n' +
             '        "msg": "Success",\n' +
             bizResult +
-            '    },\n' +
-            '    "sign": "xxxxxx"\n' +
+            '    }' +
             '}';
         json = formatJson(json);
         $('#responseExampleJson').text(json);
@@ -164,8 +163,7 @@ layui.config({
             '        "msg": "Service is temporarily unavailable",\n' +
             '        "sub_code": "isp.unknow-error",\n' +
             '        "sub_msg": "服务暂不可用"\n' +
-            '    },\n' +
-            '    "sign": "xxxxxxx"\n' +
+            '    }' +
             '}';
         errorJson = formatJson(errorJson);
         $('#responseErrorJson').text(errorJson);

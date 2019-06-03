@@ -22,7 +22,7 @@ public class DefaultDemoService implements DemoService {
     @Override
     public DemoResult getStory(DemoParam param) {
         DemoResult demoResult = new DemoResult();
-        demoResult.setId(2);
+        demoResult.setId(param.getId());
         demoResult.setName("dubbo 白雪公主, param=" + param);
         return demoResult;
     }

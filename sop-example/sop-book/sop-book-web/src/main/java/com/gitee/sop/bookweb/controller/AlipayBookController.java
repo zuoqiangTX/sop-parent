@@ -42,7 +42,7 @@ public class AlipayBookController {
         return story;
     }
 
-    // 调用story服务
+    // 通过Feign调用story服务
     @ApiMapping(value = "alipay.book.story.get")
     public Object getBook2() {
         Story story = new Story();

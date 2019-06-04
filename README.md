@@ -24,7 +24,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 架构图
 
-![SOP架构图](https://images.gitee.com/uploads/images/2019/0309/093312_8afb4789_332975.png "sop.png")
+![SOP架构图](https://images.gitee.com/uploads/images/2019/0604/145659_c039bb1f_332975.png "sop.png")
 
 ## 已完成列表
 

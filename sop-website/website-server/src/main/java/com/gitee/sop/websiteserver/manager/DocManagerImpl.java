@@ -102,7 +102,7 @@ public class DocManagerImpl implements DocManager {
                 throw new IllegalAccessException("无权访问");
             }
             String docInfoJson = entity.getBody();
-            JSONObject docRoot = JSON.parseObject(docInfoJson, Feature.OrderedField);
+            JSONObject docRoot = JSON.parseObject(docInfoJson, Feature.OrderedField, Feature.DisableCircularReferenceDetect);
             DocParser docParser = this.buildDocParser(docRoot);
             DocInfo docInfo = docParser.parseJson(docRoot);
             docDefinitionMap.put(docInfo.getTitle(), docInfo);

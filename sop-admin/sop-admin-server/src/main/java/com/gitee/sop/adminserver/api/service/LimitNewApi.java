@@ -9,31 +9,19 @@ import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.fastmybatis.core.PageInfo;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.fastmybatis.core.query.Sort;
-import com.gitee.fastmybatis.core.query.expression.ValueExpression;
 import com.gitee.fastmybatis.core.util.MapperUtil;
-import com.gitee.fastmybatis.core.util.MyBeanUtil;
 import com.gitee.sop.adminserver.api.service.param.LimitNewAddParam;
 import com.gitee.sop.adminserver.api.service.param.LimitNewParam;
 import com.gitee.sop.adminserver.api.service.param.LimitNewUpdateParam;
-import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
 import com.gitee.sop.adminserver.api.service.result.LimitNewVO;
 import com.gitee.sop.adminserver.bean.ConfigLimitDto;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
-import com.gitee.sop.adminserver.common.LimitEnum;
 import com.gitee.sop.adminserver.entity.ConfigLimit;
 import com.gitee.sop.adminserver.mapper.ConfigLimitMapper;
 import com.gitee.sop.adminserver.service.RouteConfigService;
 import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 限流
@@ -41,7 +29,7 @@ import java.util.stream.Collectors;
  * @author tanghc
  */
 @ApiService
-@ApiDoc("服务管理")
+@ApiDoc("服务管理-限流管理")
 @Slf4j
 public class LimitNewApi {
 

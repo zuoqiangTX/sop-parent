@@ -8,9 +8,11 @@ import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultLimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultServiceErrorManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
+import com.gitee.sop.gatewaycommon.manager.ServiceErrorManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.DefaultDataNameBuilder;
@@ -128,6 +130,11 @@ public class ApiConfig {
      */
     private ResultAppender resultAppender;
 
+    /**
+     * 处理错误信息
+     */
+    private ServiceErrorManager serviceErrorManager = new DefaultServiceErrorManager();
+
     // -------- fields ---------
 
     /**
@@ -161,6 +168,11 @@ public class ApiConfig {
      * 显示返回sign
      */
     private boolean showReturnSign = true;
+
+    /**
+     * 保存错误信息容器的容量
+     */
+    private int storeErrorCapacity = 20;
 
     public void addAppSecret(Map<String, String> appSecretPair) {
         for (Map.Entry<String, String> entry : appSecretPair.entrySet()) {

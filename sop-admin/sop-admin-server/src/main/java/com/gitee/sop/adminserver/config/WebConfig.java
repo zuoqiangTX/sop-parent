@@ -32,9 +32,10 @@ public class WebConfig {
     @Bean
     ApiConfig apiConfig() {
         ApiConfig apiConfig = new ApiConfig();
-        apiConfig.setJsonResultSerializer(obj -> {
-            return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
-        });
+        apiConfig.setJsonResultSerializer(obj -> JSON.toJSONString(obj,
+                SerializerFeature.WriteDateUseDateFormat
+                , SerializerFeature.WriteNullStringAsEmpty
+                , SerializerFeature.WriteMapNullValue));
         ApiSessionManager apiSessionManager = new ApiSessionManager();
         // session有效期
         int timeout = NumberUtils.toInt(accessTokenTimeout, 30);

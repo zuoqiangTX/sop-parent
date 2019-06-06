@@ -35,7 +35,7 @@ Object.assign(Vue.prototype, {
       const resp = response.data
       const code = resp.code
       if (!code || code === '-9') {
-        that.$message.error('系统错误')
+        that.$message.error(resp.msg || '系统错误')
         return
       }
       if (code === '-100' || code === '18' || code === '21') { // 未登录
@@ -96,6 +96,9 @@ Object.assign(Vue.prototype, {
   },
   logout: function() {
     removeToken()
-    this.$router.push({ path: `/login?redirect=${this.$route.fullPath}` })
+    const fullPath = this.$route.fullPath
+    if (fullPath.indexOf('login?redirect') === -1) {
+      this.$router.push({ path: `/login?redirect=${fullPath}` })
+    }
   }
 })

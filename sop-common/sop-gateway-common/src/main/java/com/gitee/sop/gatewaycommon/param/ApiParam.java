@@ -29,6 +29,14 @@ public class ApiParam extends JSONObject implements Param {
 
     private transient ApiUploadContext apiUploadContext;
 
+    public static ApiParam build(Map<String, ?> map) {
+        ApiParam apiParam = new ApiParam();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            apiParam.put(entry.getKey(), entry.getValue());
+        }
+        return apiParam;
+    }
+
     @JSONField(serialize = false)
     public String getRouteId() {
         return this.fetchNameVersion();

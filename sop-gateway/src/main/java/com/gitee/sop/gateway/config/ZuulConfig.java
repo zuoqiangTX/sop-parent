@@ -41,6 +41,9 @@ public class ZuulConfig extends AlipayZuulConfiguration {
 //public class ZuulConfig extends EasyopenZuulConfiguration {
 //    static {
 //        new ManagerInitializer();
+//        Map<String, String> appSecretMap = new HashMap<>();
+//        appSecretMap.put("easyopen_test", "G9w0BAQEFAAOCAQ8AMIIBCgKCA");
+//        ApiConfig.getInstance().addAppSecret(appSecretMap);
 //    }
 //
 //}

@@ -1,4 +1,4 @@
-package com.gitee.sop.gateway;
+package com.gitee.sop.gateway.controller;
 
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import org.springframework.beans.factory.annotation.Value;

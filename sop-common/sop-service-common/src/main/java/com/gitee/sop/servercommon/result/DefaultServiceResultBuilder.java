@@ -16,15 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 public class DefaultServiceResultBuilder implements ServiceResultBuilder {
 
     public static final String ISP_UNKNOWN_ERROR = "isp.unknown-error";
-    /**
-     * 与网关约定好的状态码，表示业务出错
-     */
-    public static final int BIZ_ERROR_CODE = 4000;
-    public static final String X_BIZ_ERROR_CODE = "x-biz-error-code";
 
     @Override
     public Object buildError(HttpServletRequest request, HttpServletResponse response, Throwable throwable) {
-        response.addHeader(X_BIZ_ERROR_CODE, String.valueOf(BIZ_ERROR_CODE));
         String subCode, subMsg;
         if (throwable instanceof ServiceException) {
             ServiceException ex = (ServiceException) throwable;

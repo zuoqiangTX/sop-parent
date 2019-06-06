@@ -78,6 +78,12 @@ export const constantRoutes = [
         name: 'Limit',
         component: () => import('@/views/service/limit/index2'),
         meta: { title: '限流管理' }
+      },
+      {
+        path: 'log',
+        name: 'Log',
+        component: () => import('@/views/service/log/index'),
+        meta: { title: '监控日志' }
       }
     ]
   },

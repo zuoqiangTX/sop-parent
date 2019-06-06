@@ -79,12 +79,12 @@
           </el-table-column>
           <el-table-column
             prop="mergeResult"
-            label="合并结果"
-            width="80"
+            label="统一格式输出"
+            width="120"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.mergeResult === 1" style="color:#67C23A">合并</span>
-              <span v-if="scope.row.mergeResult === 0" style="color:#E6A23C">不合并</span>
+              <span v-if="scope.row.mergeResult === 1" style="color:#67C23A">是</span>
+              <span v-if="scope.row.mergeResult === 0" style="color:#E6A23C">否</span>
             </template>
           </el-table-column>
           <el-table-column

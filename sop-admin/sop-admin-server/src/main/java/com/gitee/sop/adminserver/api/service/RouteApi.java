@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @author tanghc
  */
 @ApiService
-@ApiDoc("服务管理")
+@ApiDoc("服务管理-路由管理")
 @Slf4j
 public class RouteApi {
 

@@ -28,7 +28,7 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
     @Override
     public int getResponseStatus(ServerWebExchange exchange) {
         int responseStatus = HttpStatus.OK.value();
-        List<String> errorCodeList = exchange.getResponse().getHeaders().get(SopConstants.X_BIZ_ERROR_CODE);
+        List<String> errorCodeList = exchange.getResponse().getHeaders().get(SopConstants.X_SERVICE_ERROR_CODE);
         if (!CollectionUtils.isEmpty(errorCodeList)) {
             String errorCode = errorCodeList.get(0);
             responseStatus = Integer.valueOf(errorCode);
@@ -37,7 +37,18 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
     }
 
     @Override
-    public Map<String, ?> getApiParam(ServerWebExchange exchange) {
+    public String getResponseErrorMessage(ServerWebExchange exchange) {
+        String errorMsg = null;
+        List<String> errorMessageList = exchange.getResponse().getHeaders().get(SopConstants.X_SERVICE_ERROR_MESSAGE);
+        if (!CollectionUtils.isEmpty(errorMessageList)) {
+            errorMsg = errorMessageList.get(0);
+        }
+        exchange.getResponse().getHeaders().remove(SopConstants.X_SERVICE_ERROR_MESSAGE);
+        return errorMsg;
+    }
+
+    @Override
+    public Map<String, Object> getApiParam(ServerWebExchange exchange) {
         return exchange.getAttribute(SopConstants.CACHE_REQUEST_BODY_FOR_MAP);
     }
 

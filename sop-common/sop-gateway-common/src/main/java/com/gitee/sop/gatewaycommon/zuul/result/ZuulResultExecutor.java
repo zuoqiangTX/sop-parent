@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author tanghc
@@ -26,23 +25,36 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
     @Override
     public int getResponseStatus(RequestContext requestContext) {
         List<Pair<String, String>> bizHeaders = requestContext.getZuulResponseHeaders();
-        Optional<String> first = bizHeaders.stream()
-                .filter(header -> {
-                    return SopConstants.X_BIZ_ERROR_CODE.equals(header.first());
-                }).map(header -> {
-                    return header.second();
-                }).findFirst();
+        int status = bizHeaders.stream()
+                .filter(header -> SopConstants.X_SERVICE_ERROR_CODE.equals(header.first()))
+                .map(header -> Integer.valueOf(header.second()))
+                .findFirst()
+                .orElse(requestContext.getResponseStatusCode());
 
-        String status = first.orElseGet(() -> {
-            int respStatus = requestContext.getResponseStatusCode();
-            return String.valueOf(respStatus);
-        });
-
-        return Integer.valueOf(status);
+        return status;
     }
 
     @Override
-    public Map<String, ?> getApiParam(RequestContext requestContext) {
+    public String getResponseErrorMessage(RequestContext requestContext) {
+        List<Pair<String, String>> bizHeaders = requestContext.getZuulResponseHeaders();
+        int index = -1;
+        String errorMsg = null;
+        for (int i = 0; i < bizHeaders.size(); i++) {
+            Pair<String, String> header = bizHeaders.get(i);
+            if (SopConstants.X_SERVICE_ERROR_MESSAGE.equals(header.first())) {
+                errorMsg = header.second();
+                index = i;
+                break;
+            }
+        }
+        if (index > -1) {
+            requestContext.getZuulResponseHeaders().remove(index);
+        }
+        return errorMsg;
+    }
+
+    @Override
+    public Map<String, Object> getApiParam(RequestContext requestContext) {
         return ZuulContext.getApiParam();
     }
 

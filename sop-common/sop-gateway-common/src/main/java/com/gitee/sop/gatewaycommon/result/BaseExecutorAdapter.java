@@ -181,7 +181,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     public String merge(T exchange, JSONObject jsonObjectService) {
         JSONObject ret = new JSONObject();
         String name = "error";
-        Map<String, ?> params = this.getApiParam(exchange);
+        Map<String, Object> params = this.getApiParam(exchange);
         if (params != null) {
             Object method = params.get(ParamNames.API_NAME);
             if (method != null) {
@@ -196,7 +196,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         this.appendReturnSign(apiConfig, params, ret);
         ResultAppender resultAppender = apiConfig.getResultAppender();
         if (resultAppender != null) {
-            resultAppender.append(ret, params);
+            resultAppender.append(ret, params, exchange);
         }
         return ret.toJSONString();
     }

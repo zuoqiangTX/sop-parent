@@ -9,6 +9,7 @@
       :data="tableData"
       style="width: 100%;margin-bottom: 20px;"
       border
+      :default-expand-all="true"
       row-key="treeId"
       empty-text="请添加监控服务器"
     >

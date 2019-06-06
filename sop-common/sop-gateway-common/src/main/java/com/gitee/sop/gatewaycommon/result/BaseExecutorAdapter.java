@@ -78,11 +78,12 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             jsonObjectService.put(GATEWAY_MSG_NAME, SUCCESS_META.getError().getMsg());
         } else if (responseStatus == SopConstants.BIZ_ERROR_STATUS) {
             // 如果是业务出错
+            this.storeError(request, ErrorType.BIZ);
             jsonObjectService = JSON.parseObject(serviceResult);
             jsonObjectService.put(GATEWAY_CODE_NAME, ISP_BIZ_ERROR.getCode());
             jsonObjectService.put(GATEWAY_MSG_NAME, ISP_BIZ_ERROR.getError().getMsg());
         } else {
-            this.storeError(request);
+            this.storeError(request, ErrorType.UNKNOWN);
             // 微服务端有可能返回500错误
             // {"path":"/book/getBook3","error":"Internal Server Error","message":"id不能为空","timestamp":"2019-02-13T07:41:00.495+0000","status":500}
             jsonObjectService = new JSONObject();
@@ -97,13 +98,18 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
      *
      * @param request
      */
-    protected void storeError(T request) {
+    protected void storeError(T request, ErrorType errorType) {
         ApiInfo apiInfo = this.getApiInfo(request);
         String errorMsg = this.getResponseErrorMessage(request);
         ErrorDefinition errorDefinition = new ErrorDefinition();
         BeanUtils.copyProperties(apiInfo, errorDefinition);
         errorDefinition.setErrorMsg(errorMsg);
-        ApiConfig.getInstance().getServiceErrorManager().saveError(errorDefinition);
+        if (errorType == ErrorType.UNKNOWN) {
+            ApiConfig.getInstance().getServiceErrorManager().saveUnknownError(errorDefinition);
+        }
+        if (errorType == ErrorType.BIZ) {
+            ApiConfig.getInstance().getServiceErrorManager().saveBizError(errorDefinition);
+        }
     }
 
 
@@ -223,4 +229,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         private BaseRouteDefinition baseRouteDefinition;
     }
 
+    enum ErrorType {
+        UNKNOWN, BIZ
+    }
 }

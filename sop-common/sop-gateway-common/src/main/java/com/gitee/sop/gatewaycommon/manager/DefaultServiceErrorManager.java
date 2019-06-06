@@ -23,7 +23,12 @@ public class DefaultServiceErrorManager implements ServiceErrorManager {
     }
 
     @Override
-    public void saveError(ErrorDefinition errorDefinition) {
+    public void saveBizError(ErrorDefinition errorDefinition) {
+
+    }
+
+    @Override
+    public void saveUnknownError(ErrorDefinition errorDefinition) {
         boolean hasCapacity = store.size() < ApiConfig.getInstance().getStoreErrorCapacity();
         // 这里还可以做其它事情，比如错误量到达一定数目后，自动发送邮件/微信给开发人员，方便及时获取异常情况
         String id = this.buildId(errorDefinition);

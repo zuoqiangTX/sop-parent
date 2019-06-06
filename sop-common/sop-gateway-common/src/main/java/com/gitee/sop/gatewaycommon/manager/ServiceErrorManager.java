@@ -11,10 +11,16 @@ import java.util.Collection;
 public interface ServiceErrorManager {
 
     /**
-     * 保存错误信息
+     * 保存业务错误，一般由开发人员自己throw的异常
      * @param errorDefinition
      */
-    void saveError(ErrorDefinition errorDefinition);
+    void saveBizError(ErrorDefinition errorDefinition);
+
+    /**
+     * 保存未知的错误信息
+     * @param errorDefinition
+     */
+    void saveUnknownError(ErrorDefinition errorDefinition);
 
     /**
      * 清除日志

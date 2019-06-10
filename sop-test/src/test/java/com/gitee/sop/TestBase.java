@@ -2,23 +2,16 @@ package com.gitee.sop;
 
 import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +61,13 @@ public class TestBase extends TestCase {
             /**
              * 通过EntityUitls获取返回内容
              */
+//            Header[] allHeaders = response.getAllHeaders();
+//            if (allHeaders != null && allHeaders.length > 0) {
+//                System.out.println("----------- headers -----------");
+//                for (Header allHeader : allHeaders) {
+//                    System.out.println(allHeader);
+//                }
+//            }
             return EntityUtils.toString(response.getEntity(),"UTF-8");
         }catch (Exception e){
             e.printStackTrace();

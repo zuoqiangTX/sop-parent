@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LimitDemoPostTest2 extends TestBase {
 
-    String url = "http://localhost:8081/api"; // zuul
+    String url = "http://localhost:8081";
     // 这个appKey会被限流
     String appId = "2019032617262200001";
     // 支付宝私钥

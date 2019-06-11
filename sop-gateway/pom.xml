@@ -26,15 +26,16 @@
             <version>1.10.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- ↓↓↓ 使用spring cloud zuul ↓↓↓ -->
+        <!-- ↓↓↓ 使用spring cloud zuul ↓↓↓
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
         </dependency>
+        -->
         <!-- ↑↑↑ 使用spring cloud zuul ↑↑↑ -->
 
 
-        <!-- ↓↓↓ 使用spring cloud gateway，处于beta阶段，推荐使用zuul ↓↓↓
+        <!-- ↓↓↓ 使用spring cloud gateway，处于beta阶段，推荐使用zuul ↓↓↓ -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -47,7 +48,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        -->
         <!-- ↑↑↑ 使用spring cloud gateway ↑↑↑ -->
 
         <dependency>

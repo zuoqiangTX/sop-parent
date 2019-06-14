@@ -7,7 +7,6 @@ import com.gitee.easyopen.doc.DataType;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.easyopen.exception.ApiException;
 import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.easyopen.util.KeyStore;
 import com.gitee.easyopen.util.RSAUtil;
@@ -24,7 +23,10 @@ import com.gitee.sop.adminserver.api.isv.result.IsvVO;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.IdGen;
+import com.gitee.sop.adminserver.common.ZookeeperOperationException;
+import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.IsvInfo;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
 import com.gitee.sop.adminserver.entity.PermRole;
@@ -133,7 +135,7 @@ public class IsvApi {
     @Transactional(rollbackFor = Exception.class)
     public void addIsv(IsvInfoFormAdd param) throws Exception {
         if (isvInfoMapper.getByColumn("app_key", param.getAppKey()) != null) {
-            throw new ApiException("appKey已存在");
+            throw new BizException("appKey已存在");
         }
         formatForm(param);
         IsvInfo rec = new IsvInfo();
@@ -175,9 +177,9 @@ public class IsvApi {
         try {
             log.info("消息推送--ISV信息(update), path:{}, data:{}", path, data);
             ZookeeperContext.updatePathData(path, data);
-        } catch (Exception e) {
+        } catch (ZookeeperPathNotExistException e) {
             log.error("发送isvChannelMsg失败, path:{}, msg:{}", path, data, e);
-            throw new ApiException("保存失败，请查看日志");
+            throw new BizException("路径不存在");
         }
     }
 
@@ -222,7 +224,7 @@ public class IsvApi {
             routePermissionService.sendIsvRolePermissionToZookeeper(isvInfo.getAppKey(), roleCodeList);
         } catch (Exception e) {
             log.error("保存到zookeeper中失败，isvInfo:{}, roleCodeList:{}", isvInfo, roleCodeList);
-            throw new ApiException("保存失败，请查看日志");
+            throw new BizException("保存失败，请查看日志");
         }
     }
 }

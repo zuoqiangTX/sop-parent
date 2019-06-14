@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-container>
-      <el-aside style="min-height: 300px;width: 200px;">
+      <el-aside style="min-height: 300px;width: 250px;">
         <el-input v-model="filterText" prefix-icon="el-icon-search" placeholder="搜索服务..." style="margin-bottom:20px;" size="mini" clearable />
         <el-tree
           ref="tree2"
@@ -17,10 +17,10 @@
           @node-click="onNodeClick"
         >
           <span slot-scope="{ node, data }" class="custom-tree-node">
-            <span v-if="data.label.length < 15">{{ data.label }}</span>
+            <span v-if="data.label.length < serviceTextLimitSize">{{ data.label }}</span>
             <span v-else>
               <el-tooltip :content="data.label" class="item" effect="light" placement="right">
-                <span>{{ data.label.substring(0, 15) + '...' }}</span>
+                <span>{{ data.label.substring(0, serviceTextLimitSize) + '...' }}</span>
               </el-tooltip>
             </span>
           </span>
@@ -222,6 +222,7 @@
 export default {
   data() {
     return {
+      serviceTextLimitSize: 20,
       filterText: '',
       treeData: [],
       tableData: [],
@@ -407,13 +408,8 @@ export default {
         }
       })
     },
-    resetForm(formName) {
-      const frm = this.$refs[formName]
-      frm && frm.resetFields()
-    },
     onLimitDialogClose: function() {
       this.resetForm('limitDialogForm')
-      this.limitDialogVisible = false
     },
     infoRender: function(row) {
       const html = []

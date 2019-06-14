@@ -6,11 +6,11 @@ import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.easyopen.exception.ApiException;
 import com.gitee.easyopen.verify.DefaultMd5Verifier;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.service.param.LogMonitorInstanceAddParam;
 import com.gitee.sop.adminserver.api.service.result.LogMonitorInstanceVO;
+import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.QueryUtil;
 import com.gitee.sop.adminserver.entity.ConfigCommon;
 import com.gitee.sop.adminserver.mapper.ConfigCommonMapper;
@@ -80,7 +80,7 @@ public class LogApi {
                 }
             } catch (Exception e) {
                 log.error("获取日志信息出错", e);
-                throw new ApiException("获取日志信息出错");
+                throw new BizException("获取日志信息出错");
             }
         }
         Collections.sort(ret, Comparator.comparing(LogMonitorInstanceVO::getCount));
@@ -98,7 +98,7 @@ public class LogApi {
             String ipPort = configCommon.getConfigKey();
             this.requestLogServer(ipPort, "clearErrors");
         } catch (Exception e) {
-            throw new ApiException("清除失败");
+            throw new BizException("清除失败");
         }
     }
 
@@ -122,7 +122,7 @@ public class LogApi {
                 .eq("config_key", ipPort);
         ConfigCommon rec = configCommonMapper.getByQuery(query);
         if (rec != null) {
-            throw new ApiException("该实例已添加");
+            throw new BizException("该实例已添加");
         }
         ConfigCommon configCommon = new ConfigCommon();
         configCommon.setConfigGroup(LOG_MONITOR_INSTANCE);
@@ -137,11 +137,11 @@ public class LogApi {
             JSONObject jsonObject = JSON.parseObject(json);
             if (!CODE_SUCCESS.equals(jsonObject.getString("code"))) {
                 log.error("请求结果:{}", json);
-                throw new ApiException("添加失败");
+                throw new BizException("添加失败");
             }
         } catch (Exception e) {
             log.error("添加失败", e);
-            throw new ApiException("添加失败");
+            throw new BizException("添加失败");
         }
     }
 

@@ -5,7 +5,7 @@ import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.easyopen.exception.ApiException;
+import com.gitee.sop.adminserver.api.service.param.ServiceAddParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfo;
@@ -14,11 +14,16 @@ import com.gitee.sop.adminserver.bean.EurekaApplication;
 import com.gitee.sop.adminserver.bean.EurekaApps;
 import com.gitee.sop.adminserver.bean.EurekaInstance;
 import com.gitee.sop.adminserver.bean.EurekaUri;
+import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.common.BizException;
+import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
+import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +33,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -47,8 +53,6 @@ public class ServiceApi {
     private Environment environment;
 
     private String eurekaUrl;
-
-    // eureka.client.serviceUrl.defaultZone
 
     @Api(name = "service.list")
     @ApiDocMethod(description = "服务列表（旧）", elementClass = ServiceInfo.class)
@@ -72,6 +76,48 @@ public class ServiceApi {
                 .collect(Collectors.toList());
 
         return serviceInfoList;
+    }
+
+    @Api(name = "service.custom.add")
+    @ApiDocMethod(description = "添加服务")
+    void addService(ServiceAddParam param) {
+        String serviceId = param.getServiceId();
+        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
+        ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
+        Date now = new Date();
+        serviceRouteInfo.setServiceId(serviceId);
+        serviceRouteInfo.setDescription("自定义服务");
+        serviceRouteInfo.setCreateTime(now);
+        serviceRouteInfo.setUpdateTime(now);
+        serviceRouteInfo.setCustom(BooleanUtils.toInteger(true));
+        String serviceData = JSON.toJSONString(serviceRouteInfo);
+        try {
+            ZookeeperContext.addPath(servicePath, serviceData);
+        } catch (ZookeeperPathExistException e) {
+            throw new BizException("服务已存在");
+        }
+    }
+
+    @Api(name = "service.custom.del")
+    @ApiDocMethod(description = "删除自定义服务")
+    void delService(ServiceSearchParam param) {
+        String serviceId = param.getServiceId();
+        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
+        String data = null;
+        try {
+            data = ZookeeperContext.getData(servicePath);
+        } catch (ZookeeperPathNotExistException e) {
+            throw new BizException("服务不存在");
+        }
+        if (StringUtils.isBlank(data)) {
+            throw new BizException("非自定义服务，无法删除");
+        }
+        ServiceRouteInfo serviceRouteInfo = JSON.parseObject(data, ServiceRouteInfo.class);
+        int custom = serviceRouteInfo.getCustom();
+        if (!BooleanUtils.toBoolean(custom)) {
+            throw new BizException("非自定义服务，无法删除");
+        }
+        ZookeeperContext.deletePathDeep(servicePath);
     }
 
     @Api(name = "service.instance.list")
@@ -133,7 +179,7 @@ public class ServiceApi {
             return response.body().string();
         } else {
             log.error("操作失败，url:{}, msg:{}, code:{}", eurekaUri.getUri(args), response.message(), response.code());
-            throw new ApiException("操作失败", String.valueOf(response.code()));
+            throw new BizException("操作失败", String.valueOf(response.code()));
         }
     }
 
@@ -141,7 +187,7 @@ public class ServiceApi {
     protected void after() {
         String eurekaUrls = environment.getProperty("eureka.client.serviceUrl.defaultZone");
         if (StringUtils.isBlank(eurekaUrls)) {
-            throw new ApiException("未指定eureka.client.serviceUrl.defaultZone参数");
+            throw new BizException("未指定eureka.client.serviceUrl.defaultZone参数");
         }
         String url = eurekaUrls.split("\\,")[0];
         if (url.endsWith("/")) {

@@ -41,10 +41,12 @@ public class LimitNewAddParam {
 
     /** 返回的错误码, 数据库字段：limit_code */
     @ApiDocField(description = "返回的错误码")
+    @Length(max = 64, message = "limitCode长度不能超过64")
     private String limitCode;
 
     /** 返回的错误信息, 数据库字段：limit_msg */
     @ApiDocField(description = "返回的错误信息")
+    @Length(max = 100, message = "limitMsg长度不能超过100")
     private String limitMsg;
 
     /** 令牌桶容量, 数据库字段：token_bucket_count */

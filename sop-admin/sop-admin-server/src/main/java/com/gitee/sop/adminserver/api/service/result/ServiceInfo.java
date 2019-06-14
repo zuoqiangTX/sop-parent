@@ -19,4 +19,8 @@ public class ServiceInfo {
 
     @ApiDocField(description = "描述")
     private String description;
+
+    /** 是否是自定义服务，1：是，0：否 */
+    @ApiDocField(description = "是否是自定义服务，1：是，0：否")
+    private Integer custom;
 }

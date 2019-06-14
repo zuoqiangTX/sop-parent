@@ -4,7 +4,6 @@ import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.easyopen.exception.ApiException;
 import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.service.param.LimitParam;
@@ -12,6 +11,7 @@ import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
 import com.gitee.sop.adminserver.api.service.result.LimitVO;
 import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
+import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.LimitEnum;
 import com.gitee.sop.adminserver.entity.ConfigRouteLimit;
 import com.gitee.sop.adminserver.mapper.ConfigRouteLimitMapper;
@@ -118,7 +118,7 @@ public class LimitApi {
             routeConfigService.sendRouteConfigMsg(routeConfigDto);
         } catch (Exception e) {
             log.error("推送限流消息错误, param:{}", param, e);
-            throw new ApiException("修改失败，请查看日志");
+            throw new BizException("修改失败，请查看日志");
         }
     }
 }

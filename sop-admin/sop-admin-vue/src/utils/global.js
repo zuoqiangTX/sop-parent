@@ -8,7 +8,7 @@ import { getToken, removeToken } from './auth'
 // 创建axios实例
 const client = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // api 的 base_url
-  timeout: 5000 // 请求超时时间
+  timeout: 10000 // 请求超时时间
 })
 
 Object.assign(Vue.prototype, {
@@ -93,6 +93,14 @@ Object.assign(Vue.prototype, {
         }
       }
     }).catch(function() {})
+  },
+  /**
+   * 重置表单
+   * @param formName 表单元素的ref
+   */
+  resetForm(formName) {
+    const frm = this.$refs[formName]
+    frm && frm.resetFields()
   },
   logout: function() {
     removeToken()

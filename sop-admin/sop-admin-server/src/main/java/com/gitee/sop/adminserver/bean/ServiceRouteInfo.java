@@ -24,4 +24,7 @@ public class ServiceRouteInfo {
 
     @JSONField(serialize = false)
     private List<GatewayRouteDefinition> routeDefinitionList;
+
+    /** 是否是自定义服务，1：是，0：否 */
+    private int custom;
 }

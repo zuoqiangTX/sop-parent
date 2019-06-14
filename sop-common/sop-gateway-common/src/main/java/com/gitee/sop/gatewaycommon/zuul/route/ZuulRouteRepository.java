@@ -1,9 +1,7 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
-import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +21,7 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
 
     @Override
     public ZuulTargetRoute get(String id) {
-        ZuulTargetRoute route = nameVersionTargetRouteMap.get(id);
-        if (route == null) {
-            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
-        }
-        return route;
+        return nameVersionTargetRouteMap.get(id);
     }
 
     @Override

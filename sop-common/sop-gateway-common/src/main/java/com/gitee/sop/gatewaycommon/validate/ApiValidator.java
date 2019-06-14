@@ -39,25 +39,23 @@ public class ApiValidator implements Validator {
 
     @Override
     public void validate(ApiParam param) {
-        ApiConfig apiConfig = ApiContext.getApiConfig();
-        if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
+        try {
+            ApiConfig apiConfig = ApiContext.getApiConfig();
+            if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
+                }
+                return;
             }
-            return;
-        }
-        if (param.fetchIgnoreSign()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("忽略签名验证, name:{}, version:{}", param.fetchName(), param.fetchVersion());
-            }
-        } else {
-            // 需要验证签名,先校验appKey，后校验签名顺序不能变
+            // 需要验证签名,先校验appKey，后校验签名,顺序不能变
             checkAppKey(param);
             checkSign(param);
+            checkTimeout(param);
+            checkFormat(param);
+            checkUploadFile(param);
+        } finally {
+            param.fitNameVersion();
         }
-        checkUploadFile(param);
-        checkTimeout(param);
-        checkFormat(param);
     }
 
 

@@ -74,6 +74,9 @@ public class DefaultLimitConfigManager implements LimitConfigManager {
 
     @Override
     public ConfigLimitDto get(String limitKey) {
+        if (StringUtils.isBlank(limitKey)) {
+            return null;
+        }
         return limitCache.get(limitKey);
     }
 

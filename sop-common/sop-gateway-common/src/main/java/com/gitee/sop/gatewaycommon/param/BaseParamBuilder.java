@@ -7,8 +7,10 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author tanghc
@@ -34,7 +36,8 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     }
 
     protected void initOtherProperty(ApiParam apiParam) {
-        if (apiParam.size() == 0) {
+        String nameVersion = apiParam.fetchNameVersion();
+        if (StringUtils.isBlank(nameVersion)) {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
@@ -42,8 +45,10 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
             throw ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getException();
         }
-        TargetRoute targetRoute = routeRepository.get(apiParam.fetchNameVersion());
-        BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        TargetRoute targetRoute = routeRepository.get(nameVersion);
+        BaseRouteDefinition routeDefinition = Optional.ofNullable(targetRoute)
+                .map(t -> t.getRouteDefinition())
+                .orElse(null);
         if (routeDefinition == null) {
             throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
         }
@@ -51,3 +56,4 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     }
 
 }
+

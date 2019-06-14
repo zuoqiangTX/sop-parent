@@ -29,6 +29,15 @@ public class ApiParam extends JSONObject implements Param {
 
     private transient ApiUploadContext apiUploadContext;
 
+    public void fitNameVersion() {
+        if (restName != null) {
+            this.put(ParamNames.API_NAME, restName);
+        }
+        if (restVersion != null) {
+            this.put(ParamNames.VERSION_NAME, restVersion);
+        }
+    }
+
     public static ApiParam build(Map<String, ?> map) {
         ApiParam apiParam = new ApiParam();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
@@ -95,6 +104,9 @@ public class ApiParam extends JSONObject implements Param {
     }
 
     public static String buildNameVersion(String name, String version) {
+        if (name == null && version == null) {
+            return null;
+        }
         if (StringUtils.isEmpty(version)) {
             return name;
         } else {

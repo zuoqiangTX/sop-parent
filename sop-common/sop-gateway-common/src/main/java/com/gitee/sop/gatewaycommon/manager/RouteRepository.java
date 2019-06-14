@@ -11,7 +11,7 @@ public interface RouteRepository<T extends TargetRoute> {
     /**
      * 获取路由信息
      * @param id 路由id
-     * @return 返回路由信息
+     * @return 返回路由信息，找不到返回null
      */
     T get(String id);
 

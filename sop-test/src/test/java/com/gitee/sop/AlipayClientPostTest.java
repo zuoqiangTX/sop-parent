@@ -4,17 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.alipay.AlipaySignature;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 模仿支付宝客户端请求接口
@@ -71,9 +64,10 @@ public class AlipayClientPostTest extends TestBase {
         params.put("sign", sign);
 
         System.out.println("----------- 返回结果 -----------");
-        String responseData = post(url, params);// 发送请求
+        String responseData = get(url, params);// 发送请求
         System.out.println(responseData);
     }
+
 
     // 这个请求会路由到book服务
     @Test
@@ -132,6 +126,40 @@ public class AlipayClientPostTest extends TestBase {
         bizContent.put("id", "1");
         bizContent.put("name", "葫芦娃");
 //        bizContent.put("name", "葫芦娃1234567890葫芦娃1234567890"); // 超出长度
+
+        params.put("biz_content", JSON.toJSONString(bizContent));
+
+        System.out.println("----------- 请求信息 -----------");
+        System.out.println("请求参数：" + buildParamQuery(params));
+        System.out.println("商户秘钥：" + privateKey);
+        String content = AlipaySignature.getSignContent(params);
+        System.out.println("待签名内容：" + content);
+        String sign = AlipaySignature.rsa256Sign(content, privateKey, "utf-8");
+        System.out.println("签名(sign)：" + sign);
+
+        params.put("sign", sign);
+
+        System.out.println("----------- 返回结果 -----------");
+        String responseData = post(url, params);// 发送请求
+        System.out.println(responseData);
+    }
+
+    // 测试dubbo服务，book会调用story提供的服务。参见：DemoConsumerController.java
+    @Test
+    public void testDubboDemo() throws Exception {
+        // 公共请求参数
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("app_id", appId);
+        params.put("method", "dubbo.story.get");
+        params.put("format", "json");
+        params.put("charset", "utf-8");
+        params.put("sign_type", "RSA2");
+        params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        params.put("version", "1.0");
+
+        // 业务参数
+        Map<String, String> bizContent = new HashMap<>();
+        bizContent.put("id", "222");
 
         params.put("biz_content", JSON.toJSONString(bizContent));
 

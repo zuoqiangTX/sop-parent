@@ -14,6 +14,11 @@ zuul:
   # 不用改，如果要改，建议全局替换修改
   secret: MZZOUSTua6LzApIWXCwEgbBmxSzpzC
 
+ribbon:
+  # 设置为true（默认false），则所有请求都重试，默认只支持get请求重试
+  # 请谨慎设置，因为post请求大多都是写入请求，如果要支持重试，确保服务的幂等性
+  OkToRetryOnAllOperations: false
+
 # 注册中心，根据实际情况修改
 eureka:
   serverAddr: localhost:1111

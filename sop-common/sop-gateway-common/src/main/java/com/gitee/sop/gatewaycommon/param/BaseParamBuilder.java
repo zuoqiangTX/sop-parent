@@ -7,7 +7,6 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -36,23 +35,20 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     }
 
     protected void initOtherProperty(ApiParam apiParam) {
-        String nameVersion = apiParam.fetchNameVersion();
-        if (StringUtils.isBlank(nameVersion)) {
-            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
-        }
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
             throw ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getException();
         }
+
+        String nameVersion = Optional.ofNullable(apiParam.fetchNameVersion()).orElse(String.valueOf(System.currentTimeMillis()));
         TargetRoute targetRoute = routeRepository.get(nameVersion);
-        BaseRouteDefinition routeDefinition = Optional.ofNullable(targetRoute)
+        Integer ignoreValidate = Optional.ofNullable(targetRoute)
                 .map(t -> t.getRouteDefinition())
-                .orElse(null);
-        if (routeDefinition == null) {
-            throw ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getException();
-        }
-        apiParam.setIgnoreValidate(BooleanUtils.toBoolean(routeDefinition.getIgnoreValidate()));
+                .map(BaseRouteDefinition::getIgnoreValidate)
+                // 默认不忽略
+                .orElse(BooleanUtils.toInteger(false));
+        apiParam.setIgnoreValidate(BooleanUtils.toBoolean(ignoreValidate));
     }
 
 }

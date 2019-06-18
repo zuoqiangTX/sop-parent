@@ -3,6 +3,9 @@ package com.gitee.sop.gatewaycommon.validate;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.Isv;
+import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
@@ -39,25 +42,38 @@ public class ApiValidator implements Validator {
 
     @Override
     public void validate(ApiParam param) {
-        try {
-            ApiConfig apiConfig = ApiContext.getApiConfig();
-            if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
-                }
-                return;
+        checkEnable(param);
+
+        ApiConfig apiConfig = ApiContext.getApiConfig();
+        if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
             }
-            // 需要验证签名,先校验appKey，后校验签名,顺序不能变
-            checkAppKey(param);
-            checkSign(param);
-            checkTimeout(param);
-            checkFormat(param);
-            checkUploadFile(param);
-        } finally {
-            param.fitNameVersion();
+            return;
         }
+        // 需要验证签名,先校验appKey，后校验签名,顺序不能变
+        checkAppKey(param);
+        checkSign(param);
+        checkTimeout(param);
+        checkFormat(param);
+        checkUploadFile(param);
     }
 
+    /**
+     * 检测能否访问
+     * @param param 接口参数
+     */
+    protected void checkEnable(ApiParam param) {
+        String routeId = param.fetchNameVersion();
+        // 检查路由是否存在
+        RouteRepositoryContext.checkExist(routeId, ErrorEnum.ISV_INVALID_METHOD);
+        // 检查路由是否启用
+        RouteConfigManager routeConfigManager = ApiConfig.getInstance().getRouteConfigManager();
+        RouteConfig routeConfig = routeConfigManager.get(routeId);
+        if (!routeConfig.enable()) {
+            throw ErrorEnum.ISP_API_DISABLED.getErrorMeta().getException();
+        }
+    }
 
     /**
      * 校验上传文件内容

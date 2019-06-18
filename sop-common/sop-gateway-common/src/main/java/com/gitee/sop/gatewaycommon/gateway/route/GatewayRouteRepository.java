@@ -11,7 +11,6 @@ import org.springframework.cloud.gateway.event.PredicateArgsEvent;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.handler.predicate.RoutePredicateFactory;
-import org.springframework.cloud.gateway.route.InMemoryRouteDefinitionRepository;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.ConfigurationUtils;
@@ -80,6 +79,9 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
      */
     @Override
     public GatewayTargetRoute get(String id) {
+        if (id == null) {
+            return null;
+        }
         return routes.get(id);
     }
 

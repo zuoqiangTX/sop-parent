@@ -21,6 +21,9 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
 
     @Override
     public ZuulTargetRoute get(String id) {
+        if (id == null) {
+            return null;
+        }
         return nameVersionTargetRouteMap.get(id);
     }
 

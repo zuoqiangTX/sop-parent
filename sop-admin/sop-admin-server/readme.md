@@ -1,9 +1,6 @@
-# easyopen-server
+# sop admin服务端
 
-启动后，接口url：http://ip:port/api
-
-如果有contextPath的话则是：http://ip:port/contextPath/api
-
-业务类在api下，重点关注这里即可。
-
+- 打开`application-dev.yml`，修改数据库`username/password`
+- 运行`SopAdminServerApplication.java`
+- 访问：`http://localhost:8082`
 

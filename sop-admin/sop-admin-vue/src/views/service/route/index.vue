@@ -34,7 +34,7 @@
         >
           <span slot-scope="{ node, data }" class="custom-tree-node">
             <div>
-              <el-tooltip v-show="data.custom" content="自定义服务" class="item" effect="light" placement="top">
+              <el-tooltip v-show="data.custom" content="自定义服务" class="item" effect="light" placement="left">
                 <i class="el-icon-warning-outline"></i>
               </el-tooltip>
               <span v-if="data.label.length < serviceTextLimitSize">{{ data.label }}</span>

@@ -19,6 +19,8 @@ spring:
 api:
   # 测试地址
   url-test: http://api-test.yourdomain.com/api
+  # 沙箱环境
+  url-sandbox: http://localhost:8081/api
   # 正式地址
   url-prod: http://open.yourdomain.com/api
   pwd: doc#123

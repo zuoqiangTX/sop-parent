@@ -11,7 +11,7 @@ zuul:
   Servlet30WrapperFilter:
     pre:
       disable: true
-  # 不用改，如果要改，建议全局替换修改
+  # 不用改，如果要改，请全局替换修改
   secret: MZZOUSTua6LzApIWXCwEgbBmxSzpzC
 
 ribbon:

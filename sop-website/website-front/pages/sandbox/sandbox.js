@@ -3,11 +3,8 @@ docEvent.bind(function (docItem,layui) {
     selectItem(docItem, layui);
 });
 
-InputCache.init();
-
 layui.use('form', function(){
     var form = layui.form;
-
     //监听提交
     form.on('submit(formSend)', function(data){
         doTest();
@@ -33,6 +30,7 @@ function selectItem(docItem, layui) {
 
     var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
     $li.addClass('layui-this').siblings().removeClass('layui-this');
+    InputCache.init();
 }
 
 function createRequestParameter(docItem) {
@@ -78,7 +76,17 @@ function createTreeTable(id, data) {
             ,{field: 'val', title: '值', width: 300, templet:function (row) {
                 var id = currentItem.nameVersion + '-' + row.name;
                 var requiredTxt = row.required ? 'required  lay-verify="required"' : '';
-                return !row.refs ? '<input id="' + id + '" ' + requiredTxt + ' type="text" name="' + row.name + '" class="layui-input test-input"/>' : '';
+                var module = row.module;
+                var attrs = [
+                    'id="' + id + '"'
+                    , 'name="'+row.name+'"'
+                    , 'class="layui-input test-input"'
+                    , 'type="text"'
+                    , requiredTxt
+                    , 'module="'+module+'"'
+                ];
+
+                return !row.refs ? '<input ' + attrs.join(' ') + '/>' : '';
             }}
             ,{field: 'description', title: '描述'}
         ]]
@@ -86,7 +94,7 @@ function createTreeTable(id, data) {
 }
 
 function doTest() {
-    var method = currentItem.method;
+    var method = currentItem.name;
     var version = currentItem.version;
     var data = {
         appId: $('#appId').val(),
@@ -97,7 +105,16 @@ function doTest() {
     var $inputs = $body.find('.test-input');
     var bizContent = {};
     $inputs.each(function () {
-        bizContent[this.name] = this.value;
+        var module = $(this).attr('module');
+        if (module) {
+            if (!bizContent[module]) {
+                bizContent[module] = {};
+            }
+            var moduleObj = bizContent[module];
+            moduleObj[this.name] = this.value;
+        } else {
+            bizContent[this.name] = this.value;
+        }
     });
     data.bizContent = JSON.stringify(bizContent);
     $.ajax({

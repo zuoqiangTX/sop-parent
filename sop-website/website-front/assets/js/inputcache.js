@@ -8,7 +8,7 @@ var InputCache = {
         if (storage) {
             var dataKey = location.host;
 
-            $('body').on('change', 'input', function (){
+            $('body').find('input[type="text"]').unbind().change(function () {
                 var id = this.id;
                 if (id) {
                     var data = getCache();

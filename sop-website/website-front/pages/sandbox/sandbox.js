@@ -3,6 +3,8 @@ docEvent.bind(function (docItem,layui) {
     selectItem(docItem, layui);
 });
 
+InputCache.init();
+
 layui.use('form', function(){
     var form = layui.form;
 
@@ -15,14 +17,12 @@ layui.use('form', function(){
 
 var $body = $('body');
 var treetable;
-var method,version;
-var nameVersion;
+var currentItem;
 
 function selectItem(docItem, layui) {
+    currentItem = docItem;
     resetResultDiv();
-    nameVersion = docItem.nameVersion;
-    method = docItem.name;
-    version = docItem.version;
+    var nameVersion = docItem.nameVersion;
     treetable = treetable || layui.treetable;
     $('.sop-name').text(docItem.name);
     $('.sop-version').text(docItem.version);
@@ -33,7 +33,6 @@ function selectItem(docItem, layui) {
 
     var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
     $li.addClass('layui-this').siblings().removeClass('layui-this');
-    InputCache.init();
 }
 
 function createRequestParameter(docItem) {
@@ -77,7 +76,7 @@ function createTreeTable(id, data) {
         cols: [[
             {field: 'name', title: '参数',width: 200}
             ,{field: 'val', title: '值', width: 300, templet:function (row) {
-                var id = nameVersion + '-' + row.name;
+                var id = currentItem.nameVersion + '-' + row.name;
                 var requiredTxt = row.required ? 'required  lay-verify="required"' : '';
                 return !row.refs ? '<input id="' + id + '" ' + requiredTxt + ' type="text" name="' + row.name + '" class="layui-input test-input"/>' : '';
             }}
@@ -87,6 +86,8 @@ function createTreeTable(id, data) {
 }
 
 function doTest() {
+    var method = currentItem.method;
+    var version = currentItem.version;
     var data = {
         appId: $('#appId').val(),
         privateKey: $('#privateKey').val(),

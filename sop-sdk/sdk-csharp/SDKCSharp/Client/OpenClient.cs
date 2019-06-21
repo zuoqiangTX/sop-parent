@@ -106,7 +106,6 @@ namespace SDKCSharp.Client
                 form[this.openConfig.AccessTokenName] = accessToken;
             }
             form[this.openConfig.AppKeyName] = this.appId;
-            string content = SopSignature.getSignContent(form);
             string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
             form[this.openConfig.SignName] = sign;
 

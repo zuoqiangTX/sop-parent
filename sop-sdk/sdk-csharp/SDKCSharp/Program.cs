@@ -29,7 +29,9 @@ namespace SDKTest
         public static void Main(string[] args)
         {
             TestGet();
+            Console.WriteLine("--------------------");
             TestCommon();
+            Console.WriteLine("--------------------");
             TestUpload();
         }
 
@@ -103,7 +105,10 @@ namespace SDKTest
             };
             request.BizModel = model;
 
-            string root = Environment.CurrentDirectory;
+            string workDir = Environment.CurrentDirectory;
+            int index = workDir.LastIndexOf(@"/bin/Debug", StringComparison.Ordinal);
+            string root = workDir.Substring(0, index);
+
             Console.WriteLine("当前目录{0}", root);
 
             // 文件上传

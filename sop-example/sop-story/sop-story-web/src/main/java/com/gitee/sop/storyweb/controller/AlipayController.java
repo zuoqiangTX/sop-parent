@@ -82,6 +82,7 @@ public class AlipayController {
         return story;
     }
 
+    // http://localhost:2222/alipay.story.get/
     @ApiMapping(value = "alipay.story.get")
     public Story getStory() {
         Story story = new Story();

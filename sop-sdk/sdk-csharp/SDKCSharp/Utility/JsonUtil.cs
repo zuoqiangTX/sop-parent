@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using SDKCSharp.Request;
 
 namespace SDKCSharp.Utility
 {
@@ -35,6 +36,7 @@ namespace SDKCSharp.Utility
         {
             return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
         }
+
 
         /// <summary>
         /// 对象转换成json字符串

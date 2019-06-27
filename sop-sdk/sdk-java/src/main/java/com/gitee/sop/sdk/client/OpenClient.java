@@ -5,11 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.sdk.common.DataNameBuilder;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
+import com.gitee.sop.sdk.common.SopSdkConstants;
+import com.gitee.sop.sdk.common.SopSdkErrors;
 import com.gitee.sop.sdk.exception.SdkException;
 import com.gitee.sop.sdk.request.BaseRequest;
 import com.gitee.sop.sdk.response.BaseResponse;
+import com.gitee.sop.sdk.response.ErrorResponse;
 import com.gitee.sop.sdk.sign.SopSignException;
 import com.gitee.sop.sdk.sign.SopSignature;
+import com.gitee.sop.sdk.sign.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,31 +29,44 @@ public class OpenClient {
     private static final Log log = LogFactory.getLog(OpenClient.class);
 
     private static final OpenConfig DEFAULT_CONFIG = new OpenConfig();
-    private static final String ERROR_RESPONSE_KEY = "error_response";
 
     private String url;
     private String appId;
     private String privateKey;
+    /**
+     * 开放平台提供的公钥
+     */
+    private String publicKeyPlatform;
 
     private OpenConfig openConfig;
     private OpenRequest openRequest;
     private DataNameBuilder dataNameBuilder;
 
-    public OpenClient(String url, String appId, String privateKey) {
-        this(url, appId, privateKey, DEFAULT_CONFIG);
+    public OpenClient(String url, String appId, String privateKeyIsv) {
+        this(url, appId, privateKeyIsv, DEFAULT_CONFIG);
     }
 
-    public OpenClient(String url, String appId, String privateKey, OpenConfig openConfig) {
+    public OpenClient(String url, String appId, String privateKeyIsv, String publicKeyPlatform) {
+        this(url, appId, privateKeyIsv);
+        this.publicKeyPlatform = publicKeyPlatform;
+    }
+
+    public OpenClient(String url, String appId, String privateKeyIsv, OpenConfig openConfig) {
         if (openConfig == null) {
             throw new IllegalArgumentException("openConfig不能为null");
         }
         this.url = url;
         this.appId = appId;
-        this.privateKey = privateKey;
+        this.privateKey = privateKeyIsv;
         this.openConfig = openConfig;
 
         this.openRequest = new OpenRequest(openConfig);
         this.dataNameBuilder = openConfig.getDataNameBuilder();
+    }
+
+    public OpenClient(String url, String appId, String privateKeyIsv, String publicKeyPlatform, OpenConfig openConfig) {
+        this(url, appId, privateKeyIsv, openConfig);
+        this.publicKeyPlatform = publicKeyPlatform;
     }
 
     /**
@@ -83,7 +100,7 @@ public class OpenClient {
         String content = SopSignature.getSignContent(form);
         String sign = null;
         try {
-            sign = SopSignature.rsa256Sign(content, privateKey, "utf-8");
+            sign = SopSignature.rsaSign(content, privateKey, openConfig.getCharset(), openConfig.getSignType());
         } catch (SopSignException e) {
             throw new SdkException("构建签名错误", e);
         }
@@ -109,16 +126,60 @@ public class OpenClient {
 
     protected <T extends BaseResponse> T parseResponse(String resp, BaseRequest<T> request) {
         String method = request.getMethod();
-        String dataName = dataNameBuilder.build(method);
+        String rootNodeName = dataNameBuilder.build(method);
         JSONObject jsonObject = JSON.parseObject(resp);
-        boolean errorResponse = jsonObject.containsKey(ERROR_RESPONSE_KEY);
+        String errorResponseName = this.openConfig.getErrorResponseName();
+        boolean errorResponse = jsonObject.containsKey(errorResponseName);
         if (errorResponse) {
-            dataName = ERROR_RESPONSE_KEY;
+            rootNodeName = errorResponseName;
         }
-        JSONObject data = jsonObject.getJSONObject(dataName);
+        JSONObject data = jsonObject.getJSONObject(rootNodeName);
+        String sign = jsonObject.getString(openConfig.getSignName());
+        // 是否要验证返回的sign
+        if (StringUtils.areNotEmpty(sign, publicKeyPlatform)) {
+            String signContent = buildBizJson(rootNodeName, resp);
+            if (!this.checkResponseSign(signContent, sign, publicKeyPlatform)) {
+                ErrorResponse error = SopSdkErrors.CHECK_RESPONSE_SIGN_ERROR.getErrorResponse();
+                data = JSON.parseObject(JSON.toJSONString(error));
+            }
+        }
         T t = data.toJavaObject(request.getResponseClass());
         t.setBody(data.toJSONString());
         return t;
+    }
+
+    protected String buildBizJson(String rootNodeName, String body) {
+        int indexOfRootNode = body.indexOf(rootNodeName);
+        if (indexOfRootNode < 0) {
+            rootNodeName = SopSdkConstants.ERROR_RESPONSE_KEY;
+            indexOfRootNode = body.indexOf(rootNodeName);
+        }
+        String result = null;
+        if (indexOfRootNode > 0) {
+            result = buildJsonNodeData(body, rootNodeName, indexOfRootNode);
+        }
+        return result;
+    }
+
+    protected String buildJsonNodeData(String body, String rootNodeName, int indexOfRootNode) {
+        int signDataStartIndex = indexOfRootNode + rootNodeName.length() + 2;
+        int indexOfSign = body.indexOf("\"" + openConfig.getSignName() + "\"");
+        if (indexOfSign < 0) {
+            return null;
+        }
+        int length = indexOfSign - 1;
+        return body.substring(signDataStartIndex, length);
+    }
+
+    protected <T extends BaseResponse> boolean checkResponseSign(String signContent, String sign, String publicKeyPlatform) {
+        try {
+            String charset = this.openConfig.getCharset();
+            String signType = this.openConfig.getSignType();
+            return SopSignature.rsaCheck(signContent, sign, publicKeyPlatform, charset, signType);
+        } catch (SopSignException e) {
+            log.error("验证服务端sign出错，signContent：" + signContent, e);
+            return false;
+        }
     }
 
 

@@ -13,9 +13,6 @@ namespace SDKCSharp.Client
 {
     public class OpenRequest
     {
-       
-        private const string HTTP_ERROR_CODE = "-400";
-
         private OpenConfig openConfig;
         private OpenHttp openHttp;
 
@@ -77,17 +74,10 @@ namespace SDKCSharp.Client
 
         protected string CauseException(Exception e)
         {
-            ErrorResponse result = new ErrorResponse();
-            result.SubCode = HTTP_ERROR_CODE;
-            result.SubMsg = e.Message;
-            result.Code = HTTP_ERROR_CODE;
-            result.Msg = e.Message;
+            ErrorResponse result = SopSdkErrors.HTTP_ERROR;
             return JsonUtil.ToJSONString(result);
         }
 
     }
 
-    class ErrorResponse : BaseResponse
-    {
-    }
 }

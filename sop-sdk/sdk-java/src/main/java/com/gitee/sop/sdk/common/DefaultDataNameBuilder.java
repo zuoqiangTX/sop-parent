@@ -19,7 +19,7 @@ package com.gitee.sop.sdk.common;
 public class DefaultDataNameBuilder implements DataNameBuilder {
     private static final char DOT = '.';
     private static final char UNDERLINE = '_';
-    private static final String DATA_SUFFIX = "_response";
+    private static final String DATA_SUFFIX = SopSdkConstants.DATA_SUFFIX;
 
     @Override
     public String build(String method) {

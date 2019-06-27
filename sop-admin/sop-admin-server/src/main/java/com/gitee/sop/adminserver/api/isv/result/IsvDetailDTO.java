@@ -17,16 +17,16 @@ public class IsvDetailDTO {
     @ApiDocField(description = "状态：0启用，1禁用")
     private Byte status;
 
-    // keys
-
     /** secret, 数据库字段：secret */
     @ApiDocField(description = "secret", example = "bbbb")
     private String secret;
 
     /** 开发者生成的公钥, 数据库字段：public_key_isv */
+    @ApiDocField(description = "开发者生成的公钥")
     private String publicKeyIsv;
 
     /** 平台生成的私钥, 数据库字段：private_key_platform */
+    @ApiDocField(description = "平台生成的私钥")
     private String privateKeyPlatform;
 
     @ApiDocField(description = "签名类型：1:RSA2,2:MD5")

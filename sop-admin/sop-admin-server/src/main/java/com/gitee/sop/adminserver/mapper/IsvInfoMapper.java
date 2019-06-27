@@ -19,8 +19,6 @@ public interface IsvInfoMapper extends CrudMapper<IsvInfo, Long> {
             "  ,t2.sign_type signType " +
             "  ,t2.secret " +
             "  ,t2.public_key_isv publicKeyIsv " +
-            "  ,t2.private_key_isv privateKeyIsv " +
-            "  ,t2.public_key_platform publicKeyPlatform " +
             "  ,t2.private_key_platform privateKeyPlatform " +
             "FROM isv_info t " +
             "INNER JOIN isv_keys t2 ON t.app_key = t2.app_key " +

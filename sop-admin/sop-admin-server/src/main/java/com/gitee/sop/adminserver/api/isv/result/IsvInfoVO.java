@@ -10,7 +10,7 @@ import java.util.List;
  * @author thc
  */
 @Data
-public class IsvVO {
+public class IsvInfoVO {
     /**  数据库字段：id */
     @ApiDocField(description = "id", example = "1")
     private Long id;
@@ -18,18 +18,6 @@ public class IsvVO {
     /** appKey, 数据库字段：app_key */
     @ApiDocField(description = "appKey", example = "aaaa")
     private String appKey;
-
-    /** secret, 数据库字段：secret */
-    @ApiDocField(description = "secret", example = "bbbb")
-    private String secret;
-
-    /** 公钥, 数据库字段：pub_key */
-    @ApiDocField(description = "pubKey")
-    private String pubKey;
-
-    /** 私钥, 数据库字段：pri_key */
-    @ApiDocField(description = "priKey")
-    private String priKey;
 
     /** 0启用，1禁用, 数据库字段：status */
     @ApiDocField(description = "状态：0启用，1禁用")

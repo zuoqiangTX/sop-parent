@@ -231,7 +231,18 @@
     </el-container>
   </div>
 </template>
-
+<style>
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
+  .el-input.is-disabled .el-input__inner {color: #909399;}
+  .el-radio__input.is-disabled+span.el-radio__label {color: #909399;}
+</style>
 <script>
 export default {
   data() {
@@ -425,6 +436,7 @@ export default {
     },
     onLimitDialogClose: function() {
       this.resetForm('limitDialogForm')
+      this.limitDialogFormData.limitStatus = 0
     },
     infoRender: function(row) {
       const html = []

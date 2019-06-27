@@ -28,20 +28,8 @@ public class IsvInfo {
     /** appKey, 数据库字段：app_key */
     private String appKey;
 
-    /** secret, 数据库字段：secret */
-    private String secret;
-
-    /** 公钥, 数据库字段：pub_key */
-    private String pubKey;
-
-    /** 私钥, 数据库字段：pri_key */
-    private String priKey;
-
     /** 1启用，2禁用, 数据库字段：status */
     private Byte status;
-
-    /** 1:RSA2,2:MD5, 数据库字段：sign_type */
-    private Byte signType;
 
     /**  数据库字段：gmt_create */
     private Date gmtCreate;

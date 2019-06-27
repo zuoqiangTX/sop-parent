@@ -4,3 +4,4 @@
 - 运行`SopAdminServerApplication.java`
 - 访问：`http://localhost:8082`
 
+登录账号：admin/123456

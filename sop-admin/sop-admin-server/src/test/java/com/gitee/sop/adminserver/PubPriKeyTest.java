@@ -1,4 +1,4 @@
-package com.gitee.durcframework.easyopen.server;
+package com.gitee.sop.adminserver;
 
 import org.junit.Test;
 

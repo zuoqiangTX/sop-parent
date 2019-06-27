@@ -2,13 +2,13 @@ package com.gitee.sop.adminserver.entity;
 
 import lombok.Data;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -19,7 +19,7 @@ import javax.persistence.Table;
  */
 @Table(name = "admin_user_info")
 @Data
-public class AdminUserInfo {
+public class AdminUserInfo implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

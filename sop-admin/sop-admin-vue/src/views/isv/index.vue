@@ -26,31 +26,12 @@
         width="250"
       />
       <el-table-column
-        prop="secret"
-        label="secret"
-        width="80"
-      >
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.signType === 2" type="text" size="mini" @click="onShowSecret(scope.row)">查看</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column
         prop=""
-        label="公私钥"
+        label="秘钥"
         width="80"
       >
         <template slot-scope="scope">
-          <el-button v-if="scope.row.signType === 1" type="text" size="mini" @click="onShowPriPubKey(scope.row)">查看</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="signType"
-        label="签名类型"
-        width="80"
-      >
-        <template slot-scope="scope">
-          <span v-if="scope.row.signType === 1">RSA2</span>
-          <span v-if="scope.row.signType === 2">MD5</span>
+          <el-button type="text" size="mini" @click="onShowKeys(scope.row)">查看</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -83,11 +64,11 @@
       />
       <el-table-column
         label="操作"
-        fixed="right"
-        width="100"
+        width="150"
       >
         <template slot-scope="scope">
           <el-button type="text" size="mini" @click="onTableUpdate(scope.row)">修改</el-button>
+          <el-button type="text" size="mini" @click="onKeysUpdate(scope.row)">秘钥管理</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -116,26 +97,9 @@
         label-width="120px"
         size="mini"
       >
-        <el-form-item label="">
-          <el-button size="mini" @click="onDataGen">一键生成数据</el-button>
-        </el-form-item>
-        <el-form-item prop="appKey" label="appKey">
-          <el-input v-model="isvDialogFormData.appKey" size="mini" />
-        </el-form-item>
-        <el-form-item prop="signType" label="签名方式">
-          <el-radio-group v-model="isvDialogFormData.signType">
-            <el-radio :label="1" name="status">RSA2</el-radio>
-            <el-radio :label="2" name="status">MD5</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 2" prop="secret" label="secret">
-          <el-input v-model="isvDialogFormData.secret" size="mini" />
-        </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 1" prop="pubKey" label="公钥">
-          <el-input v-model="isvDialogFormData.pubKey" type="textarea" />
-        </el-form-item>
-        <el-form-item v-show="isvDialogFormData.signType === 1" prop="priKey" label="私钥">
-          <el-input v-model="isvDialogFormData.priKey" type="textarea" />
+        <el-form-item label="appKey">
+          <span v-if="isvDialogFormData.id === 0" style="color: gray;">(系统自动生成)</span>
+          <span v-else>{{ isvDialogFormData.appKey }}</span>
         </el-form-item>
         <el-form-item label="角色">
           <el-checkbox-group v-model="isvDialogFormData.roleCode">
@@ -154,31 +118,75 @@
         <el-button type="primary" @click="onIsvDialogSave">保 存</el-button>
       </div>
     </el-dialog>
+    <!--view keys dialog-->
+    <el-dialog
+      title="秘钥信息"
+      :visible.sync="isvKeysDialogVisible"
+      @close="resetForm('isvKeysFrom')"
+    >
+      <el-form
+        ref="isvKeysFrom"
+        :model="isvKeysFormData"
+        label-width="160px"
+        size="mini"
+        class="key-view"
+      >
+        <el-form-item label="">
+          <el-alert
+            title="带 ★ 的分配给开发者"
+            type="warning"
+            :closable="false"
+          />
+        </el-form-item>
+        <el-form-item :label="selfLabel('appKey')">
+          <span>{{ isvKeysFormData.appKey }}</span>
+        </el-form-item>
+        <el-form-item label="签名方式">
+          <span v-if="isvKeysFormData.signType === 1">RSA2</span>
+          <span v-if="isvKeysFormData.signType === 2">MD5</span>
+        </el-form-item>
+        <el-form-item v-show="showKeys()" label="秘钥格式">
+          <span v-if="isvKeysFormData.keyFormat === 1">PKCS8(JAVA适用)</span>
+          <span v-if="isvKeysFormData.keyFormat === 2">PKCS1(非JAVA适用)</span>
+        </el-form-item>
+        <el-form-item v-show="isvKeysFormData.signType === 2" :label="selfLabel('secret')">
+          <span>{{ isvKeysFormData.secret }}</span>
+        </el-form-item>
+        <fieldset v-show="showKeys()">
+          <legend>ISV公私钥</legend>
+          <el-form-item label="ISV公钥">
+            <el-input v-model="isvKeysFormData.publicKeyIsv" type="textarea" readonly />
+          </el-form-item>
+          <el-form-item :label="selfLabel('ISV私钥')">
+            <el-input v-model="isvKeysFormData.privateKeyIsv" type="textarea" readonly />
+          </el-form-item>
+        </fieldset>
+        <fieldset v-show="showKeys()">
+          <legend>平台公私钥</legend>
+          <el-form-item :label="selfLabel('平台公钥')">
+            <el-input v-model="isvKeysFormData.publicKeyPlatform" type="textarea" readonly />
+          </el-form-item>
+          <el-form-item prop="privateKeyPlatform" label="平台私钥">
+            <el-input v-model="isvKeysFormData.privateKeyPlatform" type="textarea" readonly />
+          </el-form-item>
+        </fieldset>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isvKeysDialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
-
+<style>
+  .gen-key {margin-bottom: 0px !important;}
+  fieldset {border: 1px solid #ccc; color: gray;margin-left: 40px;margin-bottom: 20px;}
+  fieldset label {width: 110px !important;}
+  fieldset .el-form-item__content {margin-left: 110px !important;}
+  .key-view .el-form-item {margin-bottom: 10px !important;}
+</style>
 <script>
 export default {
   data() {
-    const validateSecret = (rule, value, callback) => {
-      if (this.isvDialogFormData.signType === 2) {
-        if (value === '') {
-          callback(new Error('不能为空'))
-        }
-        if (value.length > 200) {
-          callback(new Error('长度不能超过200'))
-        }
-      }
-      callback()
-    }
-    const validatePubPriKey = (rule, value, callback) => {
-      if (this.isvDialogFormData.signType === 1) {
-        if (value === '') {
-          callback(new Error('不能为空'))
-        }
-      }
-      callback()
-    }
     return {
       searchFormData: {
         appKey: '',
@@ -195,11 +203,6 @@ export default {
       isvDialogTitle: '新增ISV',
       isvDialogFormData: {
         id: 0,
-        appKey: '',
-        secret: '',
-        pubKey: '',
-        priKey: '',
-        signType: 1,
         status: 1,
         roleCode: []
       },
@@ -207,16 +210,17 @@ export default {
         appKey: [
           { required: true, message: '不能为空', trigger: 'blur' },
           { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
-        ],
-        secret: [
-          { validator: validateSecret, trigger: 'blur' }
-        ],
-        pubKey: [
-          { validator: validatePubPriKey, trigger: 'blur' }
-        ],
-        priKey: [
-          { validator: validatePubPriKey, trigger: 'blur' }
         ]
+      },
+      isvKeysDialogVisible: false,
+      isvKeysFormData: {
+        appKey: '',
+        secret: '',
+        publicKeyIsv: '',
+        privateKeyIsv: '',
+        publicKeyPlatform: '',
+        privateKeyPlatform: '',
+        signType: ''
       }
     }
   },
@@ -237,16 +241,12 @@ export default {
         })
       }
     },
-    onShowSecret: function(row) {
-      this.$alert(row.secret, 'secret')
-    },
-    onShowPriPubKey: function(row) {
-      const pubKey = row.pubKey
-      const priKey = row.priKey
-      const content = '<div>公钥：<textarea style="width: 380px;height: 100px;" readonly="readonly">' + pubKey + '</textarea><br>' +
-        '私钥：<textarea style="width: 380px;height: 100px;" readonly="readonly">' + priKey + '</textarea></div>'
-      this.$alert(content, '公私钥', {
-        dangerouslyUseHTMLString: true
+    onShowKeys: function(row) {
+      this.post('isv.keys.get', { appKey: row.appKey }, function(resp) {
+        this.isvKeysDialogVisible = true
+        this.$nextTick(() => {
+          Object.assign(this.isvKeysFormData, resp.data)
+        })
       })
     },
     onSearchTable: function() {
@@ -268,6 +268,9 @@ export default {
         })
       })
     },
+    onKeysUpdate: function(row) {
+      this.$router.push({ path: `keys?appKey=${row.appKey}` })
+    },
     onSizeChange: function(size) {
       this.searchFormData.pageSize = size
       this.loadTable()
@@ -277,9 +280,11 @@ export default {
       this.loadTable()
     },
     onAdd: function() {
-      this.isvDialogFormData.id = 0
       this.isvDialogTitle = '新增ISV'
       this.isvDialogVisible = true
+      this.$nextTick(() => {
+        this.isvDialogFormData.id = 0
+      })
     },
     onIsvDialogSave: function() {
       const that = this
@@ -294,8 +299,12 @@ export default {
       })
     },
     onIsvDialogClose: function() {
-      this.$refs.isvForm.resetFields()
-      this.isvDialogVisible = false
+      this.resetForm('isvForm')
+      this.isvDialogFormData.status = 1
+      this.isvDialogFormData.roleCode = []
+    },
+    selfLabel: function(lab) {
+      return '★ ' + lab
     },
     roleRender: function(row) {
       const html = []
@@ -305,27 +314,8 @@ export default {
       }
       return html.join(', ')
     },
-    onDataGen: function() {
-      this.post('isv.form.gen', {}, function(resp) {
-        const data = resp.data
-        // 如果是新增状态
-        if (this.isvDialogFormData.id === 0) {
-          Object.assign(this.isvDialogFormData, data)
-        } else {
-          const signType = this.isvDialogFormData.signType
-          // RSA2
-          if (signType === 1) {
-            Object.assign(this.isvDialogFormData, {
-              pubKey: data.pubKey,
-              priKey: data.priKey
-            })
-          } else if (signType === 2) {
-            Object.assign(this.isvDialogFormData, {
-              secret: data.secret
-            })
-          }
-        }
-      })
+    showKeys: function() {
+      return this.isvKeysFormData.signType === 1
     }
   }
 }

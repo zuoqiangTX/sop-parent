@@ -8,29 +8,32 @@ import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.easyopen.util.CopyUtil;
-import com.gitee.easyopen.util.KeyStore;
-import com.gitee.easyopen.util.RSAUtil;
 import com.gitee.fastmybatis.core.PageInfo;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.fastmybatis.core.util.MapperUtil;
 import com.gitee.sop.adminserver.api.IdParam;
-import com.gitee.sop.adminserver.api.isv.param.IsvInfoForm;
 import com.gitee.sop.adminserver.api.isv.param.IsvInfoFormAdd;
 import com.gitee.sop.adminserver.api.isv.param.IsvInfoFormUpdate;
+import com.gitee.sop.adminserver.api.isv.param.IsvKeysFormUpdate;
+import com.gitee.sop.adminserver.api.isv.param.IsvKeysGen;
 import com.gitee.sop.adminserver.api.isv.param.IsvPageParam;
-import com.gitee.sop.adminserver.api.isv.result.IsvFormVO;
-import com.gitee.sop.adminserver.api.isv.result.IsvVO;
+import com.gitee.sop.adminserver.api.isv.result.IsvDetailDTO;
+import com.gitee.sop.adminserver.api.isv.result.IsvInfoVO;
+import com.gitee.sop.adminserver.api.isv.result.IsvKeysGenVO;
+import com.gitee.sop.adminserver.api.isv.result.IsvKeysVO;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.IdGen;
-import com.gitee.sop.adminserver.common.ZookeeperOperationException;
+import com.gitee.sop.adminserver.common.RSATool;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.IsvInfo;
+import com.gitee.sop.adminserver.entity.IsvKeys;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
 import com.gitee.sop.adminserver.entity.PermRole;
 import com.gitee.sop.adminserver.mapper.IsvInfoMapper;
+import com.gitee.sop.adminserver.mapper.IsvKeysMapper;
 import com.gitee.sop.adminserver.mapper.PermIsvRoleMapper;
 import com.gitee.sop.adminserver.mapper.PermRoleMapper;
 import com.gitee.sop.adminserver.service.RoutePermissionService;
@@ -39,6 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -58,6 +62,9 @@ public class IsvApi {
     IsvInfoMapper isvInfoMapper;
 
     @Autowired
+    IsvKeysMapper isvKeysMapper;
+
+    @Autowired
     PermIsvRoleMapper permIsvRoleMapper;
 
     @Autowired
@@ -71,20 +78,20 @@ public class IsvApi {
             @ApiDocField(name = "pageIndex", description = "第几页", dataType = DataType.INT, example = "1"),
             @ApiDocField(name = "pageSize", description = "每页几条数据", dataType = DataType.INT, example = "10"),
             @ApiDocField(name = "total", description = "每页几条数据", dataType = DataType.LONG, example = "100"),
-            @ApiDocField(name = "rows", description = "数据", dataType = DataType.ARRAY, elementClass = IsvVO.class)
+            @ApiDocField(name = "rows", description = "数据", dataType = DataType.ARRAY, elementClass = IsvInfoVO.class)
     })
-    PageInfo<IsvVO> pageIsv(IsvPageParam param) {
+    PageInfo<IsvInfoVO> pageIsv(IsvPageParam param) {
         Query query = Query.build(param);
         PageInfo<IsvInfo> pageInfo = MapperUtil.query(isvInfoMapper, query);
         List<IsvInfo> list = pageInfo.getList();
 
-        List<IsvVO> retList = list.stream()
+        List<IsvInfoVO> retList = list.stream()
                 .map(isvInfo -> {
                     return buildIsvVO(isvInfo);
                 })
                 .collect(Collectors.toList());
 
-        PageInfo<IsvVO> pageInfoRet = new PageInfo<>();
+        PageInfo<IsvInfoVO> pageInfoRet = new PageInfo<>();
         pageInfoRet.setTotal(pageInfo.getTotal());
         pageInfoRet.setList(retList);
 
@@ -93,16 +100,30 @@ public class IsvApi {
 
     @Api(name = "isv.info.get")
     @ApiDocMethod(description = "获取isv")
-    IsvVO getIsvVO(IdParam param) {
+    IsvInfoVO getIsvVO(IdParam param) {
         IsvInfo isvInfo = isvInfoMapper.getById(param.getId());
         return buildIsvVO(isvInfo);
     }
 
-    private IsvVO buildIsvVO(IsvInfo isvInfo) {
+    @Api(name = "isv.keys.get")
+    @ApiDocMethod(description = "获取isv2")
+    IsvKeysVO getIsvKeys(@NotBlank(message = "appKey不能为空")
+                         @ApiDocField(description = "appKey")
+                                 String appKey) {
+        IsvKeys isvKeys = isvKeysMapper.getByColumn("app_key", appKey);
+        IsvKeysVO isvDetailVO = new IsvKeysVO();
+        if (isvKeys != null) {
+            CopyUtil.copyProperties(isvKeys, isvDetailVO);
+        }
+        isvDetailVO.setAppKey(appKey);
+        return isvDetailVO;
+    }
+
+    private IsvInfoVO buildIsvVO(IsvInfo isvInfo) {
         if (isvInfo == null) {
             return null;
         }
-        IsvVO vo = new IsvVO();
+        IsvInfoVO vo = new IsvInfoVO();
         CopyUtil.copyProperties(isvInfo, vo);
         vo.setRoleList(this.buildIsvRole(isvInfo));
         return vo;
@@ -134,44 +155,57 @@ public class IsvApi {
     @ApiDocMethod(description = "添加isv")
     @Transactional(rollbackFor = Exception.class)
     public void addIsv(IsvInfoFormAdd param) throws Exception {
-        if (isvInfoMapper.getByColumn("app_key", param.getAppKey()) != null) {
-            throw new BizException("appKey已存在");
-        }
-        formatForm(param);
+        String appKey = new SimpleDateFormat("yyyyMMdd").format(new Date()) + IdGen.nextId();
         IsvInfo rec = new IsvInfo();
+        rec.setAppKey(appKey);
         CopyUtil.copyPropertiesIgnoreNull(param, rec);
         isvInfoMapper.saveIgnoreNull(rec);
         if (CollectionUtils.isNotEmpty(param.getRoleCode())) {
             this.saveIsvRole(rec, param.getRoleCode());
         }
+        IsvKeysGenVO isvKeysGenVO = this.createIsvKeys();
+        IsvKeys isvKeys = new IsvKeys();
+        CopyUtil.copyPropertiesIgnoreNull(isvKeysGenVO, isvKeys);
+        isvKeysMapper.saveIgnoreNull(isvKeys);
 
-        this.sendChannelMsg(rec);
+        this.sendChannelMsg(rec.getAppKey());
     }
 
     @Api(name = "isv.info.update")
     @ApiDocMethod(description = "修改isv")
     @Transactional(rollbackFor = Exception.class)
     public void updateIsv(IsvInfoFormUpdate param) {
-        formatForm(param);
         IsvInfo rec = isvInfoMapper.getById(param.getId());
         CopyUtil.copyPropertiesIgnoreNull(param, rec);
         isvInfoMapper.updateIgnoreNull(rec);
         this.saveIsvRole(rec, param.getRoleCode());
 
-        this.sendChannelMsg(rec);
+        this.sendChannelMsg(rec.getAppKey());
     }
 
-    private void formatForm(IsvInfoForm form) {
-        if (form.getSignType() == SIGN_TYPE_RSA2) {
-            form.setSecret("");
+    @Api(name = "isv.keys.update")
+    @ApiDocMethod(description = "修改isv")
+    @Transactional(rollbackFor = Exception.class)
+    public void updateIsvKeys(IsvKeysFormUpdate param) {
+        IsvKeys isvKeys = isvKeysMapper.getByColumn("app_key", param.getAppKey());
+        if (isvKeys == null) {
+            isvKeys = new IsvKeys();
+            CopyUtil.copyPropertiesIgnoreNull(param, isvKeys);
+            isvKeysMapper.saveIgnoreNull(isvKeys);
         } else {
-            form.setPubKey("");
-            form.setPriKey("");
+            CopyUtil.copyPropertiesIgnoreNull(param, isvKeys);
+            isvKeysMapper.updateIgnoreNull(isvKeys);
         }
+
+        this.sendChannelMsg(isvKeys.getAppKey());
     }
 
-    private void sendChannelMsg(IsvInfo rec) {
-        ChannelMsg channelMsg = new ChannelMsg("update", rec);
+    private void sendChannelMsg(String appKey) {
+        IsvDetailDTO isvDetail = isvInfoMapper.getIsvDetail(appKey);
+        if (isvDetail == null) {
+            return;
+        }
+        ChannelMsg channelMsg = new ChannelMsg("update", isvDetail);
         String path = ZookeeperContext.getIsvInfoChannelPath();
         String data = JSON.toJSONString(channelMsg);
         try {
@@ -183,23 +217,41 @@ public class IsvApi {
         }
     }
 
-    @Api(name = "isv.form.gen")
-    @ApiDocMethod(description = "isv表单内容一键生成")
-    IsvFormVO createIsvForm() throws Exception {
-        IsvFormVO isvFormVO = new IsvFormVO();
-        String appKey = new SimpleDateFormat("yyyyMMdd").format(new Date()) + IdGen.nextId();
+    private IsvKeysGenVO createIsvKeys() throws Exception {
+        IsvKeysGenVO isvFormVO = new IsvKeysGenVO();
         String secret = IdGen.uuid();
 
-        isvFormVO.setAppKey(appKey);
         isvFormVO.setSecret(secret);
 
-        KeyStore keyStore = RSAUtil.createKeys();
-        isvFormVO.setPubKey(keyStore.getPublicKey());
-        isvFormVO.setPriKey(keyStore.getPrivateKey());
+        RSATool rsaToolIsv = new RSATool(RSATool.KeyFormat.PKCS8, RSATool.KeyLength.LENGTH_2048);
+        RSATool.KeyStore keyStoreIsv = rsaToolIsv.createKeys();
+        isvFormVO.setPublicKeyIsv(keyStoreIsv.getPublicKey());
+        isvFormVO.setPrivateKeyIsv(keyStoreIsv.getPrivateKey());
+
+        RSATool rsaToolPlatform = new RSATool(RSATool.KeyFormat.PKCS8, RSATool.KeyLength.LENGTH_2048);
+        RSATool.KeyStore keyStorePlatform = rsaToolPlatform.createKeys();
+        isvFormVO.setPublicKeyPlatform(keyStorePlatform.getPublicKey());
+        isvFormVO.setPrivateKeyPlatform(keyStorePlatform.getPrivateKey());
         return isvFormVO;
     }
 
+    @Api(name = "isv.keys.gen")
+    @ApiDocMethod(description = "生成公私钥")
+    RSATool.KeyStore createPubPriKey(IsvKeysGen param) throws Exception {
+        RSATool.KeyFormat format = RSATool.KeyFormat.PKCS8;
+        Byte keyFormat = param.getKeyFormat();
+        if (keyFormat != null && keyFormat == 2) {
+            format = RSATool.KeyFormat.PKCS1;
+        }
+        RSATool rsaTool = new RSATool(format, RSATool.KeyLength.LENGTH_2048);
+        return rsaTool.createKeys();
+    }
 
+    @Api(name = "isv.secret.gen")
+    @ApiDocMethod(description = "生成MD秘钥")
+    String createSecret() throws Exception {
+        return IdGen.uuid();
+    }
 
     void saveIsvRole(IsvInfo isvInfo, List<String> roleCodeList) {
         Query query = new Query();

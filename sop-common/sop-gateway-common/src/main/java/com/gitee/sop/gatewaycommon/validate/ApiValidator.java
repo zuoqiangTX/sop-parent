@@ -2,8 +2,11 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
@@ -12,6 +15,7 @@ import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.param.UploadContext;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -57,6 +61,7 @@ public class ApiValidator implements Validator {
         checkTimeout(param);
         checkFormat(param);
         checkUploadFile(param);
+        checkPermission(param);
     }
 
     /**
@@ -156,9 +161,8 @@ public class ApiValidator implements Validator {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();
             }
             Signer signer = apiConfig.getSigner();
-            boolean isRightSign = signer.checkSign(param, secret);
             // 错误的sign
-            if (!isRightSign) {
+            if (!signer.checkSign(param, secret)) {
                 throw ErrorEnum.ISV_INVALID_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion());
             }
         } finally {
@@ -174,6 +178,25 @@ public class ApiValidator implements Validator {
 
         if (!contains) {
             throw ErrorEnum.ISV_INVALID_FORMAT.getErrorMeta().getException(param.fetchNameVersion(), format);
+        }
+    }
+
+    /**
+     * 校验访问权限
+     * @param apiParam
+     */
+    protected void checkPermission(ApiParam apiParam) {
+        String routeId = apiParam.fetchNameVersion();
+        TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(routeId);
+        BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
+        if (needCheckPermission) {
+            IsvRoutePermissionManager isvRoutePermissionManager = ApiConfig.getInstance().getIsvRoutePermissionManager();
+            String appKey = apiParam.fetchAppKey();
+            boolean hasPermission = isvRoutePermissionManager.hasPermission(appKey, routeId);
+            if (!hasPermission) {
+                throw ErrorEnum.ISV_ROUTE_NO_PERMISSIONS.getErrorMeta().getException();
+            }
         }
     }
 

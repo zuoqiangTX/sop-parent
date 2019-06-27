@@ -2,9 +2,6 @@ package com.gitee.sop.gatewaycommon.bean;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Date;
 
 /**
  * @author tanghc
@@ -12,6 +9,8 @@ import java.util.Date;
 @Getter
 @Setter
 public class IsvDefinition implements Isv {
+
+    public static final int SIGN_TYPE_RSA2 = 1;
 
     public IsvDefinition() {
     }
@@ -21,35 +20,38 @@ public class IsvDefinition implements Isv {
         this.secret = secret;
     }
 
-    private Long id;
-
     private String appKey;
 
-    /** 秘钥，如果是支付宝开放平台，对应的pubKey */
+    /** 秘钥,签名方式为MD5时有用 */
     private String secret;
 
-    private String pubKey;
+    /** 开发者生成的公钥, 数据库字段：public_key_isv */
+    private String publicKeyIsv;
+
+    /** 平台生成的私钥, 数据库字段：private_key_platform */
+    private String privateKeyPlatform;
 
     /** 0启用，1禁用 */
     private Byte status;
 
-    private Date gmtCreate;
-
-    private Date gmtModified;
+    /** 签名类型：1:RSA2,2:MD5 */
+    private Byte signType = 1;
 
     @Override
     public String getSecretInfo() {
-        return StringUtils.isBlank(pubKey) ? secret : pubKey;
+        return signType == SIGN_TYPE_RSA2 ? publicKeyIsv : secret;
     }
+
 
     @Override
     public String toString() {
         return "IsvDefinition{" +
-                "id=" + id +
-                ", appKey='" + appKey + '\'' +
+                "appKey='" + appKey + '\'' +
+                ", secret='" + secret + '\'' +
+                ", publicKeyIsv='" + publicKeyIsv + '\'' +
+                ", privateKeyPlatform='" + privateKeyPlatform + '\'' +
                 ", status=" + status +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtModified=" + gmtModified +
+                ", signType=" + signType +
                 '}';
     }
 }

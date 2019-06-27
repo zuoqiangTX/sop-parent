@@ -15,7 +15,9 @@ import org.apache.commons.lang3.BooleanUtils;
 /**
  * 路由权限校验，有些接口需要配置权限才能访问。
  * @author tanghc
+ * @deprecated 已经整合到ApiValidator中，见ApiValidator.checkPermission()
  */
+@Deprecated
 public class PreRoutePermissionFilter extends BaseZuulFilter {
     @Override
     protected FilterType getFilterType() {

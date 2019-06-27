@@ -7,17 +7,23 @@ import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.ErrorDefinition;
+import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.message.ErrorMeta;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
+import com.gitee.sop.gatewaycommon.secret.IsvManager;
+import com.gitee.sop.gatewaycommon.validate.alipay.AlipayConstants;
+import com.gitee.sop.gatewaycommon.validate.alipay.AlipaySignature;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -26,6 +32,7 @@ import java.util.Optional;
 /**
  * @author tanghc
  */
+@Slf4j
 public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> {
     private static final ErrorMeta SUCCESS_META = ErrorEnum.SUCCESS.getErrorMeta();
     private static final ErrorMeta ISP_UNKNOW_ERROR_META = ErrorEnum.ISP_UNKNOW_ERROR.getErrorMeta();
@@ -36,6 +43,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     public static final String ARRAY_START = "[";
     public static final String ARRAY_END = "]";
     public static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
+    public static final String ERROR_METHOD = "error";
 
 
     /**
@@ -70,33 +78,33 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         }
         serviceResult = wrapResult(serviceResult);
         int responseStatus = this.getResponseStatus(request);
-        JSONObject jsonObjectService;
+        JSONObject responseData;
         if (responseStatus == HttpStatus.OK.value()) {
             // 200正常返回
-            jsonObjectService = JSON.parseObject(serviceResult);
-            jsonObjectService.put(GATEWAY_CODE_NAME, SUCCESS_META.getCode());
-            jsonObjectService.put(GATEWAY_MSG_NAME, SUCCESS_META.getError().getMsg());
+            responseData = JSON.parseObject(serviceResult);
+            responseData.put(GATEWAY_CODE_NAME, SUCCESS_META.getCode());
+            responseData.put(GATEWAY_MSG_NAME, SUCCESS_META.getError().getMsg());
         } else if (responseStatus == SopConstants.BIZ_ERROR_STATUS) {
             // 如果是业务出错
             this.storeError(request, ErrorType.BIZ);
-            jsonObjectService = JSON.parseObject(serviceResult);
-            jsonObjectService.put(GATEWAY_CODE_NAME, ISP_BIZ_ERROR.getCode());
-            jsonObjectService.put(GATEWAY_MSG_NAME, ISP_BIZ_ERROR.getError().getMsg());
+            responseData = JSON.parseObject(serviceResult);
+            responseData.put(GATEWAY_CODE_NAME, ISP_BIZ_ERROR.getCode());
+            responseData.put(GATEWAY_MSG_NAME, ISP_BIZ_ERROR.getError().getMsg());
         } else {
             this.storeError(request, ErrorType.UNKNOWN);
             // 微服务端有可能返回500错误
             // {"path":"/book/getBook3","error":"Internal Server Error","message":"id不能为空","timestamp":"2019-02-13T07:41:00.495+0000","status":500}
-            jsonObjectService = new JSONObject();
-            jsonObjectService.put(GATEWAY_CODE_NAME, ISP_UNKNOW_ERROR_META.getCode());
-            jsonObjectService.put(GATEWAY_MSG_NAME, ISP_UNKNOW_ERROR_META.getError().getMsg());
+            responseData = new JSONObject();
+            responseData.put(GATEWAY_CODE_NAME, ISP_UNKNOW_ERROR_META.getCode());
+            responseData.put(GATEWAY_MSG_NAME, ISP_UNKNOW_ERROR_META.getError().getMsg());
         }
-        return this.merge(request, jsonObjectService);
+        return this.merge(request, responseData);
     }
 
     /**
      * 保存错误信息
      *
-     * @param request
+     * @param request request
      */
     protected void storeError(T request, ErrorType errorType) {
         ApiInfo apiInfo = this.getApiInfo(request);
@@ -116,7 +124,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 该路由是否合并结果
      *
-     * @param request
+     * @param request request
      * @return true：需要合并
      */
     protected boolean isMergeResult(T request) {
@@ -137,13 +145,8 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     protected ApiInfo getApiInfo(T request) {
         Map<String, Object> params = this.getApiParam(request);
-        String name = Optional.ofNullable(params)
-                .map(map -> (String) map.get(ParamNames.API_NAME))
-                .orElse("method.unknown");
-
-        String version = Optional.ofNullable(params)
-                .map(map -> (String) map.get(ParamNames.VERSION_NAME))
-                .orElse("version.unknown");
+        String name = this.getParamValue(params, ParamNames.API_NAME, "method.unknown");
+        String version = this.getParamValue(params, ParamNames.VERSION_NAME, "version.unknown");
 
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(name + version);
 
@@ -178,46 +181,66 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         return serviceResult;
     }
 
-    public String merge(T exchange, JSONObject jsonObjectService) {
-        JSONObject ret = new JSONObject();
-        String name = "error";
+    public String merge(T exchange, JSONObject responseData) {
+        JSONObject finalData = new JSONObject();
         Map<String, Object> params = this.getApiParam(exchange);
-        if (params != null) {
-            Object method = params.get(ParamNames.API_NAME);
-            if (method != null) {
-                name = String.valueOf(method);
-            }
-        }
+        String name = this.getParamValue(params, ParamNames.API_NAME, ERROR_METHOD);
         ApiConfig apiConfig = ApiConfig.getInstance();
         // 点换成下划线
         DataNameBuilder dataNameBuilder = apiConfig.getDataNameBuilder();
-        String method = dataNameBuilder.build(name);
-        ret.put(method, jsonObjectService);
-        this.appendReturnSign(apiConfig, params, ret);
+        // alipay_goods_get_response
+        String responseDataNodeName = dataNameBuilder.build(name);
+        finalData.put(responseDataNodeName, responseData);
         ResultAppender resultAppender = apiConfig.getResultAppender();
+        // 追加额外的结果
         if (resultAppender != null) {
-            resultAppender.append(ret, params, exchange);
+            resultAppender.append(finalData, params, exchange);
         }
-        return ret.toJSONString();
+        // 添加服务端sign
+        if (apiConfig.isShowReturnSign() && !CollectionUtils.isEmpty(params)) {
+            // 添加try...catch，生成sign出错不影响结果正常返回
+            try {
+                String sign = this.createResponseSign(apiConfig, params, responseData.toJSONString());
+                if (StringUtils.hasLength(sign)) {
+                    finalData.put(ParamNames.SIGN_NAME, sign);
+                }
+            } catch (Exception e) {
+                log.error("生成平台签名失败, params: {}, serviceResult:{}", JSON.toJSONString(params), responseData, e);
+            }
+        }
+        return finalData.toJSONString();
     }
 
-    protected void appendReturnSign(ApiConfig apiConfig, Map<String, ?> params, JSONObject ret) {
-        if (apiConfig.isShowReturnSign() && params != null) {
-            Object appKey = params.get(ParamNames.APP_KEY_NAME);
-            String sign = this.createReturnSign(String.valueOf(appKey));
-            ret.put(ParamNames.SIGN_NAME, sign);
-        }
+    protected String getParamValue(Map<String, Object> apiParam, String key, String defaultValue) {
+        return CollectionUtils.isEmpty(apiParam) ? defaultValue : (String) apiParam.getOrDefault(key, defaultValue);
     }
+
 
     /**
-     * 这里需要使用平台的私钥生成一个sign，需要配置两套公私钥。目前暂未实现
+     * 这里需要使用平台的私钥生成一个sign，需要配置两套公私钥。
      *
-     * @param appKey
-     * @return
+     * @param apiConfig         配置
+     * @param params            请求参数
+     * @param serviceResult 业务返回结果
+     * @return 返回平台生成的签名
      */
-    protected String createReturnSign(String appKey) {
-        // TODO: 返回sign
-        return null;
+    protected String createResponseSign(ApiConfig apiConfig, Map<String, Object> params, String serviceResult) {
+        IsvManager isvManager = apiConfig.getIsvManager();
+        // 根据appId获取秘钥
+        String appKey = this.getParamValue(params, ParamNames.APP_KEY_NAME, "");
+        if (StringUtils.isEmpty(appKey)) {
+            return null;
+        }
+        Isv isvInfo = isvManager.getIsv(appKey);
+        String privateKeyPlatform = isvInfo.getPrivateKeyPlatform();
+        if (StringUtils.isEmpty(privateKeyPlatform)) {
+            return null;
+        }
+        String charset = Optional.ofNullable(params.get(ParamNames.CHARSET_NAME))
+                .map(String::valueOf)
+                .orElse(SopConstants.UTF8);
+        String signType = getParamValue(params, ParamNames.SIGN_TYPE_NAME, AlipayConstants.SIGN_TYPE_RSA2);
+        return AlipaySignature.rsaSign(serviceResult, privateKeyPlatform, charset, signType);
     }
 
     @Getter

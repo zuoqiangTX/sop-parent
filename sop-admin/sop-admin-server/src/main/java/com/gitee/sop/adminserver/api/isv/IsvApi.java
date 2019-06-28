@@ -10,6 +10,7 @@ import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.fastmybatis.core.PageInfo;
 import com.gitee.fastmybatis.core.query.Query;
+import com.gitee.fastmybatis.core.query.Sort;
 import com.gitee.fastmybatis.core.util.MapperUtil;
 import com.gitee.sop.adminserver.api.IdParam;
 import com.gitee.sop.adminserver.api.isv.param.IsvInfoFormAdd;
@@ -82,6 +83,7 @@ public class IsvApi {
     })
     PageInfo<IsvInfoVO> pageIsv(IsvPageParam param) {
         Query query = Query.build(param);
+        query.orderby("id", Sort.DESC);
         PageInfo<IsvInfo> pageInfo = MapperUtil.query(isvInfoMapper, query);
         List<IsvInfo> list = pageInfo.getList();
 
@@ -165,6 +167,7 @@ public class IsvApi {
         }
         IsvKeysGenVO isvKeysGenVO = this.createIsvKeys();
         IsvKeys isvKeys = new IsvKeys();
+        isvKeys.setAppKey(appKey);
         CopyUtil.copyPropertiesIgnoreNull(isvKeysGenVO, isvKeys);
         isvKeysMapper.saveIgnoreNull(isvKeys);
 

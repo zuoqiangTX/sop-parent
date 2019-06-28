@@ -28,6 +28,8 @@ public class IsvInfo {
     /** appKey, 数据库字段：app_key */
     private String appKey;
 
+    private String secret = "";
+
     /** 1启用，2禁用, 数据库字段：status */
     private Byte status;
 

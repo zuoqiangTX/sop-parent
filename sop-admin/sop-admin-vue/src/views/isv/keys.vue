@@ -21,7 +21,7 @@
       </el-form-item>
       <el-form-item label="签名方式">
         <el-radio-group v-model="isvKeysFormData.signType">
-          <el-radio :label="1" name="status">RSA2</el-radio>
+          <el-radio :label="1" name="status">RSA</el-radio>
           <el-radio :label="2" name="status">MD5</el-radio>
         </el-radio-group>
       </el-form-item>

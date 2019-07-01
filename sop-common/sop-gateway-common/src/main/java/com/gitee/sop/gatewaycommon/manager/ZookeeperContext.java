@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_MSG_CHANNEL_PATH;
-import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_ROUTE_PERMISSION_PATH;
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 
 /**
@@ -58,10 +57,6 @@ public class ZookeeperContext {
 
     public static String getRouteRootPath() {
         return SOP_SERVICE_ROUTE_PATH;
-    }
-
-    public static String getRoutePermissionPath() {
-        return SOP_ROUTE_PERMISSION_PATH;
     }
 
     public static String getIsvInfoChannelPath() {

@@ -86,7 +86,7 @@ public class DocManagerImpl implements DocManager {
 
     protected void loadDocInfo(ServiceInstance serviceInstance) {
         String query = this.buildQuery();
-        String url = "http://" + serviceInstance.getIpPort() + "/v2/api-docs" + query;
+        String url = "http://" + serviceInstance.getIp() + ":" + serviceInstance.getPort() + "/v2/api-docs" + query;
         try {
             log.info("读取swagger文档，url:{}", url);
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);

@@ -19,6 +19,12 @@ ribbon:
   # 请谨慎设置，因为post请求大多都是写入请求，如果要支持重试，确保服务的幂等性
   OkToRetryOnAllOperations: false
 
+# eureka注册中心，如果使用nacos注册中心，这里要注释掉
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
+
 spring:
   application:
     name: api-gateway
@@ -35,15 +41,9 @@ spring:
           enabled: true
 
     # nacos注册中心，和eureka只能用一个
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-
-# eureka注册中心，如果使用nacos注册中心，这里要注释掉
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://localhost:1111/eureka/
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
 
   # 数据源，根据实际情况修改
   datasource:

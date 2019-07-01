@@ -50,6 +50,9 @@ public enum EurekaUri {
     }
 
     public Request getRequest(String url, String... args) {
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 1);
+        }
         String requestUrl = url + getUri(args);
         Request request = this.getBuilder()
                 .url(requestUrl)

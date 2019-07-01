@@ -37,7 +37,7 @@ registry:
   eureka-server-addr: http://localhost:1111/eureka/
   nacos-server-addr: 127.0.0.1:8848
   # 使用哪个配置中心，使用eureka，填eureka；使用nacos填nacos
-  name: nacos
+  name: eureka
 
 
 # 根据实际情况改

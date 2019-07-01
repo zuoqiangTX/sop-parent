@@ -15,24 +15,18 @@
       row-key="id"
     >
       <el-table-column
-        prop="name"
-        label="服务名称(serviceId)"
+        prop="serviceId"
+        label="服务名称"
         width="200"
-      />
+      >
+        <template slot-scope="scope">
+          <span v-html="renderServiceName(scope.row)"></span>
+        </template>
+      </el-table-column>
       <el-table-column
-        prop="instanceId"
-        label="instanceId"
+        prop="ipPort"
+        label="IP端口"
         width="250"
-      />
-      <el-table-column
-        prop="ipAddr"
-        label="IP地址"
-        width="150"
-      />
-      <el-table-column
-        prop="serverPort"
-        label="端口号"
-        width="100"
       />
       <el-table-column
         prop="status"
@@ -110,28 +104,30 @@ export default {
       this.loadTable()
     },
     onOffline: function(row) {
-      this.confirm('确定要下线【' + row.name + '】吗?', function(done) {
-        const params = {
-          serviceId: row.name,
-          instanceId: row.instanceId
-        }
-        this.post('service.instance.offline', params, function() {
+      this.confirm('确定要下线【' + row.serviceId + '】吗?', function(done) {
+        this.post('service.instance.offline', row, function() {
           this.tip('下线成功')
           done()
         })
       })
     },
     onOnline: function(row) {
-      this.confirm('确定要上线【' + row.name + '】吗?', function(done) {
-        const params = {
-          serviceId: row.name,
-          instanceId: row.instanceId
-        }
-        this.post('service.instance.online', params, function() {
+      this.confirm('确定要上线【' + row.serviceId + '】吗?', function(done) {
+        this.post('service.instance.online', row, function() {
           this.tip('上线成功')
           done()
         })
       })
+    },
+    renderServiceName: function(row) {
+      let instanceCount = ''
+      if (row.children && row.children.length > 0) {
+        const onlineCount = row.children.filter(el => {
+          return el.status === 'UP'
+        }).length
+        instanceCount = ` (${onlineCount}/${row.children.length})`
+      }
+      return row.serviceId + instanceCount
     }
   }
 }

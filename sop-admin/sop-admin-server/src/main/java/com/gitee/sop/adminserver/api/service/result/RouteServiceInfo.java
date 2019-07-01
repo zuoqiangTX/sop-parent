@@ -7,7 +7,7 @@ import lombok.Data;
  * @author tanghc
  */
 @Data
-public class ServiceInfo {
+public class RouteServiceInfo {
     @ApiDocField(description = "serviceId")
     private String serviceId;
 

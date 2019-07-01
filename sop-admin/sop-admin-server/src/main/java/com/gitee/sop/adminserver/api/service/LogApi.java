@@ -114,7 +114,7 @@ public class LogApi {
     @Api(name = "monitor.instance.add")
     @ApiDocMethod(description = "添加监控实例")
     void addServiceInstance(LogMonitorInstanceAddParam param) {
-        String ipPort = param.getIp() + ":" + param.getPort();
+        String ipPort = param.getIpPort();
         this.checkInstance(ipPort);
 
         Query query = new Query();

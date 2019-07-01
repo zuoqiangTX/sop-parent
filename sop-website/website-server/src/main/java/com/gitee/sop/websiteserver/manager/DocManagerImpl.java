@@ -3,19 +3,13 @@ package com.gitee.sop.websiteserver.manager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
+import com.gitee.sop.registryapi.bean.ServiceInfo;
+import com.gitee.sop.registryapi.bean.ServiceInstance;
+import com.gitee.sop.registryapi.service.RegistryService;
 import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
-import com.gitee.sop.websiteserver.bean.EurekaApplication;
-import com.gitee.sop.websiteserver.bean.EurekaApps;
-import com.gitee.sop.websiteserver.bean.EurekaInstance;
-import com.gitee.sop.websiteserver.bean.EurekaUri;
 import com.gitee.sop.websiteserver.bean.ZookeeperContext;
-import com.gitee.sop.websiteserver.vo.ServiceInfoVO;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -26,8 +20,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +45,6 @@ public class DocManagerImpl implements DocManager {
     Map<String, DocItem> docItemMap = new HashMap<>();
 
 
-    OkHttpClient client = new OkHttpClient();
-
     RestTemplate restTemplate = new RestTemplate();
 
     DocParser swaggerDocParser = new SwaggerDocParser();
@@ -70,33 +60,35 @@ public class DocManagerImpl implements DocManager {
     @Autowired
     private Environment environment;
 
-    private String eurekaUrl;
+    @Autowired
+    private RegistryService registryService;
 
     private volatile boolean listenInited;
 
     @Override
     public void load() {
         try {
-            // {"STORY-SERVICE":[{"ipAddr":"10.1.30.54","name":"STORY-SERVICE","serverPort":"2222"}],"API-GATEWAY":[{"ipAddr":"10.1.30.54","name":"API-GATEWAY","serverPort":"8081"}]}
-            Map<String, List<ServiceInfoVO>> listMap = this.getAllServiceList();
-            log.info("服务列表：{}", JSON.toJSONString(listMap.keySet()));
-            listMap.entrySet()
+            List<ServiceInfo> serviceInfoList = registryService.listAllService(1, 9999);
+            log.info("服务列表：{}", serviceInfoList);
+
+            serviceInfoList
                     .stream()
                     // 网关没有文档提供，需要排除
-                    .filter(entry -> !"API-GATEWAY".equalsIgnoreCase(entry.getKey()))
-                    .forEach(entry -> {
-                        ServiceInfoVO serviceInfoVo = entry.getValue().get(0);
-                        loadDocInfo(serviceInfoVo);
-                    });
+                    .filter(serviceInfo -> !"API-GATEWAY".equalsIgnoreCase(serviceInfo.getServiceId()))
+                    .filter(serviceInfo -> !serviceInfo.getInstances().isEmpty())
+                    .map(serviceInfo -> serviceInfo.getInstances().get(0))
+                    .collect(Collectors.toList())
+                    .forEach(this::loadDocInfo);
         } catch (Exception e) {
             log.error("加载失败", e);
         }
     }
 
-    protected void loadDocInfo(ServiceInfoVO serviceInfoVo) {
+    protected void loadDocInfo(ServiceInstance serviceInstance) {
         String query = this.buildQuery();
-        String url = "http://" + serviceInfoVo.getIpAddr() + ":" + serviceInfoVo.getServerPort() + "/v2/api-docs" + query;
+        String url = "http://" + serviceInstance.getIpPort() + "/v2/api-docs" + query;
         try {
+            log.info("读取swagger文档，url:{}", url);
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
             if (entity.getStatusCode() != HttpStatus.OK) {
                 throw new IllegalAccessException("无权访问");
@@ -144,55 +136,8 @@ public class DocManagerImpl implements DocManager {
         return docDefinitionMap.values();
     }
 
-    protected Map<String, List<ServiceInfoVO>> getAllServiceList() throws IOException {
-        String json = this.requestEurekaServer(EurekaUri.QUERY_APPS);
-        EurekaApps eurekaApps = JSON.parseObject(json, EurekaApps.class);
-
-        List<ServiceInfoVO> serviceInfoVoList = new ArrayList<>();
-        List<EurekaApplication> applicationList = eurekaApps.getApplications().getApplication();
-        applicationList.stream()
-                .forEach(eurekaApplication -> {
-                    List<EurekaInstance> instanceList = eurekaApplication.getInstance();
-                    for (EurekaInstance instance : instanceList) {
-                        if ("UP".equals(instance.getStatus())) {
-                            ServiceInfoVO vo = new ServiceInfoVO();
-                            vo.setName(eurekaApplication.getName());
-                            vo.setIpAddr(instance.getIpAddr());
-                            vo.setServerPort(instance.fetchPort());
-                            serviceInfoVoList.add(vo);
-                        }
-                    }
-                });
-
-        Map<String, List<ServiceInfoVO>> listMap = serviceInfoVoList.stream()
-                .collect(Collectors.groupingBy(ServiceInfoVO::getName));
-
-        return listMap;
-    }
-
-    protected String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
-        Request request = eurekaUri.getRequest(this.eurekaUrl, args);
-        Response response = client.newCall(request).execute();
-        if (response.isSuccessful()) {
-            return response.body().string();
-        } else {
-            log.error("操作失败，url:{}, msg:{}, code:{}", eurekaUri.getUri(args), response.message(), response.code());
-            throw new RuntimeException("操作失败");
-        }
-    }
-
     @PostConstruct
     protected void after() throws Exception {
-        String eurekaUrls = environment.getProperty("eureka.client.serviceUrl.defaultZone");
-        if (StringUtils.isBlank(eurekaUrls)) {
-            throw new IllegalArgumentException("未指定eureka.client.serviceUrl.defaultZone参数");
-        }
-        String url = eurekaUrls.split("\\,")[0];
-        if (url.endsWith("/")) {
-            url = eurekaUrls.substring(0, eurekaUrls.length() - 1);
-        }
-        this.eurekaUrl = url;
-
         this.listenServiceId();
     }
 

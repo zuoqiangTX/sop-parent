@@ -78,7 +78,7 @@ CREATE TABLE `config_route_limit` (
 CREATE TABLE `isv_info` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `app_key` varchar(100) NOT NULL COMMENT 'appKey',
-  `secret` varchar(200) NOT NULL COMMENT 'secret',
+  `secret` varchar(200) COMMENT 'secret',
   `pub_key` text COMMENT '公钥',
   `pri_key` text COMMENT '私钥',
   `status` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '1启用，2禁用',

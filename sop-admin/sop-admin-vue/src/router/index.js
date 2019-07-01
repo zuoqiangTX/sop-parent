@@ -91,14 +91,20 @@ export const constantRoutes = [
   {
     path: '/isv',
     component: Layout,
+    name: 'Isv',
     meta: { title: 'ISV管理', icon: 'user' },
-    redirect: '/isv/list',
     children: [
       {
         path: 'list',
         name: 'IsvList',
         component: () => import('@/views/isv/index'),
         meta: { title: 'ISV列表' }
+      },
+      {
+        path: 'role',
+        name: 'Role',
+        component: () => import('@/views/isv/role'),
+        meta: { title: '角色管理' }
       },
       {
         path: 'keys',

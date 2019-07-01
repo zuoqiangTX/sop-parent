@@ -87,7 +87,7 @@ public class AlipayController {
     public Story getStory() {
         Story story = new Story();
         story.setId(1);
-        story.setName("海底小纵队(alipay.story.get)");
+        story.setName("海底小纵队(alipay.story.get)，2222");
         return story;
     }
 

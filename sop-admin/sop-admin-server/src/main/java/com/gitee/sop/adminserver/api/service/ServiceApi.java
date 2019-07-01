@@ -6,33 +6,28 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.sop.adminserver.api.service.param.ServiceAddParam;
-import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
-import com.gitee.sop.adminserver.api.service.result.ServiceInfo;
+import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
-import com.gitee.sop.adminserver.bean.EurekaApplication;
-import com.gitee.sop.adminserver.bean.EurekaApps;
-import com.gitee.sop.adminserver.bean.EurekaInstance;
-import com.gitee.sop.adminserver.bean.EurekaUri;
+import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
+import com.gitee.sop.registryapi.bean.ServiceInfo;
+import com.gitee.sop.registryapi.bean.ServiceInstance;
+import com.gitee.sop.registryapi.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,24 +41,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ServiceApi {
 
-
-    OkHttpClient client = new OkHttpClient();
-
     @Autowired
-    private Environment environment;
+    private RegistryService registryService;
 
-    private String eurekaUrl;
-
-    @Api(name = "service.list")
-    @ApiDocMethod(description = "服务列表（旧）", elementClass = ServiceInfo.class)
-    List<ServiceInfo> listServiceInfo(ServiceSearchParam param) throws Exception {
+    @Api(name = "zookeeper.service.list")
+    @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
+    List<RouteServiceInfo> listServiceInfo(ServiceSearchParam param) {
         String routeRootPath = ZookeeperContext.getSopRouteRootPath();
         List<ChildData> childDataList = ZookeeperContext.getChildrenData(routeRootPath);
-        List<ServiceInfo> serviceInfoList = childDataList.stream()
+        List<RouteServiceInfo> serviceInfoList = childDataList.stream()
                 .filter(childData -> childData.getData() != null && childData.getData().length > 0)
                 .map(childData -> {
                     String serviceNodeData = new String(childData.getData());
-                    ServiceInfo serviceInfo = JSON.parseObject(serviceNodeData, ServiceInfo.class);
+                    RouteServiceInfo serviceInfo = JSON.parseObject(serviceNodeData, RouteServiceInfo.class);
                     return serviceInfo;
                 })
                 .filter(serviceInfo -> {
@@ -121,39 +111,40 @@ public class ServiceApi {
     }
 
     @Api(name = "service.instance.list")
-    @ApiDocMethod(description = "服务列表", elementClass = ServiceInfoVo.class)
-    List<ServiceInfoVo> listService(ServiceSearchParam param) throws Exception {
-        String json = this.requestEurekaServer(EurekaUri.QUERY_APPS);
-        EurekaApps eurekaApps = JSON.parseObject(json, EurekaApps.class);
-
-        List<ServiceInfoVo> serviceInfoVoList = new ArrayList<>();
-        List<EurekaApplication> applicationList = eurekaApps.getApplications().getApplication();
+    @ApiDocMethod(description = "获取注册中心的服务列表", elementClass = ServiceInfoVo.class)
+    List<ServiceInstanceVO> listService(ServiceSearchParam param) {
+        List<ServiceInfo> serviceInfos;
+        try {
+            serviceInfos = registryService.listAllService(1, 99999/* 获取所有实例 */);
+        } catch (Exception e) {
+            log.error("获取服务实例失败", e);
+            return Collections.emptyList();
+        }
+        List<ServiceInstanceVO> serviceInfoVoList = new ArrayList<>();
         AtomicInteger idGen = new AtomicInteger(1);
-        applicationList.stream()
-                .filter(eurekaApplication -> {
+        serviceInfos.stream()
+                .filter(serviceInfo -> {
                     if (StringUtils.isBlank(param.getServiceId())) {
                         return true;
                     }
-                    return StringUtils.containsIgnoreCase(eurekaApplication.getName(), param.getServiceId());
+                    return StringUtils.containsIgnoreCase(serviceInfo.getServiceId(), param.getServiceId());
                 })
-                .forEach(eurekaApplication -> {
+                .forEach(serviceInfo -> {
                     int pid = idGen.getAndIncrement();
-                    String name = eurekaApplication.getName();
-                    ServiceInfoVo parent = new ServiceInfoVo();
+                    String serviceId = serviceInfo.getServiceId();
+                    ServiceInstanceVO parent = new ServiceInstanceVO();
                     parent.setId(pid);
-                    parent.setName(name);
+                    parent.setServiceId(serviceId);
                     parent.setParentId(0);
                     serviceInfoVoList.add(parent);
-                    List<EurekaInstance> instanceList = eurekaApplication.getInstance();
-                    for (EurekaInstance instance : instanceList) {
-                        ServiceInfoVo vo = new ServiceInfoVo();
-                        BeanUtils.copyProperties(instance, vo);
+                    List<ServiceInstance> instanceList = serviceInfo.getInstances();
+                    for (ServiceInstance instance : instanceList) {
+                        ServiceInstanceVO instanceVO = new ServiceInstanceVO();
+                        BeanUtils.copyProperties(instance, instanceVO);
                         int id = idGen.getAndIncrement();
-                        vo.setId(id);
-                        vo.setName(name);
-                        vo.setParentId(pid);
-                        vo.setServerPort(instance.fetchPort());
-                        serviceInfoVoList.add(vo);
+                        instanceVO.setId(id);
+                        instanceVO.setParentId(pid);
+                        serviceInfoVoList.add(instanceVO);
                     }
                 });
 
@@ -162,38 +153,24 @@ public class ServiceApi {
 
     @Api(name = "service.instance.offline")
     @ApiDocMethod(description = "服务下线")
-    void serviceOffline(ServiceInstanceParam param) throws IOException {
-        this.requestEurekaServer(EurekaUri.OFFLINE_SERVICE, param.getServiceId(), param.getInstanceId());
+    void serviceOffline(ServiceInstance param) {
+        try {
+            registryService.offlineInstance(param);
+        } catch (Exception e) {
+            log.error("下线失败，param:{}", param, e);
+            throw new BizException("下线失败，请查看日志");
+        }
     }
 
     @Api(name = "service.instance.online")
     @ApiDocMethod(description = "服务上线")
-    void serviceOnline(ServiceInstanceParam param) throws IOException {
-        this.requestEurekaServer(EurekaUri.ONLINE_SERVICE, param.getServiceId(), param.getInstanceId());
-    }
-
-    private String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {
-        Request request = eurekaUri.getRequest(this.eurekaUrl, args);
-        Response response = client.newCall(request).execute();
-        if (response.isSuccessful()) {
-            return response.body().string();
-        } else {
-            log.error("操作失败，url:{}, msg:{}, code:{}", eurekaUri.getUri(args), response.message(), response.code());
-            throw new BizException("操作失败", String.valueOf(response.code()));
+    void serviceOnline(ServiceInstance param) throws IOException {
+        try {
+            registryService.onlineInstance(param);
+        } catch (Exception e) {
+            log.error("上线失败，param:{}", param, e);
+            throw new BizException("上线失败，请查看日志");
         }
-    }
-
-    @PostConstruct
-    protected void after() {
-        String eurekaUrls = environment.getProperty("eureka.client.serviceUrl.defaultZone");
-        if (StringUtils.isBlank(eurekaUrls)) {
-            throw new BizException("未指定eureka.client.serviceUrl.defaultZone参数");
-        }
-        String url = eurekaUrls.split("\\,")[0];
-        if (url.endsWith("/")) {
-            url = eurekaUrls.substring(0, eurekaUrls.length() - 1);
-        }
-        this.eurekaUrl = url;
     }
 
 }

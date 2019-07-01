@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.3.RELEASE</version>
+		<version>2.1.4.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -27,12 +27,12 @@
 	</properties>
 
 	<dependencies>
-		<!-- 将前端页面打包成webjars，然后打开注释
 		<dependency>
 			<groupId>com.gitee.sop</groupId>
-			<artifactId>sop-admin-front</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>-->
+			<artifactId>sop-registry-api</artifactId>
+			<version>1.12.0-SNAPSHOT</version>
+		</dependency>
+
 		<!-- easyopen starter -->
 		<dependency>
 			<groupId>net.oschina.durcframework</groupId>
@@ -79,12 +79,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -109,6 +103,12 @@
 			<version>1.18.4</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+            <version>2.1.0.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

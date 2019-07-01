@@ -288,7 +288,7 @@ export default {
     },
     onIsvDialogSave: function() {
       const that = this
-      this.$refs['isvForm'].validate((valid) => {
+      this.$refs.isvForm.validate((valid) => {
         if (valid) {
           const uri = this.isvDialogFormData.id === 0 ? 'isv.info.add' : 'isv.info.update'
           that.post(uri, that.isvDialogFormData, function() {

@@ -3,6 +3,7 @@ package com.gitee.sop.websiteserver.controller;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
  * 沙箱环境代理类
  * @author tanghc
  */
+@Slf4j
 @RestController
 @RequestMapping("sandbox")
 public class SandboxController {
@@ -45,8 +47,8 @@ public class SandboxController {
             , @RequestParam String version
             , @RequestParam String bizContent) throws AlipayApiException {
 
-        Assert.isTrue(StringUtils.isNotBlank(appId), "appId不能为空");
-        Assert.isTrue(StringUtils.isNotBlank(privateKey), "privateKey不能为空");
+        Assert.isTrue(StringUtils.isNotBlank(appId), "AppId不能为空");
+        Assert.isTrue(StringUtils.isNotBlank(privateKey), "PrivateKey不能为空");
         Assert.isTrue(StringUtils.isNotBlank(method), "method不能为空");
 
         // 公共请求参数
@@ -69,7 +71,12 @@ public class SandboxController {
         String content = AlipaySignature.getSignContent(params);
         result.beforeSign = content;
 
-        String sign = AlipaySignature.rsa256Sign(content, privateKey, "utf-8");
+        String sign = null;
+        try {
+            sign = AlipaySignature.rsa256Sign(content, privateKey, "utf-8");
+        } catch (AlipayApiException e) {
+            throw new RuntimeException("构建签名失败");
+        }
         result.sign = sign;
 
         params.put("sign", sign);

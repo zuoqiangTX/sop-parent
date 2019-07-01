@@ -1,6 +1,5 @@
 package com.gitee.sop.bookweb.controller;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Data;
 
 /**
@@ -48,7 +47,6 @@ import lombok.Data;
  *
  * @author tanghc
  */
-@XStreamAlias("response")
 @Data
 public class ApiResult  {
 

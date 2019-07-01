@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sop</groupId>
 	<artifactId>sop-common</artifactId>
-	<version>1.11.0-SNAPSHOT</version>
+	<version>1.12.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -37,7 +37,8 @@
 	<modules>
 		<module>sop-gateway-common</module>
 		<module>sop-service-common</module>
-	</modules>
+        <module>sop-registry-api</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>

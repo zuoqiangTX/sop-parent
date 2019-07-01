@@ -10,22 +10,21 @@ import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
-import com.gitee.sop.adminserver.bean.ServiceInfo;
-import com.gitee.sop.adminserver.bean.ServiceInstance;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
-import com.gitee.sop.adminserver.service.RegistrationService;
-import com.gitee.sop.adminserver.service.impl.RegistrationServiceEureka;
+import com.gitee.sop.registryapi.bean.ServiceInfo;
+import com.gitee.sop.registryapi.bean.ServiceInstance;
+import com.gitee.sop.registryapi.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +41,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ServiceApi {
 
-    @Resource(type = RegistrationServiceEureka.class)
-    private RegistrationService registrationService;
+    @Autowired
+    private RegistryService registryService;
 
     @Api(name = "zookeeper.service.list")
     @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
@@ -113,10 +112,10 @@ public class ServiceApi {
 
     @Api(name = "service.instance.list")
     @ApiDocMethod(description = "获取注册中心的服务列表", elementClass = ServiceInfoVo.class)
-    List<ServiceInstanceVO> listService(ServiceSearchParam param)  {
+    List<ServiceInstanceVO> listService(ServiceSearchParam param) {
         List<ServiceInfo> serviceInfos;
         try {
-            serviceInfos = registrationService.listAllService(1, 99999/* 获取所有实例 */);
+            serviceInfos = registryService.listAllService(1, 99999/* 获取所有实例 */);
         } catch (Exception e) {
             log.error("获取服务实例失败", e);
             return Collections.emptyList();
@@ -156,7 +155,7 @@ public class ServiceApi {
     @ApiDocMethod(description = "服务下线")
     void serviceOffline(ServiceInstance param) {
         try {
-            registrationService.offlineInstance(param);
+            registryService.offlineInstance(param);
         } catch (Exception e) {
             log.error("下线失败，param:{}", param, e);
             throw new BizException("下线失败，请查看日志");
@@ -167,7 +166,7 @@ public class ServiceApi {
     @ApiDocMethod(description = "服务上线")
     void serviceOnline(ServiceInstance param) throws IOException {
         try {
-            registrationService.onlineInstance(param);
+            registryService.onlineInstance(param);
         } catch (Exception e) {
             log.error("上线失败，param:{}", param, e);
             throw new BizException("上线失败，请查看日志");

@@ -1,11 +1,9 @@
-package com.gitee.sop.adminserver.bean;
+package com.gitee.sop.registryapi.bean;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.internal.http.HttpMethod;
-import org.apache.commons.lang.ArrayUtils;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * https://github.com/Netflix/eureka/wiki/Eureka-REST-operations
@@ -17,22 +15,22 @@ public enum EurekaUri {
     /**
      * 查询所有实例 Query for all instances
      */
-    QUERY_APPS(RequestMethod.GET, "/apps"),
+    QUERY_APPS("GET", "/apps"),
     /**
      * 下线 Take instance out of service
      */
-    OFFLINE_SERVICE(RequestMethod.PUT, "/apps/%s/%s/status?value=OUT_OF_SERVICE"),
+    OFFLINE_SERVICE("PUT", "/apps/%s/%s/status?value=OUT_OF_SERVICE"),
     /**
      * 上线 Move instance back into service (remove override)
      */
-    ONLINE_SERVICE(RequestMethod.DELETE, "/apps/%s/%s/status?value=UP"),
+    ONLINE_SERVICE("DELETE", "/apps/%s/%s/status?value=UP"),
     ;
     public static final String URL_PREFIX = "/";
 
     String uri;
-    RequestMethod requestMethod;
+    String requestMethod;
 
-    EurekaUri(RequestMethod httpMethod, String uri) {
+    EurekaUri(String httpMethod, String uri) {
         if (!uri.startsWith(URL_PREFIX)) {
             uri = "/" + uri;
         }
@@ -41,10 +39,13 @@ public enum EurekaUri {
     }
 
     public String getUri(String... args) {
-        if (ArrayUtils.isEmpty(args)) {
+        if (args == null || args.length == 0) {
             return uri;
         }
-        Object[] param = ArrayUtils.clone(args);
+        Object[] param = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            param[i] = args[i];
+        }
         return String.format(uri, param);
     }
 
@@ -59,12 +60,12 @@ public enum EurekaUri {
     }
 
     public Request.Builder getBuilder() {
-        String method = requestMethod.name();
+        String method = requestMethod;
         RequestBody requestBody = null;
         if (HttpMethod.requiresRequestBody(method)) {
-            MediaType contentType = MediaType.parse(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
+            MediaType contentType = MediaType.parse("application/json");
             requestBody = RequestBody.create(contentType, "{}");
         }
-        return new Request.Builder().method(requestMethod.name(), requestBody);
+        return new Request.Builder().method(requestMethod, requestBody);
     }
 }

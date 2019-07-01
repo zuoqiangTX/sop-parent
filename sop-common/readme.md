@@ -1,7 +1,10 @@
 # sop-common
 
 - sop-gateway-common：提供给网关使用
+- sop-registry-api：注册中心API
 - sop-service-common：提供给微服务端使用，需要打成jar
+
+正式开发请将这些模块上传的maven私服
 
 - 打包成jar：`mvn clean package`
 - 上传到本机仓库：`mvn clean install`

@@ -12,6 +12,8 @@ spring:
     name: sop-admin
 
   cloud:
+
+    # zookeeper地址，根据实际情况修改
     zookeeper:
       connect-string: localhost:2181
       baseSleepTimeMs: 3000
@@ -31,12 +33,12 @@ easyopen:
   ignore-validate: true
 
 # 注册中心地址，根据实际情况改，这里只是参数，并不会去注册
-eureka:
-  port: 1111
-  host: localhost
-  client:
-    serviceUrl:
-      defaultZone: http://${eureka.host}:${eureka.port}/eureka/
+registry:
+  eureka-server-addr: http://localhost:1111/eureka/
+  nacos-server-addr: 127.0.0.1:8848
+  # 使用哪个配置中心，使用eureka，填eureka；使用nacos填nacos
+  name: nacos
+
 
 # 根据实际情况改
 logging:

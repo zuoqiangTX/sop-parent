@@ -1,4 +1,4 @@
-package com.gitee.sop.adminserver.bean;
+package com.gitee.sop.registryapi.bean;
 
 import lombok.Data;
 
@@ -15,12 +15,18 @@ public class ServiceInstance {
     private String serviceId;
 
     /**
-     * IP 端口
+     * ip
      */
-    private String ipPort;
+    private String ip;
 
     /**
-     * 状态，1：上线，2：下线
+     * port
+     */
+    private int port;
+
+    /**
+     * 服务状态，UP：已上线，OUT_OF_SERVICE：已下线
      */
     private String status;
+
 }

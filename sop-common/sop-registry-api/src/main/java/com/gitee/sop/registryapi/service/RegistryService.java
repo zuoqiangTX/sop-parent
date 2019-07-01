@@ -1,14 +1,14 @@
-package com.gitee.sop.adminserver.service;
+package com.gitee.sop.registryapi.service;
 
-import com.gitee.sop.adminserver.bean.ServiceInfo;
-import com.gitee.sop.adminserver.bean.ServiceInstance;
+import com.gitee.sop.registryapi.bean.ServiceInfo;
+import com.gitee.sop.registryapi.bean.ServiceInstance;
 
 import java.util.List;
 
 /**
  * @author tanghc
  */
-public interface RegistrationService {
+public interface RegistryService {
     /**
      * 获取所有服务列表
      *

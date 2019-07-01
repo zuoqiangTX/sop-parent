@@ -24,6 +24,12 @@ public class ServiceInstanceVO {
     @ApiDocField(description = "ipPort")
     private String ipPort;
 
+    @ApiDocField(description = "ip")
+    private String ip;
+
+    @ApiDocField(description = "port")
+    private int port;
+
     @ApiDocField(description = "status，服务状态，UP：已上线，OUT_OF_SERVICE：已下线")
     private String status;
 
@@ -39,6 +45,10 @@ public class ServiceInstanceVO {
             return null;
         }
         return new Date(Long.valueOf(lastUpdatedTimestamp));
+    }
+
+    public String getIpPort() {
+        return ip != null && port > 0 ? ip + ":" + port : "";
     }
 
 }

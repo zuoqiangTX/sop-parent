@@ -1,4 +1,4 @@
-package com.gitee.sop.adminserver.bean;
+package com.gitee.sop.registryapi.bean;
 
 import lombok.Data;
 import org.springframework.util.CollectionUtils;

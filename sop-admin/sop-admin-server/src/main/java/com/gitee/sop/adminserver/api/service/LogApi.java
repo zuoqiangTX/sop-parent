@@ -80,7 +80,7 @@ public class LogApi {
                 }
             } catch (Exception e) {
                 log.error("获取日志信息出错", e);
-                throw new BizException("获取日志信息出错");
+                logMonitorInstanceVOParent.setMonitorName(logMonitorInstanceVOParent.getMonitorName() + "(请求出错)");
             }
         }
         Collections.sort(ret, Comparator.comparing(LogMonitorInstanceVO::getCount));

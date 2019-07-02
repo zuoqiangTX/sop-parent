@@ -38,7 +38,7 @@ registry:
   # nacos服务器地址
   nacos-server-addr: 127.0.0.1:8848
   # 使用eureka，填：eureka，使用nacos填：nacos
-  name: eureka
+  name: nacos
 
 
 # 根据实际情况改

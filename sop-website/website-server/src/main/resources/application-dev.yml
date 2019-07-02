@@ -3,10 +3,11 @@ server:
 
 # 注册中心地址，根据实际情况改，这里只是参数，并不会去注册
 registry:
-  # 使用哪个配置中心，使用eureka，填eureka；使用nacos填nacos
-  name: nacos
   eureka-server-addr: http://localhost:1111/eureka/
+  # nacos服务器地址
   nacos-server-addr: 127.0.0.1:8848
+  # 使用eureka，填：eureka，使用nacos填：nacos
+  name: eureka
 
 spring:
   application:

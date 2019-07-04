@@ -14,4 +14,6 @@ public class SopAdminConstants {
      */
     public static final String SOP_MSG_CHANNEL_PATH = "/com.gitee.sop.channel";
 
+    public static final String RELOAD_ROUTE_PERMISSION_PATH = "/com.gitee.sop.route.permission.reload";
+
 }

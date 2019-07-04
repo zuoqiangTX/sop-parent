@@ -141,10 +141,6 @@
         <el-form-item :label="selfLabel('appKey')">
           <span>{{ isvKeysFormData.appKey }}</span>
         </el-form-item>
-        <el-form-item label="签名方式">
-          <span v-if="isvKeysFormData.signType === 1">RSA</span>
-          <span v-if="isvKeysFormData.signType === 2">MD5</span>
-        </el-form-item>
         <el-form-item v-show="showKeys()" label="秘钥格式">
           <span v-if="isvKeysFormData.keyFormat === 1">PKCS8(JAVA适用)</span>
           <span v-if="isvKeysFormData.keyFormat === 2">PKCS1(非JAVA适用)</span>

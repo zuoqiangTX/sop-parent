@@ -6,7 +6,6 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.easyopen.util.CopyUtil;
-import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.api.service.param.RouteAddParam;
 import com.gitee.sop.adminserver.api.service.param.RouteDeleteParam;
@@ -22,7 +21,6 @@ import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.ConfigRouteBase;
 import com.gitee.sop.adminserver.entity.PermRole;
-import com.gitee.sop.adminserver.entity.PermRolePermission;
 import com.gitee.sop.adminserver.mapper.ConfigRouteBaseMapper;
 import com.gitee.sop.adminserver.mapper.PermRoleMapper;
 import com.gitee.sop.adminserver.mapper.PermRolePermissionMapper;
@@ -30,14 +28,11 @@ import com.gitee.sop.adminserver.service.RouteConfigService;
 import com.gitee.sop.adminserver.service.RoutePermissionService;
 import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -188,6 +183,11 @@ public class RouteApi {
         return this.getRouteRole(param.getId());
     }
 
+    /**
+     * 获取路由对应的角色
+     * @param id routeId
+     * @return
+     */
     private List<RoleVO> getRouteRole(String id) {
         return permRolePermissionMapper.listByColumn("route_id", id)
                 .stream()
@@ -203,33 +203,28 @@ public class RouteApi {
 
     @Api(name = "route.role.update")
     @ApiDocMethod(description = "更新路由对应的角色")
-    @Transactional(rollbackFor = Exception.class)
     public void updateRouteRole(RoutePermissionParam param) {
-        String routeId = param.getRouteId();
-        // 删除所有数据
-        Query delQuery = new Query();
-        delQuery.eq("route_id", routeId);
-        permRolePermissionMapper.deleteByQuery(delQuery);
-
-        List<String> roleCodes = param.getRoleCode();
-        if (CollectionUtils.isNotEmpty(roleCodes)) {
-            List<PermRolePermission> tobeSave = new ArrayList<>(roleCodes.size());
-            for (String roleCode : roleCodes) {
-                PermRolePermission permRolePermission = new PermRolePermission();
-                permRolePermission.setRoleCode(roleCode);
-                permRolePermission.setRouteId(routeId);
-                tobeSave.add(permRolePermission);
-            }
-            // 批量添加
-            permRolePermissionMapper.saveBatch(tobeSave);
-        }
-
+        RoutePermissionParam oldRoutePermission = this.buildOldRoutePermission(param.getRouteId());
+        routePermissionService.updateRoutePermission(param);
         try {
-            routePermissionService.sendRoutePermissionReloadMsg();
+            routePermissionService.sendRoutePermissionReloadMsg(oldRoutePermission);
         } catch (Exception e) {
-            log.info("消息推送--路由权限(reload)失败", e);
-            throw new BizException("修改失败，请查看日志");
+            log.error("消息推送--路由权限(reload)失败", e);
+            // 回滚
+            routePermissionService.updateRoutePermission(oldRoutePermission);
+            throw new BizException(e.getMessage());
         }
+    }
+
+    private RoutePermissionParam buildOldRoutePermission(String routeId) {
+        List<RoleVO> routeRole = this.getRouteRole(routeId);
+        List<String> roleCodeList = routeRole.stream()
+                .map(RoleVO::getRoleCode)
+                .collect(Collectors.toList());
+        RoutePermissionParam routePermissionParam = new RoutePermissionParam();
+        routePermissionParam.setRouteId(routeId);
+        routePermissionParam.setRoleCode(roleCodeList);
+        return routePermissionParam;
     }
 
 }

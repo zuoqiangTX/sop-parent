@@ -6,6 +6,10 @@ admin:
   access-token:
     timeout-minutes: 30
 
+sop:
+  # 签名方式，rsa：支付宝开放平台签名方式，md5：淘宝开放平台签名方式
+  sign-type: rsa
+
 # 不用改
 spring:
   application:

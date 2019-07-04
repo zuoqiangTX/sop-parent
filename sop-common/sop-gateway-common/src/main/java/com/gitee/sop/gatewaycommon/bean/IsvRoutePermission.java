@@ -14,5 +14,6 @@ public class IsvRoutePermission {
     private String appKey;
     private List<String> routeIdList = Collections.emptyList();
     private String routeIdListMd5;
+    private String listenPath;
 
 }

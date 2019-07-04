@@ -4,54 +4,67 @@ import com.gitee.sop.adminserver.common.ZookeeperOperationException;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
+import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.gitee.sop.adminserver.bean.SopAdminConstants.SOP_MSG_CHANNEL_PATH;
 
 /**
  * @author tanghc
  */
-@Configuration
 @Slf4j
 public class ZookeeperContext {
 
     private static CuratorFramework client;
 
-    @Value("${spring.cloud.zookeeper.connect-string}")
-    private String zookeeperServerAddr;
+    private static Environment environment;
 
-    @Value("${spring.cloud.zookeeper.baseSleepTimeMs}")
-    private String baseSleepTimeMs;
+    public static void setEnvironment(Environment environment) {
+        Assert.notNull(environment, "environment不能为null");
+        ZookeeperContext.environment = environment;
+        initZookeeperClient();
+    }
 
-    @Value("${spring.cloud.zookeeper.maxRetries}")
-    private String maxRetries;
-
-    @PostConstruct
-    protected void after() {
-        if (StringUtils.isBlank(zookeeperServerAddr)) {
-            throw new IllegalArgumentException("未指定spring.cloud.zookeeper.connect-string参数");
+    public synchronized static void initZookeeperClient() {
+        if (client != null) {
+            return;
         }
+        setClient(createClient());
+    }
+
+    public static CuratorFramework createClient() {
+        String zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
+        if (StringUtils.isBlank(zookeeperServerAddr)) {
+            throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
+        }
+        String baseSleepTimeMs = environment.getProperty("spring.cloud.zookeeper.baseSleepTimeMs");
+        String maxRetries = environment.getProperty("spring.cloud.zookeeper.maxRetries");
+        log.info("初始化zookeeper客户端，zookeeperServerAddr:{}, baseSleepTimeMs:{}, maxRetries:{}",
+                zookeeperServerAddr, baseSleepTimeMs, maxRetries);
         CuratorFramework client = CuratorFrameworkFactory.builder()
                 .connectString(zookeeperServerAddr)
                 .retryPolicy(new ExponentialBackoffRetry(NumberUtils.toInt(baseSleepTimeMs, 3000), NumberUtils.toInt(maxRetries, 3)))
                 .build();
 
         client.start();
-
-        setClient(client);
+        return client;
     }
 
     public static String getSopRouteRootPath() {
@@ -129,6 +142,7 @@ public class ZookeeperContext {
 
     /**
      * 创建新的path，并赋值。如果path已存在抛异常
+     *
      * @param path 待创建的path
      * @param data 值
      * @throws ZookeeperPathExistException
@@ -138,9 +152,26 @@ public class ZookeeperContext {
             throw new ZookeeperPathExistException("path " + path + " 已存在");
         }
         try {
-            return  getClient().create()
+            return addPath(path, CreateMode.PERSISTENT, data);
+        } catch (Exception e) {
+            throw new ZookeeperOperationException("addPath error path=" + path, e);
+        }
+    }
+
+    /**
+     * 添加节点
+     *
+     * @param path       待创建的path
+     * @param createMode 节点类型
+     * @param data       节点数据
+     * @return
+     */
+    public static String addPath(String path, CreateMode createMode, String data) {
+        try {
+            return getClient().create()
                     // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
                     .creatingParentContainersIfNeeded()
+                    .withMode(createMode)
                     .forPath(path, data.getBytes());
         } catch (Exception e) {
             throw new ZookeeperOperationException("addPath error path=" + path, e);
@@ -149,6 +180,7 @@ public class ZookeeperContext {
 
     /**
      * 删除节点及子节点
+     *
      * @param path
      */
     public static void deletePathDeep(String path) {
@@ -157,12 +189,13 @@ public class ZookeeperContext {
                     .deletingChildrenIfNeeded()
                     .forPath(path);
         } catch (Exception e) {
-            throw new ZookeeperOperationException("deletePathDeep error path=" + path, e);
         }
     }
 
+
     /**
      * 创建新的path，并赋值。如果path已存在则不创建
+     *
      * @param path 待创建的path
      * @param data 值
      */
@@ -171,10 +204,7 @@ public class ZookeeperContext {
             return path;
         }
         try {
-            return  getClient().create()
-                    // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
-                    .creatingParentContainersIfNeeded()
-                    .forPath(path, data.getBytes());
+            return addPath(path, data);
         } catch (Exception e) {
             throw new ZookeeperOperationException("addPathQuietly error path=" + path, e);
         }
@@ -182,6 +212,7 @@ public class ZookeeperContext {
 
     /**
      * 新建或保存节点
+     *
      * @param path
      * @param data
      * @return
@@ -201,6 +232,7 @@ public class ZookeeperContext {
 
     /**
      * 获取节点内容
+     *
      * @param path
      * @return
      * @throws ZookeeperPathNotExistException
@@ -245,6 +277,56 @@ public class ZookeeperContext {
             throw new ZookeeperOperationException("buildPathChildrenCache error path=" + path, e);
         }
         return childrenCache;
+    }
+
+    /**
+     * 监听一个节点
+     *
+     * @param path
+     * @param onChange 节点修改后触发
+     * @return 返回path
+     * @throws Exception
+     */
+    public static void listenTempPath(String path, Consumer<String> onChange) throws Exception {
+        String initData = "{}";
+        CuratorFramework client = createClient();
+        client.create()
+                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
+                .creatingParentContainersIfNeeded()
+                .withMode(CreateMode.EPHEMERAL)
+                .forPath(path, initData.getBytes());
+
+        final NodeCache cache = new NodeCache(client, path, false);
+        cache.getListenable().addListener(new NodeCacheListener() {
+            @Override
+            public void nodeChanged() throws Exception {
+                byte[] nodeData = cache.getCurrentData().getData();
+                String data = new String(nodeData);
+                if (!initData.equals(data)) {
+                    onChange.accept(data);
+                    new Thread(new ZKClose(cache, client)).start();
+                }
+            }
+        });
+        cache.start();
+    }
+
+    static class ZKClose implements Runnable {
+        Closeable[] closes;
+
+        public ZKClose(Closeable ...closes) {
+            this.closes = closes;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(2000);
+                IOUtils.closeQuietly(closes);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

@@ -19,12 +19,6 @@
       <el-form-item :label="selfLabel('appKey')">
         <div>{{ isvKeysFormData.appKey }}</div>
       </el-form-item>
-      <el-form-item label="签名方式">
-        <el-radio-group v-model="isvKeysFormData.signType">
-          <el-radio :label="1" name="status">RSA</el-radio>
-          <el-radio :label="2" name="status">MD5</el-radio>
-        </el-radio-group>
-      </el-form-item>
       <el-form-item v-show="showKeys()" label="秘钥格式">
         <el-radio-group v-model="isvKeysFormData.keyFormat">
           <el-radio :label="1" name="keyFormat">PKCS8(JAVA适用)</el-radio>

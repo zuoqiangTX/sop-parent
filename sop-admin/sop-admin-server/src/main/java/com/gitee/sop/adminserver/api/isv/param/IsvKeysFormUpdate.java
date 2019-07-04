@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author tanghc
@@ -45,8 +44,4 @@ public class IsvKeysFormUpdate {
     /** 平台生成的私钥, 数据库字段：private_key_platform */
     @ApiDocField(description = "平台生成的私钥")
     private String privateKeyPlatform;
-
-    @ApiDocField(description = "签名类型：1:RSA2,2:MD5")
-    @NotNull(message = "signType不能为空")
-    private Byte signType;
 }

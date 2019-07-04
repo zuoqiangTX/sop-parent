@@ -2,8 +2,10 @@ package com.gitee.sop.adminserver.service;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.fastmybatis.core.query.Query;
+import com.gitee.sop.adminserver.api.service.param.RoutePermissionParam;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.IsvRoutePermission;
+import com.gitee.sop.adminserver.bean.SopAdminConstants;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
 import com.gitee.sop.adminserver.entity.PermRolePermission;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,12 +96,48 @@ public class RoutePermissionService {
     /**
      * 推送所有路由权限到zookeeper
      */
-    public void sendRoutePermissionReloadMsg() throws Exception {
-        ChannelMsg channelMsg = new ChannelMsg("reload", null);
+    public synchronized void sendRoutePermissionReloadMsg(RoutePermissionParam oldRoutePermission) throws Exception {
+        String listenPath = SopAdminConstants.RELOAD_ROUTE_PERMISSION_PATH + "/" + System.currentTimeMillis();
+        ZookeeperContext.listenTempPath(listenPath, code -> {
+            // 0成功
+            if (!"0".equals(code)) {
+                log.error("推送所有路由权限到zookeeper失败，进行回滚，msg: {}，oldRoutePermission：{}", code, JSON.toJSONString(oldRoutePermission));
+                // 回滚
+                this.updateRoutePermission(oldRoutePermission);
+            }
+        });
+        IsvRoutePermission isvRoutePermission = new IsvRoutePermission();
+        isvRoutePermission.setListenPath(listenPath);
+        ChannelMsg channelMsg = new ChannelMsg("reload", isvRoutePermission);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getIsvRoutePermissionChannelPath();
         log.info("消息推送--路由权限(reload), path:{}, data:{}", path, jsonData);
         ZookeeperContext.createOrUpdateData(path, jsonData);
     }
 
+    /**
+     * 更新路由权限
+     *
+     * @param param
+     */
+    public synchronized void updateRoutePermission(RoutePermissionParam param) {
+        String routeId = param.getRouteId();
+        // 删除所有数据
+        Query delQuery = new Query();
+        delQuery.eq("route_id", routeId);
+        permRolePermissionMapper.deleteByQuery(delQuery);
+
+        List<String> roleCodes = param.getRoleCode();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(roleCodes)) {
+            List<PermRolePermission> tobeSave = new ArrayList<>(roleCodes.size());
+            for (String roleCode : roleCodes) {
+                PermRolePermission permRolePermission = new PermRolePermission();
+                permRolePermission.setRoleCode(roleCode);
+                permRolePermission.setRouteId(routeId);
+                tobeSave.add(permRolePermission);
+            }
+            // 批量添加
+            permRolePermissionMapper.saveBatch(tobeSave);
+        }
+    }
 }

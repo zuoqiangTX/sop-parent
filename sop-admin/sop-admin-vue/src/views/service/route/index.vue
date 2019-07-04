@@ -214,8 +214,8 @@
         label-width="120px"
         size="mini"
       >
-        <el-form-item label="id">
-          <el-input v-model="authDialogFormData.routeId" readonly="readonly" />
+        <el-form-item label="路由ID">
+          <span>{{ authDialogFormData.routeId }}</span>
         </el-form-item>
         <el-form-item label="角色">
           <el-checkbox-group v-model="authDialogFormData.roleCode">

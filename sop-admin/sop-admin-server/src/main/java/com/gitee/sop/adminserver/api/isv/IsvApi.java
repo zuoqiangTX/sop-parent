@@ -41,13 +41,16 @@ import com.gitee.sop.adminserver.service.RoutePermissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotBlank;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +61,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class IsvApi {
 
-    public static final int SIGN_TYPE_RSA2 = 1;
+    public static final byte SIGN_TYPE_RSA = 1;
+    public static final byte SIGN_TYPE_MD5 = 2;
+
+    static Map<String, Byte> SIGN_TYPE_MAP = new HashMap<>();
+    static {
+        SIGN_TYPE_MAP.put("rsa", (byte) SIGN_TYPE_RSA);
+        SIGN_TYPE_MAP.put("md5", (byte) SIGN_TYPE_MD5);
+    }
+
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
@@ -73,6 +84,9 @@ public class IsvApi {
 
     @Autowired
     RoutePermissionService routePermissionService;
+
+    @Value("${sop.sign-type}")
+    private String sopSignType;
 
     @Api(name = "isv.info.page")
     @ApiDocMethod(description = "isv列表", results = {
@@ -118,6 +132,7 @@ public class IsvApi {
             CopyUtil.copyProperties(isvKeys, isvDetailVO);
         }
         isvDetailVO.setAppKey(appKey);
+        isvDetailVO.setSignType(getSignType());
         return isvDetailVO;
     }
 
@@ -168,10 +183,15 @@ public class IsvApi {
         IsvKeysGenVO isvKeysGenVO = this.createIsvKeys();
         IsvKeys isvKeys = new IsvKeys();
         isvKeys.setAppKey(appKey);
+        isvKeys.setSignType(getSignType());
         CopyUtil.copyPropertiesIgnoreNull(isvKeysGenVO, isvKeys);
         isvKeysMapper.saveIgnoreNull(isvKeys);
 
         this.sendChannelMsg(rec.getAppKey());
+    }
+
+    private byte getSignType() {
+        return SIGN_TYPE_MAP.getOrDefault(sopSignType, SIGN_TYPE_RSA);
     }
 
     @Api(name = "isv.info.update")
@@ -194,6 +214,7 @@ public class IsvApi {
         if (isvKeys == null) {
             isvKeys = new IsvKeys();
             CopyUtil.copyPropertiesIgnoreNull(param, isvKeys);
+            isvKeys.setSignType(getSignType());
             isvKeysMapper.saveIgnoreNull(isvKeys);
         } else {
             CopyUtil.copyPropertiesIgnoreNull(param, isvKeys);
@@ -279,7 +300,7 @@ public class IsvApi {
             routePermissionService.sendIsvRolePermissionToZookeeper(isvInfo.getAppKey(), roleCodeList);
         } catch (Exception e) {
             log.error("保存到zookeeper中失败，isvInfo:{}, roleCodeList:{}", isvInfo, roleCodeList);
-            throw new BizException("保存失败，请查看日志");
+            throw new BizException("同步zookeeper失败，请查看网关日志");
         }
     }
 }

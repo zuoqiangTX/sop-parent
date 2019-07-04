@@ -8,13 +8,17 @@ import com.gitee.easyopen.ApiParamParser;
 import com.gitee.easyopen.ParamNames;
 import com.gitee.easyopen.interceptor.ApiInterceptor;
 import com.gitee.easyopen.session.ApiSessionManager;
+import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.interceptor.LoginInterceptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -28,6 +32,9 @@ public class WebConfig {
 
     @Value("${admin.access-token.timeout-minutes}")
     private String accessTokenTimeout;
+
+    @Autowired
+    private Environment environment;
 
     @Bean
     ApiConfig apiConfig() {
@@ -57,6 +64,11 @@ public class WebConfig {
         });
 
         return apiConfig;
+    }
+
+    @PostConstruct
+    public void after() {
+        ZookeeperContext.setEnvironment(environment);
     }
 
 }

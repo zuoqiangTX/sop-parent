@@ -70,6 +70,10 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-test：接口调用测试用例
 - sop-website：开放平台对应网站，提供文档API等内容
 
+## 分支说明
+
+- develop：日常开发分支
+- registry-nacos：nacos作为注册中心
 
 ## 相关文档
 

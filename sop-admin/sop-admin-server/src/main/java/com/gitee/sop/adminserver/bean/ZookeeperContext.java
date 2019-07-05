@@ -22,7 +22,6 @@ import org.springframework.util.Assert;
 import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.gitee.sop.adminserver.bean.SopAdminConstants.SOP_MSG_CHANNEL_PATH;
 
@@ -283,11 +282,11 @@ public class ZookeeperContext {
      * 监听一个节点
      *
      * @param path
-     * @param onChange 节点修改后触发
+     * @param listenCallback 回调
      * @return 返回path
      * @throws Exception
      */
-    public static void listenTempPath(String path, Consumer<String> onChange) throws Exception {
+    public static void listenTempPath(String path, ListenCallback listenCallback) throws Exception {
         String initData = "{}";
         CuratorFramework client = createClient();
         client.create()
@@ -302,13 +301,17 @@ public class ZookeeperContext {
             public void nodeChanged() throws Exception {
                 byte[] nodeData = cache.getCurrentData().getData();
                 String data = new String(nodeData);
-                if (!initData.equals(data)) {
-                    onChange.accept(data);
+                if (StringUtils.isNotBlank(data) && !initData.equals(data)) {
+                    listenCallback.onError(data);
                     new Thread(new ZKClose(cache, client)).start();
                 }
             }
         });
         cache.start();
+    }
+
+    public interface ListenCallback {
+        void onError(String errorMsg);
     }
 
     static class ZKClose implements Runnable {

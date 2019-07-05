@@ -96,15 +96,12 @@ public class RoutePermissionService {
     /**
      * 推送所有路由权限到zookeeper
      */
-    public synchronized void sendRoutePermissionReloadMsg(RoutePermissionParam oldRoutePermission) throws Exception {
+    public void sendRoutePermissionReloadMsg(RoutePermissionParam oldRoutePermission) throws Exception {
         String listenPath = SopAdminConstants.RELOAD_ROUTE_PERMISSION_PATH + "/" + System.currentTimeMillis();
-        ZookeeperContext.listenTempPath(listenPath, code -> {
-            // 0成功
-            if (!"0".equals(code)) {
-                log.error("推送所有路由权限到zookeeper失败，进行回滚，msg: {}，oldRoutePermission：{}", code, JSON.toJSONString(oldRoutePermission));
-                // 回滚
-                this.updateRoutePermission(oldRoutePermission);
-            }
+        ZookeeperContext.listenTempPath(listenPath, errorMsg -> {
+            log.error("推送所有路由权限到zookeeper失败，进行回滚，errorMsg: {}，oldRoutePermission：{}", errorMsg, JSON.toJSONString(oldRoutePermission));
+            // 回滚
+            updateRoutePermission(oldRoutePermission);
         });
         IsvRoutePermission isvRoutePermission = new IsvRoutePermission();
         isvRoutePermission.setListenPath(listenPath);

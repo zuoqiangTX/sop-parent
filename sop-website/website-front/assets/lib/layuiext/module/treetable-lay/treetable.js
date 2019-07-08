@@ -75,10 +75,11 @@ layui.define(['layer', 'table'], function (exports) {
                 count: param.data.length,
                 limit: param.data.length
             };
-            param.cols[0][param.treeColIndex].templet = function (d) {
-                var mId = d.id;
-                var mPid = d.pid;
-                var isDir = d.isParent;
+            var firstTemplet = param.firstTemplet;
+            param.cols[0][param.treeColIndex].templet = function (row) {
+                var mId = row.id;
+                var mPid = row.pid;
+                var isDir = row.isParent;
                 var emptyNum = treetable.getEmptyNum(mPid, mData);
                 var iconHtml = '';
                 for (var i = 0; i < emptyNum; i++) {
@@ -92,7 +93,9 @@ layui.define(['layer', 'table'], function (exports) {
                 iconHtml += '&nbsp;&nbsp;';
                 var ttype = isDir ? 'dir' : 'file';
                 var vg = '<span class="treeTable-icon open" lay-tid="' + mId + '" lay-tpid="' + mPid + '" lay-ttype="' + ttype + '">';
-                return vg + iconHtml + d[param.cols[0][param.treeColIndex].field] + '</span>'
+                var field = param.cols[0][param.treeColIndex].field;
+                var cellVal = firstTemplet ? firstTemplet(row) : row[field];
+                return vg + iconHtml + cellVal + '</span>'
             };
 
             param.done = function (res, curr, count) {

@@ -7,7 +7,6 @@ import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.FormBodyWrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
-import com.gitee.sop.gatewaycommon.zuul.filter.PreRoutePermissionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
@@ -94,14 +93,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     @Bean
     PreLimitFilter preLimitFilter() {
         return new PreLimitFilter();
-    }
-
-    /**
-     * 权限校验
-     */
-    @Bean
-    PreRoutePermissionFilter preRoutePermissionFilter() {
-        return new PreRoutePermissionFilter();
     }
 
     /**

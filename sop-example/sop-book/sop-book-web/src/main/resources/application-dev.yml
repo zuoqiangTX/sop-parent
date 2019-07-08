@@ -10,12 +10,16 @@ spring:
       # zookeeper配置
       connect-string: localhost:2181
 
+    # nacos注册中心，和eureka只能用一个
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+
+# eureka注册中心，如果使用nacos注册中心，这里要注释掉
 eureka:
-  port: 1111
-  host: localhost
   client:
     serviceUrl:
-      defaultZone: http://${eureka.host}:${eureka.port}/eureka/
+      defaultZone: http://localhost:1111/eureka/
 
 # dubbo consumer
 demo:

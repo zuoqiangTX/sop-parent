@@ -10,13 +10,10 @@ public class SopAdminConstants {
     public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
 
     /**
-     * zookeeper存放路由授权信息根目录
-     */
-    public static final String SOP_ROUTE_PERMISSION_PATH = "/com.gitee.sop.isv.route.permission";
-
-    /**
      * 消息监听路径
      */
     public static final String SOP_MSG_CHANNEL_PATH = "/com.gitee.sop.channel";
+
+    public static final String RELOAD_ROUTE_PERMISSION_PATH = "/com.gitee.sop.route.permission.reload";
 
 }

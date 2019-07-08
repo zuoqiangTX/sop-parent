@@ -463,4 +463,21 @@ body .site-demo-nav .layui-nav-item{line-height: 40px}
 }
 .site-out-up{-webkit-animation-duration: 3s; animation-duration: 3s; -webkit-animation-fill-mode: both; animation-fill-mode: both; -webkit-animation-name: site-anim-closeup; animation-name: site-anim-closeup; overflow: hidden;}
 
+.layui-table-input {
+  display: block;
+  width: 100%;
+  padding-left: 10px;
 
+  height: 28px;
+  line-height: 1.3;
+  line-height: 38px\9;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #e6e6e6;
+}
+
+.layui-table-cell .layui-input,td .layui-input,th .layui-input {
+  height: 28px;
+}

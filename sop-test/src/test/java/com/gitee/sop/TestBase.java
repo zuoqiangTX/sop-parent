@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -58,6 +59,61 @@ public class TestBase extends TestCase {
              * 执行post请求
              */
             response = client.execute(post);
+            /**
+             * 通过EntityUitls获取返回内容
+             */
+//            Header[] allHeaders = response.getAllHeaders();
+//            if (allHeaders != null && allHeaders.length > 0) {
+//                System.out.println("----------- headers -----------");
+//                for (Header allHeader : allHeaders) {
+//                    System.out.println(allHeader);
+//                }
+//            }
+            return EntityUtils.toString(response.getEntity(),"UTF-8");
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            IOUtils.closeQuietly(client);
+            IOUtils.closeQuietly(response);
+        }
+        return null;
+    }
+
+    /**
+     * 发送get请求
+     * @param url
+     * @return JSON或者字符串
+     * @throws Exception
+     */
+    public static String get(String url, Map<String, String> params) {
+        CloseableHttpClient client = null;
+        CloseableHttpResponse response = null;
+        try{
+            /**
+             *  创建一个httpclient对象
+             */
+            client = HttpClients.createDefault();
+
+            List<NameValuePair> nameValuePairs = params.entrySet()
+                    .stream()
+                    .map(entry -> new BasicNameValuePair(entry.getKey(), String.valueOf(entry.getValue())))
+                    .collect(Collectors.toList());
+            /**
+             * 包装成一个Entity对象
+             */
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(nameValuePairs, "UTF-8");
+            //参数转换为字符串
+            String paramsStr = EntityUtils.toString(entity);
+            url = url + "?" + paramsStr;
+            /**
+             * 创建一个post对象
+             */
+            HttpGet get = new HttpGet(url);
+
+            /**
+             * 执行post请求
+             */
+            response = client.execute(get);
             /**
              * 通过EntityUitls获取返回内容
              */

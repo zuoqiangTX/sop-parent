@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -129,7 +128,19 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
             switch (channelMsg.getOperation()) {
                 case "reload":
                     log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    load();
+                    String listenPath = isvRoutePermission.getListenPath();
+                    String code = "";
+                    try {
+                        load();
+                    } catch (Exception e) {
+                        log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
+                        code = e.getMessage();
+                    }
+                    try {
+                        ZookeeperContext.updatePath(listenPath, code);
+                    } catch (Exception e1) {
+                        log.error("重新加载路由权限信息, zookeeper操作失败， path: {}", listenPath, e1);
+                    }
                     break;
                 case "update":
                     log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);

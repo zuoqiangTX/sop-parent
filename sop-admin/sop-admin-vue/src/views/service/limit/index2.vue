@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-container>
-      <el-aside style="min-height: 300px;width: 200px;">
+      <el-aside style="min-height: 300px;width: 250px;">
         <el-input v-model="filterText" prefix-icon="el-icon-search" placeholder="搜索服务..." style="margin-bottom:20px;" size="mini" clearable />
         <el-tree
           ref="tree2"
@@ -17,11 +17,25 @@
           @node-click="onNodeClick"
         >
           <span slot-scope="{ node, data }" class="custom-tree-node">
-            <span v-if="data.label.length < 15">{{ data.label }}</span>
-            <span v-else>
-              <el-tooltip :content="data.label" class="item" effect="light" placement="right">
-                <span>{{ data.label.substring(0, 15) + '...' }}</span>
+            <div>
+              <el-tooltip v-show="data.custom" content="自定义服务" class="item" effect="light" placement="left">
+                <i class="el-icon-warning-outline"></i>
               </el-tooltip>
+              <span v-if="data.label.length < serviceTextLimitSize">{{ data.label }}</span>
+              <span v-else>
+                <el-tooltip :content="data.label" class="item" effect="light" placement="right">
+                  <span>{{ data.label.substring(0, serviceTextLimitSize) + '...' }}</span>
+                </el-tooltip>
+              </span>
+            </div>
+            <span>
+              <el-button
+                v-if="data.custom === 1"
+                type="text"
+                size="mini"
+                icon="el-icon-delete"
+                title="删除服务"
+                @click.stop="() => onDelService(data)"/>
             </span>
           </span>
         </el-tree>
@@ -217,11 +231,23 @@
     </el-container>
   </div>
 </template>
-
+<style>
+  .custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
+  .el-input.is-disabled .el-input__inner {color: #909399;}
+  .el-radio__input.is-disabled+span.el-radio__label {color: #909399;}
+</style>
 <script>
 export default {
   data() {
     return {
+      serviceTextLimitSize: 20,
       filterText: '',
       treeData: [],
       tableData: [],
@@ -311,7 +337,7 @@ export default {
   methods: {
     // 加载树
     loadTree: function() {
-      this.post('service.list', {}, function(resp) {
+      this.post('zookeeper.service.list', {}, function(resp) {
         const respData = resp.data
         this.treeData = this.convertToTreeData(respData, 0)
       })
@@ -361,8 +387,9 @@ export default {
       }
       const children = []
       for (let i = 0; i < data.length; i++) {
-        const item = { label: data[i].serviceId, parentId: 1 }
-        children.push(item)
+        data[i].parentId = 1
+        data[i].label = data[i].serviceId
+        children.push(data[i])
       }
       root.children = children
       result.push(root)
@@ -407,13 +434,9 @@ export default {
         }
       })
     },
-    resetForm(formName) {
-      const frm = this.$refs[formName]
-      frm && frm.resetFields()
-    },
     onLimitDialogClose: function() {
       this.resetForm('limitDialogForm')
-      this.limitDialogVisible = false
+      this.limitDialogFormData.limitStatus = 0
     },
     infoRender: function(row) {
       const html = []

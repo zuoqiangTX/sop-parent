@@ -85,12 +85,12 @@
             <el-option
               v-for="item in serviceData"
               :key="item.id"
-              :label="item.name + '(' + item.ipAddr + ':' + item.serverPort + ')'"
+              :label="item.serviceId + '(' + item.ipPort + ')'"
               :value="item"
               :disabled="isOptionDisabled(item)"
             >
-              <span style="float: left">{{ item.name }} <span v-if="isOptionDisabled(item)">(已添加)</span></span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.ipAddr + ':' + item.serverPort }}</span>
+              <span style="float: left">{{ item.serviceId }} <span v-if="isOptionDisabled(item)">(已添加)</span></span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.ipPort }}</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -156,7 +156,7 @@ export default {
       })
     },
     isOptionDisabled: function(item) {
-      const ipPort = item.ipAddr + ':' + item.serverPort
+      const ipPort = item.ipPort
       const index = this.addedInstanceList.findIndex((value, index, arr) => {
         return value === ipPort
       })
@@ -218,12 +218,7 @@ export default {
       this.$refs['logDialogForm'].validate((valid) => {
         if (valid) {
           const instanceData = this.logDialogFormData.instanceData
-          const data = {
-            serviceId: instanceData.serviceId,
-            ip: instanceData.ipAddr,
-            port: instanceData.serverPort
-          }
-          this.post('monitor.instance.add', data, function(resp) {
+          this.post('monitor.instance.add', instanceData, function(resp) {
             this.logDialogInstanceVisible = false
             this.loadTable()
           })

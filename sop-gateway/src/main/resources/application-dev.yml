@@ -11,15 +11,19 @@ zuul:
   Servlet30WrapperFilter:
     pre:
       disable: true
-  # 不用改，如果要改，建议全局替换修改
+  # 不用改，如果要改，请全局替换修改
   secret: MZZOUSTua6LzApIWXCwEgbBmxSzpzC
 
-# 注册中心，根据实际情况修改
+ribbon:
+  # 设置为true（默认false），则所有请求都重试，默认只支持get请求重试
+  # 请谨慎设置，因为post请求大多都是写入请求，如果要支持重试，确保服务的幂等性
+  OkToRetryOnAllOperations: false
+
+# eureka注册中心，如果使用nacos注册中心，这里要注释掉
 eureka:
-  serverAddr: localhost:1111
   client:
     serviceUrl:
-      defaultZone: http://${eureka.serverAddr}/eureka/
+      defaultZone: http://localhost:1111/eureka/
 
 spring:
   application:
@@ -36,6 +40,10 @@ spring:
           lower-case-service-id: true
           enabled: true
 
+    # nacos注册中心，和eureka只能用一个
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
 
   # 数据源，根据实际情况修改
   datasource:

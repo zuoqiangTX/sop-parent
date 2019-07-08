@@ -1,4 +1,4 @@
-# admin前端页面
+# admin前端页面(停止维护，改用sop-admin-vue)
 
 做到前后端分离。
 

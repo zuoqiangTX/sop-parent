@@ -20,7 +20,7 @@ public class RouteConfigService {
      * @param routeConfigDto
      * @throws Exception
      */
-    public void sendRouteConfigMsg(RouteConfigDto routeConfigDto) throws Exception {
+    public void sendRouteConfigMsg(RouteConfigDto routeConfigDto) {
         String configData = JSON.toJSONString(routeConfigDto);
         ChannelMsg channelMsg = new ChannelMsg("update", configData);
         String jsonData = JSON.toJSONString(channelMsg);

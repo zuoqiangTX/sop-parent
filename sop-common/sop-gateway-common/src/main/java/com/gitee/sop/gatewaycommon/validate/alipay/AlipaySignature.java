@@ -88,16 +88,16 @@ public class AlipaySignature {
      * sha256WithRsa 加签
      *
      * @param content
-     * @param publicKey
+     * @param privateKey
      * @param charset
      * @return
      */
-    public static String rsa256Sign(String content, String publicKey,
+    public static String rsa256Sign(String content, String privateKey,
                                     String charset) {
 
         try {
             PrivateKey priKey = getPrivateKeyFromPKCS8(AlipayConstants.SIGN_TYPE_RSA,
-                    new ByteArrayInputStream(publicKey.getBytes()));
+                    new ByteArrayInputStream(privateKey.getBytes()));
 
             java.security.Signature signature = java.security.Signature
                     .getInstance(AlipayConstants.SIGN_SHA256RSA_ALGORITHMS);

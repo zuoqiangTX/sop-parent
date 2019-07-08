@@ -18,6 +18,12 @@ public interface Isv {
     String getSecretInfo();
 
     /**
+     * 获取平台的私钥
+     * @return 返回私钥
+     */
+    String getPrivateKeyPlatform();
+
+    /**
      * 0启用，1禁用
      * @return 返回状态
      */

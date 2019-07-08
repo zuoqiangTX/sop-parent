@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
 import com.gitee.sop.sdk.common.RequestMethod;
-import com.gitee.sop.sdk.common.SdkConfig;
 import com.gitee.sop.sdk.common.UploadFile;
 import com.gitee.sop.sdk.response.BaseResponse;
 import com.gitee.sop.sdk.util.ClassUtil;
@@ -36,10 +35,6 @@ import java.util.Map;
 public abstract class BaseRequest<T extends BaseResponse> {
 
     private String method;
-    private String format = SdkConfig.FORMAT_TYPE;
-    private String charset = SdkConfig.CHARSET;
-    private String signType = SdkConfig.SIGN_TYPE;
-    private String timestamp = new SimpleDateFormat(SdkConfig.TIMESTAMP_PATTERN).format(new Date());
     private String version;
 
     private String bizContent;
@@ -50,11 +45,10 @@ public abstract class BaseRequest<T extends BaseResponse> {
      */
     private List<UploadFile> files;
 
-    private Class<T> responseClass;
+    private Class<T> responseClass = (Class<T>) ClassUtil.getSuperClassGenricType(this.getClass(), 0);;
 
     protected abstract String method();
 
-    @SuppressWarnings("unchecked")
     public BaseRequest() {
         this.setMethodVersion(this.method(), this.version());
     }
@@ -65,16 +59,16 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     private void setMethodVersion(String method, String version) {
         this.method = method;
-        this.version = version == null ? SdkConfig.DEFAULT_VERSION : version;
-        this.responseClass = (Class<T>) ClassUtil.getSuperClassGenricType(this.getClass(), 0);
+        this.version = version;
     }
 
     protected String version() {
-        return SdkConfig.DEFAULT_VERSION;
+        return null;
     }
 
     /**
      * 添加上传文件
+     *
      * @param file
      */
     public void addFile(UploadFile file) {
@@ -88,11 +82,13 @@ public abstract class BaseRequest<T extends BaseResponse> {
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();
         params.put(openConfig.getMethodName(), this.method);
-        params.put(openConfig.getFormatName(), this.format);
-        params.put(openConfig.getCharsetName(), this.charset);
-        params.put(openConfig.getSignTypeName(), this.signType);
-        params.put(openConfig.getTimestampName(), this.timestamp);
-        params.put(openConfig.getVersionName(), this.version);
+        params.put(openConfig.getFormatName(), openConfig.getFormatType());
+        params.put(openConfig.getCharsetName(), openConfig.getCharset());
+        params.put(openConfig.getSignTypeName(), openConfig.getSignType());
+        String timestamp = new SimpleDateFormat(openConfig.getTimestampPattern()).format(new Date());
+        params.put(openConfig.getTimestampName(), timestamp);
+        String v = this.version == null ? openConfig.getDefaultVersion() : this.version;
+        params.put(openConfig.getVersionName(), v);
 
         // 业务参数
         String biz_content = buildBizContent();
@@ -101,7 +97,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
         RequestForm requestForm = new RequestForm(params);
         requestForm.setRequestMethod(getRequestMethod());
-        requestForm.setCharset(this.charset);
+        requestForm.setCharset(openConfig.getCharset());
         requestForm.setFiles(this.files);
         return requestForm;
     }
@@ -120,6 +116,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     /**
      * 指定版本号
+     *
      * @param version
      */
     public void setVersion(String version) {
@@ -144,9 +141,11 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     /**
      * 指定HTTP请求method,默认POST
+     *
      * @return
      */
     protected RequestMethod getRequestMethod() {
         return RequestMethod.POST;
     }
+
 }

@@ -1,5 +1,6 @@
 package com.gitee.sop.adminserver.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
 
@@ -30,11 +31,13 @@ public class GatewayRouteDefinition {
     /**
      * 路由断言集合配置
      */
+    @JSONField(serialize = false)
     private List<GatewayPredicateDefinition> predicates = new ArrayList<>();
 
     /**
      * 路由过滤器集合配置
      */
+    @JSONField(serialize = false)
     private List<GatewayFilterDefinition> filters = new ArrayList<>();
 
     /**
@@ -67,14 +70,20 @@ public class GatewayRouteDefinition {
     private int status = 1;
 
     /**
-     * 合并结果
+     * 合并结果，统一格式输出
      */
-    @ApiDocField(description = "合并结果，1：合并，2：不合并")
+    @ApiDocField(description = "合并结果，统一格式输出，1：合并，0：不合并")
     private int mergeResult = 1;
 
     /**
      * 是否需要授权才能访问
      */
-    @ApiDocField(description = "是否需要授权才能访问，1：是，2：否")
+    @ApiDocField(description = "是否需要授权才能访问，1：是，0：否")
     private int permission;
+
+    /**
+     * 是否是自定义路由
+     */
+    @ApiDocField(description = "是否是自定义路由，1：是，0：否")
+    private int custom;
 }

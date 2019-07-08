@@ -11,6 +11,7 @@ public class SopConstants {
     private SopConstants() {}
     
     public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
+    public static final String UTF8 = "UTF-8";
     public static final String FORMAT_JSON = "json";
     public static final String DEFAULT_SIGN_METHOD = "md5";
     public static final String EMPTY_JSON = "{}";
@@ -43,11 +44,6 @@ public class SopConstants {
      * zookeeper存放接口路由信息的根目录
      */
     public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
-
-    /**
-     * zookeeper存放路由授权信息根目录
-     */
-    public static final String SOP_ROUTE_PERMISSION_PATH = "/com.gitee.sop.isv.route.permission";
 
     /**
      * 消息监听路径

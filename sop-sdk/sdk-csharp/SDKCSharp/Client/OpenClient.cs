@@ -11,6 +11,7 @@ using SDKCSharp.Request;
 using SDKCSharp.Response;
 using SDKCSharp.Utility;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace SDKCSharp.Client
 {
@@ -21,7 +22,6 @@ namespace SDKCSharp.Client
     {
 
         private static OpenConfig DEFAULT_CONFIG = new OpenConfig();
-        private const string ERROR_RESPONSE_KEY = "error_response";
 
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
@@ -29,20 +29,35 @@ namespace SDKCSharp.Client
         private string url;
         private string appId;
         private string privateKey;
+        private string publicKeyPlatform;
 
         private OpenConfig openConfig;
         private OpenRequest openRequest;
         private DataNameBuilder dataNameBuilder;
 
 
-        public OpenClient(string url, string appId, string privateKey) : this(url, appId, privateKey,false, DEFAULT_CONFIG)
+        public OpenClient(string url, string appId, string privateKey) 
+            : this(url, appId, privateKey,false, DEFAULT_CONFIG)
         {
             
         }
 
-        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile) : this(url, appId, privateKey, priKeyFromFile, DEFAULT_CONFIG)
+        public OpenClient(string url, string appId, string privateKey, string publicKeyPlatform)
+            : this(url, appId, privateKey)
+        {
+            this.publicKeyPlatform = publicKeyPlatform;
+        }
+
+        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile) 
+            : this(url, appId, privateKey, priKeyFromFile, DEFAULT_CONFIG)
         {
 
+        }
+
+        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile, string publicKeyPlatform)
+            : this(url, appId, privateKey, priKeyFromFile)
+        {
+            this.publicKeyPlatform = publicKeyPlatform;
         }
 
         public OpenClient(string url, string appId, string privateKey,bool priKeyFromFile, OpenConfig openConfig)
@@ -58,6 +73,12 @@ namespace SDKCSharp.Client
                 this.privateKey = LoadCertificateFile(privateKey);
             }
             this.dataNameBuilder = openConfig.DataNameBuilder;
+        }
+
+        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile, string publicKeyPlatform, OpenConfig openConfig)
+            : this(url, appId, privateKey, priKeyFromFile, openConfig)
+        {
+            this.publicKeyPlatform = publicKeyPlatform;
         }
 
         /// <summary>
@@ -106,8 +127,7 @@ namespace SDKCSharp.Client
                 form[this.openConfig.AccessTokenName] = accessToken;
             }
             form[this.openConfig.AppKeyName] = this.appId;
-            string content = SopSignature.getSignContent(form);
-            string sign = SignUtil.CreateSign(form, privateKey, request.Charset, request.SignType);
+            string sign = SignUtil.CreateSign(form, privateKey, openConfig.Charset, openConfig.SignType);
             form[this.openConfig.SignName] = sign;
 
             string resp = this.DoExecute(url, requestForm, header);
@@ -134,22 +154,84 @@ namespace SDKCSharp.Client
         /// <param name="resp">服务器响应内容</param>
         /// <param name="request">请求Request</param>
         /// <returns>返回Response</returns>
-        protected virtual T ParseResponse<T>(string resp, BaseRequest<T> request) where T: BaseResponse {
+        protected virtual T ParseResponse<T>(string resp, BaseRequest<T> request) where T: BaseResponse
+        {
             string method = request.Method;
-            string dataName = this.dataNameBuilder.Build(method);
-            Dictionary<string, object> jsonObject = JsonUtil.ParseToDictionary(resp);
-            bool errorResponse = jsonObject.ContainsKey(ERROR_RESPONSE_KEY);
+            string rootNodeName = this.dataNameBuilder.Build(method);
+            string errorRootNode = openConfig.ErrorResponseName;
+            Dictionary<string, object> responseData = JsonUtil.ParseToDictionary(resp);
+            bool errorResponse = responseData.ContainsKey(errorRootNode);
             if (errorResponse)
             {
-                dataName = ERROR_RESPONSE_KEY;
+                rootNodeName = errorRootNode;
             }
-            object data = jsonObject[dataName];
-            string jsonData = data == null ? "{}" : data.ToString();           
+            object data = responseData[rootNodeName];
+            responseData.TryGetValue(openConfig.SignName, out object sign);
+            if (sign != null && !string.IsNullOrEmpty(publicKeyPlatform))
+            {
+                string signContent = BuildBizJson(rootNodeName, resp);
+                if (!CheckResponseSign(signContent, sign.ToString(), publicKeyPlatform))
+                {
+                    ErrorResponse checkSignErrorResponse = SopSdkErrors.CHECK_RESPONSE_SIGN_ERROR;
+                    data = JsonUtil.ToJSONString(checkSignErrorResponse);
+                }
+            }
+            string jsonData = data == null ? "{}" : data.ToString();
             T t = JsonUtil.ParseObject<T>(jsonData);
             t.Body = jsonData;
             return t;
         }
 
+        /// <summary>
+        /// 验证服务端返回的sign
+        /// </summary>
+        /// <returns><c>true</c>, if response sign was checked, <c>false</c> otherwise.</returns>
+        /// <param name="signContent">Response data.</param>
+        /// <param name="sign">sign data.</param>
+        /// <param name="publicKeyPlatform">Public key platform.</param>
+        protected virtual bool CheckResponseSign(string signContent, string sign, string publicKeyPlatform)
+        {
+            try
+            {
+                Encoding charset = openConfig.Charset;
+                SignType signType = openConfig.SignType;
+                return SignUtil.RsaCheck(signContent, sign, publicKeyPlatform, charset, signType);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
+        protected virtual string BuildBizJson(string rootNodeName, string body)
+        {
+            int indexOfRootNode = body.IndexOf(rootNodeName);
+            if (indexOfRootNode < 0)
+            {
+                rootNodeName = openConfig.ErrorResponseName;
+                indexOfRootNode = body.IndexOf(rootNodeName);
+            }
+            string result = null;
+            if (indexOfRootNode > 0)
+            {
+                result = BuildJsonNodeData(body, rootNodeName, indexOfRootNode);
+            }
+            return result;
+        }
+
+        protected virtual string BuildJsonNodeData(string body, string rootNode, int indexOfRootNode)
+        {
+            int signDataStartIndex = indexOfRootNode + rootNode.Length + 2;
+            int indexOfSign = body.IndexOf("\"" + openConfig.SignName  + "\"");
+            if (indexOfSign < 0)
+            {
+                return null;
+            }
+
+            int signDataEndIndex = indexOfSign - 1;
+            int length = signDataEndIndex - signDataStartIndex;
+
+            return body.Substring(signDataStartIndex, length);
+        }
     }
 }

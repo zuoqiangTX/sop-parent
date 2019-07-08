@@ -10,7 +10,7 @@ namespace SDKCSharp.Common
 
         private const char DOT = '.';
         private const char UNDERLINE = '_';
-        private const string DATA_SUFFIX = "_response";
+        private const string DATA_SUFFIX = SopSdkConstants.DATA_SUFFIX;
 
         public string Build(string method)
         {

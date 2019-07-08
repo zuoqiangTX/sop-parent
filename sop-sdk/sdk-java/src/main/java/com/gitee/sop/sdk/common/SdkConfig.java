@@ -1,5 +1,9 @@
 package com.gitee.sop.sdk.common;
 
+/**
+ * @deprecated 已废弃，使用com.gitee.sop.sdk.common.OpenConfig
+ */
+@Deprecated
 public class SdkConfig {
 
 	public static String SUCCESS_CODE = "10000";

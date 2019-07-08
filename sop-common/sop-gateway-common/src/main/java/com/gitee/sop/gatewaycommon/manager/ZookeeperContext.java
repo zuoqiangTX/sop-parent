@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_MSG_CHANNEL_PATH;
-import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_ROUTE_PERMISSION_PATH;
 import static com.gitee.sop.gatewaycommon.bean.SopConstants.SOP_SERVICE_ROUTE_PATH;
 
 /**
@@ -29,15 +28,22 @@ public class ZookeeperContext {
 
     private static CuratorFramework client;
 
+    private static Environment environment;
+
     public static void setEnvironment(Environment environment) {
         Assert.notNull(environment, "environment不能为null");
-        initZookeeperClient(environment);
+        ZookeeperContext.environment = environment;
+        initZookeeperClient();
     }
 
-    public synchronized static void initZookeeperClient(Environment environment) {
+    public synchronized static void initZookeeperClient() {
         if (client != null) {
             return;
         }
+        setClient(createClient());
+    }
+
+    public static CuratorFramework createClient() {
         String zookeeperServerAddr = environment.getProperty("spring.cloud.zookeeper.connect-string");
         if (StringUtils.isBlank(zookeeperServerAddr)) {
             throw new RuntimeException("未指定spring.cloud.zookeeper.connect-string参数");
@@ -52,16 +58,11 @@ public class ZookeeperContext {
                 .build();
 
         client.start();
-
-        setClient(client);
+        return client;
     }
 
     public static String getRouteRootPath() {
         return SOP_SERVICE_ROUTE_PATH;
-    }
-
-    public static String getRoutePermissionPath() {
-        return SOP_ROUTE_PERMISSION_PATH;
     }
 
     public static String getIsvInfoChannelPath() {
@@ -103,6 +104,16 @@ public class ZookeeperContext {
                 // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
                 .creatingParentContainersIfNeeded()
                 .forPath(path, data.getBytes());
+    }
+
+    /**
+     * 更新节点
+     * @param path
+     * @param data
+     * @throws Exception
+     */
+    public static void updatePath(String path, String data) throws Exception {
+        getClient().setData().forPath(path, data.getBytes());
     }
 
     /**

@@ -12,11 +12,7 @@ namespace SDKCSharp.Request
     /// <typeparam name="T">对应的Response对象</typeparam>
     public abstract class BaseRequest<T>
     {
-        private string method;
-        private string format = SdkConfig.FORMAT_TYPE;
-        private Encoding charset = SdkConfig.CHARSET;
-        private SignType signType = SdkConfig.SIGN_TYPE;
-        private string timestamp = DateTime.Now.ToString(SdkConfig.TIMESTAMP_PATTERN);
+        private string method; 
         private string version;
 
         private string bizContent;
@@ -30,8 +26,6 @@ namespace SDKCSharp.Request
         public string BizContent { set => bizContent = value; }
         public object BizModel { set => bizModel = value; }
         public string Version { get => version; set => version = value; }
-        public Encoding Charset { get => charset; set => charset = value; }
-        public SignType SignType { get => signType; set => signType = value; }
 
         /// <summary>
         /// 返回接口名
@@ -45,7 +39,7 @@ namespace SDKCSharp.Request
         /// <returns></returns>
         public virtual string GetVersion()
         {
-            return SdkConfig.DEFAULT_VERSION;
+            return null;
         }
 
         /// <summary>
@@ -66,7 +60,7 @@ namespace SDKCSharp.Request
         protected BaseRequest(string name, string version)
         {
             this.method = name;
-            this.version = version == null ? SdkConfig.DEFAULT_VERSION : version;
+            this.version = version;
         }
 
         /// <summary>
@@ -88,23 +82,28 @@ namespace SDKCSharp.Request
         /// <returns></returns>
         public RequestForm CreateRequestForm(OpenConfig openConfig)
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            dict[openConfig.MethodName] = this.Method;
-            dict[openConfig.FormatName] = this.format;
-            dict[openConfig.CharsetName] = this.charset.BodyName;
-            dict[openConfig.SignTypeName] = this.signType.ToString();
-            dict[openConfig.TimestampName] = this.timestamp;
-            dict[openConfig.VersionName] = this.version;
-
+            string timestamp = DateTime.Now.ToString(openConfig.TimestampPattern);
+            string v = this.version ?? openConfig.DefaultVersion;
             // 业务参数
-            String biz_content = BuildBizContent();
+            string biz_content = BuildBizContent();
 
-            dict[openConfig.DataName] = biz_content;
+            Dictionary<string, string> dict = new Dictionary<string, string>
+            {
+                [openConfig.MethodName] = this.Method,
+                [openConfig.FormatName] = openConfig.FormatType,
+                [openConfig.CharsetName] = openConfig.Charset.BodyName,
+                [openConfig.SignTypeName] = openConfig.SignType.ToString(),
+                [openConfig.TimestampName] = timestamp,
+                [openConfig.VersionName] = v,
+                [openConfig.DataName] = biz_content
+            };
 
-            RequestForm requestForm = new RequestForm(dict);
-            requestForm.Charset = this.charset;
-            requestForm.RequestMethod = GetRequestMethod();
-            requestForm.Files = this.files;
+            RequestForm requestForm = new RequestForm(dict)
+            {
+                Charset = openConfig.Charset,
+                RequestMethod = GetRequestMethod(),
+                Files = this.files
+            };
             return requestForm;
         }
 

@@ -13,4 +13,5 @@ public class IsvRoutePermission {
     private String appKey;
     private List<String> routeIdList;
     private String routeIdListMd5;
+    private String listenPath;
 }

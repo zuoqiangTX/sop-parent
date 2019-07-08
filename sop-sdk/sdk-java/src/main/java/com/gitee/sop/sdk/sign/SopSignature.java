@@ -53,14 +53,14 @@ public class SopSignature {
      * @param sortedParams
      * @return
      */
-    public static String getSignContent(Map<String, String> sortedParams) {
+    public static String getSignContent(Map<String, ?> sortedParams) {
         StringBuffer content = new StringBuffer();
         List<String> keys = new ArrayList<String>(sortedParams.keySet());
         Collections.sort(keys);
         int index = 0;
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
-            String value = sortedParams.get(key);
+            String value = String.valueOf(sortedParams.get(key));
             if (StringUtils.areNotEmpty(key, value)) {
                 content.append((index == 0 ? "" : "&") + key + "=" + value);
                 index++;
@@ -210,7 +210,7 @@ public class SopSignature {
         return content.toString();
     }
 
-    public static String getSignCheckContentV2(Map<String, String> params) {
+    public static String getSignCheckContentV2(Map<String, ?> params) {
         if (params == null) {
             return null;
         }
@@ -223,7 +223,7 @@ public class SopSignature {
 
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
-            String value = params.get(key);
+            String value = String.valueOf(params.get(key));
             content.append((i == 0 ? "" : "&") + key + "=" + value);
         }
 
@@ -254,9 +254,9 @@ public class SopSignature {
         return rsaCheckContent(content, sign, publicKey, charset);
     }
     
-    public static boolean rsaCheckV2(Map<String, String> params, String publicKey,
+    public static boolean rsaCheckV2(Map<String, ?> params, String publicKey,
             String charset,String signType) throws SopSignException {
-		String sign = params.get("sign");
+		String sign = String.valueOf(params.get("sign"));
 		String content = getSignCheckContentV2(params);
 		
 		return rsaCheck(content, sign, publicKey, charset,signType);

@@ -2,13 +2,20 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
+import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
+import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
+import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.param.UploadContext;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -39,6 +46,8 @@ public class ApiValidator implements Validator {
 
     @Override
     public void validate(ApiParam param) {
+        checkEnable(param);
+
         ApiConfig apiConfig = ApiContext.getApiConfig();
         if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
             if (logger.isDebugEnabled()) {
@@ -46,20 +55,30 @@ public class ApiValidator implements Validator {
             }
             return;
         }
-        if (param.fetchIgnoreSign()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("忽略签名验证, name:{}, version:{}", param.fetchName(), param.fetchVersion());
-            }
-        } else {
-            // 需要验证签名,先校验appKey，后校验签名顺序不能变
-            checkAppKey(param);
-            checkSign(param);
-        }
-        checkUploadFile(param);
+        // 需要验证签名,先校验appKey，后校验签名,顺序不能变
+        checkAppKey(param);
+        checkSign(param);
         checkTimeout(param);
         checkFormat(param);
+        checkUploadFile(param);
+        checkPermission(param);
     }
 
+    /**
+     * 检测能否访问
+     * @param param 接口参数
+     */
+    protected void checkEnable(ApiParam param) {
+        String routeId = param.fetchNameVersion();
+        // 检查路由是否存在
+        RouteRepositoryContext.checkExist(routeId, ErrorEnum.ISV_INVALID_METHOD);
+        // 检查路由是否启用
+        RouteConfigManager routeConfigManager = ApiConfig.getInstance().getRouteConfigManager();
+        RouteConfig routeConfig = routeConfigManager.get(routeId);
+        if (!routeConfig.enable()) {
+            throw ErrorEnum.ISP_API_DISABLED.getErrorMeta().getException();
+        }
+    }
 
     /**
      * 校验上传文件内容
@@ -142,9 +161,8 @@ public class ApiValidator implements Validator {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();
             }
             Signer signer = apiConfig.getSigner();
-            boolean isRightSign = signer.checkSign(param, secret);
             // 错误的sign
-            if (!isRightSign) {
+            if (!signer.checkSign(param, secret)) {
                 throw ErrorEnum.ISV_INVALID_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion());
             }
         } finally {
@@ -160,6 +178,25 @@ public class ApiValidator implements Validator {
 
         if (!contains) {
             throw ErrorEnum.ISV_INVALID_FORMAT.getErrorMeta().getException(param.fetchNameVersion(), format);
+        }
+    }
+
+    /**
+     * 校验访问权限
+     * @param apiParam
+     */
+    protected void checkPermission(ApiParam apiParam) {
+        String routeId = apiParam.fetchNameVersion();
+        TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(routeId);
+        BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
+        if (needCheckPermission) {
+            IsvRoutePermissionManager isvRoutePermissionManager = ApiConfig.getInstance().getIsvRoutePermissionManager();
+            String appKey = apiParam.fetchAppKey();
+            boolean hasPermission = isvRoutePermissionManager.hasPermission(appKey, routeId);
+            if (!hasPermission) {
+                throw ErrorEnum.ISV_ROUTE_NO_PERMISSIONS.getErrorMeta().getException();
+            }
         }
     }
 

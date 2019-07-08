@@ -15,6 +15,9 @@ import org.springframework.core.env.Environment;
 @Slf4j
 public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRouteInfo, ZuulRouteDefinition, ZuulTargetRoute> {
 
+    /** 路由重试 */
+    public static final boolean RETRYABLE = true;
+
     public ZuulZookeeperRouteManager(Environment environment, RouteRepository<ZuulTargetRoute> routeRepository) {
         super(environment, routeRepository);
     }
@@ -31,9 +34,7 @@ public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRoute
 
     @Override
     protected ZuulTargetRoute buildRouteDefinition(ZuulServiceRouteInfo serviceRouteInfo, ZuulRouteDefinition routeDefinition) {
-        // 路由重试
-        String retry = environment.getProperty("sop.route.retry", "true");
-        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), RouteUtil.getZuulLocation(routeDefinition.getUri()), null, Boolean.valueOf(retry), null);
+        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), RouteUtil.getZuulLocation(routeDefinition.getUri()), null, RETRYABLE, null);
         return new ZuulTargetRoute(serviceRouteInfo, routeDefinition, route);
     }
 }

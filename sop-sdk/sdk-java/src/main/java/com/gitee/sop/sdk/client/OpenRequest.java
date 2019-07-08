@@ -4,8 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.sdk.common.OpenConfig;
 import com.gitee.sop.sdk.common.RequestForm;
 import com.gitee.sop.sdk.common.RequestMethod;
+import com.gitee.sop.sdk.common.SopSdkErrors;
 import com.gitee.sop.sdk.common.UploadFile;
-import com.gitee.sop.sdk.response.BaseResponse;
+import com.gitee.sop.sdk.response.ErrorResponse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -19,8 +20,6 @@ import java.util.Map;
  * @author tanghc
  */
 public class OpenRequest {
-
-    private static final String HTTP_ERROR_CODE = "-400";
 
     private OpenHttp openHttp;
 
@@ -69,14 +68,7 @@ public class OpenRequest {
     }
 
     protected String causeException(Exception e) {
-        ErrorResponse result = new ErrorResponse();
-        result.setCode(HTTP_ERROR_CODE);
-        result.setSubCode(HTTP_ERROR_CODE);
-        result.setSubMsg(e.getMessage());
-        result.setMsg(e.getMessage());
+        ErrorResponse result = SopSdkErrors.HTTP_ERROR.getErrorResponse();
         return JSON.toJSONString(result);
-    }
-
-    static class ErrorResponse extends BaseResponse {
     }
 }

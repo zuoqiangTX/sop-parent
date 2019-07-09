@@ -42,5 +42,8 @@ public class ParamNames {
     /**  */
     public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    /** 返回sign名称 */
+    public static String RESPONSE_SIGN_NAME = "sign";
+
 
 }

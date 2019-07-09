@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
         routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri() + "#" + gatewayRouteDefinition.getPath()));
         routeDefinition.setOrder(gatewayRouteDefinition.getOrder());
         List<FilterDefinition> filterDefinitionList = new ArrayList<>(gatewayRouteDefinition.getFilters().size());
-        List<PredicateDefinition> predicateDefinitionList = new ArrayList<>(gatewayRouteDefinition.getPredicates().size());
+        LinkedList<PredicateDefinition> predicateDefinitionList = new LinkedList<>();
         for (GatewayFilterDefinition filter : gatewayRouteDefinition.getFilters()) {
             FilterDefinition filterDefinition = new FilterDefinition();
             BeanUtils.copyProperties(filter, filterDefinition);
@@ -56,10 +57,28 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
             BeanUtils.copyProperties(predicate, predicateDefinition);
             predicateDefinitionList.add(predicateDefinition);
         }
-
+        this.addPredicate(predicateDefinitionList, "NameVersion", gatewayRouteDefinition.getId());
+        this.addPredicate(predicateDefinitionList, "ReadBody", "");
         routeDefinition.setFilters(filterDefinitionList);
         routeDefinition.setPredicates(predicateDefinitionList);
         return new GatewayTargetRoute(serviceRouteInfo, gatewayRouteDefinition, routeDefinition);
+    }
+
+    /**
+     * 添加断言
+     *
+     * @param predicateDefinitionList
+     * @param name                    断言名称
+     * @param args                    断言参数
+     */
+    protected void addPredicate(LinkedList<PredicateDefinition> predicateDefinitionList, String name, String args) {
+        for (PredicateDefinition predicateDefinition : predicateDefinitionList) {
+            // 如果已经存在，直接返回
+            if (predicateDefinition.getName().equals(name)) {
+                return;
+            }
+        }
+        predicateDefinitionList.addFirst(new PredicateDefinition(name + "=" + args));
     }
 
 }

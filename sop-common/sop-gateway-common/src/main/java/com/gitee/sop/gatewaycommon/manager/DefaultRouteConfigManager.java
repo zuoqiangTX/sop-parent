@@ -38,9 +38,8 @@ public class DefaultRouteConfigManager implements RouteConfigManager {
             routeConfig = newRouteConfig();
             routeConfig.setRouteId(routeId);
             routeConfigMap.put(routeId, routeConfig);
-        } else {
-            MyBeanUtil.copyPropertiesIgnoreNull(res, routeConfig);
         }
+        MyBeanUtil.copyPropertiesIgnoreNull(res, routeConfig);
         routeConfig.initRateLimiter();
     }
 

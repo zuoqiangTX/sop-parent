@@ -34,7 +34,7 @@ public class AlipayClientPostTest extends TestBase {
      */
     // 这个请求会路由到story服务
     @Test
-    public void testPost() throws Exception {
+    public void testGet() throws Exception {
 
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();

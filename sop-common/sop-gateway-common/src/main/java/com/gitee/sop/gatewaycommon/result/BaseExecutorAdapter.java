@@ -145,15 +145,15 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     protected ApiInfo getApiInfo(T request) {
         Map<String, Object> params = this.getApiParam(request);
-        String name = this.getParamValue(params, ParamNames.API_NAME, "method.unknown");
-        String version = this.getParamValue(params, ParamNames.VERSION_NAME, "version.unknown");
+        String name = this.getParamValue(params, ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
+        String version = this.getParamValue(params, ParamNames.VERSION_NAME, SopConstants.UNKNOWN_VERSION);
 
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(name + version);
 
         String serviceId = Optional.ofNullable(targetRoute)
                 .flatMap(route -> Optional.ofNullable(route.getServiceRouteInfo()))
                 .map(BaseServiceRouteInfo::getServiceId)
-                .orElse("serviceId.unknown");
+                .orElse(SopConstants.UNKNOWN_SERVICE);
 
         BaseRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
                 .map(route -> route.getRouteDefinition())
@@ -182,7 +182,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     }
 
     public String merge(T exchange, JSONObject responseData) {
-        JSONObject finalData = new JSONObject();
+        JSONObject finalData = new JSONObject(true);
         Map<String, Object> params = this.getApiParam(exchange);
         String name = this.getParamValue(params, ParamNames.API_NAME, ERROR_METHOD);
         ApiConfig apiConfig = ApiConfig.getInstance();
@@ -200,15 +200,34 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         if (apiConfig.isShowReturnSign() && !CollectionUtils.isEmpty(params)) {
             // 添加try...catch，生成sign出错不影响结果正常返回
             try {
-                String sign = this.createResponseSign(apiConfig, params, responseData.toJSONString());
+                String responseSignContent = this.buildResponseSignContent(responseDataNodeName, finalData);
+                String sign = this.createResponseSign(apiConfig, params, responseSignContent);
                 if (StringUtils.hasLength(sign)) {
-                    finalData.put(ParamNames.SIGN_NAME, sign);
+                    finalData.put(ParamNames.RESPONSE_SIGN_NAME, sign);
                 }
             } catch (Exception e) {
                 log.error("生成平台签名失败, params: {}, serviceResult:{}", JSON.toJSONString(params), responseData, e);
             }
         }
         return finalData.toJSONString();
+    }
+
+    /**
+     * 获取待签名内容
+     *
+     * @param rootNodeName 业务数据节点
+     * @param finalData    最终结果
+     * @return 返回待签名内容
+     */
+    protected String buildResponseSignContent(String rootNodeName, JSONObject finalData) {
+        String body = finalData.toJSONString();
+        int indexOfRootNode = body.indexOf(rootNodeName);
+        if (indexOfRootNode > 0) {
+            int signDataStartIndex = indexOfRootNode + rootNodeName.length() + 2;
+            int length = body.length() - 1;
+            return body.substring(signDataStartIndex, length);
+        }
+        return null;
     }
 
     protected String getParamValue(Map<String, Object> apiParam, String key, String defaultValue) {
@@ -219,12 +238,15 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 这里需要使用平台的私钥生成一个sign，需要配置两套公私钥。
      *
-     * @param apiConfig         配置
-     * @param params            请求参数
-     * @param serviceResult 业务返回结果
+     * @param apiConfig           配置
+     * @param params              请求参数
+     * @param responseSignContent 待签名内容
      * @return 返回平台生成的签名
      */
-    protected String createResponseSign(ApiConfig apiConfig, Map<String, Object> params, String serviceResult) {
+    protected String createResponseSign(ApiConfig apiConfig, Map<String, Object> params, String responseSignContent) {
+        if (StringUtils.isEmpty(responseSignContent)) {
+            return null;
+        }
         IsvManager isvManager = apiConfig.getIsvManager();
         // 根据appId获取秘钥
         String appKey = this.getParamValue(params, ParamNames.APP_KEY_NAME, "");
@@ -240,7 +262,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
                 .map(String::valueOf)
                 .orElse(SopConstants.UTF8);
         String signType = getParamValue(params, ParamNames.SIGN_TYPE_NAME, AlipayConstants.SIGN_TYPE_RSA2);
-        return AlipaySignature.rsaSign(serviceResult, privateKeyPlatform, charset, signType);
+        return AlipaySignature.rsaSign(responseSignContent, privateKeyPlatform, charset, signType);
     }
 
     @Getter

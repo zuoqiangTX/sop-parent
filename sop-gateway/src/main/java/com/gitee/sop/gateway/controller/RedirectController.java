@@ -6,7 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author tanghc
@@ -18,14 +21,15 @@ public class RedirectController {
     private String path;
 
     @RequestMapping("/{method}/{version}/")
-    public String redirect(
+    public void redirect(
             @PathVariable("method") String method
             , @PathVariable("version") String version
             , HttpServletRequest request
-    ) {
+            , HttpServletResponse response
+    ) throws ServletException, IOException {
         request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, method);
         request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, version);
-        return "forward:" + path;
+        request.getRequestDispatcher(path).forward(request, response);
     }
 
 }

@@ -1,9 +1,10 @@
 package com.gitee.sop.gatewaycommon.gateway.param;
 
-import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
 import com.gitee.sop.gatewaycommon.param.BaseParamBuilder;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -12,7 +13,8 @@ import java.util.Map;
 public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {
 
     @Override
-    public Map<String, String> buildRequestParams(ServerWebExchange request) {
-        return request.getAttribute(SopConstants.CACHE_REQUEST_BODY_FOR_MAP);
+    public Map<String, String> buildRequestParams(ServerWebExchange exchange) {
+        Map<String, String> params = GatewayContext.getRequestParams(exchange);
+        return params == null ? Collections.emptyMap() : params;
     }
 }

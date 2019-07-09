@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.bean.ServiceConstants;
 import com.gitee.sop.servercommon.bean.ZookeeperTool;
-import com.gitee.sop.servercommon.route.GatewayPredicateDefinition;
 import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.Getter;
@@ -16,7 +15,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,14 +33,6 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     public static final String SOP_SERVICE_ROUTE_PATH = ServiceConstants.SOP_SERVICE_ROUTE_PATH;
     public static final String PATH_START_CHAR = "/";
-
-    /**
-     * NameVersion=alipay.story.get1.0
-     * see com.gitee.sop.gatewaycommon.routeDefinition.NameVersionRoutePredicateFactory
-     */
-    private static String QUERY_PREDICATE_DEFINITION_TPL = "NameVersion=%s";
-
-    private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
 
     private final String routeRootPath = SOP_SERVICE_ROUTE_PATH;
 
@@ -99,8 +89,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     protected ServiceRouteInfo buildServiceGatewayInfo(ServiceApiInfo serviceApiInfo) {
         List<ServiceApiInfo.ApiMeta> apis = serviceApiInfo.getApis();
-        List<GatewayRouteDefinition> routeDefinitionList = new ArrayList<>(apis.size() + 1);
-        routeDefinitionList.add(this.buildReadBodyRouteDefinition(serviceApiInfo));
+        List<GatewayRouteDefinition> routeDefinitionList = new ArrayList<>(apis.size());
         for (ServiceApiInfo.ApiMeta apiMeta : apis) {
             GatewayRouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
             routeDefinitionList.add(gatewayRouteDefinition);
@@ -118,32 +107,12 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         return serviceRouteInfo;
     }
 
-    /**
-     * 添加com.gitee.sop.gatewaycommon.routeDefinition.ReadBodyRoutePredicateFactory,解决form表单获取不到问题
-     *
-     * @return 返回路由定义
-     */
-    protected GatewayRouteDefinition buildReadBodyRouteDefinition(ServiceApiInfo serviceApiInfo) {
-        GatewayRouteDefinition readBodyRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
-        readBodyRouteDefinition.setOrder(Integer.MIN_VALUE);
-
-        GatewayPredicateDefinition gatewayPredicateDefinition = new GatewayPredicateDefinition();
-        gatewayPredicateDefinition.setName("ReadBody");
-        GatewayPredicateDefinition readerBodyPredicateDefinition = this.buildNameVersionPredicateDefinition(FIRST_API_META);
-        List<GatewayPredicateDefinition> predicates = Arrays.asList(gatewayPredicateDefinition, readerBodyPredicateDefinition);
-        readBodyRouteDefinition.setPredicates(predicates);
-
-        return readBodyRouteDefinition;
-    }
-
     protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
         GatewayRouteDefinition gatewayRouteDefinition = new GatewayRouteDefinition();
         // 唯一id规则：接口名 + 版本号
         BeanUtils.copyProperties(apiMeta, gatewayRouteDefinition);
         gatewayRouteDefinition.setId(apiMeta.fetchNameVersion());
         gatewayRouteDefinition.setFilters(Collections.emptyList());
-        List<GatewayPredicateDefinition> predicates = Arrays.asList(this.buildNameVersionPredicateDefinition(apiMeta));
-        gatewayRouteDefinition.setPredicates(predicates);
         String uri = this.buildUri(serviceApiInfo, apiMeta);
         String path = this.buildServletPath(serviceApiInfo, apiMeta);
         gatewayRouteDefinition.setUri(uri);
@@ -164,10 +133,6 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
             servletPath = PATH_START_CHAR + servletPath;
         }
         return servletPath;
-    }
-
-    protected GatewayPredicateDefinition buildNameVersionPredicateDefinition(ServiceApiInfo.ApiMeta apiMeta) {
-        return new GatewayPredicateDefinition(String.format(QUERY_PREDICATE_DEFINITION_TPL, apiMeta.fetchNameVersion()));
     }
 
     /**

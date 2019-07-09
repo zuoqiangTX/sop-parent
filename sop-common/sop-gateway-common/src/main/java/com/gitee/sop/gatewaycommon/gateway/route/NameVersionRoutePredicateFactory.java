@@ -1,10 +1,11 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
-import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -15,17 +16,15 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
+ * 此断言决定执行哪个路由
+ *
  * @author tanghc
  */
 @Slf4j
 public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFactory<NameVersionRoutePredicateFactory.Config> {
 
-    public static final String PARAM_KEY = "param";
-    public static final String REGEXP_KEY = "regexp";
-
-    private static final String CACHE_REQUEST_BODY_OBJECT_KEY = SopConstants.CACHE_REQUEST_BODY_OBJECT_KEY;
-    public static final String CACHE_REQUEST_BODY_FOR_MAP = SopConstants.CACHE_REQUEST_BODY_FOR_MAP;
-
+    private static final String PARAM_KEY = "param";
+    private static final String REGEXP_KEY = "regexp";
 
     public NameVersionRoutePredicateFactory() {
         super(Config.class);
@@ -37,7 +36,7 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
     }
 
     /**
-     * config.param为nameVersion
+     * config.param为nameVersion，即路由id
      *
      * @param config
      * @return 返回断言
@@ -46,21 +45,14 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
     public Predicate<ServerWebExchange> apply(Config config) {
 
         return exchange -> {
-            String cachedBody = exchange.getAttribute(CACHE_REQUEST_BODY_OBJECT_KEY);
-            if (cachedBody == null) {
+            Map<String, String> params = GatewayContext.getRequestParams(exchange);
+            if (CollectionUtils.isEmpty(params)) {
                 return false;
             }
-            Map<String, String> params = exchange.getAttribute(CACHE_REQUEST_BODY_FOR_MAP);
-            if (params == null) {
-                params = RequestUtil.parseQueryToMap(cachedBody);
-                exchange.getAttributes().put(CACHE_REQUEST_BODY_FOR_MAP, params);
-            }
-
             String nameVersion = config.param;
-            String name = params.getOrDefault(ParamNames.API_NAME, String.valueOf(System.currentTimeMillis()));
+            String name = params.getOrDefault(ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
             String version = params.getOrDefault(ParamNames.VERSION_NAME, "");
-            boolean match = (name + version).equals(nameVersion);
-            return match;
+            return (name + version).equals(nameVersion);
         };
     }
 

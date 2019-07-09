@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 public class SopConstants {
 
     private SopConstants() {}
-    
+
     public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
     public static final String UTF8 = "UTF-8";
     public static final String FORMAT_JSON = "json";

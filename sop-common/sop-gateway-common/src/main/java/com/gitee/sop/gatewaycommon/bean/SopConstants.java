@@ -51,5 +51,7 @@ public class SopConstants {
     public static final String SOP_MSG_CHANNEL_PATH = "/com.gitee.sop.channel";
 
 
-
+    public static final String UNKNOWN_SERVICE= "_sop_unknown_service_";
+    public static final String UNKNOWN_METHOD = "_sop_unknown_method_";
+    public static final String UNKNOWN_VERSION = "_sop_unknown_version_";
 }

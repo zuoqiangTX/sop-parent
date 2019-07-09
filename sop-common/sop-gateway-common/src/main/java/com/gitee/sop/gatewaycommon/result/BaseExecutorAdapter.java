@@ -145,15 +145,15 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     protected ApiInfo getApiInfo(T request) {
         Map<String, Object> params = this.getApiParam(request);
-        String name = this.getParamValue(params, ParamNames.API_NAME, "method.unknown");
-        String version = this.getParamValue(params, ParamNames.VERSION_NAME, "version.unknown");
+        String name = this.getParamValue(params, ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
+        String version = this.getParamValue(params, ParamNames.VERSION_NAME, SopConstants.UNKNOWN_VERSION);
 
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(name + version);
 
         String serviceId = Optional.ofNullable(targetRoute)
                 .flatMap(route -> Optional.ofNullable(route.getServiceRouteInfo()))
                 .map(BaseServiceRouteInfo::getServiceId)
-                .orElse("serviceId.unknown");
+                .orElse(SopConstants.UNKNOWN_SERVICE);
 
         BaseRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
                 .map(route -> route.getRouteDefinition())

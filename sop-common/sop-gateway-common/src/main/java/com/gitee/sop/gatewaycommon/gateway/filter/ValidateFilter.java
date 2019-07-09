@@ -2,8 +2,8 @@ package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class ValidateFilter implements GlobalFilter, Ordered {
         ApiConfig apiConfig = ApiContext.getApiConfig();
         // 解析参数
         ApiParam param = apiConfig.getGatewayParamBuilder().build(exchange);
-        exchange.getAttributes().put(SopConstants.CACHE_API_PARAM, param);
+        GatewayContext.setApiParam(exchange, param);
         // 验证操作，这里有负责验证签名参数
         Validator validator = apiConfig.getValidator();
         try {

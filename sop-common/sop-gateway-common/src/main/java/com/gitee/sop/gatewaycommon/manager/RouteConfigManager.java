@@ -2,7 +2,6 @@ package com.gitee.sop.gatewaycommon.manager;
 
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
-import com.gitee.sop.gatewaycommon.bean.RouteConfigDto;
 
 /**
  * 路由配置管理
@@ -11,9 +10,9 @@ import com.gitee.sop.gatewaycommon.bean.RouteConfigDto;
 public interface RouteConfigManager extends BeanInitializer {
     /**
      * 更新路由配置
-     * @param routeConfigDto 路由配置
+     * @param routeConfig 路由配置
      */
-    void update(RouteConfigDto routeConfigDto);
+    void update(RouteConfig routeConfig);
 
     /**
      * 获取路由配置

@@ -2,7 +2,6 @@ package com.gitee.sop.gatewaycommon.zuul.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.limit.LimitType;
@@ -25,8 +24,6 @@ import java.util.List;
  * @author tanghc
  */
 public class PreLimitFilter extends BaseZuulFilter {
-
-    public static final int LIMIT_STATUS_OPEN = 1;
 
     @Override
     protected FilterType getFilterType() {
@@ -52,7 +49,7 @@ public class PreLimitFilter extends BaseZuulFilter {
             return null;
         }
         // 单个限流功能未开启
-        if (configLimitDto.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
+        if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return null;
         }
         byte limitType = configLimitDto.getLimitType().byteValue();
@@ -94,7 +91,7 @@ public class PreLimitFilter extends BaseZuulFilter {
             if (configLimitDto == null) {
                 continue;
             }
-            if (configLimitDto.getLimitStatus().intValue() == LIMIT_STATUS_OPEN) {
+            if (configLimitDto.getLimitStatus().intValue() == ConfigLimitDto.LIMIT_STATUS_OPEN) {
                 limitConfigList.add(configLimitDto);
             }
         }

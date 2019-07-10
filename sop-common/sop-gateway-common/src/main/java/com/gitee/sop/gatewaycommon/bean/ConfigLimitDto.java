@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Data
 public class ConfigLimitDto {
 
+    public static final byte LIMIT_STATUS_OPEN = 1;
+    public static final byte LIMIT_STATUS_CLOSE = 0;
+
     /**  数据库字段：id */
     private Long id;
 

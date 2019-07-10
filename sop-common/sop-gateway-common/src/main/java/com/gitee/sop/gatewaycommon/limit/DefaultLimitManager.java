@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.limit;
 
 import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +15,7 @@ public class DefaultLimitManager implements LimitManager {
 
     @Override
     public double acquireToken(ConfigLimitDto routeConfig) {
-        if (routeConfig.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
+        if (routeConfig.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return 0;
         }
         if (LimitType.LEAKY_BUCKET.getType() == routeConfig.getLimitType().byteValue()) {
@@ -28,7 +27,7 @@ public class DefaultLimitManager implements LimitManager {
 
     @Override
     public boolean acquire(ConfigLimitDto routeConfig) {
-        if (routeConfig.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
+        if (routeConfig.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return true;
         }
         if (LimitType.TOKEN_BUCKET.getType() == routeConfig.getLimitType().byteValue()) {

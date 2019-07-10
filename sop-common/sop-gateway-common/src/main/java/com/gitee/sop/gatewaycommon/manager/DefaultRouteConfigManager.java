@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.manager;
 
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
-import com.gitee.sop.gatewaycommon.bean.RouteConfigDto;
 import com.gitee.sop.gatewaycommon.util.MyBeanUtil;
 
 import java.util.Map;
@@ -28,8 +27,8 @@ public class DefaultRouteConfigManager implements RouteConfigManager {
     }
 
     @Override
-    public void update(RouteConfigDto routeConfigDto) {
-        this.doUpdate(routeConfigDto.getRouteId(), routeConfigDto);
+    public void update(RouteConfig routeConfig) {
+        this.doUpdate(routeConfig.getRouteId(), routeConfig);
     }
 
     protected void doUpdate(String routeId, Object res) {
@@ -40,7 +39,6 @@ public class DefaultRouteConfigManager implements RouteConfigManager {
             routeConfigMap.put(routeId, routeConfig);
         }
         MyBeanUtil.copyPropertiesIgnoreNull(res, routeConfig);
-        routeConfig.initRateLimiter();
     }
 
     protected RouteConfig newRouteConfig() {

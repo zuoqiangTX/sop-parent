@@ -7,7 +7,6 @@ import com.gitee.sop.gateway.mapper.ConfigRouteLimitMapper;
 import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
-import com.gitee.sop.gatewaycommon.bean.RouteConfigDto;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
@@ -39,21 +38,12 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
         loadAllRoute();
 
         Query query = new Query();
-
         configRouteBaseMapper.list(query)
                 .stream()
                 .forEach(configRouteBase -> {
                     String key = configRouteBase.getRouteId();
                     putVal(key, configRouteBase);
                 });
-
-        configRouteLimitMapper.list(query)
-                .stream()
-                .forEach(configRouteLimit -> {
-                    String key = configRouteLimit.getRouteId();
-                    putVal(key, configRouteLimit);
-                });
-
     }
 
     protected void loadAllRoute() {
@@ -84,15 +74,15 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
         ZookeeperContext.listenPath(path, nodeCache -> {
             String nodeData = new String(nodeCache.getCurrentData().getData());
             ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final RouteConfigDto routeConfigDto = JSON.parseObject(channelMsg.getData(), RouteConfigDto.class);
+            final RouteConfig routeConfig = JSON.parseObject(channelMsg.getData(), RouteConfig.class);
             switch (channelMsg.getOperation()) {
                 case "reload":
-                    log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfigDto);
+                    log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
                     load();
                     break;
                 case "update":
-                    log.info("更新路由配置信息，routeConfigDto:{}", routeConfigDto);
-                    update(routeConfigDto);
+                    log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
+                    update(routeConfig);
                     break;
             }
         });

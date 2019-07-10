@@ -2,7 +2,6 @@ package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
-import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
 import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
@@ -41,7 +40,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
             return null;
         }
         // 单个限流功能未开启
-        if (configLimitDto.getLimitStatus() == RouteConfig.LIMIT_STATUS_CLOSE) {
+        if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return null;
         }
         byte limitType = configLimitDto.getLimitType().byteValue();

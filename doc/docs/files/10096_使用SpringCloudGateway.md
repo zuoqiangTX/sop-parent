@@ -1,6 +1,6 @@
 # 使用SpringCloudGateway
 
-SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway。
+SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway，完整代码见`SpringCloudGateway`分支。
 
 **注：**：SOP对Spring Cloud Gateway的支持目前处于beta阶段，推荐使用zuul。
 
@@ -60,14 +60,14 @@ public class SopGatewayApplication {
 
 ```java
 //@Configuration
-public class ZuulConfig extends AlipayZuulConfiguration {
+public class ZuulConfig extends AlipayZuulConfiguration {...}
 ```
 
 - 启用GatewayConfig类，打开@Configuration注释
 
 ```java
 @Configuration
-public class GatewayConfig extends AlipayGatewayConfiguration
+public class GatewayConfig extends AlipayGatewayConfiguration {...}
 ```
 
 修改完毕，重启sop-gateway

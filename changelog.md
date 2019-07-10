@@ -1,5 +1,10 @@
 # changelog
 
+## 1.12.1
+
+- 修复重启网关路由状态重置BUG
+- 优化SpringCloudGateway
+
 ## 1.12.0
 
 - admin后台新增角色管理

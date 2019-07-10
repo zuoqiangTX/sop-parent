@@ -74,6 +74,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 - develop：日常开发分支
 - registry-nacos：nacos作为注册中心
+- SpringCloudGateway：SpringCloudGateway作为网关
 
 ## 相关文档
 

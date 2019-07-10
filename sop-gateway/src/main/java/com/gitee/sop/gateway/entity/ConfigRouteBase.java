@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
 
 
 /**
@@ -30,10 +29,4 @@ public class ConfigRouteBase {
 
     /** 状态，1：启用，2：禁用, 数据库字段：status */
     private Byte status;
-
-    /**  数据库字段：gmt_create */
-    private Date gmtCreate;
-
-    /**  数据库字段：gmt_modified */
-    private Date gmtModified;
 }

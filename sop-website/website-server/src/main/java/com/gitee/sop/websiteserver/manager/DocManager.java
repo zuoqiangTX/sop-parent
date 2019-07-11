@@ -10,7 +10,7 @@ import java.util.Collection;
  */
 public interface DocManager {
 
-    void load();
+    void load(String serviceId);
 
     DocItem get(String method, String version);
 

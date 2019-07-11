@@ -35,8 +35,11 @@ public class WebsiteConfig implements ApplicationRunner {
         return new HttpMessageConverters(converter);
     }
 
+    /**
+     * SpringBoot启动完毕执行
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        docManager.load();
+        docManager.load(null);
     }
 }

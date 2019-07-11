@@ -14,6 +14,8 @@ public class DocItem {
     private String version;
     private String summary;
     private String description;
+    // 是否多文件上传
+    private boolean multiple;
 
     List<DocParameter> requestParameters;
     List<DocParameter> responseParameters;

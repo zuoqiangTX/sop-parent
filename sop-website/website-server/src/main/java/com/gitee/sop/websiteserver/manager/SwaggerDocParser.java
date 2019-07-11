@@ -67,6 +67,7 @@ public class SwaggerDocParser implements DocParser {
         docItem.setVersion(docInfo.getString("sop_version"));
         docItem.setSummary(docInfo.getString("summary"));
         docItem.setDescription(docInfo.getString("description"));
+        docItem.setMultiple(docInfo.getString("multiple") != null);
         String moduleName = this.buildModuleName(docInfo, docRoot);
         docItem.setModule(moduleName);
         List<DocParameter> docParameterList = this.buildRequestParameterList(docInfo, docRoot);

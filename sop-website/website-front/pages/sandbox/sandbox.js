@@ -20,6 +20,7 @@ function selectItem(docItem, layui) {
     currentItem = docItem;
     resetResultDiv();
     var nameVersion = docItem.nameVersion;
+    var multiple = docItem.multiple;
     treetable = treetable || layui.treetable;
     $('.sop-name').text(docItem.name);
     $('.sop-version').text(docItem.version);
@@ -27,6 +28,8 @@ function selectItem(docItem, layui) {
     $('.sop-description').text(docItem.description || docItem['summary']);
 
     createRequestParameter(docItem);
+
+    $('#multipleDiv').css('display', multiple ? 'block' : 'none');
 
     var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
     $li.addClass('layui-this').siblings().removeClass('layui-this');
@@ -77,11 +80,12 @@ function createTreeTable(id, data) {
                 var id = currentItem.nameVersion + '-' + row.name;
                 var requiredTxt = row.required ? 'required  lay-verify="required"' : '';
                 var module = row.module;
+                var type = row.type == 'file' ? 'file' : 'text';
                 var attrs = [
                     'id="' + id + '"'
                     , 'name="'+row.name+'"'
                     , 'class="layui-input test-input"'
-                    , 'type="text"'
+                    , 'type="' + type + '"'
                     , requiredTxt
                     , 'module="'+module+'"'
                 ];
@@ -102,6 +106,7 @@ function doTest() {
         method: method,
         version: version
     };
+    var uploadFileObjects = getUploadFileObjects();
     var $inputs = $body.find('.test-input');
     var bizContent = {};
     $inputs.each(function () {
@@ -111,30 +116,90 @@ function doTest() {
                 bizContent[module] = {};
             }
             var moduleObj = bizContent[module];
-            moduleObj[this.name] = this.value;
+            putVal(moduleObj, this);
         } else {
-            bizContent[this.name] = this.value;
+            putVal(bizContent, this);
         }
     });
     data.bizContent = JSON.stringify(bizContent);
+    // 确定文件数量，并且知道参数名称
+    if (uploadFileObjects.length > 0) {
+        var formData = new FormData();
+        for (var i = 0; i < uploadFileObjects.length; i++) {
+            var fileInput = uploadFileObjects[i];
+            formData.append(fileInput.name, fileInput.file);
+        }
+        postFile(data, formData);
+    } else {
+        postJson(data);
+    }
+}
+
+function putVal(obj, input) {
+    if (input.type == 'text') {
+        obj[input.name] = input.value;
+    }
+}
+
+function getUploadFileObjects() {
+    var fileObjects = [];
+    $body.find('input[type=file]')
+        .each(function () {
+            var $input = $(this);
+            var name = this.name;
+            var fileList = $input.prop('files');
+            var multiple = $input.prop('multiple');
+            if (multiple) {
+                for (var i = 0; i < fileList.length; i++) {
+                    fileObjects.push({name: name + i, file: fileList[i]});
+                }
+            } else {
+                fileObjects.push({name: name, file: fileList[0]});
+            }
+        });
+    return fileObjects;
+}
+
+function postJson(data) {
     $.ajax({
         url: SopConfig.url + '/sandbox/test'
         , dataType: 'json'
         , data: data
         , method: 'post'
-        , success: function (resp) {
-            setReqInfo(resp);
-            showRespnfo(resp.apiResult);
-        }
-        , error: function (xhr,status,error) {
-            // {"timestamp":"2019-06-19 15:57:36","status":500,"error":"Internal Server Error","message":"appId不能为空","path":"/sandbox/test"}
-            var errorData = xhr.responseJSON;
-            if (errorData) {
-                setReqInfo('');
-                showRespnfo(errorData.message);
-            }
-        }
+        , success: successHandler
+        , error: errorHandler
     });
+}
+
+function postFile(data, formData) {
+    for(var key in data) {
+        formData.append(key, data[key]);
+    }
+    $.ajax({
+        url: SopConfig.url + '/sandbox/test'
+        , data: formData
+        // ajax2.0可以不用设置请求头，但是jq帮我们自动设置了，这样的话需要我们自己取消掉
+        , contentType: false
+        // 取消帮我们格式化数据，是什么就是什么
+        , processData: false
+        , method: 'post'
+        , success: successHandler
+        , error: errorHandler
+    });
+}
+
+function successHandler(resp) {
+    setReqInfo(resp);
+    showRespnfo(resp.apiResult);
+}
+
+function errorHandler(xhr,status,error) {
+    // {"timestamp":"2019-06-19 15:57:36","status":500,"error":"Internal Server Error","message":"appId不能为空","path":"/sandbox/test"}
+    var errorData = xhr.responseJSON;
+    if (errorData) {
+        setReqInfo('');
+        showRespnfo(errorData.message);
+    }
 }
 
 function showRespnfo(info) {

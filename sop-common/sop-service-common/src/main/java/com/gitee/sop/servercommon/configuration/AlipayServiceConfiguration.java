@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class AlipayServiceConfiguration extends BaseServiceConfiguration {
 
-    public AlipayServiceConfiguration() {
+    static {
         // 默认版本号为1.0
         ServiceConfig.getInstance().setDefaultVersion("1.0");
     }

@@ -34,27 +34,30 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - 秘钥管理
 - 微服务端自动验证（JSR-303）
 - 支持Spring Cloud Gateway
-- 关闭签名校验功能
-- 整合[easyopen](https://gitee.com/durcframework/easyopen)
 - Admin管理平台，统一管理微服务配置，管理路由管理，微服务上下线
 - 接入方管理+秘钥管理
 - 接口权限分配
+- 文件上传
 - SDK
 - 接口限流
 - 文档整合
 - 应用授权
 - 监控日志
+- 支持nacos
 
+## 界面预览
 
-## admin界面预览
+![服务列表](https://images.gitee.com/uploads/images/2019/0711/174825_2856281f_332975.png "admin_servicelist.png")
 
-![预览界面](https://images.gitee.com/uploads/images/2019/0509/140139_e99ab644_332975.png "admin_new1.png")
+![路由管理](https://images.gitee.com/uploads/images/2019/0711/174843_1648591c_332975.png "admin_route.png")
 
-![预览界面](https://images.gitee.com/uploads/images/2019/0509/140154_c181db76_332975.png "admin_new2.png")
+![限流管理](https://images.gitee.com/uploads/images/2019/0711/174900_9315cc8e_332975.png "admin_limit.png")
 
-![预览界面](https://images.gitee.com/uploads/images/2019/0509/140203_0ed411a3_332975.png "admin_new3.png")
+![秘钥信息](https://images.gitee.com/uploads/images/2019/0711/174921_bd817533_332975.png "admin_key.png")
 
-![预览界面](https://images.gitee.com/uploads/images/2019/0509/140220_1110f153_332975.png "admin_new4.png")
+![API文档](https://images.gitee.com/uploads/images/2019/0711/174939_97886883_332975.png "website_doc.png")
+
+![沙箱环境](https://images.gitee.com/uploads/images/2019/0711/175226_3f69346a_332975.png "website_sandbox.png")
 
 ## 工程说明
 
@@ -68,7 +71,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - sop-example：微服务示例，含springboot,springmvc示例
 - sop-sdk：基础sdk，含Java、C#版本
 - sop-test：接口调用测试用例
-- sop-website：开放平台对应网站，提供文档API等内容
+- sop-website：开放平台对应网站，提供文档API、沙箱测试等内容
 
 ## 分支说明
 

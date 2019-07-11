@@ -5,6 +5,10 @@ import com.gitee.sop.servercommon.util.UploadUtil;
 import com.gitee.sop.storyweb.controller.param.FileUploadParam;
 import com.gitee.sop.storyweb.controller.param.FileUploadParam2;
 import com.gitee.sop.storyweb.vo.FileUploadVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Extension;
+import io.swagger.annotations.ExtensionProperty;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +23,7 @@ import java.util.Collection;
  * @author tanghc
  */
 @RestController
+@Api(tags = "文件上传")
 public class FileUploadDemoController {
 
     /**
@@ -26,6 +31,7 @@ public class FileUploadDemoController {
      * @param param
      * @return
      */
+    @ApiOperation(value = "文件上传例1", notes = "上传文件demo")
     @ApiMapping(value = "demo.file.upload")
     public FileUploadVO file1(FileUploadParam param) {
         System.out.println(param.getRemark());
@@ -48,6 +54,9 @@ public class FileUploadDemoController {
      * @param param
      * @return
      */
+    @ApiOperation(value = "文件上传例2", notes = "可上传多个文件"
+            // 多文件上传、不确定文件数量上传，必须申明下面这句，否则沙盒界面不会出现上传控件
+            , extensions = @Extension(properties = @ExtensionProperty(name = "multiple", value = "multiple")))
     @ApiMapping(value = "demo.file.upload2")
     public FileUploadVO file2(FileUploadParam2 param, HttpServletRequest request) {
         System.out.println(param.getRemark());

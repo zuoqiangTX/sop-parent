@@ -9,6 +9,7 @@ import com.gitee.sop.registryapi.service.RegistryService;
 import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.bean.ZookeeperContext;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -66,7 +68,7 @@ public class DocManagerImpl implements DocManager {
     private volatile boolean listenInited;
 
     @Override
-    public void load() {
+    public void load(String serviceId) {
         try {
             List<ServiceInfo> serviceInfoList = registryService.listAllService(1, 9999);
             log.info("服务列表：{}", serviceInfoList);
@@ -76,6 +78,12 @@ public class DocManagerImpl implements DocManager {
                     // 网关没有文档提供，需要排除
                     .filter(serviceInfo -> !"API-GATEWAY".equalsIgnoreCase(serviceInfo.getServiceId()))
                     .filter(serviceInfo -> !serviceInfo.getInstances().isEmpty())
+                    .filter(serviceInfo -> {
+                        if (StringUtils.isEmpty(serviceId)) {
+                            return true;
+                        }
+                        return serviceId.equalsIgnoreCase(serviceInfo.getServiceId());
+                    })
                     .map(serviceInfo -> serviceInfo.getInstances().get(0))
                     .collect(Collectors.toList())
                     .forEach(this::loadDocInfo);
@@ -88,7 +96,7 @@ public class DocManagerImpl implements DocManager {
         String query = this.buildQuery();
         String url = "http://" + serviceInstance.getIp() + ":" + serviceInstance.getPort() + "/v2/api-docs" + query;
         try {
-            log.info("读取swagger文档，url:{}", url);
+            log.info("读取swagger文档，serviceId:{}, url:{}", serviceInstance.getServiceId(), url);
             ResponseEntity<String> entity = restTemplate.getForEntity(url, String.class);
             if (entity.getStatusCode() != HttpStatus.OK) {
                 throw new IllegalAccessException("无权访问");
@@ -156,8 +164,15 @@ public class DocManagerImpl implements DocManager {
         ZookeeperContext.listenChildren(routeRootPath, 1, (client, event) -> {
             if (listenInited) {
                 long id = System.currentTimeMillis();
+                byte[] data = event.getData().getData();
+                String serviceInfoJson = new String(data);
+                ZKServiceInfo serviceInfo = JSON.parseObject(serviceInfoJson, ZKServiceInfo.class);
+                String serviceId = serviceInfo.getServiceId();
+                log.info("微服务[{}]推送更新", serviceId);
+                Msg msg = new Msg(id, 1000 * 20);
+                msg.serviceId = serviceId;
                 // 延迟20秒执行
-                queue.offer(new Msg(id, 1000 * 20));
+                queue.offer(msg);
             }
             TreeCacheEvent.Type type = event.getType();
             if (type == TreeCacheEvent.Type.INITIALIZED) {
@@ -169,6 +184,7 @@ public class DocManagerImpl implements DocManager {
     static class Msg implements Delayed {
         private long id;
         private long delay;
+        private String serviceId;
 
         // 自定义实现比较方法返回 1 0 -1三个参数
 
@@ -192,6 +208,14 @@ public class DocManagerImpl implements DocManager {
         }
     }
 
+    @Data
+    static class ZKServiceInfo {
+        /** 服务名称，对应spring.application.name */
+        private String serviceId;
+
+        private String description;
+    }
+
     @Slf4j
     static class Consumer implements Runnable {
         private DelayQueue<Msg> queue;
@@ -206,9 +230,9 @@ public class DocManagerImpl implements DocManager {
         public void run() {
             while (true) {
                 try {
-                    queue.take();
+                    Msg msg = queue.take();
                     log.info("延迟队列触发--重新加载文档信息");
-                    docManager.load();
+                    docManager.load(msg.serviceId);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

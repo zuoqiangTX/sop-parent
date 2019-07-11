@@ -28,7 +28,11 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-    // 开启文档
+
+    /**
+     * 开启文档
+     * http://ip:port/v2/api-docs
+     */
     @Configuration
     @EnableSwagger2
     public static class Swagger2 extends SwaggerSupport {

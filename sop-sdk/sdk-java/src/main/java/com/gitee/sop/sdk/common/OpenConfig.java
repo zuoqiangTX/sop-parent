@@ -50,11 +50,11 @@ public class OpenConfig {
     private String errorResponseName = "error_response";
 
     /** 请求超时时间 */
-    private int connectTimeoutSeconds = 10;
+    private int connectTimeoutSeconds = 60;
     /** http读取超时时间 */
-    private int readTimeoutSeconds = 10;
+    private int readTimeoutSeconds = 60;
     /** http写超时时间 */
-    private int writeTimeoutSeconds = 10;
+    private int writeTimeoutSeconds = 60;
 
     /**
      * 构建数据节点名称

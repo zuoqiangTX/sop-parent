@@ -15,6 +15,10 @@ zuul:
   secret: MZZOUSTua6LzApIWXCwEgbBmxSzpzC
 
 ribbon:
+  # https://blog.csdn.net/qq_36872046/article/details/81058045
+  # 路由转发超时时间，毫秒，默认值1000，详见：RibbonClientConfiguration.DEFAULT_READ_TIMEOUT。
+  # 如果微服务端 处理时间过长，会导致ribbon read超时，解决办法将这个值调大一点
+  ReadTimeout: 2000
   # 设置为true（默认false），则所有请求都重试，默认只支持get请求重试
   # 请谨慎设置，因为post请求大多都是写入请求，如果要支持重试，确保服务的幂等性
   OkToRetryOnAllOperations: false

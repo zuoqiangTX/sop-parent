@@ -70,7 +70,7 @@ public class DocController {
     public String reload(String pwd) {
         boolean correct = StringUtils.equals(this.pwd, pwd);
         if (correct) {
-            docManager.load();
+            docManager.load(null);
         }
         return String.valueOf(correct);
     }

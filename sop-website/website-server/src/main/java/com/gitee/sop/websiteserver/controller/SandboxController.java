@@ -1,9 +1,13 @@
 package com.gitee.sop.websiteserver.controller;
 
+import com.gitee.sop.websiteserver.bean.HttpTool;
+import com.gitee.sop.websiteserver.bean.UploadFile;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
+import com.gitee.sop.websiteserver.util.UploadUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -13,18 +17,24 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -39,13 +49,16 @@ public class SandboxController {
     @Value("${api.url-sandbox}")
     private String url;
 
+    static HttpTool httpTool = new HttpTool();
+
     @RequestMapping("/test")
     public SandboxResult proxy(
             @RequestParam String appId
             , @RequestParam String privateKey
             , @RequestParam String method
             , @RequestParam String version
-            , @RequestParam String bizContent) throws AlipayApiException {
+            , @RequestParam String bizContent
+            , HttpServletRequest request) throws AlipayApiException {
 
         Assert.isTrue(StringUtils.isNotBlank(appId), "AppId不能为空");
         Assert.isTrue(StringUtils.isNotBlank(privateKey), "PrivateKey不能为空");
@@ -81,9 +94,31 @@ public class SandboxController {
 
         params.put("sign", sign);
 
-        String responseData = get(url, params);// 发送请求
-        result.apiResult = responseData;
-        return result;
+        Collection<MultipartFile> uploadFiles = UploadUtil.getUploadFiles(request);
+        List<UploadFile> files = uploadFiles.stream()
+                .map(multipartFile -> {
+                    try {
+                        return new UploadFile(multipartFile.getName(), multipartFile.getOriginalFilename(), multipartFile.getBytes());
+                    } catch (IOException e) {
+                        log.error("封装文件失败", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        try {
+            String responseData;
+            if (!CollectionUtils.isEmpty(files)) {
+                responseData = httpTool.requestFile(url, params, Collections.emptyMap(), files);
+            } else {
+                responseData = httpTool.request(url, params, Collections.emptyMap(), "get");
+            }
+            result.apiResult = responseData;
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("请求失败");
+        }
     }
 
     @Data
@@ -95,6 +130,7 @@ public class SandboxController {
         private String apiResult;
     }
 
+
     /**
      * 发送get请求
      * @param url
@@ -102,14 +138,10 @@ public class SandboxController {
      * @throws Exception
      */
     public static String get(String url, Map<String, String> params) {
-        CloseableHttpClient client = null;
+        CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try{
-            /**
-             *  创建一个httpclient对象
-             */
-            client = HttpClients.createDefault();
-
+            httpClient = HttpClients.createDefault();
             List<NameValuePair> nameValuePairs = params.entrySet()
                     .stream()
                     .map(entry -> new BasicNameValuePair(entry.getKey(), String.valueOf(entry.getValue())))
@@ -129,7 +161,7 @@ public class SandboxController {
             /**
              * 执行post请求
              */
-            response = client.execute(get);
+            response = httpClient.execute(get);
             /**
              * 通过EntityUitls获取返回内容
              */
@@ -137,7 +169,7 @@ public class SandboxController {
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            IOUtils.closeQuietly(client);
+            IOUtils.closeQuietly(httpClient);
             IOUtils.closeQuietly(response);
         }
         return null;

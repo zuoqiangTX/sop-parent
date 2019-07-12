@@ -101,10 +101,11 @@ function doTest() {
     var method = currentItem.name;
     var version = currentItem.version;
     var data = {
-        appId: $('#appId').val(),
-        privateKey: $('#privateKey').val(),
-        method: method,
-        version: version
+        appId: $('#appId').val()
+        , privateKey: $('#privateKey').val()
+        , method: method
+        , version: version
+        , httpMethod: currentItem.httpMethod
     };
     var uploadFileObjects = getUploadFileObjects();
     var $inputs = $body.find('.test-input');

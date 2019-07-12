@@ -30,14 +30,16 @@ public class SwaggerDocParser implements DocParser {
 
         JSONObject paths = docRoot.getJSONObject("paths");
         Set<String> pathNameSet = paths.keySet();
-        for (String pathName : pathNameSet) {
-            JSONObject pathInfo = paths.getJSONObject(pathName);
+        for (String apiPath : pathNameSet) {
+            JSONObject pathInfo = paths.getJSONObject(apiPath);
+            // key: get,post,head...
             Set<String> pathSet = pathInfo.keySet();
             Optional<String> first = pathSet.stream().findFirst();
             if (first.isPresent()) {
-                String path = first.get();
-                JSONObject docInfo = pathInfo.getJSONObject(path);
+                String method = first.get();
+                JSONObject docInfo = pathInfo.getJSONObject(method);
                 DocItem docItem = buildDocItem(docInfo, docRoot);
+                docItem.setHttpMethod(method);
                 docItems.add(docItem);
             }
         }

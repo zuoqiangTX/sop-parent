@@ -16,6 +16,7 @@ public class DocItem {
     private String description;
     // 是否多文件上传
     private boolean multiple;
+    private String httpMethod;
 
     List<DocParameter> requestParameters;
     List<DocParameter> responseParameters;

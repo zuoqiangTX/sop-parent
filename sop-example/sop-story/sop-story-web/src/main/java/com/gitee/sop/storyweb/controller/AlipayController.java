@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -126,7 +127,7 @@ public class AlipayController {
      * @return
      */
     @ApiOperation(value="获取分类信息", notes = "演示表格树")
-    @ApiMapping(value = "alipay.category.get")
+    @ApiMapping(value = "alipay.category.get", method = RequestMethod.POST)
     public Category getCategory(Category story) {
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;

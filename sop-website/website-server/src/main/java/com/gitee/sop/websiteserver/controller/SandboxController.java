@@ -58,6 +58,7 @@ public class SandboxController {
             , @RequestParam String method
             , @RequestParam String version
             , @RequestParam String bizContent
+            , @RequestParam(defaultValue = "get") String httpMethod
             , HttpServletRequest request) throws AlipayApiException {
 
         Assert.isTrue(StringUtils.isNotBlank(appId), "AppId不能为空");
@@ -112,7 +113,7 @@ public class SandboxController {
             if (!CollectionUtils.isEmpty(files)) {
                 responseData = httpTool.requestFile(url, params, Collections.emptyMap(), files);
             } else {
-                responseData = httpTool.request(url, params, Collections.emptyMap(), "get");
+                responseData = httpTool.request(url, params, Collections.emptyMap(), httpMethod);
             }
             result.apiResult = responseData;
             return result;

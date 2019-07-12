@@ -46,6 +46,7 @@ public class HttpTool {
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         cookieStore.put(httpUrl.host(), list);
                     }
+
                     public List<Cookie> loadForRequest(HttpUrl httpUrl) {
                         List<Cookie> cookies = cookieStore.get(httpUrl.host());
                         return cookies != null ? cookies : new ArrayList<Cookie>();
@@ -55,11 +56,17 @@ public class HttpTool {
 
     @Data
     public static class HttpToolConfig {
-        /** 请求超时时间 */
+        /**
+         * 请求超时时间
+         */
         private int connectTimeoutSeconds = 10;
-        /** http读取超时时间 */
+        /**
+         * http读取超时时间
+         */
         private int readTimeoutSeconds = 10;
-        /** http写超时时间 */
+        /**
+         * http写超时时间
+         */
         private int writeTimeoutSeconds = 10;
     }
 
@@ -84,33 +91,15 @@ public class HttpTool {
     /**
      * 提交表单
      *
-     * @param url url
-     * @param form 参数
+     * @param url    url
+     * @param form   参数
      * @param header header
      * @param method 请求方式，post，get等
      * @return
      * @throws IOException
      */
     public String request(String url, Map<String, String> form, Map<String, String> header, String method) throws IOException {
-        Request.Builder requestBuilder;
-        if (METHOD_GET.equalsIgnoreCase(method)) {
-            HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-            for (Map.Entry<String, String> entry : form.entrySet()) {
-                urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
-            }
-            requestBuilder = new Request.Builder()
-                    .url(urlBuilder.build())
-                    .get();
-        } else {
-            FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
-            for (Map.Entry<String, String> entry : form.entrySet()) {
-                paramBuilder.add(entry.getKey(), entry.getValue());
-            }
-            FormBody formBody = paramBuilder.build();
-            requestBuilder = new Request.Builder()
-                    .url(url)
-                    .method(method, formBody);
-        }
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
         // 添加header
         addHeader(requestBuilder, header);
 
@@ -123,6 +112,47 @@ public class HttpTool {
         } finally {
             response.close();
         }
+    }
+
+    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, String method) {
+        switch (method) {
+            case "get":
+                return new Request.Builder()
+                        .url(buildHttpUrl(url, form))
+                        .get();
+            case "head":
+                return new Request.Builder()
+                        .url(buildHttpUrl(url, form))
+                        .head();
+            case "put":
+                return new Request.Builder()
+                        .url(url)
+                        .put(buildFormBody(form));
+            case "delete":
+                return new Request.Builder()
+                        .url(url)
+                        .delete(buildFormBody(form));
+            default:
+                return new Request.Builder()
+                        .url(url)
+                        .post(buildFormBody(form));
+        }
+    }
+
+    public static HttpUrl buildHttpUrl(String url, Map<String, String> form) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
+        }
+        return urlBuilder.build();
+    }
+
+    public static FormBody buildFormBody(Map<String, String> form) {
+        FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            paramBuilder.add(entry.getKey(), entry.getValue());
+        }
+        return paramBuilder.build();
     }
 
     /**

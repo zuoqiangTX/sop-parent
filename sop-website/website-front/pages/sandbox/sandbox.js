@@ -17,6 +17,7 @@ var treetable;
 var currentItem;
 
 function selectItem(docItem, layui) {
+    var form = layui.form;
     currentItem = docItem;
     resetResultDiv();
     var nameVersion = docItem.nameVersion;
@@ -31,9 +32,23 @@ function selectItem(docItem, layui) {
 
     $('#multipleDiv').css('display', multiple ? 'block' : 'none');
 
+    $('#httpMethodList').html(buildHttpMethodOptions(docItem));
+
     var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
     $li.addClass('layui-this').siblings().removeClass('layui-this');
+
+    form.render();
     InputCache.init();
+}
+
+function buildHttpMethodOptions(docItem) {
+    var methodList = docItem.httpMethodList;
+    var html = []
+    for (var i = 0; i < methodList.length; i++) {
+        var method = methodList[i];
+        html.push('<option value="' + method + '"> ' + method.toUpperCase() + ' </option>');
+    }
+    return html.join('');
 }
 
 function createRequestParameter(docItem) {
@@ -105,7 +120,7 @@ function doTest() {
         , privateKey: $('#privateKey').val()
         , method: method
         , version: version
-        , httpMethod: currentItem.httpMethod
+        , httpMethod: $('#httpMethodList').val()
     };
     var uploadFileObjects = getUploadFileObjects();
     var $inputs = $body.find('.test-input');

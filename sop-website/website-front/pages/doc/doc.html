@@ -102,12 +102,17 @@
         <blockquote class="layui-elem-quote layui-text sop-description">
         </blockquote>
 
+
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend>请求地址</legend>
+            </fieldset>
+        </div>
         <div class="site-text">
-            <h3>请求地址</h3>
             <table class="layui-table">
                 <thead>
                 <tr>
-                    <th>环境</th>
+                    <th style="width: 120px;">环境</th>
                     <th>请求地址</th>
                 </tr>
                 </thead>
@@ -122,12 +127,21 @@
 
         <div class="site-title">
             <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend>请求方法</legend>
+            </fieldset>
+        </div>
+        <div class="site-text">
+            <span id="httpMethodList"></span>
+        </div>
+
+
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
                 <legend>公共参数</legend>
             </fieldset>
         </div>
 
         <div class="site-text">
-            <h3>公共请求参数</h3>
             <table class="layui-table">
                 <thead>
                 <tr>
@@ -244,7 +258,7 @@
 
         <div class="site-title">
             <fieldset class="layui-elem-field layui-field-title site-title">
-                <legend>请求参数</legend>
+                <legend>业务参数</legend>
             </fieldset>
         </div>
         <div class="site-text">
@@ -308,7 +322,7 @@
 
         <div class="site-title">
             <fieldset class="layui-elem-field layui-field-title site-title">
-                <legend>响应参数</legend>
+                <legend>业务响应参数</legend>
             </fieldset>
         </div>
         <div class="site-text">

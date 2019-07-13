@@ -83,8 +83,12 @@
         <blockquote class="layui-elem-quote layui-text sop-description">
         </blockquote>
 
+        <div class="site-title">
+            <fieldset class="layui-elem-field layui-field-title site-title">
+                <legend>参数配置</legend>
+            </fieldset>
+        </div>
         <div class="site-text">
-            <h3>参数配置</h3>
             <table class="layui-table">
                 <tr>
                     <td class="table-title">AppId</td>
@@ -106,6 +110,12 @@
             <table id="treeTableReq" class="layui-table" lay-size="sm"></table>
             <div id="multipleDiv" style="margin-bottom: 20px;margin-top: 20px;display: none;">
                 <input id="multipleFile" name="file" type="file"  multiple="multiple" value="上传文件" />
+            </div>
+            <div class="layui-form-item">
+                <label style="float: left;padding-top: 9px;">请求方法</label>
+                <div style="margin-left: 70px;width: 120px;">
+                    <select id="httpMethodList"></select>
+                </div>
             </div>
             <button lay-submit lay-filter="formSend" class="layui-btn layui-btn-normal">发送请求</button>
         </form>

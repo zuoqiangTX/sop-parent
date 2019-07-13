@@ -6,10 +6,13 @@ import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.bean.DocParameter;
+import com.gitee.sop.websiteserver.bean.DocParserContext;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +36,17 @@ public class SwaggerDocParser implements DocParser {
         for (String apiPath : pathNameSet) {
             JSONObject pathInfo = paths.getJSONObject(apiPath);
             // key: get,post,head...
-            Set<String> pathSet = pathInfo.keySet();
-            Optional<String> first = pathSet.stream().findFirst();
+            Collection<String> httpMethodList = getHttpMethods(pathInfo);
+            Optional<String> first = httpMethodList.stream().findFirst();
             if (first.isPresent()) {
                 String method = first.get();
                 JSONObject docInfo = pathInfo.getJSONObject(method);
                 DocItem docItem = buildDocItem(docInfo, docRoot);
-                docItem.setHttpMethod(method);
+                if (docItem.isUploadRequest()) {
+                    docItem.setHttpMethodList(Sets.newHashSet("post"));
+                } else {
+                    docItem.setHttpMethodList(httpMethodList);
+                }
                 docItems.add(docItem);
             }
         }
@@ -61,6 +68,22 @@ public class SwaggerDocParser implements DocParser {
         docInfo.setTitle(title);
         docInfo.setDocModuleList(docModuleList);
         return docInfo;
+    }
+
+    protected Collection<String> getHttpMethods(JSONObject pathInfo) {
+        // key: get,post,head...
+        List<String> retList;
+        Set<String> httpMethodList = pathInfo.keySet();
+        if (httpMethodList.size() <= 2) {
+            retList = new ArrayList<>(httpMethodList);
+        } else {
+            Set<String> ignoreHttpMethods = DocParserContext.ignoreHttpMethods;
+            retList = httpMethodList.stream()
+                    .filter(method -> !ignoreHttpMethods.contains(method.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        Collections.sort(retList);
+        return retList;
     }
 
     protected DocItem buildDocItem(JSONObject docInfo, JSONObject docRoot) {

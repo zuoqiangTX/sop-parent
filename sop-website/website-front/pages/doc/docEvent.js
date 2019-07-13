@@ -19,6 +19,8 @@ function selectItem(docItem, layui) {
 
     var $li = $('#docItemTree').find('li[nameversion="'+nameVersion+'"]');
     $li.addClass('layui-this').siblings().removeClass('layui-this');
+
+    $('#httpMethodList').text(docItem.httpMethodList.join(' / ').toUpperCase());
 }
 
 function createRequestParameter(docItem) {

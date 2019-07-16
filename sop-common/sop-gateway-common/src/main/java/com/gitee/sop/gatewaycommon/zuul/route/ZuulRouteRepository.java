@@ -47,6 +47,7 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
     public void deleteAll(String serviceId) {
         Collection<ZuulTargetRoute> values = nameVersionTargetRouteMap.values();
         List<String> idList = values.stream()
+                .filter(zuulTargetRoute -> zuulTargetRoute.getServiceRouteInfo().getServiceId().equalsIgnoreCase(serviceId))
                 .map(zuulTargetRoute -> zuulTargetRoute.getRouteDefinition().getId())
                 .collect(Collectors.toList());
 

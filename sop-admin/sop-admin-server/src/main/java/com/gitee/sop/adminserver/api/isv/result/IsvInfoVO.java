@@ -26,6 +26,9 @@ public class IsvInfoVO {
     @ApiDocField(description = "签名类型：1:RSA2,2:MD5")
     private Byte signType;
 
+    @ApiDocField(description = "备注")
+    private String remark;
+
     /**  数据库字段：gmt_create */
     @ApiDocField(description = "添加时间")
     private Date gmtCreate;

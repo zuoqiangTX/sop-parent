@@ -40,6 +40,9 @@ public class IsvInfo {
     /** 1启用，2禁用, 数据库字段：status */
     private Byte status;
 
+    /** 备注，数据库字段：remark */
+    private String remark;
+
     /**  数据库字段：gmt_create */
     private Date gmtCreate;
 

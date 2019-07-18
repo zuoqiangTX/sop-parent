@@ -83,6 +83,7 @@ CREATE TABLE `isv_info` (
   `pri_key` text COMMENT '私钥',
   `status` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '1启用，2禁用',
   `sign_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1:RSA2,2:MD5',
+  `remark` varchar(128) DEFAULT NULL COMMENT '备注',
   `gmt_create` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

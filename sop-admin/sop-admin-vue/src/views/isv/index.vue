@@ -37,6 +37,8 @@
       <el-table-column
         prop="roleList"
         label="角色"
+        width="100"
+        show-overflow-tooltip="true"
       >
         <template slot-scope="scope">
           <div v-html="roleRender(scope.row)"></div>
@@ -61,6 +63,12 @@
         prop="gmtModified"
         label="修改时间"
         width="160"
+      />
+      <el-table-column
+        prop="remark"
+        label="备注"
+        width="120"
+        show-overflow-tooltip="true"
       />
       <el-table-column
         label="操作"
@@ -106,6 +114,9 @@
             <el-checkbox v-for="item in roles" :key="item.roleCode" :label="item.roleCode">{{ item.description }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="isvDialogFormData.remark" type="textarea" />
+        </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="isvDialogFormData.status">
             <el-radio :label="1" name="status">启用</el-radio>
@@ -115,7 +126,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isvDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="onIsvDialogSave">保 存</el-button>
+        <el-button type="primary" :disabled="isSaveButtonDisabled" @click="onIsvDialogSave">保 存</el-button>
       </div>
     </el-dialog>
     <!--view keys dialog-->
@@ -200,14 +211,15 @@ export default {
       isvDialogFormData: {
         id: 0,
         status: 1,
+        remark: '',
         roleCode: []
       },
       rulesIsvForm: {
-        appKey: [
-          { required: true, message: '不能为空', trigger: 'blur' },
-          { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
+        remark: [
+          { min: 0, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
         ]
       },
+      isSaveButtonDisabled: false,
       isvKeysDialogVisible: false,
       isvKeysFormData: {
         appKey: '',
@@ -283,19 +295,20 @@ export default {
       })
     },
     onIsvDialogSave: function() {
-      const that = this
       this.$refs.isvForm.validate((valid) => {
         if (valid) {
+          this.isSaveButtonDisabled = true
           const uri = this.isvDialogFormData.id === 0 ? 'isv.info.add' : 'isv.info.update'
-          that.post(uri, that.isvDialogFormData, function() {
-            that.isvDialogVisible = false
-            that.loadTable()
+          this.post(uri, this.isvDialogFormData, function() {
+            this.isvDialogVisible = false
+            this.loadTable()
           })
         }
       })
     },
     onIsvDialogClose: function() {
       this.resetForm('isvForm')
+      this.isSaveButtonDisabled = false
       this.isvDialogFormData.status = 1
       this.isvDialogFormData.roleCode = []
     },

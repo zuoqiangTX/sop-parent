@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,7 @@ import java.util.Date;
  * @author tanghc
  */
 @RestController
+@Slf4j
 @Api(tags = "故事接口")
 public class AlipayController {
 
@@ -101,7 +103,7 @@ public class AlipayController {
     @ApiOperation(value = "获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
     @ApiMapping(value = "alipay.story.find")
     public StoryVO getStory2(StoryParam story, HttpServletRequest request) {
-        System.out.println(story);
+        log.info("获取故事信息参数, story: {}", story);
         // 获取其它参数
         System.out.println(request.getParameter("app_id"));
         StoryVO storyVO = new StoryVO();

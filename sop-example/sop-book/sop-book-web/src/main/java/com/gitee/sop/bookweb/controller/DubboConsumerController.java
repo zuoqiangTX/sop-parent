@@ -6,6 +6,7 @@ import com.gitee.sop.story.api.domain.Story;
 import com.gitee.sop.story.api.param.DemoParam;
 import com.gitee.sop.story.api.result.DemoResult;
 import com.gitee.sop.story.api.service.DemoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -17,16 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
  * Feign的使用方式参见：com.gitee.sop.bookweb.controller.AlipayBookController#getBook2()
  */
 @RestController
+@Slf4j
 public class DubboConsumerController {
 
-    @Reference(version = "${demo.service.version}",
-            application = "${dubbo.application.id}",
-            url = "dubbo://localhost:12345")
+    @Reference(version = "1.0.0", url = "dubbo://127.0.0.1:12345")
     private DemoService demoService;
 
     // 作为开放接口
     @ApiMapping(value = "dubbo.story.get")
     public Story openApi(DemoParam demoParam) {
+        log.info("dubbo consumer, param: {}", demoParam);
         // 通过dubbo调用story提供的服务
         DemoResult dubboStory = demoService.getStory(demoParam);
         Story story = new Story();

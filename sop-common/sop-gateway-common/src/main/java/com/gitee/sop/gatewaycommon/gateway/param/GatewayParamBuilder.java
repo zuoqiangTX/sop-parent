@@ -17,4 +17,9 @@ public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {
         Map<String, String> params = GatewayContext.getRequestParams(exchange);
         return params == null ? Collections.emptyMap() : params;
     }
+
+    @Override
+    public String getIP(ServerWebExchange ctx) {
+        return ctx.getRequest().getRemoteAddress().getAddress().getHostAddress();
+    }
 }

@@ -53,6 +53,12 @@ public class AbstractConfiguration implements ApplicationContextAware {
     LimitConfigManager limitConfigManager() {
         return ApiConfig.getInstance().getLimitConfigManager();
     }
+
+    @Bean
+    IPBlacklistManager ipBlacklistManager() {
+        return ApiConfig.getInstance().getIpBlacklistManager();
+    }
+
     /**
      * 跨域过滤器
      *

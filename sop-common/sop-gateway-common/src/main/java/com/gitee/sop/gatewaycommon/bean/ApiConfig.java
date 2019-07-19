@@ -5,10 +5,12 @@ import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
 import com.gitee.sop.gatewaycommon.limit.DefaultLimitManager;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultIPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultLimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultServiceErrorManager;
+import com.gitee.sop.gatewaycommon.manager.IPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
@@ -114,6 +116,11 @@ public class ApiConfig {
      * 限流配置
      */
     private LimitConfigManager limitConfigManager = new DefaultLimitConfigManager();
+
+    /**
+     * IP黑名单
+     */
+    private IPBlacklistManager ipBlacklistManager = new DefaultIPBlacklistManager();
 
     /**
      * 限流管理

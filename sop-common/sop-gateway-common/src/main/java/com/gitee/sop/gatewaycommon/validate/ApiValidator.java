@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.manager.IPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
@@ -46,6 +47,7 @@ public class ApiValidator implements Validator {
 
     @Override
     public void validate(ApiParam param) {
+        checkIP(param);
         checkEnable(param);
 
         ApiConfig apiConfig = ApiContext.getApiConfig();
@@ -62,6 +64,18 @@ public class ApiValidator implements Validator {
         checkFormat(param);
         checkUploadFile(param);
         checkPermission(param);
+    }
+
+    /**
+     * 是否在IP黑名单中
+     * @param param 接口参数
+     */
+    protected void checkIP(ApiParam param) {
+        IPBlacklistManager ipBlacklistManager = ApiConfig.getInstance().getIpBlacklistManager();
+        String ip = param.fetchIp();
+        if (ipBlacklistManager.contains(ip)) {
+            throw ErrorEnum.ISV_IP_FORBIDDEN.getErrorMeta().getException();
+        }
     }
 
     /**

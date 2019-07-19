@@ -19,6 +19,8 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
 
     public abstract Map<String, String> buildRequestParams(T ctx);
 
+    public abstract String getIP(T ctx);
+
     @Override
     public ApiParam build(T ctx) {
         ApiParam apiParam = this.newApiParam(ctx);
@@ -27,6 +29,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
             apiParam.put(entry.getKey(), entry.getValue());
         }
         this.initOtherProperty(apiParam);
+        apiParam.setIp(this.getIP(ctx));
         return apiParam;
     }
 

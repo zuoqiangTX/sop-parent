@@ -64,26 +64,32 @@ export const constantRoutes = [
       {
         path: 'list',
         name: 'ServiceList',
-        component: () => import('@/views/service/list/index'),
+        component: () => import('@/views/service/serviceList'),
         meta: { title: '服务列表' }
       },
       {
         path: 'route',
         name: 'Route',
-        component: () => import('@/views/service/route/index'),
+        component: () => import('@/views/service/route'),
         meta: { title: '路由管理' }
       },
       {
         path: 'limit',
         name: 'Limit',
-        component: () => import('@/views/service/limit/index2'),
+        component: () => import('@/views/service/limit'),
         meta: { title: '限流管理' }
       },
       {
         path: 'log',
         name: 'Log',
-        component: () => import('@/views/service/log/index'),
+        component: () => import('@/views/service/log'),
         meta: { title: '监控日志' }
+      },
+      {
+        path: 'blacklist',
+        name: 'Blacklist',
+        component: () => import('@/views/service/ipBlacklist'),
+        meta: { title: 'IP黑名单' }
       }
     ]
   },

@@ -104,6 +104,10 @@ public class ZookeeperContext {
         return SOP_MSG_CHANNEL_PATH + "/limit-conf";
     }
 
+    public static String getIpBlacklistChannelPath() {
+        return SOP_MSG_CHANNEL_PATH + "/ipblacklist-conf";
+    }
+
     public static CuratorFramework getClient() {
         return client;
     }

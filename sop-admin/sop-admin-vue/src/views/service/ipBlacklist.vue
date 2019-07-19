@@ -1,28 +1,28 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
-      <el-form-item label="角色码">
-        <el-input v-model="searchFormData.roleCode" :clearable="true" placeholder="输入角色码" style="width: 250px;" />
+      <el-form-item label="IP">
+        <el-input v-model="searchFormData.ip" :clearable="true" placeholder="输入IP" style="width: 250px;" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="loadTable">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-button type="primary" size="mini" icon="el-icon-plus" style="margin-bottom: 10px;" @click="onAdd">新增角色</el-button>
+    <el-button type="primary" size="mini" icon="el-icon-plus" style="margin-bottom: 10px;" @click="onAdd">新增IP</el-button>
     <el-table
       :data="pageInfo.rows"
       border
       highlight-current-row
     >
       <el-table-column
-        prop="roleCode"
-        label="角色码"
+        prop="ip"
+        label="IP"
         width="200"
       />
       <el-table-column
-        prop="description"
-        label="角色描述"
-        width="200"
+        prop="remark"
+        label="备注"
+        width="300"
       />
       <el-table-column
         prop="gmtCreate"
@@ -57,29 +57,29 @@
     />
     <!--dialog-->
     <el-dialog
-      :title="roleDialogTitle"
-      :visible.sync="roleDialogVisible"
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
       :close-on-click-modal="false"
-      @close="resetForm('roleForm')"
+      @close="resetForm('dialogForm')"
     >
       <el-form
-        ref="roleForm"
-        :rules="roleDialogFormRules"
-        :model="roleDialogFormData"
+        ref="dialogForm"
+        :rules="dialogFormRules"
+        :model="dialogFormData"
         label-width="120px"
         size="mini"
       >
-        <el-form-item prop="roleCode" label="角色码">
-          <el-input v-show="roleDialogFormData.id === 0" v-model="roleDialogFormData.roleCode" />
-          <span v-show="roleDialogFormData.id > 0">{{ roleDialogFormData.roleCode }}</span>
+        <el-form-item prop="ip" label="IP">
+          <el-input v-show="dialogFormData.id === 0" v-model="dialogFormData.ip" />
+          <span v-show="dialogFormData.id > 0">{{ dialogFormData.ip }}</span>
         </el-form-item>
-        <el-form-item prop="description" label="角色描述">
-          <el-input v-model="roleDialogFormData.description" />
+        <el-form-item prop="remark" label="备注">
+          <el-input v-model="dialogFormData.remark" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="roleDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="onRoleDialogSave">保 存</el-button>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="onDialogSave">保 存</el-button>
       </div>
     </el-dialog>
   </div>
@@ -88,9 +88,20 @@
 <script>
 export default {
   data() {
+    const ipValidator = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入IP'))
+      } else {
+        const regexIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        if (!regexIP.test(value)) {
+          callback(new Error('IP格式不正确'))
+        }
+        callback()
+      }
+    }
     return {
       searchFormData: {
-        roleCode: '',
+        ip: '',
         pageIndex: 1,
         pageSize: 10
       },
@@ -98,20 +109,20 @@ export default {
         rows: [],
         total: 0
       },
-      roleDialogVisible: false,
-      roleDialogTitle: '',
-      roleDialogFormData: {
+      dialogVisible: false,
+      dialogTitle: '',
+      dialogFormData: {
         id: 0,
-        roleCode: '',
-        description: ''
+        ip: '',
+        remark: ''
       },
-      roleDialogFormRules: {
-        roleCode: [
-          { required: true, message: '不能为空', trigger: 'blur' },
+      dialogFormRules: {
+        ip: [
+          { validator: ipValidator, trigger: 'blur' },
           { min: 1, max: 64, message: '长度在 1 到 64 个字符', trigger: 'blur' }
         ],
-        description: [
-          { max: 64, message: '不能超过 64 个字符', trigger: 'blur' }
+        remark: [
+          { max: 100, message: '不能超过 100 个字符', trigger: 'blur' }
         ]
       }
     }
@@ -121,35 +132,35 @@ export default {
   },
   methods: {
     loadTable: function() {
-      this.post('role.page', this.searchFormData, function(resp) {
+      this.post('ip.blacklist.page', this.searchFormData, function(resp) {
         this.pageInfo = resp.data
       })
     },
     onTableUpdate: function(row) {
-      this.roleDialogTitle = '修改角色'
-      this.roleDialogVisible = true
+      this.dialogTitle = '修改IP'
+      this.dialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.roleDialogFormData, row)
+        Object.assign(this.dialogFormData, row)
       })
     },
     onTableDelete: function(row) {
-      this.confirm(`确认要删除角色【${row.roleCode}】吗？`, function(done) {
+      this.confirm(`确认要移除IP【${row.ip}】吗？`, function(done) {
         const data = {
           id: row.id
         }
-        this.post('role.del', data, function() {
+        this.post('ip.blacklist.del', data, function() {
           done()
           this.tip('删除成功')
           this.loadTable()
         })
       })
     },
-    onRoleDialogSave: function() {
-      this.$refs.roleForm.validate((valid) => {
+    onDialogSave: function() {
+      this.$refs.dialogForm.validate((valid) => {
         if (valid) {
-          const uri = this.roleDialogFormData.id ? 'role.update' : 'role.add'
-          this.post(uri, this.roleDialogFormData, function() {
-            this.roleDialogVisible = false
+          const uri = this.dialogFormData.id ? 'ip.blacklist.update' : 'ip.blacklist.add'
+          this.post(uri, this.dialogFormData, function() {
+            this.dialogVisible = false
             this.loadTable()
           })
         }
@@ -160,9 +171,9 @@ export default {
       this.loadTable()
     },
     onAdd: function() {
-      this.roleDialogTitle = '新增角色'
-      this.roleDialogVisible = true
-      this.roleDialogFormData.id = 0
+      this.dialogTitle = '新增IP'
+      this.dialogVisible = true
+      this.dialogFormData.id = 0
     },
     onPageIndexChange: function(pageIndex) {
       this.searchFormData.pageIndex = pageIndex

@@ -100,6 +100,8 @@ public enum ErrorEnum {
     ISV_ROUTE_NO_PERMISSIONS(Codes.CODE_ISV_PERM, "isv.route-no-permissions"),
     /** 禁止访问 */
     ISV_ACCESS_FORBIDDEN(Codes.CODE_ISV_PERM, "isv.access-forbidden"),
+    /** 禁止IP访问 */
+    ISV_IP_FORBIDDEN(Codes.CODE_ISV_PERM, "isv.ip-forbidden"),
 
     ;
     private ErrorMeta errorMeta;

@@ -27,6 +27,8 @@ public class ApiParam extends JSONObject implements Param {
     private String restName;
     private String restVersion;
 
+    private String ip;
+
     private transient ApiUploadContext apiUploadContext;
 
     public void fitNameVersion() {
@@ -235,5 +237,13 @@ public class ApiParam extends JSONObject implements Param {
 
     public void setRestVersion(String restVersion) {
         this.restVersion = restVersion;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String fetchIp() {
+        return ip;
     }
 }

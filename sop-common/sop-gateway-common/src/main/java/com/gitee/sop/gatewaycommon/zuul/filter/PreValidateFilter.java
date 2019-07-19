@@ -36,7 +36,7 @@ public class PreValidateFilter extends BaseZuulFilter {
         try {
             validator.validate(param);
         } catch (ApiException e) {
-            log.error("验证失败，params:{}", param.toJSONString(), e);
+            log.error("验证失败，ip:{}, params:{}", param.fetchIp(), param.toJSONString(), e);
             throw e;
         } finally {
             param.fitNameVersion();

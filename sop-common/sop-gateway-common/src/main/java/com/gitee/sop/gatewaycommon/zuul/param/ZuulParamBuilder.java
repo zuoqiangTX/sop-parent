@@ -63,6 +63,11 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
     }
 
     @Override
+    public String getIP(RequestContext ctx) {
+        return RequestUtil.getIP(ctx.getRequest());
+    }
+
+    @Override
     protected ApiParam newApiParam(RequestContext ctx) {
         ApiParam apiParam = super.newApiParam(ctx);
         HttpServletRequest request = ctx.getRequest();

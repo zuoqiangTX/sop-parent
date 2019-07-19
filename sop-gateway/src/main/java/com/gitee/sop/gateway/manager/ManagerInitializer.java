@@ -13,5 +13,6 @@ public class ManagerInitializer {
         apiConfig.setIsvRoutePermissionManager(new DbIsvRoutePermissionManager());
         apiConfig.setRouteConfigManager(new DbRouteConfigManager());
         apiConfig.setLimitConfigManager(new DbLimitConfigManager());
+        apiConfig.setIpBlacklistManager(new DbIPBlacklistManager());
     }
 }

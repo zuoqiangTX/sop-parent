@@ -1,3 +1,5 @@
+use sop;
+
 CREATE TABLE `config_ip_blacklist` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `ip` varchar(64) NOT NULL DEFAULT '' COMMENT 'ip',

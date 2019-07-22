@@ -66,13 +66,13 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
      *
      * @param methodParameter
      * @param nativeWebRequest
-     * @return
+     * @return 没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
         String bizContent = nativeWebRequest.getParameter(ParamNames.BIZ_CONTENT_NAME);
-        Class<?> parameterType = methodParameter.getParameterType();
         Object bizObj = null;
         if (bizContent != null) {
+            Class<?> parameterType = methodParameter.getParameterType();
             bizObj = JSON.parseObject(bizContent, parameterType);
         }
         this.bindUploadFile(bizObj, nativeWebRequest);
@@ -80,7 +80,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     }
 
     /**
-     * 将文件绑定到
+     * 将上传文件对象绑定到属性中
      *
      * @param bizObj           业务参数
      * @param nativeWebRequest

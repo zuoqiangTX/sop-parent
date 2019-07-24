@@ -11,9 +11,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,16 +25,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
-    private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
-            new ConcurrentHashMap<>(256);
+    private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache = new ConcurrentHashMap<>(256);
 
-    private final ParamValidator paramValidator = new ServiceParamValidator();
+    private ParamValidator paramValidator = new ServiceParamValidator();
 
-    private List<HandlerMethodArgumentResolver> argumentResolvers = Collections.emptyList();
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     @Override
-    public void setResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        this.argumentResolvers = resolvers;
+    public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
     }
 
     @Override
@@ -61,18 +60,19 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         }
     }
 
+
     /**
      * 获取参数对象，将request中的参数绑定到实体对象中去
      *
      * @param methodParameter
      * @param nativeWebRequest
-     * @return
+     * @return 没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
         String bizContent = nativeWebRequest.getParameter(ParamNames.BIZ_CONTENT_NAME);
-        Class<?> parameterType = methodParameter.getParameterType();
         Object bizObj = null;
         if (bizContent != null) {
+            Class<?> parameterType = methodParameter.getParameterType();
             bizObj = JSON.parseObject(bizContent, parameterType);
         }
         this.bindUploadFile(bizObj, nativeWebRequest);
@@ -80,7 +80,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     }
 
     /**
-     * 将文件绑定到
+     * 将上传文件对象绑定到属性中
      *
      * @param bizObj           业务参数
      * @param nativeWebRequest
@@ -89,9 +89,9 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         if (bizObj == null) {
             return;
         }
-        Object nativeRequest = nativeWebRequest.getNativeRequest();
-        if (nativeRequest instanceof StandardMultipartHttpServletRequest) {
-            StandardMultipartHttpServletRequest request = (StandardMultipartHttpServletRequest) nativeRequest;
+        if (this.isMultipartRequest(nativeWebRequest)) {
+            Object nativeRequest = nativeWebRequest.getNativeRequest();
+            MultipartHttpServletRequest request = (MultipartHttpServletRequest) nativeRequest;
             Class<?> bizClass = bizObj.getClass();
             ReflectionUtils.doWithFields(bizClass, field -> {
                 ReflectionUtils.makeAccessible(field);
@@ -102,10 +102,21 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         }
     }
 
+    protected boolean isMultipartRequest(NativeWebRequest nativeWebRequest) {
+        return nativeWebRequest.getNativeRequest() instanceof MultipartHttpServletRequest;
+    }
+
+    /**
+     * 获取其它的参数解析器
+     *
+     * @param parameter 业务参数
+     * @return 返回合适参数解析器，没有返回null
+     */
     protected HandlerMethodArgumentResolver getOtherArgumentResolver(MethodParameter parameter) {
         HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
         if (result == null) {
-            for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
+            List<HandlerMethodArgumentResolver> argumentResolvers = this.requestMappingHandlerAdapter.getArgumentResolvers();
+            for (HandlerMethodArgumentResolver methodArgumentResolver : argumentResolvers) {
                 if (methodArgumentResolver instanceof SopHandlerMethodArgumentResolver) {
                     continue;
                 }
@@ -119,4 +130,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         return result;
     }
 
+    public void setParamValidator(ParamValidator paramValidator) {
+        this.paramValidator = paramValidator;
+    }
 }

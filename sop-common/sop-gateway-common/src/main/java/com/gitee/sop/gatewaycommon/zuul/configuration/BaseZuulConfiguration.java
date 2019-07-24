@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.FormBodyWrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreHttpServletRequestWrapperFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
@@ -41,6 +42,11 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
         ZuulRouteRepository zuulRouteRepository = new ZuulRouteRepository();
         RouteRepositoryContext.setRouteRepository(zuulRouteRepository);
         return zuulRouteRepository;
+    }
+
+    @Bean
+    PreHttpServletRequestWrapperFilter preHttpServletRequestWrapperFilter() {
+        return new PreHttpServletRequestWrapperFilter();
     }
 
     @Bean

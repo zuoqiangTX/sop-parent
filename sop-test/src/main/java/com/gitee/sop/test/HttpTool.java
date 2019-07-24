@@ -270,7 +270,7 @@ public class HttpTool {
         }
 
         public static HTTPMethod fromValue(String v) {
-            return valueOf(v);
+            return valueOf(v.toUpperCase());
         }
     }
 

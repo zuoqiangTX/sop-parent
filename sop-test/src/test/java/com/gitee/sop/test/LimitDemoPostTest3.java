@@ -1,7 +1,7 @@
-package com.gitee.sop;
+package com.gitee.sop.test;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.sop.alipay.AlipaySignature;
+import com.gitee.sop.test.alipay.AlipaySignature;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -12,14 +12,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 限流测试，根据【ip + 路由id】限流
+ * 限流测试，根据appKey限流
  */
-public class LimitDemoPostTest5 extends TestBase {
+public class LimitDemoPostTest3 extends TestBase {
 
     String url = "http://localhost:8081/api"; // zuul
-    String appId = "20190513577548661718777856";
+    String appId = "20190401562373796095328256";
     // 支付宝私钥
-    String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJ0aPPcgTZVC14ONBoVpxcsIAip0QghVx/stbt/XjZXnlDTG1yMNM4eMEcTFmwbrj9jlYrPihBVYadfC2uV53xCDRgADu55q3yYTw3MlKb23Ft9T2HBcHvucnFWQXJpIbWnQhkWs1ClttTFNf3vnl14/sN1xIXXjwsuvT3VX75LdAgMBAAECgYB68z/nQDa3q/oykDocS21qujfHtfi/wTKjVylAsdezC+wnab6RRhGf8XUuhGARiGWpn8whcBNjCTC8lVju4vQ5IIx4Hb74vwDDMtNXeqwkLmARLYu2ELibauezSeqom8/J8cR3ho7Hr4VHPTiC8qvePRmu8AvXVQz2T7SOhEjDGQJBAOm8XOivr+atiknLbQhmo508ON3sjoN9VMwK9cmnup+ZPCsurJTHRja0MJQNdOXObUVJ6wJhs1PHWT+vITfXGJ8CQQCsESzxOYTkZaqBUFjbWVf1rSwjOOsylweTuq44YIJkHhwMjHf3kN/UTXbxsBPUGeT7/+2K5UwQ9snUPr0yTBcDAkA0FMezBWqxgNu+g7iA1bYBVCjrskkzHVsmuA56Z4hbBZ71lEnaQOjxSYdFhhYVGsEYXlciSbjWoyXM3e4N7jzLAkB0ejv+H33CTsAZQZalBdnxSQTz4vf0CyDp9BkzuMELnQZHyF79i2i5gqbd/N+vWMgVfq4CtC3F3gnKT54rii6ZAkAMBIvHriT5Zbs1fW+oxBP1rHqdsRvqs1zEyIadvJgKAFwFEisryfdw2mWm3vxQQ22RlOquBiZEDIlyM0z2m9PJ";
+    String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJvGfQSfZyPb23yL6bV1Pux4X1dDHdwRqgKVcVOWZzvxjVm5AVvJj31VLC/wlu2kbE+8FJUP1I+ZdY0FEFtIdP6DFK1x1cP1B4PeScYXL/VX7PcTZGP/osiUWaBOUaHV+YSC20+OxRbUOPvTj/J3IivD4IDIAwpDKsWDTBiY1b5RAgMBAAECgYAE27/ycPZKjATgcYyseCeqQGbY1eMMhhCDXB3YuYwmtnXuInMEZdjv08Q5CovqhYJLSlZp/8BlaifcahgEgNIFQXmxAF0U0HsNC6W4Dk1gGgQaVmYaZv5ex7uIcFB1qFvlO60kWf82YeRnO5KsFBODOJ1XSNwqjL2GeLSHBSVyQQJBAOsvDmClBsETSdiNSFMz+D9WCnCh1Ip4AoCzA/yG+PRSwYjZDdceP2DXieiZXPlxTFZ7MIXxAafgeyeQA2hpkQUCQQCpkCUSbrZ+nd4BYdnxZOSf0//cUT0o6+3kROX7gsXV7zRAWWxojT6DkGVlduDLZM/hjWeHRjWUxKC/jgbzvundAkBckhUSrWJPNQxoFJRXS6l3JKLPWqOSLVKu3ce/6lCrurc66lSsS9eegrhhuZwDAzmNAMhEsGx6a72OAP2WZ5cRAkBd8cT4X2qw4BpePa6YdcPNYZHCqSfvgje9XwbkwGGH1A3pESJlEsxt7BShkKmfRu1+E/AmHJoXIJHHT5M+fKnpAkA+VfyAAviKeCwUSq+5oUa0B+ozEA3frp/40cKQP7k02aamocAQCDRaC1ZlWffeQqYMnYe1/Mjr/SdX/Ut3X0CC";
 
     @Test
     public void testLimit() throws InterruptedException {
@@ -54,12 +54,12 @@ public class LimitDemoPostTest5 extends TestBase {
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();
         params.put("app_id", appId);
-        params.put("method", "story.get");
+        params.put("method", "alipay.story.get");
         params.put("format", "json");
         params.put("charset", "utf-8");
         params.put("sign_type", "RSA2");
         params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        params.put("version", "1.1");
+        params.put("version", "1.2");
 
         // 业务参数
         Map<String, String> bizContent = new HashMap<>();

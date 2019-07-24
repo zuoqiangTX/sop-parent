@@ -2,7 +2,7 @@
  * Alipay.com Inc.
  * Copyright (c) 2004-2012 All Rights Reserved.
  */
-package com.gitee.sop.alipay;
+package com.gitee.sop.test.alipay;
 
 
 import org.apache.commons.codec.binary.Base64;

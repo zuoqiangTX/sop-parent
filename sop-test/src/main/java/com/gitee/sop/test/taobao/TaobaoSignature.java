@@ -1,6 +1,6 @@
-package com.gitee.sop.taobao;
+package com.gitee.sop.test.taobao;
 
-import com.gitee.sop.alipay.StringUtils;
+import com.gitee.sop.test.alipay.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;

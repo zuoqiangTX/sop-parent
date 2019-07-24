@@ -1,7 +1,7 @@
-package com.gitee.sop;
+package com.gitee.sop.test;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.sop.alipay.AlipaySignature;
+import com.gitee.sop.test.alipay.AlipaySignature;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -12,9 +12,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 限流测试，根据【ip】限流
+ * 限流测试，根据【ip + 路由id】限流
  */
-public class LimitDemoPostTest4 extends TestBase {
+public class LimitDemoPostTest5 extends TestBase {
 
     String url = "http://localhost:8081/api"; // zuul
     String appId = "20190513577548661718777856";
@@ -59,7 +59,7 @@ public class LimitDemoPostTest4 extends TestBase {
         params.put("charset", "utf-8");
         params.put("sign_type", "RSA2");
         params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        params.put("version", "1.0");
+        params.put("version", "1.1");
 
         // 业务参数
         Map<String, String> bizContent = new HashMap<>();

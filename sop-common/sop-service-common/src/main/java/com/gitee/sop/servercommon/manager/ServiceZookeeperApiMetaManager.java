@@ -166,9 +166,8 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      * @return 返回文件夹路径
      */
     protected String uploadFolder(ServiceRouteInfo serviceRouteInfo) throws Exception {
-        String serviceId = serviceRouteInfo.getServiceId();
         // 保存路径
-        String savePath = routeRootPath + "/" + serviceId;
+        String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
         this.zookeeperTool.createOrUpdateData(savePath, serviceRouteInfoJson);

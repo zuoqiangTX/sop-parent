@@ -122,7 +122,6 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
                 }
                 if (methodArgumentResolver.supportsParameter(parameter)) {
                     result = methodArgumentResolver;
-                    System.out.println(parameter + "  " + result.getClass().getName());
                     this.argumentResolverCache.put(parameter, result);
                     break;
                 }

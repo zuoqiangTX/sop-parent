@@ -32,7 +32,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      * zookeeper存放接口路由信息的根目录
      */
     public static final String SOP_SERVICE_ROUTE_PATH = ServiceConstants.SOP_SERVICE_ROUTE_PATH;
-    public static final String PATH_START_CHAR = "/";
+    public static final String PATH_SPLIT = "/";
 
     private final String routeRootPath = SOP_SERVICE_ROUTE_PATH;
 
@@ -60,6 +60,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     protected void uploadServiceId(Environment environment) {
         try {
+            this.checkZookeeperNode(serviceId, "serviceId（" + serviceId + "）不能有斜杠字符'/'");
             ServiceRouteInfo serviceRouteInfo = this.buildServiceRouteInfo();
             // 保存路径
             String savePath = routeRootPath + "/" + serviceId;
@@ -109,9 +110,11 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
         GatewayRouteDefinition gatewayRouteDefinition = new GatewayRouteDefinition();
+        String routeId = apiMeta.fetchNameVersion();
+        this.checkZookeeperNode(routeId, "接口定义（" + routeId + "）不能有斜杠字符'/'");
         // 唯一id规则：接口名 + 版本号
         BeanUtils.copyProperties(apiMeta, gatewayRouteDefinition);
-        gatewayRouteDefinition.setId(apiMeta.fetchNameVersion());
+        gatewayRouteDefinition.setId(routeId);
         gatewayRouteDefinition.setFilters(Collections.emptyList());
         String uri = this.buildUri(serviceApiInfo, apiMeta);
         String path = this.buildServletPath(serviceApiInfo, apiMeta);
@@ -129,8 +132,8 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         if (servletPath == null) {
             servletPath = "";
         }
-        if (!servletPath.startsWith(PATH_START_CHAR)) {
-            servletPath = PATH_START_CHAR + servletPath;
+        if (!servletPath.startsWith(PATH_SPLIT)) {
+            servletPath = PATH_SPLIT + servletPath;
         }
         return servletPath;
     }
@@ -163,8 +166,9 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      * @return 返回文件夹路径
      */
     protected String uploadFolder(ServiceRouteInfo serviceRouteInfo) throws Exception {
+        String serviceId = serviceRouteInfo.getServiceId();
         // 保存路径
-        String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
+        String savePath = routeRootPath + "/" + serviceId;
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
         this.zookeeperTool.createOrUpdateData(savePath, serviceRouteInfoJson);
@@ -181,10 +185,16 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         List<GatewayRouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
         for (GatewayRouteDefinition routeDefinition : routeDefinitionList) {
             // 父目录/子目录
-            String savePath = parentPath + PATH_START_CHAR + routeDefinition.getId();
+            String savePath = parentPath + PATH_SPLIT + routeDefinition.getId();
             String routeDefinitionJson = JSON.toJSONString(routeDefinition);
             log.info("上传路由配置到zookeeper，路径:{}，路由数据:{}", savePath, routeDefinitionJson);
             this.zookeeperTool.createOrUpdateData(savePath, routeDefinitionJson);
+        }
+    }
+
+    private void checkZookeeperNode(String path, String errorMsg) {
+        if (path.contains(PATH_SPLIT)) {
+            throw new IllegalArgumentException(errorMsg);
         }
     }
 

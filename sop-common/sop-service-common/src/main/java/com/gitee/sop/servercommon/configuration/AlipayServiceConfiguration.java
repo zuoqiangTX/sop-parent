@@ -33,7 +33,6 @@ public class AlipayServiceConfiguration extends BaseServiceConfiguration {
     protected void doAfter() {
         super.doAfter();
         SopHandlerMethodArgumentResolver sopHandlerMethodArgumentResolver = ServiceConfig.getInstance().getMethodArgumentResolver();
-        List<HandlerMethodArgumentResolver> defaultArgumentResolvers = requestMappingHandlerAdapter.getArgumentResolvers();
-        sopHandlerMethodArgumentResolver.setResolvers(defaultArgumentResolvers);
+        sopHandlerMethodArgumentResolver.setRequestMappingHandlerAdapter(requestMappingHandlerAdapter);
     }
 }

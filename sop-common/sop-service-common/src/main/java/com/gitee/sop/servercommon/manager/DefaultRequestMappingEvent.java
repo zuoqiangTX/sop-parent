@@ -24,6 +24,9 @@ import java.util.Set;
 @Getter
 public class DefaultRequestMappingEvent implements RequestMappingEvent {
 
+    /** 接口名规则：允许字母、数字、点、下划线 */
+    private static final String REGEX_API_NAME = "^[a-zA-Z0-9\\.\\_\\-]+$";
+
     private ApiMetaManager apiMetaManager;
     private Environment environment;
 
@@ -85,6 +88,7 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
             if (name == null) {
                 name = buildName(path);
             }
+            this.checkApiName(name);
             ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, version);
             apiMeta.setIgnoreValidate(BooleanUtils.toInteger(apiMappingInfo.isIgnoreValidate()));
             apiMeta.setMergeResult(BooleanUtils.toInteger(apiMappingInfo.isMergeResult()));
@@ -92,6 +96,12 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
             return apiMeta;
         }
         return null;
+    }
+
+    protected void checkApiName(String name) {
+        if (!name.matches(REGEX_API_NAME)) {
+            throw new IllegalArgumentException("接口名称只允许【字母、数字、点(.)、下划线(_)、减号(-)】，错误接口：" + name);
+        }
     }
 
     protected String buildName(String path) {

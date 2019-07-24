@@ -14,6 +14,12 @@ public abstract class BaseZuulFilter extends ZuulFilter {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
 
+    public static final int HTTP_SERVLET_REQUEST_WRAPPER_FILTER_ORDER = -2000;
+
+    public static final int SERVLET_30_WRAPPER_FILTER_ORDER = HTTP_SERVLET_REQUEST_WRAPPER_FILTER_ORDER + 1;
+
+    public static final int FORM_BODY_WRAPPER_FILTER_ORDER = SERVLET_30_WRAPPER_FILTER_ORDER + 1;
+
     /** 签名验证过滤 */
     public static final int PRE_VALIDATE_FILTER_ORDER = -1000;
 

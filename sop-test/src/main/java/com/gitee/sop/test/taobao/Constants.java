@@ -1,4 +1,4 @@
-package com.gitee.sop.taobao;
+package com.gitee.sop.test.taobao;
 
 /**
  * @author tanghc

@@ -1,7 +1,6 @@
-package com.gitee.sop;
+package com.gitee.sop.test;
 
 import com.alibaba.fastjson.JSON;
-import junit.framework.TestCase;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 

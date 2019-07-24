@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class EasyopenClientPostTest extends TestBase {
 
-    String url = "http://localhost:8081/api";
+    String url = "http://localhost:8081";
     String appKey = "easyopen_test";
     String secret = "G9w0BAQEFAAOCAQ8AMIIBCgKCA";
 

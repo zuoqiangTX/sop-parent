@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  * @author tanghc
  */
 public class HttpTool {
-    private static final String METHOD_GET = "get";
     private Map<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
     private OkHttpClient httpClient;

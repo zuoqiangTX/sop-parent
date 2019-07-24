@@ -1,5 +1,8 @@
 # changelog
 
+## 1.13.1
+
+- 支持json方式请求（application/json）
 
 ## 1.13.0
 

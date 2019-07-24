@@ -1,5 +1,7 @@
 package com.gitee.sop.gatewaycommon.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -35,6 +37,9 @@ public class RequestUtil {
     public static final String MULTIPART = "multipart/";
 
     private static final String UTF8 = "UTF-8";
+    private static final String IP_UNKNOWN = "unknown";
+    private static final String IP_LOCAL = "127.0.0.1";
+    private static final int IP_LEN = 15;
 
     /**
      * 将get类型的参数转换成map，
@@ -114,6 +119,31 @@ public class RequestUtil {
         return params;
     }
 
+    /**
+     * 转换json请求到Map，
+     * @param request 请求类型为application/json的Request
+     * @return 返回Map
+     */
+    public static Map<String, String> convertJsonRequestToMap(HttpServletRequest request) {
+        try {
+            String text = getText(request);
+            JSONObject parseObject = JSON.parseObject(text);
+            Map<String, String> params = new HashMap<>(parseObject.size());
+            for (Map.Entry<String, Object> entry : parseObject.entrySet()) {
+                params.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+            return params;
+        } catch (IOException e) {
+            log.error("解析json请求失败", e);
+            return Collections.emptyMap();
+        }
+    }
+
+    /**
+     * 是否是文件上传请求
+     * @param request 请求
+     * @return true：是
+     */
     public static boolean isMultipart(HttpServletRequest request) {
         String contentType = request.getContentType();
         // Don't use this filter on GET method
@@ -130,29 +160,32 @@ public class RequestUtil {
 
     public static String getIP(HttpServletRequest request) {
         String ipAddress = request.getHeader("x-forwarded-for");
-        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+        if (ipAddress == null || ipAddress.length() == 0 || IP_UNKNOWN.equalsIgnoreCase(ipAddress)) {
             ipAddress = request.getHeader("Proxy-Client-IP");
         }
-
-        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+        if (ipAddress == null || ipAddress.length() == 0 || IP_UNKNOWN.equalsIgnoreCase(ipAddress)) {
             ipAddress = request.getHeader("WL-Proxy-Client-IP");
         }
-
-        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+        if (ipAddress == null || ipAddress.length() == 0 || IP_UNKNOWN.equalsIgnoreCase(ipAddress)) {
             ipAddress = request.getRemoteAddr();
-            if ("127.0.0.1".equals(ipAddress)) {
+            if (IP_LOCAL.equals(ipAddress)) {
+                // 根据网卡取本机配置的IP
                 try {
                     InetAddress inet = InetAddress.getLocalHost();
                     ipAddress = inet.getHostAddress();
-                } catch (UnknownHostException var3) {
+                } catch (UnknownHostException e) {
+                    // ignore
                 }
             }
+
         }
 
-        if (ipAddress != null && ipAddress.length() > 15 && ipAddress.indexOf(",") > 0) {
-            ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+        // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+        if (ipAddress != null && ipAddress.length() > IP_LEN) {
+            if (ipAddress.indexOf(",") > 0) {
+                ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+            }
         }
-
         return ipAddress;
     }
 }

@@ -6,6 +6,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -22,12 +23,20 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * HTTP请求工具
+ *
  * @author tanghc
  */
 public class OpenHttp {
+    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+
     private Map<String, List<Cookie>> cookieStore = new HashMap<String, List<Cookie>>();
 
     private OkHttpClient httpClient;
+
+    public OpenHttp() {
+        this(new OpenConfig());
+    }
 
     public OpenHttp(OpenConfig openConfig) {
         this.initHttpClient(openConfig);
@@ -69,24 +78,18 @@ public class OpenHttp {
     }
 
     /**
-     * 提交表单
-     *
-     * @param url url
-     * @param form 参数
+     * 请求json数据，contentType=application/json
+     * @param url 请求路径
+     * @param json json数据
      * @param header header
-     * @param method 请求方式，post，get等
-     * @return
+     * @return 返回响应结果
      * @throws IOException
      */
-    public String requestFormBody(String url, Map<String, String> form, Map<String, String> header, String method) throws IOException {
-        FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
-        for (Map.Entry<String, String> entry : form.entrySet()) {
-            paramBuilder.add(entry.getKey(), entry.getValue());
-        }
-        FormBody formBody = paramBuilder.build();
+    public String requestJson(String url, String json, Map<String, String> header) throws IOException {
+        RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
         Request.Builder requestBuilder = new Request.Builder()
                 .url(url)
-                .method(method, formBody);
+                .post(body);
         // 添加header
         addHeader(requestBuilder, header);
 
@@ -99,6 +102,73 @@ public class OpenHttp {
         } finally {
             response.close();
         }
+    }
+
+    /**
+     * 提交表单
+     *
+     * @param url    url
+     * @param form   参数
+     * @param header header
+     * @param method 请求方式，post，get等
+     * @return
+     * @throws IOException
+     */
+    public String request(String url, Map<String, String> form, Map<String, String> header, String method) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
+        // 添加header
+        addHeader(requestBuilder, header);
+
+        Request request = requestBuilder.build();
+        Response response = httpClient
+                .newCall(request)
+                .execute();
+        try {
+            return response.body().string();
+        } finally {
+            response.close();
+        }
+    }
+
+    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, String method) {
+        switch (method) {
+            case "get":
+                return new Request.Builder()
+                        .url(buildHttpUrl(url, form))
+                        .get();
+            case "head":
+                return new Request.Builder()
+                        .url(buildHttpUrl(url, form))
+                        .head();
+            case "put":
+                return new Request.Builder()
+                        .url(url)
+                        .put(buildFormBody(form));
+            case "delete":
+                return new Request.Builder()
+                        .url(url)
+                        .delete(buildFormBody(form));
+            default:
+                return new Request.Builder()
+                        .url(url)
+                        .post(buildFormBody(form));
+        }
+    }
+
+    public static HttpUrl buildHttpUrl(String url, Map<String, String> form) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
+        }
+        return urlBuilder.build();
+    }
+
+    public static FormBody buildFormBody(Map<String, String> form) {
+        FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            paramBuilder.add(entry.getKey(), entry.getValue());
+        }
+        return paramBuilder.build();
     }
 
     /**
@@ -161,5 +231,6 @@ public class OpenHttp {
     public void setHttpClient(OkHttpClient httpClient) {
         this.httpClient = httpClient;
     }
+
 
 }

@@ -105,10 +105,10 @@ public class AlipayController {
     public StoryVO getStory2(StoryParam story, HttpServletRequest request) {
         log.info("获取故事信息参数, story: {}", story);
         // 获取其它参数
-        System.out.println(request.getParameter("app_id"));
+        String app_id = request.getParameter("app_id");
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;
-        storyVO.name = "白雪公主";
+        storyVO.name = "白雪公主, app_id:" + app_id;
         storyVO.gmt_create = new Date();
         return storyVO;
     }

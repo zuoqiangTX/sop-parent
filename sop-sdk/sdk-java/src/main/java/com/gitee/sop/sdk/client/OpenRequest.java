@@ -42,9 +42,7 @@ public class OpenRequest {
                     }
                     return openHttp.get(url, header);
                 } else {
-                    return openHttp.request(url, form, header, requestMethod.name());
-                    // 下面这种方式也可以，以application/json方式请求
-                    // return openHttp.requestJson(url, JSON.toJSONString(form), header);
+                     return openHttp.requestJson(url, JSON.toJSONString(form), header);
                 }
             }
         } catch (IOException e) {

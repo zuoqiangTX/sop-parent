@@ -1,4 +1,4 @@
-package com.gitee.sop.alipay;
+package com.gitee.sop.test.alipay;
 
 /**
  * 字符串工具类。

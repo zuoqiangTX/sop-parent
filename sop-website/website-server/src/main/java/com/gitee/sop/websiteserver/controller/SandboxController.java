@@ -1,7 +1,7 @@
 package com.gitee.sop.websiteserver.controller;
 
 import com.gitee.sop.websiteserver.bean.HttpTool;
-import com.gitee.sop.websiteserver.bean.UploadFile;
+import com.gitee.sop.websiteserver.bean.HttpTool.*;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
 import com.gitee.sop.websiteserver.util.UploadUtil;
@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 
 /**
  * 沙箱环境代理类
@@ -113,7 +114,7 @@ public class SandboxController {
             if (!CollectionUtils.isEmpty(files)) {
                 responseData = httpTool.requestFile(url, params, Collections.emptyMap(), files);
             } else {
-                responseData = httpTool.request(url, params, Collections.emptyMap(), httpMethod);
+                responseData = httpTool.request(url, params, Collections.emptyMap(), HTTPMethod.fromValue(httpMethod));
             }
             result.apiResult = responseData;
             return result;

@@ -1,4 +1,4 @@
-package com.gitee.sop.websiteserver.bean;
+package com.gitee.sop.test;
 
 import lombok.Data;
 import lombok.Getter;
@@ -262,12 +262,15 @@ public class HttpTool {
         HEAD,
         DELETE;
 
+        private HTTPMethod() {
+        }
+
         public String value() {
             return this.name();
         }
 
         public static HTTPMethod fromValue(String v) {
-            return valueOf(v.toUpperCase());
+            return valueOf(v);
         }
     }
 

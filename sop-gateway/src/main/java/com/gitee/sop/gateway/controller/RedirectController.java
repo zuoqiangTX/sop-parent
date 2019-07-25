@@ -32,15 +32,4 @@ public class RedirectController {
         request.getRequestDispatcher(path).forward(request, response);
     }
 
-    @RequestMapping("/{method}")
-    public void redirect2(
-            @PathVariable("method") String method
-            , HttpServletRequest request
-            , HttpServletResponse response
-    ) throws ServletException, IOException {
-        request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, method);
-        request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, "1.0");
-        request.getRequestDispatcher(path).forward(request, response);
-    }
-
 }

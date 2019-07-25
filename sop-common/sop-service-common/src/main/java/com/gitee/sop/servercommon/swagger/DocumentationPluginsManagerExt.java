@@ -3,7 +3,7 @@ package com.gitee.sop.servercommon.swagger;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
-import com.gitee.sop.servercommon.mapping.MappingUtil;
+import com.gitee.sop.servercommon.mapping.RouteUtil;
 import com.google.common.base.Optional;
 import springfox.documentation.service.Operation;
 import springfox.documentation.service.StringVendorExtension;
@@ -42,7 +42,7 @@ public class DocumentationPluginsManagerExt extends DocumentationPluginsManager 
             if (abilityOptional.isPresent()) {
                 ApiAbility apiAbility = abilityOptional.get();
                 String mappingPattern = operationContext.requestMappingPattern();
-                String name = MappingUtil.buildApiName(mappingPattern);
+                String name = RouteUtil.buildApiName(mappingPattern);
                 String version = buildVersion(apiAbility.version());
                 vendorExtensions.add(new StringVendorExtension(SOP_NAME, name));
                 vendorExtensions.add(new StringVendorExtension(SOP_VERSION, version));

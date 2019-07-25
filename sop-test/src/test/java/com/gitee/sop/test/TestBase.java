@@ -22,6 +22,14 @@ public class TestBase extends TestCase {
      */
     public static String post(String url, Map<String, String> params) {
         try {
+            return httpTool.request(url, params, Collections.emptyMap(), HttpTool.HTTPMethod.POST);
+        } catch (IOException e) {
+            throw new RuntimeException("网络请求异常", e);
+        }
+    }
+
+    public static String postJson(String url, Map<String, String> params) {
+        try {
             return httpTool.requestJson(url, JSON.toJSONString(params), Collections.emptyMap());
         } catch (IOException e) {
             throw new RuntimeException("网络请求异常", e);

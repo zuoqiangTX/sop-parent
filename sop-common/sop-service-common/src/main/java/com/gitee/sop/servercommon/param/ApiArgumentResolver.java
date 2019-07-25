@@ -1,9 +1,13 @@
 package com.gitee.sop.servercommon.param;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
-import com.gitee.sop.servercommon.bean.ParamNames;
+import com.gitee.sop.servercommon.bean.OpenContext;
+import com.gitee.sop.servercommon.bean.OpenContextImpl;
+import com.gitee.sop.servercommon.bean.ServiceContext;
+import com.gitee.sop.servercommon.util.OpenUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -14,6 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author tanghc
  */
+@Slf4j
 public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
     private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache = new ConcurrentHashMap<>(256);
@@ -69,14 +77,38 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
      * @return 没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
-        String bizContent = nativeWebRequest.getParameter(ParamNames.BIZ_CONTENT_NAME);
-        Object bizObj = null;
-        if (bizContent != null) {
-            Class<?> parameterType = methodParameter.getParameterType();
-            bizObj = JSON.parseObject(bizContent, parameterType);
+        HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
+        JSONObject requestParams = OpenUtil.getRequestParams(request);
+        Class<?> parameterType = methodParameter.getParameterType();
+        // 方法参数类型
+        Class<?> bizObjClass = parameterType;
+        boolean isOpenRequestParam = parameterType == OpenContext.class;
+        // 参数是OpenRequest，则取OpenRequest的泛型参数类型
+        if (isOpenRequestParam) {
+            bizObjClass = this.getOpenRequestGenericParameterClass(methodParameter);
         }
+        OpenContext openContext = new OpenContextImpl(requestParams, bizObjClass);
+        ServiceContext.getCurrentContext().setOpenContext(openContext);
+        Object bizObj = openContext.getBizObject();
         this.bindUploadFile(bizObj, nativeWebRequest);
-        return bizObj;
+        return isOpenRequestParam ? openContext : bizObj;
+    }
+
+    /**
+     * 获取泛型参数类型
+     * @param methodParameter 参数
+     * @return 返回泛型参数class
+     */
+    protected Class<?> getOpenRequestGenericParameterClass(MethodParameter methodParameter) {
+        Type genericParameterType = methodParameter.getGenericParameterType();
+        Class<?> bizObjClass = null;
+        if (genericParameterType instanceof ParameterizedType) {
+            Type[] params = ((ParameterizedType) genericParameterType).getActualTypeArguments();
+            if (params != null && params.length >= 1) {
+                bizObjClass = (Class<?>) params[0];
+            }
+        }
+        return bizObjClass;
     }
 
     /**

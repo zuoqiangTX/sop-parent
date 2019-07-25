@@ -2,6 +2,8 @@ package com.gitee.sop.storyweb.controller;
 
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
+import com.gitee.sop.servercommon.bean.OpenContext;
+import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.story.api.domain.Story;
 import com.gitee.sop.storyweb.controller.param.StoryParam;
 import io.swagger.annotations.Api;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -97,15 +98,15 @@ public class AlipayController {
     /**
      * 参数绑定
      * @param story 对应biz_content中的内容，并自动JSR-303校验
-     * @param request
      * @return
      */
     @ApiOperation(value = "获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
     @ApiMapping(value = "alipay.story.find")
-    public StoryVO getStory2(StoryParam story, HttpServletRequest request) {
+    public StoryVO getStory2(StoryParam story) {
         log.info("获取故事信息参数, story: {}", story);
         // 获取其它参数
-        String app_id = request.getParameter("app_id");
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        String app_id = openContext.getAppId();
         StoryVO storyVO = new StoryVO();
         storyVO.id = 1L;
         storyVO.name = "白雪公主, app_id:" + app_id;

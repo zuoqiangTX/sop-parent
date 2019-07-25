@@ -49,7 +49,7 @@ namespace SDKCSharp.Client
                     }
                     return openHttp.Get(url, header);
                 }
-                return this.openHttp.RequestFormBody(url, form, header);
+                return this.openHttp.PostJsonBody(url, JsonUtil.ToJSONString(form), header);
             }
         }
 

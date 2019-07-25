@@ -4,7 +4,7 @@ import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
-import com.gitee.sop.servercommon.mapping.MappingUtil;
+import com.gitee.sop.servercommon.mapping.RouteUtil;
 import lombok.Getter;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.env.Environment;
@@ -108,7 +108,7 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
 
 
     protected String buildName(String path) {
-        return MappingUtil.buildApiName(path);
+        return RouteUtil.buildApiName(path);
     }
 
 }

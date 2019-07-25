@@ -1,10 +1,7 @@
-package com.gitee.sop.servercommon.mapping;
+package com.gitee.sop.gatewaycommon.util;
 
 import org.springframework.util.StringUtils;
 
-/**
- * @author tanghc
- */
 public class MappingUtil {
 
     public static final char SEPARATOR_CHAR = '/';

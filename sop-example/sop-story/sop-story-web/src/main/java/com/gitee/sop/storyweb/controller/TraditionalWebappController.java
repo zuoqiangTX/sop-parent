@@ -22,7 +22,7 @@ import java.util.Collection;
 public class TraditionalWebappController {
 
 
-    // http://localhost:8081/getFoodById?id=1  网关入口
+    // http://localhost:8081/rest/food/getFoodById?id=1  网关入口
     // http://localhost:2222/food/getFoodById/?id=12  本地入口
     @ApiMapping(value = "getFoodById", method = RequestMethod.GET)
     public Food getFoodById(Integer id) {
@@ -33,7 +33,7 @@ public class TraditionalWebappController {
         return food;
     }
 
-    // http://localhost:8081/getFoodById?id=2&version=1.1   网关入口
+    // http://localhost:8081/rest/food/getFoodById?id=2&version=1.1   网关入口
     // http://localhost:2222/food/getFoodById/?id=12&version=1.1
     @ApiMapping(value = "getFoodById", method = RequestMethod.GET, version = "1.1")
     public Food getFoodById2(Integer id) {
@@ -44,13 +44,13 @@ public class TraditionalWebappController {
         return food;
     }
 
-    // http://localhost:8081/getFoodByObj?id=2
-    @ApiMapping(value = "getFoodByObj", method = RequestMethod.GET)
+    // http://localhost:8081/rest/food/get/getFoodByObj?id=2
+    @ApiMapping(value = "/get/getFoodByObj", method = RequestMethod.GET)
     public Food getFoodByObj(Food food) {
         return food;
     }
 
-    // http://localhost:8081/saveFood
+    // http://localhost:8081/rest/food/saveFood
     @ApiMapping(value = "saveFood", method = RequestMethod.POST)
     public Food saveFood(@RequestBody Food food) {
         food.setId(3);

@@ -1,6 +1,7 @@
 package com.gitee.sop.servercommon.manager;
 
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
+import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
 import com.gitee.sop.servercommon.mapping.MappingUtil;
@@ -83,9 +84,10 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
             ApiMappingInfo apiMappingInfo = condition.getApiMappingInfo();
             String name = apiMappingInfo.getName();
             String version = apiMappingInfo.getVersion();
+            // 方法完整的path，如: /goods/listGoods,/users/user/get
             String path = patterns.iterator().next();
             // 不是ApiMapping注解的接口，name属性是null
-            if (name == null) {
+            if (name == null || ServiceConfig.getInstance().isWebappMode()) {
                 name = buildName(path);
             }
             this.checkApiName(name);
@@ -103,6 +105,7 @@ public class DefaultRequestMappingEvent implements RequestMappingEvent {
             throw new IllegalArgumentException("接口名称只允许【字母、数字、点(.)、下划线(_)、减号(-)】，错误接口：" + name);
         }
     }
+
 
     protected String buildName(String path) {
         return MappingUtil.buildApiName(path);

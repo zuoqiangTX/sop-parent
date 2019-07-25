@@ -44,8 +44,8 @@ public class TraditionalWebappController {
         return food;
     }
 
-    // http://localhost:8081/rest/food/get/getFoodByObj?id=2
-    @ApiMapping(value = "/get/getFoodByObj", method = RequestMethod.GET)
+    // http://localhost:8081/rest/food/getFoodByObj?id=2
+    @ApiMapping(value = "ggetFoodByObj", method = RequestMethod.GET)
     public Food getFoodByObj(Food food) {
         return food;
     }

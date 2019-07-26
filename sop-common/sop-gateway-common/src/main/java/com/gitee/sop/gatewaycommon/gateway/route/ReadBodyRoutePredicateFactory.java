@@ -44,7 +44,7 @@ public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory
 
     private static final String TEST_ATTRIBUTE = "read_body_predicate_test_attribute";
     private static final String CACHE_REQUEST_BODY_OBJECT_KEY = "cachedRequestBodyObject";
-    private static final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();
+    private static final List<HttpMessageReader<?>> HTTP_MESSAGE_READERS = HandlerStrategies.withDefaults().messageReaders();
 
 
     public ReadBodyRoutePredicateFactory() {
@@ -108,7 +108,7 @@ public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory
                                 return cachedFlux;
                             }
                         };
-                        return ServerRequest.create(exchange.mutate().request(mutatedRequest).build(), messageReaders)
+                        return ServerRequest.create(exchange.mutate().request(mutatedRequest).build(), HTTP_MESSAGE_READERS)
                                 .bodyToMono(inClass)
                                 .doOnNext(objectValue -> {
                                     exchange.getAttributes().put(CACHE_REQUEST_BODY_OBJECT_KEY, objectValue);

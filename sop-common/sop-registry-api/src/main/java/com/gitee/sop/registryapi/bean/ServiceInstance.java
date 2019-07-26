@@ -2,6 +2,9 @@ package com.gitee.sop.registryapi.bean;
 
 import lombok.Data;
 
+/**
+ * @author thc
+ */
 @Data
 public class ServiceInstance {
     /**

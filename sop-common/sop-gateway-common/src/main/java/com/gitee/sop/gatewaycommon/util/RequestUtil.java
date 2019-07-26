@@ -105,7 +105,7 @@ public class RequestUtil {
         DiskFileItemFactory factory = new DiskFileItemFactory();
         //2、创建一个文件上传解析器
         ServletFileUpload upload = new ServletFileUpload(factory);
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>(16);
         try {
             List<FileItem> fileItems = upload.parseRequest(request);
             for (FileItem fileItem : fileItems) {

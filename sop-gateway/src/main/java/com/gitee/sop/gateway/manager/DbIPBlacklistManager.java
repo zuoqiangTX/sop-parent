@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * 限流配置管理
+ *
  * @author tanghc
  */
 @Slf4j
@@ -52,6 +53,8 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
                     log.info("移除IP黑名单，ip:{}", ip);
                     remove(ip);
                     break;
+                default:
+                    log.error("IP黑名单，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

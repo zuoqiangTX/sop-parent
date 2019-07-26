@@ -60,6 +60,8 @@ public class DbLimitConfigManager extends DefaultLimitConfigManager {
                     log.info("更新限流配置信息，configLimitDto:{}", configLimitDto);
                     update(configLimitDto);
                     break;
+                default:
+                    log.error("限流配置信息，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

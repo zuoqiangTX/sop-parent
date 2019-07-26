@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * 限流拦截器
+ *
  * @author tanghc
  */
 public class PreLimitFilter extends BaseZuulFilter {
@@ -36,8 +37,7 @@ public class PreLimitFilter extends BaseZuulFilter {
     }
 
     @Override
-    protected Object doRun(RequestContext requestContext) throws ZuulException
-    {
+    protected Object doRun(RequestContext requestContext) throws ZuulException {
         ApiConfig apiConfig = ApiConfig.getInstance();
         // 限流功能未开启，直接返回
         if (!apiConfig.isOpenLimit()) {
@@ -75,14 +75,21 @@ public class PreLimitFilter extends BaseZuulFilter {
 
         // 最多7种情况
         String[] limitKeys = new String[]{
-                routeId, // 根据路由ID限流
-                appKey, // 根据appKey限流
-                routeId + appKey, // 根据路由ID + appKey限流
+                // 根据路由ID限流
+                routeId,
+                // 根据appKey限流
+                appKey,
+                // 根据路由ID + appKey限流
+                routeId + appKey,
 
-                ip, // 根据ip限流
-                ip + routeId, // 根据ip+路由id限流
-                ip + appKey, // 根据ip+appKey限流
-                ip + routeId + appKey, // 根据ip+路由id+appKey限流
+                // 根据ip限流
+                ip,
+                // 根据ip+路由id限流
+                ip + routeId,
+                // 根据ip+appKey限流
+                ip + appKey,
+                // 根据ip+路由id+appKey限流
+                ip + routeId + appKey,
         };
 
         List<ConfigLimitDto> limitConfigList = new ArrayList<>();

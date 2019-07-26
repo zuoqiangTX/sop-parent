@@ -9,7 +9,7 @@ import lombok.Data;
 public class LogMonitorInstanceVO {
     private String id;
     private int treeId;
-    // 表主键
+    /** 表主键 */
     private long rawId;
     private String name;
     private String version;

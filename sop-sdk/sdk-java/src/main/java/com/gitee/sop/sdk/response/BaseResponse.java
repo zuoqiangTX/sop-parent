@@ -16,7 +16,7 @@ import lombok.Setter;
  * },
  * "sign": "ERITJKEIJKJHKKKKKKKHJEREEEEEEEEEEE"
  * }
- *
+ * @author thc
  */
 @Setter
 @Getter

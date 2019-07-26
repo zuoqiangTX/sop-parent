@@ -115,7 +115,7 @@ public class ServiceApi {
     List<ServiceInstanceVO> listService(ServiceSearchParam param) {
         List<ServiceInfo> serviceInfos;
         try {
-            serviceInfos = registryService.listAllService(1, 99999/* 获取所有实例 */);
+            serviceInfos = registryService.listAllService(1, 99999);
         } catch (Exception e) {
             log.error("获取服务实例失败", e);
             return Collections.emptyList();

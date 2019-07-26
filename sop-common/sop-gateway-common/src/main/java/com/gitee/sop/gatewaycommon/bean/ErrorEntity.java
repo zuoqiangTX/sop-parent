@@ -6,6 +6,9 @@ import lombok.ToString;
 
 import java.util.Objects;
 
+/**
+ * @author thc
+ */
 @Getter
 @Setter
 @ToString
@@ -19,8 +22,12 @@ public class ErrorEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ErrorEntity that = (ErrorEntity) o;
         return id.equals(that.id);
     }

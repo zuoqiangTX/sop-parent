@@ -2,6 +2,10 @@ package com.gitee.sop.sdk.util;
 
 import java.security.MessageDigest;
 
+/**
+ * MD5工具类
+ * @author thc
+ */
 public class MD5Util {
 
     private static final String MD5 = "MD5";

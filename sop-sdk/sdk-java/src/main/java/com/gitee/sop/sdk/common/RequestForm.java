@@ -6,6 +6,10 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 请求form
+ * @author thc
+ */
 @Getter
 @Setter
 public class RequestForm  {

@@ -13,6 +13,11 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface IsvInfoMapper extends CrudMapper<IsvInfo, Long> {
 
+    /**
+     * 获取isv详细信息
+     * @param appKey appKey
+     * @return 返回详细信息，没有返回null
+     */
     @Select("SELECT  " +
             "  t.app_key appKey " +
             "  ,t.status " +

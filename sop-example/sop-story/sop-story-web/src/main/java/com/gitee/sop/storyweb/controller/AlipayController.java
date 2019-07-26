@@ -64,6 +64,13 @@ public class AlipayController {
         return story;
     }
 
+    // 忽略验证
+    @ApiMapping(value = "story.get", version = "2.1", ignoreValidate = true)
+    public Story getStory21(Story story) {
+        story.setName(story.getName() + ", story.get2.1, ignoreValidate = true");
+        return story;
+    }
+
     // http://localhost:2222/getStory2
     // 遗留接口具备开放平台能力
     @ApiAbility

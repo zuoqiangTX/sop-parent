@@ -44,14 +44,17 @@ public class OpenHttp {
 
     protected void initHttpClient(OpenConfig openConfig) {
         httpClient = new OkHttpClient.Builder()
-                .connectTimeout(openConfig.getConnectTimeoutSeconds(), TimeUnit.SECONDS) // 设置链接超时时间，默认10秒
+                // 设置链接超时时间
+                .connectTimeout(openConfig.getConnectTimeoutSeconds(), TimeUnit.SECONDS)
                 .readTimeout(openConfig.getReadTimeoutSeconds(), TimeUnit.SECONDS)
                 .writeTimeout(openConfig.getWriteTimeoutSeconds(), TimeUnit.SECONDS)
                 .cookieJar(new CookieJar() {
+                    @Override
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         cookieStore.put(httpUrl.host(), list);
                     }
 
+                    @Override
                     public List<Cookie> loadForRequest(HttpUrl httpUrl) {
                         List<Cookie> cookies = cookieStore.get(httpUrl.host());
                         return cookies != null ? cookies : new ArrayList<Cookie>();
@@ -79,8 +82,9 @@ public class OpenHttp {
 
     /**
      * 请求json数据，contentType=application/json
-     * @param url 请求路径
-     * @param json json数据
+     *
+     * @param url    请求路径
+     * @param json   json数据
      * @param header header
      * @return 返回响应结果
      * @throws IOException
@@ -188,9 +192,14 @@ public class OpenHttp {
         bodyBuilder.setType(MultipartBody.FORM);
 
         for (UploadFile uploadFile : files) {
-            bodyBuilder.addFormDataPart(uploadFile.getName(), // 请求的名字
-                    uploadFile.getFileName(), // 文件的文字，服务器端用来解析的
-                    RequestBody.create(null, uploadFile.getFileData()) // 创建RequestBody，把上传的文件放入
+
+            bodyBuilder.addFormDataPart(
+                    // 请求的名字
+                    uploadFile.getName(),
+                    // 文件的文字，服务器端用来解析的
+                    uploadFile.getFileName(),
+                    // 创建RequestBody，把上传的文件放入
+                    RequestBody.create(null, uploadFile.getFileData())
             );
         }
 

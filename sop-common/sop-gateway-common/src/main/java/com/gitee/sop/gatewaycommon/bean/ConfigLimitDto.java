@@ -13,6 +13,9 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * @author thc 
+ */
 @Data
 public class ConfigLimitDto {
 

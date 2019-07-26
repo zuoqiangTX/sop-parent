@@ -84,6 +84,8 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
                     log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
                     update(routeConfig);
                     break;
+                default:
+                    log.error("路由配置信息，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

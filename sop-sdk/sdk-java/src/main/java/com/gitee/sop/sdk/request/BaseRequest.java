@@ -31,6 +31,8 @@ import java.util.Map;
  * biz_content	    String	是		请求参数的集合，最大长度不限，除公共参数外所有请求参数都必须放在这个参数中传递，具体参照各产品快速接入文档
  *
  * @param <T> 对应的Response对象
+ *
+ * @author thc
  */
 public abstract class BaseRequest<T extends BaseResponse> {
 
@@ -47,6 +49,10 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     private Class<T> responseClass = (Class<T>) ClassUtil.getSuperClassGenricType(this.getClass(), 0);;
 
+    /**
+     * 定义接口名称
+     * @return 接口名称
+     */
     protected abstract String method();
 
     public BaseRequest() {
@@ -80,7 +86,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
 
     public RequestForm createRequestForm(OpenConfig openConfig) {
         // 公共请求参数
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<String, String>(16);
         params.put(openConfig.getMethodName(), this.method);
         params.put(openConfig.getFormatName(), openConfig.getFormatType());
         params.put(openConfig.getCharsetName(), openConfig.getCharset());

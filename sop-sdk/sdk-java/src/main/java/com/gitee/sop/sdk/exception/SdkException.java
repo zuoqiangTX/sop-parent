@@ -1,5 +1,8 @@
 package com.gitee.sop.sdk.exception;
 
+/**
+ * @author thc
+ */
 public class SdkException extends RuntimeException {
 
 	private static final long serialVersionUID = -1108392076700488161L;

@@ -9,7 +9,8 @@ import com.gitee.easyopen.message.ErrorMeta;
 public class AdminErrors {
     private AdminErrors(){}
 
-    static String isvModule = "isv.error_"; // error_zh_CN2.properties内容前缀
+    /** error_zh_CN2.properties内容前缀 */
+    static String isvModule = "isv.error_";
 
     
     public static final ErrorMeta NO_LOGIN = new ErrorMeta(isvModule, "-100", "用户未登录");

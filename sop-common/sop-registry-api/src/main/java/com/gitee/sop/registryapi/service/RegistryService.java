@@ -15,6 +15,7 @@ public interface RegistryService {
      * @param pageNo   当前页码
      * @param pageSize 分页大小
      * @return 返回服务列表
+     * @throws Exception 获取失败抛出异常
      */
     List<ServiceInfo> listAllService(int pageNo, int pageSize) throws Exception;
 
@@ -22,6 +23,7 @@ public interface RegistryService {
      * 服务上线
      *
      * @param serviceInstance
+     * @throws Exception 服务上线失败抛出异常
      */
     void onlineInstance(ServiceInstance serviceInstance) throws Exception;
 
@@ -29,6 +31,7 @@ public interface RegistryService {
      * 服务下线
      *
      * @param serviceInstance
+     * @throws Exception 服务下线失败抛出异常
      */
     void offlineInstance(ServiceInstance serviceInstance) throws Exception;
 

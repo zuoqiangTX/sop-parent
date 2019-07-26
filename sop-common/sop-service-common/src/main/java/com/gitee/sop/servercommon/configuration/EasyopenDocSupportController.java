@@ -19,6 +19,10 @@ public abstract class EasyopenDocSupportController {
 
     private SwaggerValidator swaggerValidator;
 
+    /**
+     * 获取文档标题
+     * @return 返回文档标题
+     */
     public abstract String getDocTitle();
 
     public EasyopenDocSupportController() {

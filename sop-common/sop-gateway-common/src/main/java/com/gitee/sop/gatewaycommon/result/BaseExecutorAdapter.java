@@ -275,6 +275,13 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     }
 
     enum ErrorType {
-        UNKNOWN, BIZ
+        /**
+         * 未知错误
+         */
+        UNKNOWN,
+        /**
+         * 业务错误
+         */
+        BIZ
     }
 }

@@ -13,6 +13,10 @@ import java.util.List;
  */
 public interface IsvInfoMapper extends CrudMapper<IsvInfo, Long> {
 
+    /**
+     * 获取所有的isv信息
+     * @return 所有的isv信息
+     */
     @Select("SELECT  " +
             "  t.app_key appKey " +
             "  ,t.status " +

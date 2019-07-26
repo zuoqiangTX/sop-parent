@@ -5,9 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,38 +19,36 @@ import java.util.Set;
 @Slf4j
 public class OpenUtil {
 
-    private static final String CONTENT_TYPE_URLENCODED = "application/x-www-form-urlencoded";
-    private static final String CONTENT_TYPE_JSON = "application/json";
-    private static final String CONTENT_TYPE_TEXT = "text/plain";
-
     private static final String UTF8 = "UTF-8";
 
     /**
-     * 从request中获取参数。如果提交方式是application/x-www-form-urlencoded，则组装成json格式。
+     * 获取request中的参数
      *
      * @param request request对象
-     * @return 返回json
-     * @throws IOException
+     * @return 返回JSONObject
      */
     public static JSONObject getRequestParams(HttpServletRequest request) {
-        String requestJson = "{}";
         String contentType = request.getContentType();
-        if (StringUtils.isBlank(contentType)) {
-            return new JSONObject();
+        if (contentType == null) {
+            contentType = "";
         }
         contentType = contentType.toLowerCase();
-        if (StringUtils.containsAny(contentType, CONTENT_TYPE_JSON, CONTENT_TYPE_TEXT)) {
+        JSONObject jsonObject;
+        if (StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE)) {
             try {
-                requestJson = IOUtils.toString(request.getInputStream(), UTF8);
-            } catch (IOException e) {
+                String requestJson = IOUtils.toString(request.getInputStream(), UTF8);
+                jsonObject = JSON.parseObject(requestJson);
+            } catch (Exception e) {
+                jsonObject = new JSONObject();
                 log.error("获取文本数据流失败", e);
             }
-        } else if (StringUtils.containsAny(contentType, CONTENT_TYPE_URLENCODED)) {
+        } else {
             Map<String, Object> params = convertRequestParamsToMap(request);
-            requestJson = JSON.toJSONString(params);
+            jsonObject = new JSONObject(params);
         }
-        return JSON.parseObject(requestJson);
+        return jsonObject;
     }
+
 
     /**
      * request中的参数转换成map
@@ -60,7 +58,7 @@ public class OpenUtil {
      */
     public static Map<String, Object> convertRequestParamsToMap(HttpServletRequest request) {
         Map<String, String[]> paramMap = request.getParameterMap();
-        if(paramMap == null || paramMap.isEmpty()) {
+        if (paramMap == null || paramMap.isEmpty()) {
             return Collections.emptyMap();
         }
         Map<String, Object> retMap = new HashMap<String, Object>(paramMap.size());

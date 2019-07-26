@@ -17,18 +17,23 @@ import static com.gitee.sop.servercommon.bean.ParamNames.VERSION_NAME;
  * @author tanghc
  */
 public class OpenContextImpl<T> implements OpenContext<T> {
-    private JSONObject jsonObject;
+    private JSONObject rootJsonObject;
     private T bizObject;
 
-    public OpenContextImpl(JSONObject jsonObject, Class<?> bizClass) {
-        this.jsonObject = jsonObject;
-        JSONObject bizJsonObj = this.jsonObject.getJSONObject(BIZ_CONTENT_NAME);
-        bizObject = (bizClass == null || bizJsonObj == null) ? null : (T) bizJsonObj.toJavaObject(bizClass);
+    public OpenContextImpl(JSONObject rootJsonObject, Class<?> bizClass) {
+        this.rootJsonObject = rootJsonObject;
+        if (bizClass != null) {
+            JSONObject bizJsonObj = this.rootJsonObject.getJSONObject(BIZ_CONTENT_NAME);
+            if (bizJsonObj == null) {
+                bizJsonObj = rootJsonObject;
+            }
+            bizObject = (T) bizJsonObj.toJavaObject(bizClass);
+        }
     }
 
     @Override
     public String getAppId() {
-        return jsonObject.getString(APP_KEY_NAME);
+        return rootJsonObject.getString(APP_KEY_NAME);
     }
 
     @Override
@@ -38,36 +43,36 @@ public class OpenContextImpl<T> implements OpenContext<T> {
 
     @Override
     public String getBizContent() {
-        return jsonObject.getString(BIZ_CONTENT_NAME);
+        return rootJsonObject.getString(BIZ_CONTENT_NAME);
     }
 
     @Override
     public String getCharset() {
-        return jsonObject.getString(CHARSET_NAME);
+        return rootJsonObject.getString(CHARSET_NAME);
     }
 
     @Override
     public String getMethod() {
-        return jsonObject.getString(API_NAME);
+        return rootJsonObject.getString(API_NAME);
     }
 
     @Override
     public String getVersion() {
-        return jsonObject.getString(VERSION_NAME);
+        return rootJsonObject.getString(VERSION_NAME);
     }
 
     @Override
     public String getFormat() {
-        return jsonObject.getString(FORMAT_NAME);
+        return rootJsonObject.getString(FORMAT_NAME);
     }
 
     @Override
     public String getSignType() {
-        return jsonObject.getString(SIGN_TYPE_NAME);
+        return rootJsonObject.getString(SIGN_TYPE_NAME);
     }
 
     @Override
     public Date getTimestamp() {
-        return jsonObject.getDate(TIMESTAMP_NAME);
+        return rootJsonObject.getDate(TIMESTAMP_NAME);
     }
 }

@@ -73,7 +73,7 @@ public class RegistryServiceNacos implements RegistryService {
 
     @Override
     public void onlineInstance(ServiceInstance serviceInstance) throws Exception {
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>(8);
         // 上线，把权重设置成1
         params.put("weight", "1");
         this.updateInstance(serviceInstance, params);
@@ -81,7 +81,7 @@ public class RegistryServiceNacos implements RegistryService {
 
     @Override
     public void offlineInstance(ServiceInstance serviceInstance) throws Exception {
-        Map<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>(8);
         // 下线，把权重设置成0
         params.put("weight", "0");
         this.updateInstance(serviceInstance, params);

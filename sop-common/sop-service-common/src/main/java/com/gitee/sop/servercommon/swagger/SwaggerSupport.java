@@ -10,8 +10,15 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+/**
+ * @author thc
+ */
 public abstract class SwaggerSupport {
 
+    /**
+     * 获取文档标题
+     * @return 返回文档标题
+     */
     protected abstract String getDocTitle();
 
     @Bean

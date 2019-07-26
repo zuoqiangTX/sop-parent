@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginInterceptor extends ApiInterceptorAdapter {
 
+    public static final String PREFIX = "nologin.";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object serviceObj, Object argu)
             throws Exception {
@@ -28,7 +30,8 @@ public class LoginInterceptor extends ApiInterceptorAdapter {
     @Override
     public boolean match(ApiMeta apiMeta) {
         String name = apiMeta.getName();
-        if (name.startsWith("nologin.")) { // 以‘nologin.’开头的接口不拦截
+        // 以‘nologin.’开头的接口不拦截
+        if (name.startsWith(PREFIX)) {
             return false;
         } else {
             return true;

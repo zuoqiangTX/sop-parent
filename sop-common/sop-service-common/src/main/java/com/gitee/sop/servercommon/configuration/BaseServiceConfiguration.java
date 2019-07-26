@@ -73,7 +73,11 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
         doAfter();
     }
 
-    // springboot启动完成后执行
+    /**
+     * springboot启动完成后执行
+     * @param args 启动参数
+     * @throws Exception 出错异常
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("-----服务器启动完毕-----");

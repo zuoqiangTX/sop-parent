@@ -1,5 +1,9 @@
 package com.gitee.sop.sdk.util;
 
+/**
+ * hex工具类
+ * @author thc
+ */
 public class HexUtil {
     private static final String ZERO = "0";
     private static final String CHARS = "0123456789ABCDEF";
@@ -30,7 +34,7 @@ public class HexUtil {
      * @return byte[]
      */
     public static byte[] hex2bytes(String hexString) {
-        if (hexString == null || hexString.equals("")) {
+        if (hexString == null || "".equalsIgnoreCase(hexString)) {
             return null;
         }
         hexString = hexString.toUpperCase();

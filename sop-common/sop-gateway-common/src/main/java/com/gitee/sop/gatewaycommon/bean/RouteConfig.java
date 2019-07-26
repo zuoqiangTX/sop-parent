@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class RouteConfig {
 
-    public static final byte STATUS_ENABLE = 1;
+    private static final byte STATUS_ENABLE = RouteStatus.ENABLE.getStatus();
 
     /**
      * 路由id

@@ -17,8 +17,18 @@ import java.util.Optional;
 @Slf4j
 public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
 
+    /**
+     * 构建请求参数
+     * @param ctx 请求request
+     * @return 返回请求参数
+     */
     public abstract Map<String, String> buildRequestParams(T ctx);
 
+    /**
+     * 返回客户端ip
+     * @param ctx  请求request
+     * @return 返回ip
+     */
     public abstract String getIP(T ctx);
 
     @Override

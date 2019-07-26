@@ -40,6 +40,7 @@ public class LogApi {
 
     public static final String LOG_MONITOR_INSTANCE = "log.monitor.instance";
     public static final String CODE_SUCCESS = "10000";
+    private static final String CODE_KEY = "code";
 
     @Autowired
     ConfigCommonMapper configCommonMapper;
@@ -135,7 +136,7 @@ public class LogApi {
         try {
             String json = this.requestLogServer(ipPort, "listErrors");
             JSONObject jsonObject = JSON.parseObject(json);
-            if (!CODE_SUCCESS.equals(jsonObject.getString("code"))) {
+            if (!CODE_SUCCESS.equals(jsonObject.getString(CODE_KEY))) {
                 log.error("请求结果:{}", json);
                 throw new BizException("添加失败");
             }
@@ -147,7 +148,7 @@ public class LogApi {
 
     private String requestLogServer(String ipPort, String path) throws Exception {
         DefaultMd5Verifier md5Verifier = new DefaultMd5Verifier();
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>(16);
         params.put("time", System.currentTimeMillis());
         String sign = md5Verifier.buildSign(params, secret);
         params.put("sign", sign);

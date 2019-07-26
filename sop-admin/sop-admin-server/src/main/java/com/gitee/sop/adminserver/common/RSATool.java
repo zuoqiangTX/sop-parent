@@ -309,7 +309,14 @@ public class RSATool {
     }
 
     public enum KeyLength {
-        LENGTH_1024(1024), LENGTH_2048(2048);
+        /**
+         * 秘钥长度：1024
+         */
+        LENGTH_1024(1024),
+        /**
+         * 秘钥长度：2048
+         */
+        LENGTH_2048(2048);
         private int length;
 
         KeyLength(int length) {

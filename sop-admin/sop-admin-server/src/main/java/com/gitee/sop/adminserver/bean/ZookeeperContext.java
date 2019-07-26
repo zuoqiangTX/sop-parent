@@ -22,6 +22,7 @@ import org.springframework.util.Assert;
 import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import static com.gitee.sop.adminserver.bean.SopAdminConstants.SOP_MSG_CHANNEL_PATH;
 
@@ -307,7 +308,7 @@ public class ZookeeperContext {
                 String data = new String(nodeData);
                 if (StringUtils.isNotBlank(data) && !initData.equals(data)) {
                     listenCallback.onError(data);
-                    new Thread(new ZKClose(cache, client)).start();
+                    Executors.newSingleThreadExecutor().execute(() -> new ZKClose(cache, client));
                 }
             }
         });

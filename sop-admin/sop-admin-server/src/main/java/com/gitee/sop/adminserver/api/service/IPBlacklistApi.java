@@ -14,7 +14,6 @@ import com.gitee.sop.adminserver.api.service.param.ConfigIpBlackForm;
 import com.gitee.sop.adminserver.api.service.param.ConfigIpBlacklistPageParam;
 import com.gitee.sop.adminserver.api.service.result.ConfigIpBlacklistVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
-import com.gitee.sop.adminserver.bean.ConfigLimitDto;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.entity.ConfigIpBlacklist;
@@ -93,6 +92,13 @@ public class IPBlacklistApi {
     }
 
     enum BlacklistMsgType {
-        ADD, DELETE
+        /**
+         * 黑名单消息类型：添加
+         */
+        ADD,
+        /**
+         * 黑名单消息类型：删除
+         */
+        DELETE
     }
 }

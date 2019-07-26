@@ -28,7 +28,7 @@ public class IsvInfo {
     /** appKey, 数据库字段：app_key */
     private String appKey;
 
-    // 不再使用，转移到isv_keys表
+    /** 不再使用，转移到isv_keys表 */
     private String secret = "";
 
     /** 公钥,不再使用，转移到isv_keys表 数据库字段：pub_key */

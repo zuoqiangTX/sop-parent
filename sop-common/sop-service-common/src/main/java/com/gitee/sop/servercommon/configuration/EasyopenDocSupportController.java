@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * 文档支持
- * @author thc
+ * @author tanghc
  */
 public abstract class EasyopenDocSupportController {
 

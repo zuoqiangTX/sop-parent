@@ -11,7 +11,6 @@ import com.gitee.sop.gatewaycommon.result.CustomDataNameBuilder;
 public class WebappZuulConfiguration extends BaseZuulConfiguration {
 
     static {
-        ApiConfig.getInstance().setIgnoreValidate(true);
         ApiConfig.getInstance().setDataNameBuilder(new CustomDataNameBuilder());
         ApiConfig.getInstance().setShowReturnSign(false);
     }

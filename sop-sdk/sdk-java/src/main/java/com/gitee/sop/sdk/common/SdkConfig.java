@@ -2,7 +2,7 @@ package com.gitee.sop.sdk.common;
 
 /**
  * @deprecated 已废弃，使用com.gitee.sop.sdk.common.OpenConfig
- * @author thc
+ * @author tanghc
  */
 @Deprecated
 public class SdkConfig {

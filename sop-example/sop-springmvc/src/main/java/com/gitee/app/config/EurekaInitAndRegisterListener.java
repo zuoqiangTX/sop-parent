@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 
 /**
  * 初始化Eureka Client
- * @author thc
+ * @author tanghc
  */
 @Slf4j
 public class EurekaInitAndRegisterListener implements ServletContextListener {

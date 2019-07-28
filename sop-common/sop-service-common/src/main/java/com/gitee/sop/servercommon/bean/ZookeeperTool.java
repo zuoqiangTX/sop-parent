@@ -1,5 +1,7 @@
 package com.gitee.sop.servercommon.bean;
 
+import com.gitee.sop.servercommon.exception.ZookeeperOperationException;
+import com.gitee.sop.servercommon.exception.ZookeeperPathNotExistException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +47,25 @@ public class ZookeeperTool implements Closeable {
         client.start();
 
         this.client = client;
+    }
+
+    /**
+     * 获取节点内容
+     *
+     * @param path
+     * @return 返回节点内容
+     * @throws ZookeeperPathNotExistException 节点不存在，抛出异常
+     */
+    public String getData(String path) throws ZookeeperPathNotExistException {
+        if (!isPathExist(path)) {
+            throw new ZookeeperPathNotExistException("path 不存在, path=" + path);
+        }
+        try {
+            byte[] data = getClient().getData().forPath(path);
+            return new String(data);
+        } catch (Exception e) {
+            throw new ZookeeperOperationException("getData error path=" + path, e);
+        }
     }
 
     public boolean isPathExist(String path) {

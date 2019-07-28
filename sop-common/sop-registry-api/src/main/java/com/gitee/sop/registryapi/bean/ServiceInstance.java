@@ -3,7 +3,7 @@ package com.gitee.sop.registryapi.bean;
 import lombok.Data;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class ServiceInstance {
@@ -31,5 +31,10 @@ public class ServiceInstance {
      * 服务状态，UP：已上线，OUT_OF_SERVICE：已下线
      */
     private String status;
+
+    /**
+     * 更新时间
+     */
+    private String updateTime;
 
 }

@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 /**
  * 文件工具类
- * @author thc
+ * @author tanghc
  */
 public class FileUtil {
 

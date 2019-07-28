@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class RoleVO {

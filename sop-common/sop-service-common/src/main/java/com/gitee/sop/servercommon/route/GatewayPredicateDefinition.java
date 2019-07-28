@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class GatewayPredicateDefinition {

@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * 请求form
- * @author thc
+ * @author tanghc
  */
 @Getter
 @Setter

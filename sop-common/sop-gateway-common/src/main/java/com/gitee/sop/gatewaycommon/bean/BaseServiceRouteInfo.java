@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class BaseServiceRouteInfo<T extends BaseRouteDefinition> {

@@ -71,4 +71,16 @@ public interface OpenContext<T> {
      */
     Date getTimestamp();
 
+    /**
+     * 返回token，即access_token
+     * @return 返回token
+     */
+    String appAuthToken();
+
+    /**
+     * 返回回调地址
+     * @return 返回回调地址
+     */
+    String getNotifyUrl();
+
 }

@@ -1,7 +1,7 @@
 package com.gitee.sop.sdk.exception;
 
 /**
- * @author thc
+ * @author tanghc
  */
 public class SdkException extends RuntimeException {
 

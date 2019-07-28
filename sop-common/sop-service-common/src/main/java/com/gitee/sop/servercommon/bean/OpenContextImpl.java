@@ -1,16 +1,21 @@
 package com.gitee.sop.servercommon.bean;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.time.DateUtils;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import static com.gitee.sop.servercommon.bean.ParamNames.API_NAME;
+import static com.gitee.sop.servercommon.bean.ParamNames.APP_AUTH_TOKEN_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.APP_KEY_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.BIZ_CONTENT_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.CHARSET_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.FORMAT_NAME;
+import static com.gitee.sop.servercommon.bean.ParamNames.NOTIFY_URL_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.SIGN_TYPE_NAME;
 import static com.gitee.sop.servercommon.bean.ParamNames.TIMESTAMP_NAME;
+import static com.gitee.sop.servercommon.bean.ParamNames.TIMESTAMP_PATTERN;
 import static com.gitee.sop.servercommon.bean.ParamNames.VERSION_NAME;
 
 /**
@@ -73,6 +78,21 @@ public class OpenContextImpl<T> implements OpenContext<T> {
 
     @Override
     public Date getTimestamp() {
-        return rootJsonObject.getDate(TIMESTAMP_NAME);
+        String timestampStr = rootJsonObject.getString(TIMESTAMP_NAME);
+        try {
+            return DateUtils.parseDate(timestampStr, TIMESTAMP_PATTERN);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public String appAuthToken() {
+        return rootJsonObject.getString(APP_AUTH_TOKEN_NAME);
+    }
+
+    @Override
+    public String getNotifyUrl() {
+        return rootJsonObject.getString(NOTIFY_URL_NAME);
     }
 }

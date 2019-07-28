@@ -1,7 +1,7 @@
 package com.gitee.sop.sdk.common;
 
 /**
- * @author thc
+ * @author tanghc
  */
 public class SopSdkConstants {
     public static String DATA_SUFFIX = "_response";

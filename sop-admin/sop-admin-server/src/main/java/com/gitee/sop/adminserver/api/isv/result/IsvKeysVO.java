@@ -4,7 +4,7 @@ import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class IsvKeysVO {

@@ -13,12 +13,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ import java.util.List;
 @Slf4j
 public class RegistryServiceEureka implements RegistryService {
 
-    OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = new OkHttpClient();
 
     @Value("${registry.eureka-server-addr:}")
     private String eurekaUrl;
@@ -56,6 +58,8 @@ public class RegistryServiceEureka implements RegistryService {
                     serviceInstance.setIp(eurekaInstance.getIpAddr());
                     serviceInstance.setPort(Integer.valueOf(eurekaInstance.fetchPort()));
                     serviceInstance.setStatus(eurekaInstance.getStatus());
+                    Date updateTime = new Date(Long.valueOf(eurekaInstance.getLastUpdatedTimestamp()));
+                    serviceInstance.setUpdateTime(DateFormatUtils.format(updateTime, TIMESTAMP_PATTERN));
                     serviceInfo.getInstances().add(serviceInstance);
                 }
             }

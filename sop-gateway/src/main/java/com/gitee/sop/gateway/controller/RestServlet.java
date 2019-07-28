@@ -14,7 +14,7 @@ import java.io.IOException;
 
 /**
  * 传统web开发入口
- * @author thc
+ * @author tanghc
  */
 @WebServlet(urlPatterns = "/rest/*")
 public class RestServlet extends HttpServlet {

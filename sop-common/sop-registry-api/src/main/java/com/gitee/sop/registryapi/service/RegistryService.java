@@ -9,6 +9,8 @@ import java.util.List;
  * @author tanghc
  */
 public interface RegistryService {
+    String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
     /**
      * 获取所有服务列表
      *

@@ -2,8 +2,8 @@ package com.gitee.sop.servercommon.manager;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
-import com.gitee.sop.servercommon.bean.ServiceConstants;
 import com.gitee.sop.servercommon.bean.ZookeeperTool;
+import com.gitee.sop.servercommon.exception.ZookeeperPathNotExistException;
 import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.Getter;
@@ -12,11 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 上传路由到zookeeper
@@ -28,13 +32,10 @@ import java.util.List;
 @Setter
 public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
-    /**
-     * zookeeper存放接口路由信息的根目录
-     */
-    public static final String SOP_SERVICE_ROUTE_PATH = ServiceConstants.SOP_SERVICE_ROUTE_PATH;
-    public static final String PATH_SPLIT = "/";
+    /** 网关对应的LoadBalance协议 */
+    private static final String PROTOCOL_LOAD_BALANCE = "lb://";
 
-    private final String routeRootPath = SOP_SERVICE_ROUTE_PATH;
+    private static final String PATH_SPLIT = "/";
 
     private Environment environment;
 
@@ -56,16 +57,16 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * 上传serviceId目录
      *
-     * @param environment
+     * @param environment environment
      */
     protected void uploadServiceId(Environment environment) {
         try {
             this.checkZookeeperNode(serviceId, "serviceId（" + serviceId + "）不能有斜杠字符'/'");
             ServiceRouteInfo serviceRouteInfo = this.buildServiceRouteInfo();
             // 保存路径
-            String savePath = routeRootPath + "/" + serviceId;
+            String savePath = serviceRouteInfo.getZookeeperPath();
             String nodeData = JSON.toJSONString(serviceRouteInfo);
-            log.info("zookeeper创建serviceId路径，path:{}, nodeData:{}", savePath, nodeData);
+            log.info("serviceId:{}, zookeeper保存路径:{}", serviceId, savePath);
             this.zookeeperTool.createPath(savePath, nodeData);
         } catch (Exception e) {
             throw new IllegalStateException("zookeeper操作失败");
@@ -85,7 +86,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * 构建接口信息，符合spring cloud gateway的格式
      *
-     * @param serviceApiInfo
+     * @param serviceApiInfo 服务接口信息
      * @return 返回服务路由信息
      */
     protected ServiceRouteInfo buildServiceGatewayInfo(ServiceApiInfo serviceApiInfo) {
@@ -97,7 +98,24 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         }
         ServiceRouteInfo serviceRouteInfo = this.buildServiceRouteInfo();
         serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
+        String md5 = buildMd5(routeDefinitionList);
+        serviceRouteInfo.setMd5(md5);
         return serviceRouteInfo;
+    }
+
+    /**
+     * 构建路由id MD5
+     *
+     * @param routeDefinitionList 路由列表
+     * @return 返回MD5
+     */
+    protected String buildMd5(List<GatewayRouteDefinition> routeDefinitionList) {
+        List<String> routeIdList = routeDefinitionList.stream()
+                .map(GatewayRouteDefinition::toString)
+                .sorted()
+                .collect(Collectors.toList());
+        String md5Source = org.apache.commons.lang3.StringUtils.join(routeIdList, "");
+        return DigestUtils.md5DigestAsHex(md5Source.getBytes(StandardCharsets.UTF_8));
     }
 
     protected ServiceRouteInfo buildServiceRouteInfo() {
@@ -110,9 +128,9 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
         GatewayRouteDefinition gatewayRouteDefinition = new GatewayRouteDefinition();
+        // 唯一id规则：接口名 + 版本号
         String routeId = apiMeta.fetchNameVersion();
         this.checkZookeeperNode(routeId, "接口定义（" + routeId + "）不能有斜杠字符'/'");
-        // 唯一id规则：接口名 + 版本号
         BeanUtils.copyProperties(apiMeta, gatewayRouteDefinition);
         gatewayRouteDefinition.setId(routeId);
         gatewayRouteDefinition.setFilters(Collections.emptyList());
@@ -124,7 +142,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     }
 
     protected String buildUri(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        return "lb://" + serviceApiInfo.getServiceId();
+        return PROTOCOL_LOAD_BALANCE + serviceApiInfo.getServiceId();
     }
 
     protected String buildServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
@@ -141,12 +159,23 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * 上传接口信息到zookeeper
      *
-     * @param serviceRouteInfo
+     * @param serviceRouteInfo 路由服务信息
      */
     protected void uploadServiceRouteInfoToZookeeper(ServiceRouteInfo serviceRouteInfo) {
+        String savePath = serviceRouteInfo.getZookeeperPath();
         try {
-            // 保存路径
-            String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
+            String existServiceRouteInfoData = zookeeperTool.getData(savePath);
+            ServiceRouteInfo serviceRouteInfoExist = JSON.parseObject(existServiceRouteInfoData, ServiceRouteInfo.class);
+            String oldMD5 = serviceRouteInfoExist.getMd5();
+            String newMD5 = serviceRouteInfo.getMd5();
+            if (Objects.equals(oldMD5, newMD5)) {
+                log.info("接口没有改变，无需上传路由信息");
+                return;
+            }
+        } catch (ZookeeperPathNotExistException e) {
+            log.warn("服务路径不存在，path:{}", savePath);
+        }
+        try {
             log.info("上传接口信息到zookeeper，path:{}, serviceId：{}, 接口数量：{}",
                     savePath,
                     serviceRouteInfo.getServiceId(),
@@ -162,12 +191,12 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * 上传文件夹内容
      *
-     * @param serviceRouteInfo
+     * @param serviceRouteInfo 路由服务信息
      * @return 返回文件夹路径
      */
     protected String uploadFolder(ServiceRouteInfo serviceRouteInfo) throws Exception {
         // 保存路径
-        String savePath = routeRootPath + "/" + serviceRouteInfo.getServiceId();
+        String savePath = serviceRouteInfo.getZookeeperPath();
         String serviceRouteInfoJson = JSON.toJSONString(serviceRouteInfo);
         log.info("上传service目录到zookeeper，路径:{}，内容:{}", savePath, serviceRouteInfoJson);
         this.zookeeperTool.createOrUpdateData(savePath, serviceRouteInfoJson);
@@ -177,7 +206,8 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     /**
      * 上传路由信息
      *
-     * @param serviceRouteInfo
+     * @param serviceRouteInfo 路由服务
+     * @param parentPath       父节点
      * @throws Exception
      */
     protected void uploadRouteItems(ServiceRouteInfo serviceRouteInfo, String parentPath) throws Exception {

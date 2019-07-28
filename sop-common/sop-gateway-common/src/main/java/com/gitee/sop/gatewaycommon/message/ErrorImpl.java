@@ -3,7 +3,7 @@ package com.gitee.sop.gatewaycommon.message;
 import lombok.Data;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Data
 public class ErrorImpl implements Error {

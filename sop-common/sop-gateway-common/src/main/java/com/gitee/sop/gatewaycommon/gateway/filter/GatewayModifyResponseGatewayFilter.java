@@ -28,7 +28,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 
 /**
  * 修改返回结果
- * @author thc
+ * @author tanghc
  */
 public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered {
 

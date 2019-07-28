@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>com.gitee.sop</groupId>
 			<artifactId>sop-registry-api</artifactId>
-			<version>1.13.3-SNAPSHOT</version>
+			<version>1.13.4-SNAPSHOT</version>
 		</dependency>
 
 		<!-- easyopen starter -->

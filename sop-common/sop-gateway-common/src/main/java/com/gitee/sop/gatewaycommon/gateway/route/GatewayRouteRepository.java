@@ -24,7 +24,7 @@ import static java.util.Collections.synchronizedMap;
 /**
  * 路由存储管理，负责动态更新路由
  *
- * @author thc
+ * @author tanghc
  */
 @Slf4j
 public class GatewayRouteRepository implements ApplicationEventPublisherAware,

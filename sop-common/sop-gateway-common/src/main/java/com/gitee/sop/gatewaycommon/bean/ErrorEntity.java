@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.util.Objects;
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Getter
 @Setter

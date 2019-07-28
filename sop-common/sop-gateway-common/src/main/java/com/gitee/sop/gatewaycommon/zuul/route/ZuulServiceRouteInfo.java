@@ -3,7 +3,7 @@ package com.gitee.sop.gatewaycommon.zuul.route;
 import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 
 /**
- * @author thc
+ * @author tanghc
  */
 public class ZuulServiceRouteInfo extends BaseServiceRouteInfo<ZuulRouteDefinition> {
 }

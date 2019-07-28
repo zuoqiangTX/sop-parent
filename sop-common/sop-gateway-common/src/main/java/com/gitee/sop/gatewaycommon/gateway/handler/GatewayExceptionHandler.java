@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 统一异常处理
  *
- * @author thc
+ * @author tanghc
  */
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 

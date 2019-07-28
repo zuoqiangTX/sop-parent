@@ -12,6 +12,7 @@ package com.gitee.sop.servercommon.bean;
  * sign	            String	是	    344	    商户请求参数的签名串，详见签名	详见示例
  * timestamp	    String	是	    19	    发送请求的时间，格式"yyyy-MM-dd HH:mm:ss"	2014-07-24 03:07:50
  * version	        String	是	    3	    调用的接口版本，固定为：1.0	1.0
+ * notify_url	    String	否	    256	    支付宝服务器主动通知商户服务器里指定的页面http/https路径。	http://api.test.alipay.net/atinterface/receive_notify.htm
  * app_auth_token	String	否	    40	    详见应用授权概述
  * biz_content	    String	是		        请求参数的集合，最大长度不限，除公共参数外所有请求参数都必须放在这个参数中传递，具体参照各产品快速接入文档
  *
@@ -34,12 +35,14 @@ public class ParamNames {
     public static String TIMESTAMP_NAME = "timestamp";
     /** 调用的接口版本 */
     public static String VERSION_NAME = "version";
+    /** 开放平台主动通知商户服务器里指定的页面http/https路径 */
+    public static String NOTIFY_URL_NAME = "notify_url";
     /** OAuth 2.0授权token */
     public static String APP_AUTH_TOKEN_NAME = "app_auth_token";
     /** 请求参数的集合，最大长度不限，除公共参数外所有请求参数都必须放在这个参数中传递，具体参照各产品快速接入文档 */
     public static String BIZ_CONTENT_NAME = "biz_content";
 
-    /**  */
+    /** 时间戳格式 */
     public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
 

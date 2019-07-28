@@ -2,7 +2,7 @@ package com.gitee.sop.sdk.util;
 
 /**
  * hex工具类
- * @author thc
+ * @author tanghc
  */
 public class HexUtil {
     private static final String ZERO = "0";

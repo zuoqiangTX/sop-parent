@@ -2,7 +2,7 @@ package com.gitee.sop.sdk.common;
 
 /**
  * 请求方法枚举
- * @author thc
+ * @author tanghc
  */
 public enum RequestMethod {
 

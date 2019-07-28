@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * @author thc
+ * @author tanghc
  */
 @Configuration
 public class WebConfig {

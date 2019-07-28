@@ -1,11 +1,7 @@
 package com.gitee.sop.adminserver.api.service.result;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
 
 /**
  * @author tanghc
@@ -34,18 +30,10 @@ public class ServiceInstanceVO {
     private String status;
 
     @ApiDocField(description = "最后更新时间")
-    private String lastUpdatedTimestamp;
+    private String updateTime;
 
     @ApiDocField(description = "parentId")
     private Integer parentId;
-
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    public Date getUpdateTime() {
-        if (StringUtils.isBlank(lastUpdatedTimestamp)) {
-            return null;
-        }
-        return new Date(Long.valueOf(lastUpdatedTimestamp));
-    }
 
     public String getIpPort() {
         return ip != null && port > 0 ? ip + ":" + port : "";

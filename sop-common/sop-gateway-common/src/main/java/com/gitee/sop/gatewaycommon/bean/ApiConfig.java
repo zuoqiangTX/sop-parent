@@ -181,6 +181,8 @@ public class ApiConfig {
      */
     private int storeErrorCapacity = 20;
 
+    private boolean useGateway;
+
     public void addAppSecret(Map<String, String> appSecretPair) {
         for (Map.Entry<String, String> entry : appSecretPair.entrySet()) {
             this.isvManager.update(new IsvDefinition(entry.getKey(), entry.getValue()));

@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.configuration;
 
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.gateway.filter.GatewayModifyResponseGatewayFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.LoadBalancerClientExtFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.ValidateFilter;
@@ -30,10 +31,8 @@ import java.util.List;
  */
 public class BaseGatewayConfiguration extends AbstractConfiguration {
 
-    public static boolean USE_GATEWAY;
-
     public BaseGatewayConfiguration() {
-        USE_GATEWAY = true;
+        ApiConfig.getInstance().setUseGateway(true);
     }
 
     /**

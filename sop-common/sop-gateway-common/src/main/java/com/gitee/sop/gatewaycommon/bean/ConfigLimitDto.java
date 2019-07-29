@@ -94,7 +94,7 @@ public class ConfigLimitDto {
      */
     public RateLimiter fetchRateLimiter() {
         if (rateLimiter == null) {
-            synchronized (this.id) {
+            synchronized (this) {
                 if (rateLimiter == null) {
                     rateLimiter = RateLimiter.create(tokenBucketCount);
                 }

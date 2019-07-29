@@ -18,7 +18,7 @@ public class RouteConfig {
     /**
      * 状态，0：待审核，1：启用，2：禁用。默认启用
      */
-    private Byte status = STATUS_ENABLE;
+    private Byte status;
 
     /**
      * 是否启用

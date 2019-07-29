@@ -111,7 +111,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
      */
     protected String buildMd5(List<GatewayRouteDefinition> routeDefinitionList) {
         List<String> routeIdList = routeDefinitionList.stream()
-                .map(GatewayRouteDefinition::toString)
+                .map(JSON::toJSONString)
                 .sorted()
                 .collect(Collectors.toList());
         String md5Source = org.apache.commons.lang3.StringUtils.join(routeIdList, "");

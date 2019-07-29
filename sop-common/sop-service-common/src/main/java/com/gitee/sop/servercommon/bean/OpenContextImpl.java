@@ -95,4 +95,16 @@ public class OpenContextImpl<T> implements OpenContext<T> {
     public String getNotifyUrl() {
         return rootJsonObject.getString(NOTIFY_URL_NAME);
     }
+
+    @Override
+    public <E> E getBizObject(Class<E> clazz) {
+        if (bizObject != null && bizObject.getClass() == clazz) {
+            return (E) bizObject;
+        }
+        JSONObject bizJsonObj = this.rootJsonObject.getJSONObject(BIZ_CONTENT_NAME);
+        if (bizJsonObj == null) {
+            return null;
+        }
+        return bizJsonObj.toJavaObject(clazz);
+    }
 }

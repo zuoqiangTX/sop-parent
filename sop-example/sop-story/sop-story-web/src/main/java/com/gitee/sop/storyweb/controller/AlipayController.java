@@ -41,9 +41,12 @@ public class AlipayController {
     // 接口名，使用默认版本号
     @ApiMapping(value = "story.get")
     public Story storyget() {
+        // 获取开放平台参数
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        String appId = openContext.getAppId();
         Story story = new Story();
         story.setId(1);
-        story.setName("海底小纵队(默认版本号)");
+        story.setName("海底小纵队(默认版本号), app_id:" + appId);
         return story;
     }
 
@@ -67,8 +70,37 @@ public class AlipayController {
     // 忽略验证
     @ApiMapping(value = "story.get", version = "2.1", ignoreValidate = true)
     public Story getStory21(Story story) {
-        story.setName(story.getName() + ", story.get2.1, ignoreValidate = true");
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        // 此处的param和story参数是一样的
+        Story param = openContext.getBizObject(Story.class);
+        boolean isSame = story == param;
+        story.setName(story.getName() + ", story.get2.1, ignoreValidate = true, story==param:" + isSame);
         return story;
+    }
+
+    /**
+     * 另一种方式，OpenContext泛型参数填bizObject类<br>
+     * 调用openContext.getBizObject()可直接获得对象<br>
+     * 此方式等价于：
+     * <pre>
+     * public Story getStory22(Story bizObject) {
+     *     OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+     *     // 获取appid，更多方法查看OpenContext类
+     *     String appId = openContext.getAppId();
+     *     System.out.println(appId);
+     *     return bizObject;
+     * }
+     * </pre>
+     * @param openContext
+     * @return
+     */
+    @ApiMapping(value = "story.get", version = "2.2")
+    public Story getStory22(OpenContext<Story> openContext) {
+        Story bizObject = openContext.getBizObject();
+        // 获取appid，更多方法查看OpenContext类
+        String appId = openContext.getAppId();
+        System.out.println(appId);
+        return bizObject;
     }
 
     // http://localhost:2222/getStory2

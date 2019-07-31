@@ -10,6 +10,7 @@ import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
+import com.gitee.sop.adminserver.bean.MetadataEnum;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
@@ -144,6 +145,9 @@ public class ServiceApi {
                         int id = idGen.getAndIncrement();
                         instanceVO.setId(id);
                         instanceVO.setParentId(pid);
+                        if (instanceVO.getMetadata() == null) {
+                            instanceVO.setMetadata(Collections.emptyMap());
+                        }
                         serviceInfoVoList.add(instanceVO);
                     }
                 });
@@ -152,21 +156,57 @@ public class ServiceApi {
     }
 
     @Api(name = "service.instance.offline")
-    @ApiDocMethod(description = "服务下线")
+    @ApiDocMethod(description = "服务禁用")
     void serviceOffline(ServiceInstance param) {
         try {
             registryService.offlineInstance(param);
         } catch (Exception e) {
-            log.error("下线失败，param:{}", param, e);
-            throw new BizException("下线失败，请查看日志");
+            log.error("服务禁用失败，param:{}", param, e);
+            throw new BizException("服务禁用失败，请查看日志");
         }
     }
 
     @Api(name = "service.instance.online")
-    @ApiDocMethod(description = "服务上线")
+    @ApiDocMethod(description = "服务启用")
     void serviceOnline(ServiceInstance param) throws IOException {
         try {
             registryService.onlineInstance(param);
+        } catch (Exception e) {
+            log.error("服务启用失败，param:{}", param, e);
+            throw new BizException("服务启用失败，请查看日志");
+        }
+    }
+
+    @Api(name = "service.instance.env.pre")
+    @ApiDocMethod(description = "预发布")
+    void serviceEnvPre(ServiceInstance param) throws IOException {
+        try {
+            MetadataEnum envPre = MetadataEnum.ENV_PRE;
+            registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
+        } catch (Exception e) {
+            log.error("预发布失败，param:{}", param, e);
+            throw new BizException("预发布失败，请查看日志");
+        }
+    }
+
+    @Api(name = "service.instance.env.gray")
+    @ApiDocMethod(description = "灰度发布")
+    void serviceEnvGray(ServiceInstance param) throws IOException {
+        try {
+            MetadataEnum envPre = MetadataEnum.ENV_GRAY;
+            registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
+        } catch (Exception e) {
+            log.error("灰度发布失败，param:{}", param, e);
+            throw new BizException("灰度发布失败，请查看日志");
+        }
+    }
+
+    @Api(name = "service.instance.env.online")
+    @ApiDocMethod(description = "上线")
+    void serviceEnvOnline(ServiceInstance param) throws IOException {
+        try {
+            MetadataEnum envPre = MetadataEnum.ENV_ONLINE;
+            registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
         } catch (Exception e) {
             log.error("上线失败，param:{}", param, e);
             throw new BizException("上线失败，请查看日志");

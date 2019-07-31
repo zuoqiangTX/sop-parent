@@ -60,6 +60,7 @@ public class RegistryServiceEureka implements RegistryService {
                     serviceInstance.setStatus(eurekaInstance.getStatus());
                     Date updateTime = new Date(Long.valueOf(eurekaInstance.getLastUpdatedTimestamp()));
                     serviceInstance.setUpdateTime(DateFormatUtils.format(updateTime, TIMESTAMP_PATTERN));
+                    serviceInstance.setMetadata(eurekaInstance.getMetadata());
                     serviceInfo.getInstances().add(serviceInstance);
                 }
             }
@@ -78,6 +79,11 @@ public class RegistryServiceEureka implements RegistryService {
     @Override
     public void offlineInstance(ServiceInstance serviceInstance) throws Exception {
         this.requestEurekaServer(EurekaUri.OFFLINE_SERVICE, serviceInstance.getServiceId(), serviceInstance.getInstanceId());
+    }
+
+    @Override
+    public void setMetadata(ServiceInstance serviceInstance, String key, String value) throws Exception {
+        this.requestEurekaServer(EurekaUri.SET_METADATA, serviceInstance.getServiceId(), serviceInstance.getInstanceId(), key, value);
     }
 
     private String requestEurekaServer(EurekaUri eurekaUri, String... args) throws IOException {

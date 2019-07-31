@@ -51,7 +51,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
-            throw ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getException();
+            throw ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getException();
         }
 
         String nameVersion = Optional.ofNullable(apiParam.fetchNameVersion()).orElse(String.valueOf(System.currentTimeMillis()));

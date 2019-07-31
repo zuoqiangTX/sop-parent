@@ -69,7 +69,7 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
         }
 
         if (error == null) {
-            error = ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getError();
+            error = ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getError();
         }
 
         JSONObject jsonObject = (JSONObject) JSON.toJSON(error);

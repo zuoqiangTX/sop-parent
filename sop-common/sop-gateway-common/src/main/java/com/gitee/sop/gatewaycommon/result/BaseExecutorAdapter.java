@@ -35,7 +35,7 @@ import java.util.Optional;
 @Slf4j
 public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> {
     private static final ErrorMeta SUCCESS_META = ErrorEnum.SUCCESS.getErrorMeta();
-    private static final ErrorMeta ISP_UNKNOW_ERROR_META = ErrorEnum.ISP_UNKNOW_ERROR.getErrorMeta();
+    private static final ErrorMeta ISP_UNKNOW_ERROR_META = ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta();
     private static final ErrorMeta ISP_BIZ_ERROR = ErrorEnum.BIZ_ERROR.getErrorMeta();
 
     public static final String GATEWAY_CODE_NAME = "code";

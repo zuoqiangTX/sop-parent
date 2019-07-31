@@ -93,7 +93,7 @@ function createResponseCode(docItem) {
         '    "'+method+'_response": {\n' +
         '        "code": "20000",\n' +
         '        "msg": "Service is temporarily unavailable",\n' +
-        '        "sub_code": "isp.unknow-error",\n' +
+        '        "sub_code": "isp.unknown-error",\n' +
         '        "sub_msg": "服务暂不可用"\n' +
         '    }' +
         '}';

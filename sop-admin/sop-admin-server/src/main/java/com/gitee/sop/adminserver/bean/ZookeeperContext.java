@@ -89,6 +89,10 @@ public class ZookeeperContext {
         return serviceIdPath + "/" + routeId;
     }
 
+    public static String getUserKeyChannelPath() {
+        return SOP_MSG_CHANNEL_PATH + "/userkey";
+    }
+
     public static String getIsvInfoChannelPath() {
         return SOP_MSG_CHANNEL_PATH + "/isvinfo";
     }

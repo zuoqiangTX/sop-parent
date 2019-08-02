@@ -22,7 +22,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
      * @param ctx 请求request
      * @return 返回请求参数
      */
-    public abstract Map<String, String> buildRequestParams(T ctx);
+    public abstract Map<String, ?> buildRequestParams(T ctx);
 
     /**
      * 返回客户端ip
@@ -34,10 +34,8 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     @Override
     public ApiParam build(T ctx) {
         ApiParam apiParam = this.newApiParam(ctx);
-        Map<String, String> requestParams = this.buildRequestParams(ctx);
-        for (Map.Entry<String, ?> entry : requestParams.entrySet()) {
-            apiParam.put(entry.getKey(), entry.getValue());
-        }
+        Map<String, ?> requestParams = this.buildRequestParams(ctx);
+        apiParam.putAll(requestParams);
         this.initOtherProperty(apiParam);
         apiParam.setIp(this.getIP(ctx));
         return apiParam;

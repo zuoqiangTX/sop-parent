@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.util;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -124,15 +123,10 @@ public class RequestUtil {
      * @param request 请求类型为application/json的Request
      * @return 返回Map
      */
-    public static Map<String, String> convertJsonRequestToMap(HttpServletRequest request) {
+    public static Map<String, Object> convertJsonRequestToMap(HttpServletRequest request) {
         try {
             String text = getText(request);
-            JSONObject parseObject = JSON.parseObject(text);
-            Map<String, String> params = new HashMap<>(parseObject.size());
-            for (Map.Entry<String, Object> entry : parseObject.entrySet()) {
-                params.put(entry.getKey(), String.valueOf(entry.getValue()));
-            }
-            return params;
+            return JSON.parseObject(text);
         } catch (IOException e) {
             log.error("解析json请求失败", e);
             return Collections.emptyMap();

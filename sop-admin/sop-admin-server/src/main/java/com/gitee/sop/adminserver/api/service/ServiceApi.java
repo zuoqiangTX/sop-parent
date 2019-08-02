@@ -6,16 +6,23 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.sop.adminserver.api.service.param.ServiceAddParam;
+import com.gitee.sop.adminserver.api.service.param.ServiceInstanceGrayParam;
+import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
+import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.MetadataEnum;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
+import com.gitee.sop.adminserver.bean.UserKeyDefinition;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
+import com.gitee.sop.adminserver.entity.ConfigGrayUserkey;
+import com.gitee.sop.adminserver.mapper.ConfigGrayUserkeyMapper;
 import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
@@ -44,6 +51,9 @@ public class ServiceApi {
 
     @Autowired
     private RegistryService registryService;
+
+    @Autowired
+    private ConfigGrayUserkeyMapper configGrayUserkeyMapper;
 
     @Api(name = "zookeeper.service.list")
     @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
@@ -157,9 +167,9 @@ public class ServiceApi {
 
     @Api(name = "service.instance.offline")
     @ApiDocMethod(description = "服务禁用")
-    void serviceOffline(ServiceInstance param) {
+    void serviceOffline(ServiceInstanceParam param) {
         try {
-            registryService.offlineInstance(param);
+            registryService.offlineInstance(param.buildServiceInstance());
         } catch (Exception e) {
             log.error("服务禁用失败，param:{}", param, e);
             throw new BizException("服务禁用失败，请查看日志");
@@ -168,9 +178,9 @@ public class ServiceApi {
 
     @Api(name = "service.instance.online")
     @ApiDocMethod(description = "服务启用")
-    void serviceOnline(ServiceInstance param) throws IOException {
+    void serviceOnline(ServiceInstanceParam param) throws IOException {
         try {
-            registryService.onlineInstance(param);
+            registryService.onlineInstance(param.buildServiceInstance());
         } catch (Exception e) {
             log.error("服务启用失败，param:{}", param, e);
             throw new BizException("服务启用失败，请查看日志");
@@ -179,10 +189,10 @@ public class ServiceApi {
 
     @Api(name = "service.instance.env.pre")
     @ApiDocMethod(description = "预发布")
-    void serviceEnvPre(ServiceInstance param) throws IOException {
+    void serviceEnvPre(ServiceInstanceParam param) throws IOException {
         try {
             MetadataEnum envPre = MetadataEnum.ENV_PRE;
-            registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
+            registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
         } catch (Exception e) {
             log.error("预发布失败，param:{}", param, e);
             throw new BizException("预发布失败，请查看日志");
@@ -191,10 +201,31 @@ public class ServiceApi {
 
     @Api(name = "service.instance.env.gray")
     @ApiDocMethod(description = "灰度发布")
-    void serviceEnvGray(ServiceInstance param) throws IOException {
+    void serviceEnvGray(ServiceInstanceGrayParam param) throws IOException {
         try {
-            MetadataEnum envPre = MetadataEnum.ENV_GRAY;
-            registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
+            Boolean onlyUpdateGrayUserkey = param.getOnlyUpdateGrayUserkey();
+            if (onlyUpdateGrayUserkey == null || !onlyUpdateGrayUserkey) {
+                MetadataEnum envPre = MetadataEnum.ENV_GRAY;
+                registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
+            }
+
+            String instanceId = param.getInstanceId();
+            String userKeyContent = param.getUserKeyContent();
+            String nameVersionContent = param.getNameVersionContent();
+
+            ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", instanceId);
+            if (configGrayUserkey == null) {
+                configGrayUserkey = new ConfigGrayUserkey();
+                configGrayUserkey.setInstanceId(instanceId);
+                configGrayUserkey.setUserKeyContent(userKeyContent);
+                configGrayUserkey.setNameVersionContent(nameVersionContent);
+                configGrayUserkeyMapper.save(configGrayUserkey);
+            } else {
+                configGrayUserkey.setUserKeyContent(userKeyContent);
+                configGrayUserkey.setNameVersionContent(nameVersionContent);
+                configGrayUserkeyMapper.update(configGrayUserkey);
+            }
+            this.sendUserKeyMsg(instanceId, ChannelOperation.GRAY_USER_KEY_SET);
         } catch (Exception e) {
             log.error("灰度发布失败，param:{}", param, e);
             throw new BizException("灰度发布失败，请查看日志");
@@ -207,10 +238,26 @@ public class ServiceApi {
         try {
             MetadataEnum envPre = MetadataEnum.ENV_ONLINE;
             registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
+            this.sendUserKeyMsg(param.getServiceId(), ChannelOperation.GRAY_USER_KEY_CLEAR);
         } catch (Exception e) {
             log.error("上线失败，param:{}", param, e);
             throw new BizException("上线失败，请查看日志");
         }
+    }
+
+    @Api(name = "service.instance.gray.userkey.get")
+    ConfigGrayUserkey getGrayUserkey(ServiceSearchParam param) {
+        return configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
+    }
+
+    private void sendUserKeyMsg(String serviceId, ChannelOperation channelOperation) {
+        UserKeyDefinition userKeyDefinition = new UserKeyDefinition();
+        userKeyDefinition.setServiceId(serviceId);
+        ChannelMsg channelMsg = new ChannelMsg(channelOperation, userKeyDefinition);
+        String jsonData = JSON.toJSONString(channelMsg);
+        String path = ZookeeperContext.getUserKeyChannelPath();
+        log.info("消息推送--灰度发布({}), path:{}, data:{}",channelOperation.getOperation(), path, jsonData);
+        ZookeeperContext.createOrUpdateData(path, jsonData);
     }
 
 }

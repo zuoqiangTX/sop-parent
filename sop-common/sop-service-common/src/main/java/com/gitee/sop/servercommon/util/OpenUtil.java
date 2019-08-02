@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,6 @@ import java.util.Set;
  */
 @Slf4j
 public class OpenUtil {
-
-    private static final String UTF8 = "UTF-8";
 
     /**
      * 获取request中的参数
@@ -36,7 +35,7 @@ public class OpenUtil {
         JSONObject jsonObject;
         if (StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE)) {
             try {
-                String requestJson = IOUtils.toString(request.getInputStream(), UTF8);
+                String requestJson = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
                 jsonObject = JSON.parseObject(requestJson);
             } catch (Exception e) {
                 jsonObject = new JSONObject();

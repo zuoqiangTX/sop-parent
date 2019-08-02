@@ -42,6 +42,8 @@ public class ParamNames {
     /** 请求参数的集合，最大长度不限，除公共参数外所有请求参数都必须放在这个参数中传递，具体参照各产品快速接入文档 */
     public static String BIZ_CONTENT_NAME = "biz_content";
 
+    public static String HEADER_VERSION_NAME = "x-sop-version";
+
     /** 时间戳格式 */
     public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 

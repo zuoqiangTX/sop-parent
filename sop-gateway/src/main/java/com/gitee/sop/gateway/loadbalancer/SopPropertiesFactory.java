@@ -17,13 +17,13 @@ public class SopPropertiesFactory extends PropertiesFactory {
      */
     private static final String PROPERTIES_KEY = "zuul.custom-rule-classname";
 
-    private static final String CUSTOM_RULE_CLASSNAME = PreEnvironmentServerChooser.class.getName();
+    private static final String CUSTOM_RULE_CLASSNAME = EnvironmentServerChooser.class.getName();
 
     @Autowired
     private Environment environment;
 
     /**
-     * 配置文件配置：<serviceId>.ribbon.NFLoadBalancerRuleClassName=com.gitee.sop.gateway.loadbalancer.PreEnvironmentServerChooser
+     * 配置文件配置：<serviceId>.ribbon.NFLoadBalancerRuleClassName=com.gitee.sop.gateway.loadbalancer.EnvironmentServerChooser
      * @param clazz
      * @param name serviceId
      * @return 返回class全限定名

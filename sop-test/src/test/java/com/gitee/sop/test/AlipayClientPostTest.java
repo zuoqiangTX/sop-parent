@@ -232,7 +232,7 @@ public class AlipayClientPostTest extends TestBase {
     }
 
     @Test
-    public void testApiAbility() throws AlipayApiException {
+    public void testGetStory2() throws AlipayApiException {
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();
         params.put("app_id", appId);

@@ -110,8 +110,8 @@ public class HttpTool {
      * @return
      * @throws IOException
      */
-    public String request(String url, Map<String, ?> form, Map<String, String> header, HTTPMethod method) throws IOException {
-        Request.Builder requestBuilder = buildRequestBuilder(url, form, method.value());
+    public String request(String url, Map<String, String> form, Map<String, String> header, HTTPMethod method) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
         // 添加header
         addHeader(requestBuilder, header);
 
@@ -153,21 +153,21 @@ public class HttpTool {
         }
     }
 
-    public static Request.Builder buildRequestBuilder(String url, Map<String, ?> form, String method) {
+    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, HTTPMethod method) {
         switch (method) {
-            case "get":
+            case GET:
                 return new Request.Builder()
                         .url(buildHttpUrl(url, form))
                         .get();
-            case "head":
+            case HEAD:
                 return new Request.Builder()
                         .url(buildHttpUrl(url, form))
                         .head();
-            case "put":
+            case PUT:
                 return new Request.Builder()
                         .url(url)
                         .put(buildFormBody(form));
-            case "delete":
+            case DELETE:
                 return new Request.Builder()
                         .url(url)
                         .delete(buildFormBody(form));
@@ -178,18 +178,18 @@ public class HttpTool {
         }
     }
 
-    public static HttpUrl buildHttpUrl(String url, Map<String, ?> form) {
+    public static HttpUrl buildHttpUrl(String url, Map<String, String> form) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-        for (Map.Entry<String, ?> entry : form.entrySet()) {
-            urlBuilder.addQueryParameter(entry.getKey(), String.valueOf(entry.getValue()));
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
         }
         return urlBuilder.build();
     }
 
-    public static FormBody buildFormBody(Map<String, ?> form) {
+    public static FormBody buildFormBody(Map<String, String> form) {
         FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
-        for (Map.Entry<String, ?> entry : form.entrySet()) {
-            paramBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            paramBuilder.add(entry.getKey(), entry.getValue());
         }
         return paramBuilder.build();
     }

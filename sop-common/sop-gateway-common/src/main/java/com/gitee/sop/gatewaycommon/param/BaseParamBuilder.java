@@ -31,6 +31,14 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
      */
     public abstract String getIP(T ctx);
 
+    /**
+     * 将版本号添加到header中
+     * @param ctx 请求request
+     * @param headerName headerName
+     * @param version 版本号
+     */
+    public abstract void setVersionInHeader(T ctx, String headerName, String version);
+
     @Override
     public ApiParam build(T ctx) {
         ApiParam apiParam = this.newApiParam(ctx);
@@ -38,6 +46,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
         apiParam.putAll(requestParams);
         this.initOtherProperty(apiParam);
         apiParam.setIp(this.getIP(ctx));
+        this.setVersionInHeader(ctx, ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
         return apiParam;
     }
 

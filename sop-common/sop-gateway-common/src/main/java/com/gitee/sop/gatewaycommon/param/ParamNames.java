@@ -45,7 +45,7 @@ public class ParamNames {
     /** 返回sign名称 */
     public static String RESPONSE_SIGN_NAME = "sign";
 
-    public static String GRAY_HEADER_VERSION_NAME = "sop_gray_version";
+    public static String HEADER_VERSION_NAME = "sop-version";
 
 
 }

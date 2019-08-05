@@ -45,11 +45,10 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
     }
 
     protected String getVersion(HttpServletRequest request) {
-        String versionInHeader = request.getHeader(ParamNames.HEADER_VERSION_NAME);
-        if (versionInHeader != null) {
-            return versionInHeader;
+        String version = request.getHeader(ParamNames.HEADER_VERSION_NAME);
+        if (version == null) {
+            version = request.getParameter(ParamNames.VERSION_NAME);
         }
-        String version = request.getParameter(ParamNames.VERSION_NAME);
         return version == null ? defaultVersion : version;
     }
 

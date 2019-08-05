@@ -47,5 +47,7 @@ public class ParamNames {
     /** 时间戳格式 */
     public static String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    public static String HEADER_VERSION_NAME = "sop-version";
+
 
 }

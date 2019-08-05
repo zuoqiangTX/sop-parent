@@ -163,7 +163,7 @@
                   </el-form-item>
                 </td>
                 <td style="vertical-align: baseline;">
-                  <el-button v-if="index > 0" type="text" @click.prevent="removeNameVersion(grayRouteConfig)">删除</el-button>
+                  <el-button v-show="grayForm.grayRouteConfigList.length > 1" type="text" @click.prevent="removeNameVersion(grayRouteConfig)">删除</el-button>
                 </td>
               </tr>
             </table>
@@ -203,11 +203,7 @@ export default {
         ipPort: '',
         userKeyContent: '',
         onlyUpdateGrayUserkey: false,
-        grayRouteConfigList: [{
-          oldRouteId: '',
-          newVersion: '',
-          key: Date.now()
-        }]
+        grayRouteConfigList: []
       },
       tabsActiveName: 'first',
       routeList: [],

@@ -3,10 +3,15 @@ package com.gitee.sop.gatewaycommon.manager;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
+import com.gitee.sop.gatewaycommon.bean.SpringContext;
+import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
+import com.gitee.sop.gatewaycommon.session.SessionManager;
+import com.gitee.sop.gatewaycommon.validate.Validator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -35,28 +40,57 @@ public class AbstractConfiguration implements ApplicationContextAware {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    Validator validator() {
+        return ApiConfig.getInstance().getValidator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     IsvManager isvManager() {
         return ApiConfig.getInstance().getIsvManager();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     IsvRoutePermissionManager isvRoutePermissionManager() {
         return ApiConfig.getInstance().getIsvRoutePermissionManager();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     RouteConfigManager routeConfigManager() {
         return ApiConfig.getInstance().getRouteConfigManager();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     LimitConfigManager limitConfigManager() {
         return ApiConfig.getInstance().getLimitConfigManager();
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    LimitManager limitManager() {
+        return ApiConfig.getInstance().getLimitManager();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     IPBlacklistManager ipBlacklistManager() {
         return ApiConfig.getInstance().getIpBlacklistManager();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    UserKeyManager userKeyManager() {
+        return ApiConfig.getInstance().getUserKeyManager();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    SessionManager sessionManager() {
+        return ApiConfig.getInstance().getSessionManager();
     }
 
     /**
@@ -89,6 +123,7 @@ public class AbstractConfiguration implements ApplicationContextAware {
 
     @PostConstruct
     public final void after() {
+        SpringContext.setApplicationContext(applicationContext);
         if (RouteRepositoryContext.getRouteRepository() == null) {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
         }

@@ -1,14 +1,14 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.entity.ConfigGrayUserkey;
-import com.gitee.sop.gateway.loadbalancer.ServiceGrayConfig;
 import com.gitee.sop.gateway.mapper.ConfigGrayUserkeyMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.UserKeyDefinition;
+import com.gitee.sop.gatewaycommon.manager.DefaultUserKeyManager;
 import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +27,11 @@ import java.util.stream.Stream;
  *
  * @author tanghc
  */
-@Service
 @Slf4j
-public class UserKeyManager {
+@Service
+public class DbUserKeyManager extends DefaultUserKeyManager {
 
-    /**
-     * KEY:instanceId
-     */
-    private Map<String, ServiceGrayConfig> serviceUserKeyMap = Maps.newConcurrentMap();
+    private static final int STATUS_ENABLE = 1;
 
     @Autowired
     private Environment environment;
@@ -42,18 +39,14 @@ public class UserKeyManager {
     @Autowired
     private ConfigGrayUserkeyMapper configGrayUserkeyMapper;
 
-    public boolean containsKey(String serviceId, Object userKey) {
-        if (serviceId == null || userKey == null) {
-            return false;
+    @Override
+    public void load() {
+        Query query = new Query();
+        query.eq("status", STATUS_ENABLE);
+        List<ConfigGrayUserkey> list = configGrayUserkeyMapper.list(query);
+        for (ConfigGrayUserkey configGrayUserkey : list) {
+            this.setServiceGrayConfig(configGrayUserkey);
         }
-        return this.getServiceGrayConfig(serviceId).containsKey(userKey);
-    }
-
-    public String getVersion(String serviceId, String nameVersion) {
-        if (serviceId == null || nameVersion == null) {
-            return null;
-        }
-        return this.getServiceGrayConfig(serviceId).getVersion(nameVersion);
     }
 
     /**
@@ -61,11 +54,12 @@ public class UserKeyManager {
      *
      * @param configGrayUserkey 灰度配置
      */
-    public void setServiceGrayConfig(String serviceId, ConfigGrayUserkey configGrayUserkey) {
+    public void setServiceGrayConfig(ConfigGrayUserkey configGrayUserkey) {
         if (configGrayUserkey == null) {
             return;
         }
-        this.clear(serviceId);
+        String instanceId = configGrayUserkey.getInstanceId();
+        this.clear(instanceId);
         String userKeyData = configGrayUserkey.getUserKeyContent();
         String nameVersionContent = configGrayUserkey.getNameVersionContent();
         String[] userKeys = StringUtils.split(userKeyData, ',');
@@ -73,7 +67,7 @@ public class UserKeyManager {
         log.info("添加userKey，userKeys.length:{}, nameVersionList:{}", userKeys.length, Arrays.toString(nameVersionList));
 
         List<String> list = Stream.of(userKeys).collect(Collectors.toList());
-        ServiceGrayConfig serviceGrayConfig = getServiceGrayConfig(serviceId);
+        ServiceGrayConfig serviceGrayConfig = getServiceGrayConfig(instanceId);
         serviceGrayConfig.getUserKeys().addAll(list);
 
         Map<String, String> grayNameVersion = serviceGrayConfig.getGrayNameVersion();
@@ -89,20 +83,10 @@ public class UserKeyManager {
     /**
      * 清空用户key
      */
-    public void clear(String serviceId) {
-        getServiceGrayConfig(serviceId).clear();
+    public void clear(String instanceId) {
+        getServiceGrayConfig(instanceId).clear();
     }
 
-    public ServiceGrayConfig getServiceGrayConfig(String serviceId) {
-        ServiceGrayConfig serviceGrayConfig = serviceUserKeyMap.get(serviceId);
-        if (serviceGrayConfig == null) {
-            serviceGrayConfig = new ServiceGrayConfig();
-            serviceGrayConfig.setUserKeys(Sets.newConcurrentHashSet());
-            serviceGrayConfig.setGrayNameVersion(Maps.newConcurrentMap());
-            serviceUserKeyMap.put(serviceId, serviceGrayConfig);
-        }
-        return serviceGrayConfig;
-    }
 
     @PostConstruct
     protected void after() throws Exception {
@@ -113,14 +97,14 @@ public class UserKeyManager {
             ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
             String data = channelMsg.getData();
             UserKeyDefinition userKeyDefinition = JSON.parseObject(data, UserKeyDefinition.class);
-            String serviceId = userKeyDefinition.getServiceId();
+            String instanceId = userKeyDefinition.getInstanceId();
             switch (channelMsg.getOperation()) {
                 case "set":
-                    ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("service_id", serviceId);
-                    this.setServiceGrayConfig(serviceId, configGrayUserkey);
+                    ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", instanceId);
+                    this.setServiceGrayConfig(configGrayUserkey);
                     break;
                 case "clear":
-                    clear(serviceId);
+                    clear(instanceId);
                     break;
                 default:
                     log.error("userKey消息，错误的消息指令，nodeData：{}", nodeData);

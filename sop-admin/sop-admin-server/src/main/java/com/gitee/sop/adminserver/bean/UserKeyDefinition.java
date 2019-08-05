@@ -7,6 +7,6 @@ import lombok.Data;
  */
 @Data
 public class UserKeyDefinition {
-    private String serviceId;
+    private String instanceId;
     private String data;
 }

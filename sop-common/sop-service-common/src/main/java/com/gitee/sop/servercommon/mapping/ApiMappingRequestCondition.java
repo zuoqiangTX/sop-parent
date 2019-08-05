@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRequestCondition> {
 
-    public static final String UTF_8 = "UTF-8";
     private String defaultVersion = ServiceConfig.getInstance().getDefaultVersion();
 
     private ApiMappingInfo apiMappingInfo;

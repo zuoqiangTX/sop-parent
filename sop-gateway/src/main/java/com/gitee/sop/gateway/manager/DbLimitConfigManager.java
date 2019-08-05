@@ -11,6 +11,7 @@ import com.gitee.sop.gatewaycommon.util.MyBeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
  * @author tanghc
  */
 @Slf4j
+@Service
 public class DbLimitConfigManager extends DefaultLimitConfigManager {
 
     @Autowired

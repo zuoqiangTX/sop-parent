@@ -1,4 +1,4 @@
-package com.gitee.sop.gateway.loadbalancer;
+package com.gitee.sop.gatewaycommon.zuul.loadbalancer;
 
 import lombok.Data;
 

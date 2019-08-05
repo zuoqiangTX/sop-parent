@@ -1,9 +1,10 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.FormBodyWrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
@@ -14,6 +15,7 @@ import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulZookeeperRouteManager;
+import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -37,8 +39,8 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    SpringContext springContext() {
-        return new SpringContext();
+    ParamBuilder<RequestContext> paramBuilder() {
+        return ApiConfig.getInstance().getZuulParamBuilder();
     }
 
     /**
@@ -129,6 +131,7 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      * 统一错误处理
      */
     @Bean
+    @ConditionalOnMissingBean
     ZuulErrorController baseZuulController() {
         return ApiContext.getApiConfig().getZuulErrorController();
     }

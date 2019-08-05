@@ -19,6 +19,7 @@ import com.gitee.sop.adminserver.bean.UserKeyDefinition;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
+import com.gitee.sop.adminserver.common.StatusEnum;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.ConfigGrayUserkey;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 @ApiDoc("服务管理-服务列表")
 @Slf4j
 public class ServiceApi {
+
 
     @Autowired
     private RegistryService registryService;
@@ -219,10 +221,12 @@ public class ServiceApi {
                 configGrayUserkey.setInstanceId(instanceId);
                 configGrayUserkey.setUserKeyContent(userKeyContent);
                 configGrayUserkey.setNameVersionContent(nameVersionContent);
+                configGrayUserkey.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
                 configGrayUserkeyMapper.save(configGrayUserkey);
             } else {
                 configGrayUserkey.setUserKeyContent(userKeyContent);
                 configGrayUserkey.setNameVersionContent(nameVersionContent);
+                configGrayUserkey.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
                 configGrayUserkeyMapper.update(configGrayUserkey);
             }
             this.sendUserKeyMsg(instanceId, ChannelOperation.GRAY_USER_KEY_SET);
@@ -238,7 +242,13 @@ public class ServiceApi {
         try {
             MetadataEnum envPre = MetadataEnum.ENV_ONLINE;
             registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
-            this.sendUserKeyMsg(param.getServiceId(), ChannelOperation.GRAY_USER_KEY_CLEAR);
+
+            ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
+            if (configGrayUserkey != null && configGrayUserkey.getStatus() == StatusEnum.STATUS_ENABLE.getStatus()) {
+                configGrayUserkey.setStatus(StatusEnum.STATUS_DISABLE.getStatus());
+                configGrayUserkeyMapper.update(configGrayUserkey);
+            }
+            this.sendUserKeyMsg(param.getInstanceId(), ChannelOperation.GRAY_USER_KEY_CLEAR);
         } catch (Exception e) {
             log.error("上线失败，param:{}", param, e);
             throw new BizException("上线失败，请查看日志");
@@ -250,9 +260,9 @@ public class ServiceApi {
         return configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
     }
 
-    private void sendUserKeyMsg(String serviceId, ChannelOperation channelOperation) {
+    private void sendUserKeyMsg(String instanceId, ChannelOperation channelOperation) {
         UserKeyDefinition userKeyDefinition = new UserKeyDefinition();
-        userKeyDefinition.setServiceId(serviceId);
+        userKeyDefinition.setInstanceId(instanceId);
         ChannelMsg channelMsg = new ChannelMsg(channelOperation, userKeyDefinition);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getUserKeyChannelPath();

@@ -34,6 +34,9 @@ public class ConfigGrayUserkey {
     /** 需要灰度的接口，goods.get=1.2,order.list=1.2, 数据库字段：name_version_content */
     private String nameVersionContent;
 
+    /** 0：禁用，1：启用, 数据库字段：status */
+    private Byte status;
+
     /**  数据库字段：gmt_create */
     private Date gmtCreate;
 

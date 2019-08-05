@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  * @author tanghc
  */
 @Slf4j
+@Service
 public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
 
     @Autowired

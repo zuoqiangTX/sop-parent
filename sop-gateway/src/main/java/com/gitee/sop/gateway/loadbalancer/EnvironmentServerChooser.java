@@ -1,6 +1,6 @@
 package com.gitee.sop.gateway.loadbalancer;
 
-import com.gitee.sop.gateway.manager.UserKeyManager;
+import com.gitee.sop.gateway.manager.DbUserKeyManager;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.Param;
@@ -83,14 +83,15 @@ public class EnvironmentServerChooser extends BaseServerChooser {
      */
     protected boolean canVisitGray(Server server, HttpServletRequest request) {
         ApiParam apiParam = ZuulContext.getApiParam();
-        UserKeyManager userKeyManager = SpringContext.getBean(UserKeyManager.class);
+        DbUserKeyManager userKeyManager = SpringContext.getBean(DbUserKeyManager.class);
         boolean canVisit = false;
         if (this.isGrayUser(apiParam, userKeyManager, server, request)) {
             // 指定灰度版本号
-            String instanceId = server.getId();
+            String instanceId = server.getMetaInfo().getInstanceId();
             String newVersion = userKeyManager.getVersion(instanceId, apiParam.fetchNameVersion());
             if (newVersion != null) {
-                RequestContext.getCurrentContext().getZuulRequestHeaders().put(ParamNames.HEADER_VERSION_NAME, newVersion);
+                // 在header中设置新的版本号，然后微服务端先获取这个新版本号
+                RequestContext.getCurrentContext().addZuulRequestHeader(ParamNames.GRAY_HEADER_VERSION_NAME, newVersion);
                 canVisit = true;
             }
         }
@@ -107,8 +108,8 @@ public class EnvironmentServerChooser extends BaseServerChooser {
      * @param request        request
      * @return true：是
      */
-    protected boolean isGrayUser(Param param, UserKeyManager userKeyManager, Server server, HttpServletRequest request) {
-        String instanceId = server.getId();
+    protected boolean isGrayUser(Param param, DbUserKeyManager userKeyManager, Server server, HttpServletRequest request) {
+        String instanceId = server.getMetaInfo().getInstanceId();
         // 这里的灰度用户为appKey，包含此appKey则为灰度用户，允许访问
         String appKey = param.fetchAppKey();
         return userKeyManager.containsKey(instanceId, appKey);

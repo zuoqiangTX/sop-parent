@@ -231,4 +231,35 @@ public class AlipayClientPostTest extends TestBase {
         System.out.println(responseData);
     }
 
+    @Test
+    public void testGetStory2() throws AlipayApiException {
+        // 公共请求参数
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("app_id", appId);
+        params.put("method", "getStory2");
+        params.put("version", "1.0");
+        params.put("format", "json");
+        params.put("charset", "utf-8");
+        params.put("sign_type", "RSA2");
+        params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        // 业务参数
+        Map<String, String> bizContent = new HashMap<>();
+
+        params.put("biz_content", JSON.toJSONString(bizContent));
+
+        System.out.println("----------- 请求信息 -----------");
+        System.out.println("请求参数：" + buildParamQuery(params));
+        System.out.println("商户秘钥：" + privateKey);
+        String content = AlipaySignature.getSignContent(params);
+        System.out.println("待签名内容：" + content);
+        String sign = AlipaySignature.rsa256Sign(content, privateKey, "utf-8");
+        System.out.println("签名(sign)：" + sign);
+
+        params.put("sign", sign);
+
+        System.out.println("----------- 返回结果 -----------");
+        String responseData = get(url, params);// 发送请求
+        System.out.println(responseData);
+    }
+
 }

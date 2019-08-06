@@ -19,22 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class BaseServerChooser extends ZoneAvoidanceRule {
 
-    /**
-     * 是否匹配对应的服务器，可在此判断是否是预发布，灰度环境
-     *
-     * @param server 指定服务器
-     * @return 返回true：是
-     */
-    protected abstract boolean match(Server server);
-
-    /**
-     * 客户端能否够访问服务器
-     *
-     * @param server  服务器实例
-     * @param request request
-     * @return 返回true：能访问
-     */
-    protected abstract boolean canVisit(Server server, HttpServletRequest request);
 
     /**
      * 是否是预发布服务器
@@ -97,7 +81,8 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
 
         List<Server> grayServers = allServers.stream()
                 .filter(this::isGrayServer)
-                .filter(server -> canVisitGray(server, request))
+                // 这句暂时不需要，放到了PreVersionDecisionFilter中判断
+                //.filter(server -> canVisitGray(server, request))
                 .collect(Collectors.toList());
         if (!grayServers.isEmpty()) {
             return doChoose(grayServers, key);

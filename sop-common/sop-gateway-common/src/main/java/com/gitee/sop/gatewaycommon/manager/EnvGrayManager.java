@@ -10,8 +10,6 @@ import java.util.List;
  */
 public interface EnvGrayManager extends BeanInitializer {
 
-    void addServiceInstance(String serviceId, String instanceId);
-
     List<String> listGrayInstanceId(String serviceId);
 
     boolean containsKey(String instanceId, Object userKey);

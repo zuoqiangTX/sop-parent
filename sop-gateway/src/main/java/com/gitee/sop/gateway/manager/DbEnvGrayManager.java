@@ -46,7 +46,6 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
         List<ConfigGrayUserkey> list = configGrayUserkeyMapper.list(query);
         for (ConfigGrayUserkey configGrayUserkey : list) {
             this.setServiceGrayConfig(configGrayUserkey);
-            this.addServiceInstance(configGrayUserkey.getServiceId(), configGrayUserkey.getInstanceId());
         }
     }
 
@@ -69,6 +68,7 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
         List<String> list = Stream.of(userKeys).collect(Collectors.toList());
         ServiceGrayConfig serviceGrayConfig = getServiceGrayConfig(instanceId);
+        serviceGrayConfig.setServiceId(configGrayUserkey.getServiceId());
         serviceGrayConfig.getUserKeys().addAll(list);
 
         Map<String, String> grayNameVersion = serviceGrayConfig.getGrayNameVersion();

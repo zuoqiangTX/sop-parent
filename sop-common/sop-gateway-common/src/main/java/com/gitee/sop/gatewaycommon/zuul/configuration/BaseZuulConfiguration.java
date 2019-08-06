@@ -11,6 +11,7 @@ import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreHttpServletRequestWrapperFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreVersionDecisionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
@@ -112,6 +113,14 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     }
 
     /**
+     * 决定版本号
+     */
+    @Bean
+    PreVersionDecisionFilter preVersionDecisionFilter() {
+        return new PreVersionDecisionFilter();
+    }
+
+    /**
      * 错误处理扩展
      */
     @Bean
@@ -126,6 +135,7 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     PostResultFilter postResultFilter() {
         return new PostResultFilter();
     }
+
 
     /**
      * 统一错误处理

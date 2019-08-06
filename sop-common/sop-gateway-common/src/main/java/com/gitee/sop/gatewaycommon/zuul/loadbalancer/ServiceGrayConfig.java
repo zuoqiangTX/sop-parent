@@ -10,6 +10,11 @@ import java.util.Set;
  */
 @Data
 public class ServiceGrayConfig {
+
+    private String serviceId;
+
+    private String instanceId;
+
     /**
      * 用户id
      */

@@ -40,12 +40,14 @@ public class PreVersionDecisionFilter extends BaseZuulFilter {
         }
         String serviceId = targetRoute.getServiceRouteInfo().getServiceId();
         List<String> instanceIdList = envGrayManager.listGrayInstanceId(serviceId);
-
+        String appKey = apiParam.fetchAppKey();
         for (String instanceId : instanceIdList) {
-            String version = envGrayManager.getVersion(instanceId, nameVersion);
-            if (version != null) {
-                requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, version);
-                break;
+            if (envGrayManager.containsKey(instanceId, appKey)) {
+                String version = envGrayManager.getVersion(instanceId, nameVersion);
+                if (version != null) {
+                    requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, version);
+                    break;
+                }
             }
         }
         return null;

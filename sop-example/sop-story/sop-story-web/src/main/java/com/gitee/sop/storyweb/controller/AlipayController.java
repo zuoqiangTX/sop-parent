@@ -30,7 +30,7 @@ public class AlipayController {
     // http://localhost:2222/story_get
     // 原生的接口，可正常调用
     @RequestMapping("story_get")
-    public Story getStory4() {
+    public Story story_get() {
         Story story = new Story();
         story.setId(1);
         story.setName("海底小纵队(原生)");
@@ -117,7 +117,7 @@ public class AlipayController {
     // http://localhost:2222/getStory2?version=2.1
     // 遗留接口具备开放平台能力，在原来的基础上加版本号
     @ApiAbility(version = "2.1")
-    @RequestMapping("getStory2")
+    @GetMapping("getStory2")
     public Story getStory2_1() {
         Story story = new Story();
         story.setId(1);

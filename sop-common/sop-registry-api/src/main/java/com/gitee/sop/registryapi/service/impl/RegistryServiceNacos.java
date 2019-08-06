@@ -11,7 +11,6 @@ import com.gitee.sop.registryapi.bean.HttpTool;
 import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
-import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
@@ -28,8 +27,6 @@ import java.util.Map;
  * @author tanghc
  */
 public class RegistryServiceNacos implements RegistryService {
-
-    OkHttpClient client = new OkHttpClient();
 
     static HttpTool httpTool = new HttpTool();
 

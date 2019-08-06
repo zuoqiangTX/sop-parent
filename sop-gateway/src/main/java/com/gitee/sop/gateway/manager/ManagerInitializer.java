@@ -14,6 +14,6 @@ public class ManagerInitializer {
         apiConfig.setRouteConfigManager(new DbRouteConfigManager());
         apiConfig.setLimitConfigManager(new DbLimitConfigManager());
         apiConfig.setIpBlacklistManager(new DbIPBlacklistManager());
-        apiConfig.setUserKeyManager(new DbUserKeyManager());
+        apiConfig.setUserKeyManager(new DbEnvGrayManager());
     }
 }

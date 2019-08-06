@@ -211,6 +211,7 @@ public class ServiceApi {
                 registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
             }
 
+            String serviceId = param.getServiceId();
             String instanceId = param.getInstanceId();
             String userKeyContent = param.getUserKeyContent();
             String nameVersionContent = param.getNameVersionContent();
@@ -218,6 +219,7 @@ public class ServiceApi {
             ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", instanceId);
             if (configGrayUserkey == null) {
                 configGrayUserkey = new ConfigGrayUserkey();
+                configGrayUserkey.setServiceId(serviceId);
                 configGrayUserkey.setInstanceId(instanceId);
                 configGrayUserkey.setUserKeyContent(userKeyContent);
                 configGrayUserkey.setNameVersionContent(nameVersionContent);

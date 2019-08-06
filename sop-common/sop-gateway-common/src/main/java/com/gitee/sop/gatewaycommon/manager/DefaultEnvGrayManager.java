@@ -4,17 +4,32 @@ import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author tanghc
  */
-public class DefaultUserKeyManager implements UserKeyManager {
+public class DefaultEnvGrayManager implements EnvGrayManager {
 
     /**
      * KEY:instanceId
      */
     private Map<String, ServiceGrayConfig> serviceUserKeyMap = Maps.newConcurrentMap();
+
+    private Map<String, List<String>> serviceInstanceIdMap = Maps.newConcurrentMap();
+
+    @Override
+    public void addServiceInstance(String serviceId, String instanceId) {
+        List<String> instanceIdList = serviceInstanceIdMap.computeIfAbsent(serviceId, key -> new ArrayList<>());
+        instanceIdList.add(instanceId);
+    }
+
+    @Override
+    public List<String> listGrayInstanceId(String serviceId) {
+        return serviceInstanceIdMap.get(serviceId);
+    }
 
     @Override
     public boolean containsKey(String instanceId, Object userKey) {
@@ -34,14 +49,12 @@ public class DefaultUserKeyManager implements UserKeyManager {
 
     @Override
     public ServiceGrayConfig getServiceGrayConfig(String instanceId) {
-        ServiceGrayConfig serviceGrayConfig = serviceUserKeyMap.get(instanceId);
-        if (serviceGrayConfig == null) {
-            serviceGrayConfig = new ServiceGrayConfig();
+        return serviceUserKeyMap.computeIfAbsent(instanceId, key -> {
+            ServiceGrayConfig serviceGrayConfig = new ServiceGrayConfig();
             serviceGrayConfig.setUserKeys(Sets.newConcurrentHashSet());
             serviceGrayConfig.setGrayNameVersion(Maps.newConcurrentMap());
-            serviceUserKeyMap.put(instanceId, serviceGrayConfig);
-        }
-        return serviceGrayConfig;
+            return serviceGrayConfig;
+        });
     }
 
     @Override

@@ -25,6 +25,9 @@ public class ConfigGrayUserkey {
     /**  数据库字段：id */
     private Long id;
 
+    /** serviceId, 数据库字段：service_id */
+    private String serviceId;
+
     /** instanceId, 数据库字段：instance_id */
     private String instanceId;
 

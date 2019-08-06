@@ -6,7 +6,7 @@ import com.gitee.sop.gateway.entity.ConfigGrayUserkey;
 import com.gitee.sop.gateway.mapper.ConfigGrayUserkeyMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.UserKeyDefinition;
-import com.gitee.sop.gatewaycommon.manager.DefaultUserKeyManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @Service
-public class DbUserKeyManager extends DefaultUserKeyManager {
+public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     private static final int STATUS_ENABLE = 1;
 
@@ -46,6 +46,7 @@ public class DbUserKeyManager extends DefaultUserKeyManager {
         List<ConfigGrayUserkey> list = configGrayUserkeyMapper.list(query);
         for (ConfigGrayUserkey configGrayUserkey : list) {
             this.setServiceGrayConfig(configGrayUserkey);
+            this.addServiceInstance(configGrayUserkey.getServiceId(), configGrayUserkey.getInstanceId());
         }
     }
 

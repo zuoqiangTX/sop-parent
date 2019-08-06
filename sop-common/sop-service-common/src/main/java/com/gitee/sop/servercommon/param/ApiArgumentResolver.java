@@ -17,12 +17,15 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -42,14 +45,29 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     @Override
     public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
+        List<HandlerMethodArgumentResolver> argumentResolversNew = new ArrayList<>(64);
+        // 先加自己
+        argumentResolversNew.add(this);
+        HandlerMethodArgumentResolver lastOne = null;
+        for (HandlerMethodArgumentResolver argumentResolver : Objects.requireNonNull(requestMappingHandlerAdapter.getArgumentResolvers())) {
+            // RequestResponseBodyMethodProcessor暂存起来，放在最后面
+            if (argumentResolver instanceof RequestResponseBodyMethodProcessor) {
+                lastOne = argumentResolver;
+            } else {
+                argumentResolversNew.add(argumentResolver);
+            }
+        }
+        if (lastOne != null) {
+            argumentResolversNew.add(lastOne);
+        }
+        this.requestMappingHandlerAdapter.setArgumentResolvers(argumentResolversNew);
     }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        boolean hasAnnotation = methodParameter.getMethodAnnotation(ApiMapping.class) != null
-                || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
         // 有注解
-        return hasAnnotation;
+        return methodParameter.getMethodAnnotation(ApiMapping.class) != null
+                || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
     }
 
     @Override

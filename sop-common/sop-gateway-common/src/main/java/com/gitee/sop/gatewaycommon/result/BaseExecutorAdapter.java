@@ -37,6 +37,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     private static final ErrorMeta SUCCESS_META = ErrorEnum.SUCCESS.getErrorMeta();
     private static final ErrorMeta ISP_UNKNOW_ERROR_META = ErrorEnum.ISP_UNKNOW_ERROR.getErrorMeta();
     private static final ErrorMeta ISP_BIZ_ERROR = ErrorEnum.BIZ_ERROR.getErrorMeta();
+    private static final ErrorMeta ISV_MISSING_METHOD_META = ErrorEnum.ISV_MISSING_METHOD.getErrorMeta();
 
     public static final String GATEWAY_CODE_NAME = "code";
     public static final String GATEWAY_MSG_NAME = "msg";
@@ -90,6 +91,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             responseData = JSON.parseObject(serviceResult);
             responseData.put(GATEWAY_CODE_NAME, ISP_BIZ_ERROR.getCode());
             responseData.put(GATEWAY_MSG_NAME, ISP_BIZ_ERROR.getError().getMsg());
+        } else if(responseStatus == HttpStatus.NOT_FOUND.value()) {
+            responseData = JSON.parseObject(serviceResult);
+            responseData.put(GATEWAY_CODE_NAME, ISV_MISSING_METHOD_META.getCode());
+            responseData.put(GATEWAY_MSG_NAME, ISV_MISSING_METHOD_META.getError().getCode());
         } else {
             this.storeError(request, ErrorType.UNKNOWN);
             // 微服务端有可能返回500错误

@@ -42,7 +42,7 @@ public class OpenRequest {
                     }
                     return openHttp.get(url, header);
                 } else {
-                    return openHttp.requestJson(url, JSON.toJSONString(form), header);
+                    return openHttp.request(url, form, header, OpenHttp.HTTPMethod.fromValue(requestMethod.name()));
                 }
             }
         } catch (IOException e) {

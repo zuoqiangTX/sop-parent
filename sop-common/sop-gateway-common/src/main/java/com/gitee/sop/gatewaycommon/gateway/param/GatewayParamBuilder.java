@@ -25,6 +25,5 @@ public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {
 
     @Override
     public void setVersionInHeader(ServerWebExchange ctx, String headerName, String version) {
-        ctx.getRequest().getHeaders().add(headerName, version);
     }
 }

@@ -1,5 +1,9 @@
 # changelog
 
+## 1.13.7
+
+- 修复修复context-path识别问题
+
 ## 1.13.6
 
 - 修复@RequestBody不能绑定问题

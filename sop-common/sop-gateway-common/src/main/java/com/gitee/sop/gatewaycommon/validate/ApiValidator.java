@@ -15,11 +15,11 @@ import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import com.gitee.sop.gatewaycommon.param.UploadContext;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,15 +35,26 @@ import java.util.List;
  *
  * @author tanghc
  */
+@Slf4j
+@Getter
 public class ApiValidator implements Validator {
-    private static final Logger logger = LoggerFactory.getLogger(ApiValidator.class);
 
     private static final int MILLISECOND_OF_ONE_SECOND = 1000;
-    public static final int STATUS_FORBIDDEN = 2;
-
+    private static final int STATUS_FORBIDDEN = 2;
 
     private static List<String> FORMAT_LIST = Arrays.asList("json", "xml");
 
+    @Autowired
+    private IsvManager isvManager;
+
+    @Autowired
+    private  IsvRoutePermissionManager isvRoutePermissionManager;
+
+    @Autowired
+    private IPBlacklistManager ipBlacklistManager;
+
+    @Autowired
+    private RouteConfigManager routeConfigManager;
 
     @Override
     public void validate(ApiParam param) {
@@ -52,8 +63,8 @@ public class ApiValidator implements Validator {
 
         ApiConfig apiConfig = ApiContext.getApiConfig();
         if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
+            if (log.isDebugEnabled()) {
+                log.debug("忽略所有验证(ignoreValidate=true), name:{}, version:{}", param.fetchName(), param.fetchVersion());
             }
             return;
         }
@@ -71,7 +82,6 @@ public class ApiValidator implements Validator {
      * @param param 接口参数
      */
     protected void checkIP(ApiParam param) {
-        IPBlacklistManager ipBlacklistManager = ApiConfig.getInstance().getIpBlacklistManager();
         String ip = param.fetchIp();
         if (ipBlacklistManager.contains(ip)) {
             throw ErrorEnum.ISV_IP_FORBIDDEN.getErrorMeta().getException();
@@ -87,7 +97,6 @@ public class ApiValidator implements Validator {
         // 检查路由是否存在
         RouteRepositoryContext.checkExist(routeId, ErrorEnum.ISV_INVALID_METHOD);
         // 检查路由是否启用
-        RouteConfigManager routeConfigManager = ApiConfig.getInstance().getRouteConfigManager();
         RouteConfig routeConfig = routeConfigManager.get(routeId);
         if (!routeConfig.enable()) {
             throw ErrorEnum.ISP_API_DISABLED.getErrorMeta().getException();
@@ -115,7 +124,7 @@ public class ApiValidator implements Validator {
                     }
                 }
             } catch (IOException e) {
-                logger.error("验证上传文件MD5错误", e);
+                log.error("验证上传文件MD5错误", e);
                 throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
             }
         }
@@ -147,8 +156,6 @@ public class ApiValidator implements Validator {
         if (StringUtils.isEmpty(param.fetchAppKey())) {
             throw ErrorEnum.ISV_MISSING_APP_ID.getErrorMeta().getException();
         }
-        IsvManager isvManager = ApiContext.getApiConfig().getIsvManager();
-        Assert.notNull(isvManager, "isvManager未初始化");
         Isv isv = isvManager.getIsv(param.fetchAppKey());
         // 没有用户
         if (isv == null) {
@@ -167,7 +174,6 @@ public class ApiValidator implements Validator {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE.getErrorMeta().getException(param.fetchNameVersion(), ParamNames.SIGN_NAME);
             }
             ApiConfig apiConfig = ApiContext.getApiConfig();
-            IsvManager isvManager = apiConfig.getIsvManager();
             // 根据appId获取秘钥
             Isv isvInfo = isvManager.getIsv(param.fetchAppKey());
             String secret = isvInfo.getSecretInfo();
@@ -205,7 +211,6 @@ public class ApiValidator implements Validator {
         BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
         boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
         if (needCheckPermission) {
-            IsvRoutePermissionManager isvRoutePermissionManager = ApiConfig.getInstance().getIsvRoutePermissionManager();
             String appKey = apiParam.fetchAppKey();
             boolean hasPermission = isvRoutePermissionManager.hasPermission(appKey, routeId);
             if (!hasPermission) {

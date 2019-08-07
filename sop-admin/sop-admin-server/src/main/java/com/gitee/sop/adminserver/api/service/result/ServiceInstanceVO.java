@@ -3,6 +3,8 @@ package com.gitee.sop.adminserver.api.service.result;
 import com.gitee.easyopen.doc.annotation.ApiDocField;
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * @author tanghc
  */
@@ -34,6 +36,9 @@ public class ServiceInstanceVO {
 
     @ApiDocField(description = "parentId")
     private Integer parentId;
+
+    @ApiDocField(description = "metadata")
+    private Map<String, String> metadata;
 
     public String getIpPort() {
         return ip != null && port > 0 ? ip + ":" + port : "";

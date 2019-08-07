@@ -7,6 +7,7 @@ import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.IsvRoutePermission;
 import com.gitee.sop.adminserver.bean.SopAdminConstants;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
 import com.gitee.sop.adminserver.entity.PermRolePermission;
 import com.gitee.sop.adminserver.mapper.IsvInfoMapper;
@@ -68,7 +69,7 @@ public class RoutePermissionService {
         isvRoutePermission.setAppKey(appKey);
         isvRoutePermission.setRouteIdList(routeIdList);
         isvRoutePermission.setRouteIdListMd5(roleCodeListMd5);
-        ChannelMsg channelMsg = new ChannelMsg("update", isvRoutePermission);
+        ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_PERMISSION_UPDATE, isvRoutePermission);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getIsvRoutePermissionChannelPath();
         log.info("消息推送--路由权限(update), path:{}, data:{}", path, jsonData);
@@ -105,7 +106,7 @@ public class RoutePermissionService {
         });
         IsvRoutePermission isvRoutePermission = new IsvRoutePermission();
         isvRoutePermission.setListenPath(listenPath);
-        ChannelMsg channelMsg = new ChannelMsg("reload", isvRoutePermission);
+        ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_PERMISSION_RELOAD, isvRoutePermission);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getIsvRoutePermissionChannelPath();
         log.info("消息推送--路由权限(reload), path:{}, data:{}", path, jsonData);

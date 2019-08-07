@@ -5,7 +5,7 @@ package com.gitee.sop.servercommon.message;
  */
 public enum ServiceErrorEnum {
     /** 系统繁忙 */
-    ISP_UNKNOW_ERROR("isp.unknow-error"),
+    ISP_UNKNOW_ERROR("isp.unknown-error"),
     /** 参数错误 */
     ISV_PARAM_ERROR("isv.invalid-parameter"),
     /** 通用错误 */

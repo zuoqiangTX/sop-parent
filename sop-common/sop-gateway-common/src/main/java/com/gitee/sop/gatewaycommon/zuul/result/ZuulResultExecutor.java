@@ -76,7 +76,7 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
             }
         }
         if (error == null) {
-            error = ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getError();
+            error = ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getError();
         }
         return error;
     }

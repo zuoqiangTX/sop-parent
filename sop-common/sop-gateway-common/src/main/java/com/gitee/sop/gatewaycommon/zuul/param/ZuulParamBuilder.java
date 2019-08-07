@@ -7,6 +7,7 @@ import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,14 +21,12 @@ import java.util.Map;
 @Slf4j
 public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
 
-    private static final String CONTENT_TYPE_JSON = MediaType.APPLICATION_JSON_VALUE;
-    private static final String CONTENT_TYPE_TEXT = MediaType.TEXT_PLAIN_VALUE;
     private static final String GET = "get";
 
     @Override
-    public Map<String, String> buildRequestParams(RequestContext ctx) {
+    public Map<String, ?> buildRequestParams(RequestContext ctx) {
         HttpServletRequest request = ctx.getRequest();
-        Map<String, String> params;
+        Map<String, ?> params;
         if (GET.equalsIgnoreCase(request.getMethod())) {
             params = RequestUtil.convertRequestParamsToMap(request);
         } else {
@@ -37,7 +36,7 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
             }
             contentType = contentType.toLowerCase();
             // json或者纯文本形式
-            if (contentType.contains(CONTENT_TYPE_JSON) || contentType.contains(CONTENT_TYPE_TEXT)) {
+            if (StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE)) {
                 params = RequestUtil.convertJsonRequestToMap(request);
             } else if (ServletFileUpload.isMultipartContent(request)) {
                 params = RequestUtil.convertMultipartRequestToMap(request);

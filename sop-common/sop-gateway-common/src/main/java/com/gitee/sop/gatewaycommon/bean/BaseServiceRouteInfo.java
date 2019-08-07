@@ -12,4 +12,8 @@ import java.util.List;
 public class BaseServiceRouteInfo<T extends BaseRouteDefinition> {
     private String serviceId;
     private List<T> routeDefinitionList = Collections.emptyList();
+
+    public String fetchServiceIdLowerCase() {
+        return this.serviceId.toLowerCase();
+    }
 }

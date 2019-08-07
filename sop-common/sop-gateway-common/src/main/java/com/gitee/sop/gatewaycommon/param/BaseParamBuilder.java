@@ -22,7 +22,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
      * @param ctx 请求request
      * @return 返回请求参数
      */
-    public abstract Map<String, String> buildRequestParams(T ctx);
+    public abstract Map<String, ?> buildRequestParams(T ctx);
 
     /**
      * 返回客户端ip
@@ -42,10 +42,8 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     @Override
     public ApiParam build(T ctx) {
         ApiParam apiParam = this.newApiParam(ctx);
-        Map<String, String> requestParams = this.buildRequestParams(ctx);
-        for (Map.Entry<String, ?> entry : requestParams.entrySet()) {
-            apiParam.put(entry.getKey(), entry.getValue());
-        }
+        Map<String, ?> requestParams = this.buildRequestParams(ctx);
+        apiParam.putAll(requestParams);
         this.initOtherProperty(apiParam);
         apiParam.setIp(this.getIP(ctx));
         this.setVersionInHeader(ctx, ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
@@ -60,7 +58,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
-            throw ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getException();
+            throw ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getException();
         }
 
         String nameVersion = Optional.ofNullable(apiParam.fetchNameVersion()).orElse(String.valueOf(System.currentTimeMillis()));

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +36,7 @@ import static java.util.stream.Collectors.toList;
  * @author tanghc
  */
 @Slf4j
+@Service
 public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager {
 
     @Autowired
@@ -150,6 +152,8 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
                     log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
                     remove(isvRoutePermission.getAppKey());
                     break;
+                default:
+
             }
         });
     }

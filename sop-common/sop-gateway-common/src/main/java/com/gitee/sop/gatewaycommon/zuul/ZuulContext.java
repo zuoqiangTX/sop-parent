@@ -70,20 +70,6 @@ public class ZuulContext extends ApiContext {
 
 
     /**
-     * 返回自定义的session,被SessionManager管理
-     *
-     * @return 如果sessionId为null，则返回null
-     */
-    public static HttpSession getManagedSession() {
-        String sessionId = getSessionId();
-        if (sessionId != null) {
-            return getSessionManager().getSession(sessionId);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * 获取登陆的token
      *
      * @return 没有返回null

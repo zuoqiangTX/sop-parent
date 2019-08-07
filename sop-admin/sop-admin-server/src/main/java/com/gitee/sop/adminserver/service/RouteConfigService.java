@@ -5,6 +5,7 @@ import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ConfigLimitDto;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,7 @@ public class RouteConfigService {
      * @throws Exception
      */
     public void sendRouteConfigMsg(RouteConfigDto routeConfigDto) {
-        String configData = JSON.toJSONString(routeConfigDto);
-        ChannelMsg channelMsg = new ChannelMsg("update", configData);
+        ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_CONFIG_UPDATE, routeConfigDto);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getRouteConfigChannelPath();
         log.info("消息推送--路由配置(update), path:{}, data:{}", path, jsonData);
@@ -35,8 +35,7 @@ public class RouteConfigService {
      * @throws Exception
      */
     public void sendLimitConfigMsg(ConfigLimitDto routeConfigDto) throws Exception {
-        String configData = JSON.toJSONString(routeConfigDto);
-        ChannelMsg channelMsg = new ChannelMsg("update", configData);
+        ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.LIMIT_CONFIG_UPDATE, routeConfigDto);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getLimitConfigChannelPath();
         log.info("消息推送--限流配置(update), path:{}, data:{}", path, jsonData);

@@ -12,6 +12,7 @@ import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -25,6 +26,12 @@ import java.util.List;
  * @author tanghc
  */
 public class PreLimitFilter extends BaseZuulFilter {
+
+    @Autowired
+    private LimitManager limitManager;
+
+    @Autowired
+    private LimitConfigManager limitConfigManager;
 
     @Override
     protected FilterType getFilterType() {
@@ -53,7 +60,6 @@ public class PreLimitFilter extends BaseZuulFilter {
             return null;
         }
         byte limitType = configLimitDto.getLimitType().byteValue();
-        LimitManager limitManager = ApiConfig.getInstance().getLimitManager();
         // 如果是漏桶策略
         if (limitType == LimitType.LEAKY_BUCKET.getType()) {
             boolean acquire = limitManager.acquire(configLimitDto);
@@ -67,8 +73,6 @@ public class PreLimitFilter extends BaseZuulFilter {
     }
 
     protected ConfigLimitDto findConfigLimitDto(ApiConfig apiConfig, ApiParam apiParam, HttpServletRequest request) {
-        LimitConfigManager limitConfigManager = apiConfig.getLimitConfigManager();
-
         String routeId = apiParam.fetchNameVersion();
         String appKey = apiParam.fetchAppKey();
         String ip = RequestUtil.getIP(request);

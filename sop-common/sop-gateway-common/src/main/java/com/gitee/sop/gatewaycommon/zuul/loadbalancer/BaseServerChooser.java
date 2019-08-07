@@ -53,19 +53,6 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
                 .filter(this::isPreServer)
                 .filter(server -> canVisitPre(server, request))
                 .collect(Collectors.toList());
-//        int index = -1;
-//        for (int i = 0; i < allServers.size(); i++) {
-//            Server server = allServers.get(i);
-//            if (isPreServer(server)) {
-//                preServers.add(server);
-//            }
-//            if (match(server)) {
-//                index = i;
-//                if (canVisit(server, RequestContext.getCurrentContext().getRequest())) {
-//                    return server;
-//                }
-//            }
-//        }
 
         if (!preServers.isEmpty()) {
             return this.doChoose(preServers, key);
@@ -81,16 +68,6 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
         }
 
         return super.choose(key);
-        // 调用默认的算法
-        // 如果选出了特殊环境服务器，需要移除命中的服务器
-//        if (index > -1) {
-//            allServers.remove(index);
-//        }
-//        if (CollectionUtils.isEmpty(allServers)) {
-//            log.error("无可用服务实例，key:", key);
-//            return null;
-//        }
-
     }
 
     protected Server doChoose(List<Server> servers, Object key) {

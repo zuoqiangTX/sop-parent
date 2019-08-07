@@ -1,13 +1,13 @@
 package com.gitee.sop.gatewaycommon.zuul.filter;
 
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
-import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 前置校验
@@ -15,6 +15,13 @@ import com.netflix.zuul.exception.ZuulException;
  * @author tanghc
  */
 public class PreValidateFilter extends BaseZuulFilter {
+
+    @Autowired
+    private ParamBuilder<RequestContext> paramBuilder;
+
+    @Autowired
+    private Validator validator;
+
     @Override
     protected FilterType getFilterType() {
         return FilterType.PRE;
@@ -27,12 +34,10 @@ public class PreValidateFilter extends BaseZuulFilter {
 
     @Override
     protected Object doRun(RequestContext requestContext) throws ZuulException {
-        ApiConfig apiConfig = ApiContext.getApiConfig();
         // 解析参数
-        ApiParam param = apiConfig.getZuulParamBuilder().build(requestContext);
+        ApiParam param = paramBuilder.build(requestContext);
         ZuulContext.setApiParam(param);
         // 验证操作，这里有负责验证签名参数
-        Validator validator = apiConfig.getValidator();
         try {
             validator.validate(param);
         } catch (ApiException e) {

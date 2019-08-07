@@ -11,7 +11,7 @@ import lombok.Setter;
  * "alipay_trade_close_response": {
  * "code": "20000",
  * "msg": "Service Currently Unavailable",
- * "sub_code": "isp.unknow-error",
+ * "sub_code": "isp.unknown-error",
  * "sub_msg": "系统繁忙"
  * },
  * "sign": "ERITJKEIJKJHKKKKKKKHJEREEEEEEEEEEE"

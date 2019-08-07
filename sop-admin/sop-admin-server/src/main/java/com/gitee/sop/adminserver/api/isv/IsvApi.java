@@ -26,6 +26,7 @@ import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.IdGen;
 import com.gitee.sop.adminserver.common.RSATool;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
@@ -229,7 +230,7 @@ public class IsvApi {
         if (isvDetail == null) {
             return;
         }
-        ChannelMsg channelMsg = new ChannelMsg("update", isvDetail);
+        ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ISV_INFO_UPDATE, isvDetail);
         String path = ZookeeperContext.getIsvInfoChannelPath();
         String data = JSON.toJSONString(channelMsg);
         try {

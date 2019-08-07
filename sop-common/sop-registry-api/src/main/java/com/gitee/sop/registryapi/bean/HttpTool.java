@@ -1,4 +1,4 @@
-package com.gitee.sop.websiteserver.bean;
+package com.gitee.sop.registryapi.bean;
 
 import lombok.Data;
 import lombok.Getter;
@@ -110,7 +110,7 @@ public class HttpTool {
      * @return
      * @throws IOException
      */
-    public String request(String url, Map<String, String> form, Map<String, String> header, HTTPMethod method) throws IOException {
+    public String request(String url, Map<String, ?> form, Map<String, String> header, HTTPMethod method) throws IOException {
         Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
         // 添加header
         addHeader(requestBuilder, header);
@@ -153,7 +153,7 @@ public class HttpTool {
         }
     }
 
-    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, HTTPMethod method) {
+    public static Request.Builder buildRequestBuilder(String url, Map<String, ?> form, HTTPMethod method) {
         switch (method) {
             case GET:
                 return new Request.Builder()
@@ -178,18 +178,18 @@ public class HttpTool {
         }
     }
 
-    public static HttpUrl buildHttpUrl(String url, Map<String, String> form) {
+    public static HttpUrl buildHttpUrl(String url, Map<String, ?> form) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
-        for (Map.Entry<String, String> entry : form.entrySet()) {
-            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, ?> entry : form.entrySet()) {
+            urlBuilder.addQueryParameter(entry.getKey(), String.valueOf(entry.getValue()));
         }
         return urlBuilder.build();
     }
 
-    public static FormBody buildFormBody(Map<String, String> form) {
+    public static FormBody buildFormBody(Map<String, ?> form) {
         FormBody.Builder paramBuilder = new FormBody.Builder(StandardCharsets.UTF_8);
-        for (Map.Entry<String, String> entry : form.entrySet()) {
-            paramBuilder.add(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, ?> entry : form.entrySet()) {
+            paramBuilder.add(entry.getKey(), String.valueOf(entry.getValue()));
         }
         return paramBuilder.build();
     }

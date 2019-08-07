@@ -76,7 +76,7 @@ public class ErrorFactory {
             // open.error_20000=Service is temporarily unavailable
             String msg = getErrorMessage(modulePrefix + code, locale);
             String subCode = errorMeta.getSubCode();
-            // open.error_20000_isp.unknow-error=Service is temporarily unavailable
+            // open.error_20000_isp.unknown-error=Service is temporarily unavailable
             String subMsg = getErrorMessage(modulePrefix + code + UNDERLINE + subCode, locale, params);
             if (StringUtils.isEmpty(msg)) {
                 msg = SYS_ERR;
@@ -85,7 +85,7 @@ public class ErrorFactory {
                 subMsg = SYS_ERR;
             }
             // solution暂未实现，如果要实现，可以这样配置：
-            // open.error_20000_isp.unknow-error_solution=Service is temporarily unavailable
+            // open.error_20000_isp.unknown-error_solution=Service is temporarily unavailable
             // <code>String solution = getErrorMessage(modulePrefix + code + UNDERLINE + subCode + "_solution", locale, params);</code>
             error = new ErrorImpl(code, msg, subCode, subMsg, null);
             errorCache.put(key, error);

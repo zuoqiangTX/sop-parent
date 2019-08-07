@@ -34,7 +34,7 @@ public class ZuulZookeeperRouteManager extends BaseRouteManager<ZuulServiceRoute
 
     @Override
     protected ZuulTargetRoute buildRouteDefinition(ZuulServiceRouteInfo serviceRouteInfo, ZuulRouteDefinition routeDefinition) {
-        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), RouteUtil.getZuulLocation(routeDefinition.getUri()), null, RETRYABLE, null);
+        Route route = new Route(routeDefinition.getId(), routeDefinition.getPath(), RouteUtil.getZuulLocation(routeDefinition.getUri()), "", RETRYABLE, null);
         return new ZuulTargetRoute(serviceRouteInfo, routeDefinition, route);
     }
 }

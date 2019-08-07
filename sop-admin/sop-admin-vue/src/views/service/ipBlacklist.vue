@@ -88,11 +88,11 @@
 <script>
 export default {
   data() {
+    const regexIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
     const ipValidator = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入IP'))
       } else {
-        const regexIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         if (!regexIP.test(value)) {
           callback(new Error('IP格式不正确'))
         }

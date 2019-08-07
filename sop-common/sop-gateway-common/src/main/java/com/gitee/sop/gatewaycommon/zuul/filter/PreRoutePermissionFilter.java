@@ -1,6 +1,5 @@
 package com.gitee.sop.gatewaycommon.zuul.filter;
 
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
@@ -11,6 +10,7 @@ import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 路由权限校验，有些接口需要配置权限才能访问。
@@ -19,6 +19,10 @@ import org.apache.commons.lang3.BooleanUtils;
  */
 @Deprecated
 public class PreRoutePermissionFilter extends BaseZuulFilter {
+
+    @Autowired
+    private IsvRoutePermissionManager isvRoutePermissionManager;
+
     @Override
     protected FilterType getFilterType() {
         return FilterType.PRE;
@@ -38,7 +42,6 @@ public class PreRoutePermissionFilter extends BaseZuulFilter {
         BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
         boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
         if (needCheckPermission) {
-            IsvRoutePermissionManager isvRoutePermissionManager = ApiConfig.getInstance().getIsvRoutePermissionManager();
             String appKey = apiParam.fetchAppKey();
             boolean hasPermission = isvRoutePermissionManager.hasPermission(appKey, routeId);
             if (!hasPermission) {

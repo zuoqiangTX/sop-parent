@@ -17,6 +17,10 @@ public enum EurekaUri {
      */
     QUERY_APPS("GET", "/apps"),
     /**
+     * 查询一个实例
+     */
+    QUERY_INSTANCES("GET", "/instances/%s"),
+    /**
      * 下线 Take instance out of service
      */
     OFFLINE_SERVICE("PUT", "/apps/%s/%s/status?value=OUT_OF_SERVICE"),
@@ -24,6 +28,12 @@ public enum EurekaUri {
      * 上线 Move instance back into service (remove override)
      */
     ONLINE_SERVICE("DELETE", "/apps/%s/%s/status?value=UP"),
+    /**
+     * 设置metadata信息
+     *
+     * /apps/{appID}/{instanceID}/metadata?key=value
+     */
+    SET_METADATA("PUT", "/apps/%s/%s/metadata?%s=%s")
     ;
     public static final String URL_PREFIX = "/";
 

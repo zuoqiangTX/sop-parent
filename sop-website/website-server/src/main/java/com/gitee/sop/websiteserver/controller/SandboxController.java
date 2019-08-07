@@ -1,7 +1,7 @@
 package com.gitee.sop.websiteserver.controller;
 
-import com.gitee.sop.websiteserver.bean.HttpTool;
-import com.gitee.sop.websiteserver.bean.HttpTool.*;
+import com.gitee.sop.registryapi.bean.HttpTool;
+import com.gitee.sop.registryapi.bean.HttpTool.*;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
 import com.gitee.sop.websiteserver.util.UploadUtil;

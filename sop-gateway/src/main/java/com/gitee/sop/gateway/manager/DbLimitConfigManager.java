@@ -11,6 +11,7 @@ import com.gitee.sop.gatewaycommon.util.MyBeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
  * @author tanghc
  */
 @Slf4j
+@Service
 public class DbLimitConfigManager extends DefaultLimitConfigManager {
 
     @Autowired
@@ -61,7 +63,6 @@ public class DbLimitConfigManager extends DefaultLimitConfigManager {
                     update(configLimitDto);
                     break;
                 default:
-                    log.error("限流配置信息，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

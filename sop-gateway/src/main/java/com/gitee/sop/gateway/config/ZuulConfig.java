@@ -6,8 +6,10 @@ package com.gitee.sop.gateway.config;
  * 注意：下面两个只能使用一个
  */
 
-import com.gitee.sop.gateway.manager.ManagerInitializer;
+import com.gitee.sop.gateway.loadbalancer.SopPropertiesFactory;
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
+import org.springframework.cloud.netflix.ribbon.PropertiesFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -17,8 +19,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ZuulConfig extends AlipayZuulConfiguration {
 
-    static {
-        new ManagerInitializer();
+    @Bean
+    PropertiesFactory propertiesFactory() {
+        return new SopPropertiesFactory();
     }
 
 }

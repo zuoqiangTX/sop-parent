@@ -2,6 +2,9 @@ package com.gitee.sop.registryapi.bean;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author tanghc
  */
@@ -36,5 +39,10 @@ public class ServiceInstance {
      * 更新时间
      */
     private String updateTime;
+
+    /**
+     * user extended attributes
+     */
+    private Map<String, String> metadata = new HashMap<String, String>();
 
 }

@@ -10,11 +10,13 @@ import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultLimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultServiceErrorManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.IPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.ServiceErrorManager;
+import com.gitee.sop.gatewaycommon.manager.EnvGrayManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.DefaultDataNameBuilder;
@@ -98,11 +100,6 @@ public class ApiConfig {
     private SessionManager sessionManager = new ApiSessionManager();
 
     /**
-     * zuul网关全局异常处理
-     */
-    private ZuulErrorController zuulErrorController = new ZuulErrorController();
-
-    /**
      * isv路由权限
      */
     private IsvRoutePermissionManager isvRoutePermissionManager = new DefaultIsvRoutePermissionManager();
@@ -128,6 +125,11 @@ public class ApiConfig {
     private LimitManager limitManager = new DefaultLimitManager();
 
     /**
+     * 用户key管理
+     */
+    private EnvGrayManager userKeyManager = new DefaultEnvGrayManager();
+
+    /**
      * 构建数据节点名称
      */
     private DataNameBuilder dataNameBuilder = new DefaultDataNameBuilder();
@@ -141,6 +143,11 @@ public class ApiConfig {
      * 处理错误信息
      */
     private ServiceErrorManager serviceErrorManager = new DefaultServiceErrorManager();
+
+    /**
+     * zuul网关全局异常处理
+     */
+    private ZuulErrorController zuulErrorController = new ZuulErrorController();
 
     // -------- fields ---------
 

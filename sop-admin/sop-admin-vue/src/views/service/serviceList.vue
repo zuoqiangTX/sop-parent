@@ -34,9 +34,11 @@
         width="100"
       >
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'pre'" type="warning">预发布</el-tag>
-          <el-tag v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="info">灰度</el-tag>
-          <el-tag v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="success">线上</el-tag>
+          <div v-if="scope.row.status === 'UP'">
+            <el-tag v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'pre'" type="warning">预发布</el-tag>
+            <el-tag v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="info">灰度</el-tag>
+            <el-tag v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="success">线上</el-tag>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -70,13 +72,19 @@
         width="250"
       >
         <template slot-scope="scope">
-          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'pre'" type="text" size="mini" @click="onEnvPreClose(scope.row)">结束预发布</el-button>
-          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="text" size="mini" @click="onEnvGrayClose(scope.row)">结束灰度</el-button>
-          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvPreOpen(scope.row)">开启预发布</el-button>
-          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvGrayOpen(scope.row)">开启灰度</el-button>
-          <el-button v-if="scope.row.parentId === 0" type="text" size="mini" @click="onGrayConfigUpdate(scope.row)">设置灰度参数</el-button>
-          <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
-          <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
+          <div v-if="scope.row.parentId === 0">
+            <el-button type="text" size="mini" @click="onGrayConfigUpdate(scope.row)">设置灰度参数</el-button>
+          </div>
+          <div v-if="scope.row.parentId > 0">
+            <span v-if="scope.row.status === 'UP'">
+              <el-button v-if="scope.row.metadata.env === 'pre'" type="text" size="mini" @click="onEnvPreClose(scope.row)">结束预发布</el-button>
+              <el-button v-if="scope.row.metadata.env === 'gray'" type="text" size="mini" @click="onEnvGrayClose(scope.row)">结束灰度</el-button>
+              <el-button v-if="!scope.row.metadata.env" type="text" size="mini" @click="onEnvPreOpen(scope.row)">开启预发布</el-button>
+              <el-button v-if="!scope.row.metadata.env" type="text" size="mini" @click="onEnvGrayOpen(scope.row)">开启灰度</el-button>
+            </span>
+            <el-button v-if="scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
+            <el-button v-if="scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -266,7 +274,7 @@ export default {
     onDisable: function(row) {
       this.confirm('确定要禁用【' + row.serviceId + '】吗?', function(done) {
         this.post('service.instance.offline', row, function() {
-          this.tip('下线成功')
+          this.tip('禁用成功')
           done()
         })
       })
@@ -274,7 +282,7 @@ export default {
     onEnable: function(row) {
       this.confirm('确定要启用【' + row.serviceId + '】吗?', function(done) {
         this.post('service.instance.online', row, function() {
-          this.tip('上线成功')
+          this.tip('启用成功')
           done()
         })
       })

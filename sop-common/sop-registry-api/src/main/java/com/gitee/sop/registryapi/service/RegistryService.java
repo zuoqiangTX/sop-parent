@@ -38,4 +38,13 @@ public interface RegistryService {
     void offlineInstance(ServiceInstance serviceInstance) throws Exception;
 
 
+    /**
+     * 设置实例元数据
+     *
+     * @param serviceInstance 实例
+     * @param key key
+     * @param value 值
+     * @throws Exception 设置实例元数据失败抛出异常
+     */
+    void setMetadata(ServiceInstance serviceInstance, String key, String value) throws Exception;
 }

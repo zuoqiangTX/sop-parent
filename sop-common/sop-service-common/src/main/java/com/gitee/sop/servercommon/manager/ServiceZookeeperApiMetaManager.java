@@ -37,6 +37,8 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
 
     private static final String PATH_SPLIT = "/";
 
+    private static final String DEFAULT_CONTEXT_PATH = "/";
+
     private Environment environment;
 
     private ZookeeperTool zookeeperTool;
@@ -146,14 +148,13 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     }
 
     protected String buildServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
+        String contextPath = environment.getProperty("server.servlet.context-path", DEFAULT_CONTEXT_PATH);
         String servletPath = apiMeta.getPath();
         if (servletPath == null) {
             servletPath = "";
         }
-        if (!servletPath.startsWith(PATH_SPLIT)) {
-            servletPath = PATH_SPLIT + servletPath;
-        }
-        return servletPath;
+        StringUtils.trimLeadingCharacter(servletPath, '/');
+        return contextPath + servletPath;
     }
 
     /**

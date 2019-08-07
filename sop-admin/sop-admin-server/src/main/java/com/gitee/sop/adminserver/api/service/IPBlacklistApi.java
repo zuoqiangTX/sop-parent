@@ -16,6 +16,7 @@ import com.gitee.sop.adminserver.api.service.result.ConfigIpBlacklistVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.entity.ConfigIpBlacklist;
 import com.gitee.sop.adminserver.mapper.ConfigIpBlacklistMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class IPBlacklistApi {
         CopyUtil.copyPropertiesIgnoreNull(form, rec);
         configIpBlacklistMapper.saveIgnoreNull(rec);
         try {
-            this.sendIpBlacklistMsg(rec, BlacklistMsgType.ADD);
+            this.sendIpBlacklistMsg(rec, ChannelOperation.BLACKLIST_ADD);
         } catch (Exception e) {
             log.error("推送IP黑名单失败, rec:{}",rec, e);
             throw new BizException("推送IP黑名单失败");
@@ -75,19 +76,18 @@ public class IPBlacklistApi {
         }
         configIpBlacklistMapper.deleteById(id);
         try {
-            this.sendIpBlacklistMsg(rec, BlacklistMsgType.DELETE);
+            this.sendIpBlacklistMsg(rec, ChannelOperation.BLACKLIST_DELETE);
         } catch (Exception e) {
             log.error("推送IP黑名单失败, rec:{}",rec, e);
             throw new BizException("推送IP黑名单失败");
         }
     }
 
-    public void sendIpBlacklistMsg(ConfigIpBlacklist configIpBlacklist, BlacklistMsgType blacklistMsgType) throws Exception {
-        String configData = JSON.toJSONString(configIpBlacklist);
-        ChannelMsg channelMsg = new ChannelMsg(blacklistMsgType.name().toLowerCase(), configData);
+    public void sendIpBlacklistMsg(ConfigIpBlacklist configIpBlacklist, ChannelOperation channelOperation) throws Exception {
+        ChannelMsg channelMsg = new ChannelMsg(channelOperation, configIpBlacklist);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getIpBlacklistChannelPath();
-        log.info("消息推送--IP黑名单设置({}), path:{}, data:{}",blacklistMsgType.name(), path, jsonData);
+        log.info("消息推送--IP黑名单设置({}), path:{}, data:{}",channelOperation.getOperation(), path, jsonData);
         ZookeeperContext.createOrUpdateData(path, jsonData);
     }
 

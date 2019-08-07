@@ -1,12 +1,12 @@
 package com.gitee.sop.gatewaycommon.gateway.filter;
 
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
-import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
 import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -19,14 +19,18 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ValidateFilter implements GlobalFilter, Ordered {
 
+    @Autowired
+    private ParamBuilder<ServerWebExchange> paramBuilder;
+
+    @Autowired
+    private Validator validator;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ApiConfig apiConfig = ApiContext.getApiConfig();
         // 解析参数
-        ApiParam param = apiConfig.getGatewayParamBuilder().build(exchange);
+        ApiParam param = paramBuilder.build(exchange);
         GatewayContext.setApiParam(exchange, param);
         // 验证操作，这里有负责验证签名参数
-        Validator validator = apiConfig.getValidator();
         try {
             validator.validate(param);
         } catch (ApiException e) {

@@ -9,9 +9,7 @@ public enum ErrorEnum {
     SUCCESS(Codes.CODE_SUCCESS, ""),
 
     /** 服务暂不可用 */
-    ISP_UNKNOW_ERROR(Codes.CODE_UNKNOW, "isp.unknow-error"),
-    /** 服务暂不可用 */
-    AOP_UNKNOW_ERROR(Codes.CODE_UNKNOW, "aop.unknow-error"),
+    ISP_UNKNOWN_ERROR(Codes.CODE_UNKNOW, "isp.unknown-error"),
     /** 服务不可用，路由被禁用 */
     ISP_API_DISABLED(Codes.CODE_UNKNOW, "isp.service-not-available"),
 

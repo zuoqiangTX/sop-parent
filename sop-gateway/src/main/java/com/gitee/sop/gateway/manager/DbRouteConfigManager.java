@@ -14,6 +14,7 @@ import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -22,6 +23,7 @@ import java.util.Collection;
  * @author tanghc
  */
 @Slf4j
+@Service
 public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     @Autowired
@@ -85,7 +87,6 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
                     update(routeConfig);
                     break;
                 default:
-                    log.error("路由配置信息，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

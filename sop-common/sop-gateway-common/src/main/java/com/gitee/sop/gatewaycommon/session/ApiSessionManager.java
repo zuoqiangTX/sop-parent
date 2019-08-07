@@ -36,7 +36,7 @@ public class ApiSessionManager implements SessionManager {
             return cache.get(sessionId);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw ErrorEnum.AOP_UNKNOW_ERROR.getErrorMeta().getException();
+            throw ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getException();
         }
     }
 

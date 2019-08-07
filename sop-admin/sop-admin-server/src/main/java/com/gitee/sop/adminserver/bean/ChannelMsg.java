@@ -1,5 +1,6 @@
 package com.gitee.sop.adminserver.bean;
 
+import com.gitee.sop.adminserver.common.ChannelOperation;
 import lombok.Data;
 
 /**
@@ -8,8 +9,8 @@ import lombok.Data;
 @Data
 public class ChannelMsg {
 
-    public ChannelMsg(String operation, Object data) {
-        this.operation = operation;
+    public ChannelMsg(ChannelOperation channelOperation, Object data) {
+        this.operation = channelOperation.getOperation();
         this.data = data;
     }
 

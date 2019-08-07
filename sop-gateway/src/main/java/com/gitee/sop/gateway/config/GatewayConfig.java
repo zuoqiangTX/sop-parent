@@ -1,6 +1,5 @@
 package com.gitee.sop.gateway.config;
 
-import com.gitee.sop.gateway.manager.ManagerInitializer;
 import com.gitee.sop.gatewaycommon.gateway.configuration.AlipayGatewayConfiguration;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,9 +20,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GatewayConfig extends AlipayGatewayConfiguration {
 
-    static {
-        new ManagerInitializer();
-    }
 }
 
 /**

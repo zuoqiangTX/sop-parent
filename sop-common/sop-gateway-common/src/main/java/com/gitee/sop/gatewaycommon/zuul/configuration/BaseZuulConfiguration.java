@@ -1,19 +1,24 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
+import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.FormBodyWrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreHttpServletRequestWrapperFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreVersionDecisionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulZookeeperRouteManager;
+import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
@@ -32,6 +37,12 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     @Autowired
     protected ServerProperties server;
+
+    @Bean
+    @ConditionalOnMissingBean
+    ParamBuilder<RequestContext> paramBuilder() {
+        return ApiConfig.getInstance().getZuulParamBuilder();
+    }
 
     /**
      * 路由存储
@@ -102,6 +113,14 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     }
 
     /**
+     * 决定版本号
+     */
+    @Bean
+    PreVersionDecisionFilter preVersionDecisionFilter() {
+        return new PreVersionDecisionFilter();
+    }
+
+    /**
      * 错误处理扩展
      */
     @Bean
@@ -117,10 +136,12 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
         return new PostResultFilter();
     }
 
+
     /**
      * 统一错误处理
      */
     @Bean
+    @ConditionalOnMissingBean
     ZuulErrorController baseZuulController() {
         return ApiContext.getApiConfig().getZuulErrorController();
     }

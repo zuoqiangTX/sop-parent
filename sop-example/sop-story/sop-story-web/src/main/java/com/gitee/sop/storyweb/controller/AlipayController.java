@@ -130,7 +130,7 @@ public class AlipayController {
     public Story getStory() {
         Story story = new Story();
         story.setId(1);
-        story.setName("海底小纵队(alipay.story.get)");
+        story.setName("海底小纵队(alipay.story.get1.0)");
         return story;
     }
 
@@ -160,7 +160,10 @@ public class AlipayController {
      */
     @ApiMapping(value = "alipay.story.get", version = "1.2")
     public Story getStory11(Story story) {
-        return story;
+        Story story2 = new Story();
+        story2.setId(1);
+        story2.setName("海底小纵队(alipay.story.get1.2)");
+        return story2;
     }
 
     /**

@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.gitee.sop</groupId>
             <artifactId>sop-service-common</artifactId>
-            <version>1.13.4-SNAPSHOT</version>
+            <version>1.13.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.gitee.sop</groupId>

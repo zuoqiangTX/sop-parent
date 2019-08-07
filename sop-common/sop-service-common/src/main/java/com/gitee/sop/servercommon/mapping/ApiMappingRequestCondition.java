@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRequestCondition> {
 
-    public static final String UTF_8 = "UTF-8";
     private String defaultVersion = ServiceConfig.getInstance().getDefaultVersion();
 
     private ApiMappingInfo apiMappingInfo;
@@ -46,7 +45,10 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
     }
 
     protected String getVersion(HttpServletRequest request) {
-        String version = request.getParameter(ParamNames.VERSION_NAME);
+        String version = request.getHeader(ParamNames.HEADER_VERSION_NAME);
+        if (version == null) {
+            version = request.getParameter(ParamNames.VERSION_NAME);
+        }
         return version == null ? defaultVersion : version;
     }
 
@@ -61,13 +63,7 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
      */
     @Override
     public int compareTo(ApiMappingRequestCondition other, HttpServletRequest request) {
-        if (null != apiMappingInfo && null == other.apiMappingInfo) {
-            return 1;
-        } else if (null == apiMappingInfo && null != other.apiMappingInfo) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return this.apiMappingInfo.getVersion().compareTo(other.apiMappingInfo.getVersion());
     }
 
 }

@@ -54,6 +54,11 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
     }
 
     @Override
+    public void setVersionInHeader(RequestContext ctx, String headerName, String version) {
+        ctx.addZuulRequestHeader(headerName, version);
+    }
+
+    @Override
     protected ApiParam newApiParam(RequestContext ctx) {
         ApiParam apiParam = super.newApiParam(ctx);
         HttpServletRequest request = ctx.getRequest();

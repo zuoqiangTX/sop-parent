@@ -6,6 +6,7 @@ import com.gitee.sop.servercommon.bean.OpenContext;
 import com.gitee.sop.story.api.domain.Story;
 import com.gitee.sop.storyweb.controller.param.StoryParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class PostJsonController {
      * @return
      */
     @ApiMapping("demo.post.json")
-    public Story postJson(StoryParam param) {
+    public Story postJson(@RequestBody StoryParam param) {
         // 获取开放平台请求参数
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         List<Object> params = Arrays.asList(
@@ -34,6 +35,26 @@ public class PostJsonController {
         Story story = new Story();
         story.setId(1);
         story.setName("参数：" + param.getName() + ", openParams:" + StringUtils.join(params));
+        return story;
+    }
+
+    /**
+     * 演示客户端使用json方式请求（application/json）
+     * @param param
+     * @return
+     */
+    @ApiMapping(value = "demo.post.json", version = "1.2")
+    public Story postJson2(StoryParam param) {
+        // 获取开放平台请求参数
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        List<Object> params = Arrays.asList(
+                openContext.getAppId(),
+                openContext.getMethod(),
+                openContext.getVersion()
+        );
+        Story story = new Story();
+        story.setId(1);
+        story.setName("1.2 参数：" + param.getName() + ", openParams:" + StringUtils.join(params));
         return story;
     }
 

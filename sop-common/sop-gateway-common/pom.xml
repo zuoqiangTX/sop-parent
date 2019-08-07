@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.gitee.sop</groupId>
         <artifactId>sop-common</artifactId>
-        <version>1.13.4-SNAPSHOT</version>
+        <version>1.13.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>sop-gateway-common</artifactId>
-    <version>1.13.4-SNAPSHOT</version>
+    <version>1.13.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>sop-gateway-common</name>

@@ -1,5 +1,13 @@
 # changelog
 
+## 1.13.6
+
+- 修复@RequestBody不能绑定问题
+
+## 1.13.5
+
+- 修复postJson下version获取不到问题
+
 ## 1.13.4
 
 - 修复admin服务列表最后更新时间不显示问题

@@ -26,7 +26,7 @@ public class RefreshTokenTest extends TestCase {
         OpenAuthTokenAppRequest request = new OpenAuthTokenAppRequest();
         OpenAuthTokenAppModel model = new OpenAuthTokenAppModel();
         model.setGrant_type("refresh_token");
-        model.setRefresh_token("856faf8d77d3b985c1073557ce6ea724");
+        model.setRefresh_token("c9e4003c06fe59066eed73d64ea074ca");
         request.setBizModel(model);
 
         OpenAuthTokenAppResponse response = openClient.execute(request);

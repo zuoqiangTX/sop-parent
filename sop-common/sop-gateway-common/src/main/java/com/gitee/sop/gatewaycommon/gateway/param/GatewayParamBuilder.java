@@ -22,4 +22,9 @@ public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {
     public String getIP(ServerWebExchange ctx) {
         return ctx.getRequest().getRemoteAddress().getAddress().getHostAddress();
     }
+
+    @Override
+    public void setVersionInHeader(ServerWebExchange ctx, String headerName, String version) {
+        ctx.getRequest().getHeaders().add(headerName, version);
+    }
 }

@@ -2,12 +2,11 @@ package com.gitee.sop.gateway.loadbalancer;
 
 import com.gitee.sop.gateway.manager.DbEnvGrayManager;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
-import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.Param;
-import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.BaseServerChooser;
 import com.netflix.loadbalancer.Server;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
+import org.springframework.core.env.Environment;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -56,21 +55,9 @@ public class EnvironmentServerChooser extends BaseServerChooser {
     @Override
     protected boolean canVisitPre(Server server, HttpServletRequest request) {
         String serverName = request.getServerName();
-        return PRE_DOMAIN.equals(serverName);
+        String domain = SpringContext.getBean(Environment.class).getProperty("pre.domain", PRE_DOMAIN);
+        return domain.equals(serverName);
     }
-
-    /**
-     * 能否进入灰度环境
-     *
-     * @param request request
-     * @return 返回true：可以进入到预发环境
-     */
-    protected boolean canVisitGray(Server server, HttpServletRequest request) {
-        ApiParam apiParam = ZuulContext.getApiParam();
-        DbEnvGrayManager userKeyManager = SpringContext.getBean(DbEnvGrayManager.class);
-        return this.isGrayUser(apiParam, userKeyManager, server, request);
-    }
-
 
     /**
      * 是否是灰度用户，可修改此方法实现自己想要的

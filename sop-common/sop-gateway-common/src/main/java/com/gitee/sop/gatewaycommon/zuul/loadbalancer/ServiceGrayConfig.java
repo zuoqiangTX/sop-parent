@@ -13,8 +13,6 @@ public class ServiceGrayConfig {
 
     private String serviceId;
 
-    private String instanceId;
-
     /**
      * 用户id
      */
@@ -31,8 +29,4 @@ public class ServiceGrayConfig {
         return grayNameVersion.get(name);
     }
 
-    public void clear() {
-        this.userKeys.clear();
-        this.grayNameVersion.clear();
-    }
 }

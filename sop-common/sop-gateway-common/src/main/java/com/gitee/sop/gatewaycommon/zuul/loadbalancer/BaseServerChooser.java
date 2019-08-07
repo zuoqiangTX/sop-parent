@@ -42,14 +42,6 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
      */
     protected abstract boolean canVisitPre(Server server, HttpServletRequest request);
 
-    /**
-     * 能否访问灰度服务器
-     * @param server 灰度服务器
-     * @param request request
-     * @return true：能
-     */
-    protected abstract boolean canVisitGray(Server server, HttpServletRequest request);
-
     @Override
     public Server choose(Object key) {
         ILoadBalancer lb = getLoadBalancer();

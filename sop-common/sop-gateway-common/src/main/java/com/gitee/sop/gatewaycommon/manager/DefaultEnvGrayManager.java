@@ -2,11 +2,8 @@ package com.gitee.sop.gatewaycommon.manager;
 
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author tanghc
@@ -14,17 +11,18 @@ import java.util.stream.Collectors;
 public class DefaultEnvGrayManager implements EnvGrayManager {
 
     /**
-     * KEY:instanceId
+     * key：serviceId，服务对应的灰度配置
      */
-    private Map<String, ServiceGrayConfig> serviceUserKeyMap = Maps.newConcurrentMap();
+    private Map<String, ServiceGrayConfig> serviceGrayConfigMap = Maps.newConcurrentMap();
+
+    /**
+     * key:instanceId value:serviceId
+     */
+    private Map<String, String> instanceIdServiceIdMap = Maps.newConcurrentMap();
 
     @Override
-    public List<String> listGrayInstanceId(String serviceId) {
-        return serviceUserKeyMap
-                .values()
-                .stream()
-                .map(ServiceGrayConfig::getInstanceId)
-                .collect(Collectors.toList());
+    public void saveServiceGrayConfig(ServiceGrayConfig serviceGrayConfig) {
+        serviceGrayConfigMap.putIfAbsent(serviceGrayConfig.getServiceId(), serviceGrayConfig);
     }
 
     @Override
@@ -32,26 +30,40 @@ public class DefaultEnvGrayManager implements EnvGrayManager {
         if (instanceId == null || userKey == null) {
             return false;
         }
-        return this.getServiceGrayConfig(instanceId).containsKey(userKey);
+        String serviceId = instanceIdServiceIdMap.get(instanceId);
+        ServiceGrayConfig grayConfig = this.getGrayConfig(serviceId);
+        return grayConfig != null && grayConfig.containsKey(userKey);
     }
 
     @Override
-    public String getVersion(String instanceId, String nameVersion) {
-        if (instanceId == null || nameVersion == null) {
+    public String getVersion(String serviceId, String nameVersion) {
+        if (serviceId == null || nameVersion == null) {
             return null;
         }
-        return this.getServiceGrayConfig(instanceId).getVersion(nameVersion);
+        boolean opened = instanceIdServiceIdMap.values().contains(serviceId);
+        // 没有开启灰度
+        if (!opened) {
+            return null;
+        }
+        ServiceGrayConfig grayConfig = this.getGrayConfig(serviceId);
+        return grayConfig != null ? grayConfig.getVersion(nameVersion) : null;
+    }
+
+    private ServiceGrayConfig getGrayConfig(String serviceId) {
+        if (serviceId == null) {
+            return null;
+        }
+        return serviceGrayConfigMap.get(serviceId);
     }
 
     @Override
-    public ServiceGrayConfig getServiceGrayConfig(String instanceId) {
-        return serviceUserKeyMap.computeIfAbsent(instanceId, key -> {
-            ServiceGrayConfig serviceGrayConfig = new ServiceGrayConfig();
-            serviceGrayConfig.setInstanceId(instanceId);
-            serviceGrayConfig.setUserKeys(Sets.newConcurrentHashSet());
-            serviceGrayConfig.setGrayNameVersion(Maps.newConcurrentMap());
-            return serviceGrayConfig;
-        });
+    public void openGray(String instanceId, String serviceId) {
+        instanceIdServiceIdMap.putIfAbsent(instanceId, serviceId);
+    }
+
+    @Override
+    public void closeGray(String instanceId) {
+        instanceIdServiceIdMap.remove(instanceId);
     }
 
     @Override

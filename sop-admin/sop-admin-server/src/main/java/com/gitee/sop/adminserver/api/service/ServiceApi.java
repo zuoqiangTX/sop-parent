@@ -15,8 +15,8 @@ import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.MetadataEnum;
+import com.gitee.sop.adminserver.bean.ServiceGrayDefinition;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
-import com.gitee.sop.adminserver.bean.UserKeyDefinition;
 import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
@@ -215,14 +215,13 @@ public class ServiceApi {
     @Api(name = "service.gray.config.get")
     @ApiDocMethod(description = "灰度配置--获取")
     ConfigGray serviceEnvGrayConfigGet(ServiceIdParam param) throws IOException {
-        String serviceId = param.getServiceId();
-        return configGrayMapper.getByColumn("service_id", serviceId);
+        return this.getConfigGray(param.getServiceId());
     }
 
     @Api(name = "service.gray.config.save")
     @ApiDocMethod(description = "灰度配置--保存")
     void serviceEnvGrayConfigSave(ServiceGrayConfigParam param) throws IOException {
-        String serviceId = param.getServiceId();
+        String serviceId = param.getServiceId().toLowerCase();
         ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
         if (configGray == null) {
             configGray = new ConfigGray();
@@ -235,16 +234,21 @@ public class ServiceApi {
             configGray.setUserKeyContent(param.getUserKeyContent());
             configGrayMapper.update(configGray);
         }
+        this.sendServiceGrayMsg(serviceId, ChannelOperation.GRAY_USER_KEY_SET);
     }
 
     @Api(name = "service.instance.env.gray.open")
     @ApiDocMethod(description = "开启灰度发布")
     void serviceEnvGray(ServiceInstanceParam param) throws IOException {
         try {
+            String serviceId = param.getServiceId().toLowerCase();
+            ConfigGray configGray = this.getConfigGray(serviceId);
+            if (configGray == null) {
+                throw new BizException("请先设置灰度参数");
+            }
             MetadataEnum envPre = MetadataEnum.ENV_GRAY;
             registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
 
-            String serviceId = param.getServiceId();
             String instanceId = param.getInstanceId();
 
             ConfigGrayInstance configGrayInstance = configGrayInstanceMapper.getByColumn("instance_id", instanceId);
@@ -256,9 +260,10 @@ public class ServiceApi {
                 configGrayInstanceMapper.save(configGrayInstance);
             } else {
                 configGrayInstance.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
+                configGrayInstance.setServiceId(serviceId);
                 configGrayInstanceMapper.update(configGrayInstance);
             }
-            this.sendUserKeyMsg(instanceId, ChannelOperation.GRAY_USER_KEY_SET);
+            this.sendServiceGrayMsg(instanceId, serviceId, ChannelOperation.GRAY_USER_KEY_OPEN);
         } catch (Exception e) {
             log.error("灰度发布失败，param:{}", param, e);
             throw new BizException("灰度发布失败，请查看日志");
@@ -276,8 +281,8 @@ public class ServiceApi {
             if (configGrayInstance != null) {
                 configGrayInstance.setStatus(StatusEnum.STATUS_DISABLE.getStatus());
                 configGrayInstanceMapper.update(configGrayInstance);
+                this.sendServiceGrayMsg(param.getInstanceId(), param.getServiceId().toLowerCase(), ChannelOperation.GRAY_USER_KEY_CLOSE);
             }
-            this.sendUserKeyMsg(param.getInstanceId(), ChannelOperation.GRAY_USER_KEY_CLEAR);
         } catch (Exception e) {
             log.error("上线失败，param:{}", param, e);
             throw new BizException("上线失败，请查看日志");
@@ -289,14 +294,23 @@ public class ServiceApi {
         return configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
     }
 
-    private void sendUserKeyMsg(String instanceId, ChannelOperation channelOperation) {
-        UserKeyDefinition userKeyDefinition = new UserKeyDefinition();
-        userKeyDefinition.setInstanceId(instanceId);
-        ChannelMsg channelMsg = new ChannelMsg(channelOperation, userKeyDefinition);
+    private void sendServiceGrayMsg(String serviceId, ChannelOperation channelOperation) {
+        this.sendServiceGrayMsg(null, serviceId, channelOperation);
+    }
+
+    private void sendServiceGrayMsg(String instanceId, String serviceId, ChannelOperation channelOperation) {
+        ServiceGrayDefinition serviceGrayDefinition = new ServiceGrayDefinition();
+        serviceGrayDefinition.setInstanceId(instanceId);
+        serviceGrayDefinition.setServiceId(serviceId);
+        ChannelMsg channelMsg = new ChannelMsg(channelOperation, serviceGrayDefinition);
         String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getUserKeyChannelPath();
+        String path = ZookeeperContext.getServiceGrayChannelPath();
         log.info("消息推送--灰度发布({}), path:{}, data:{}",channelOperation.getOperation(), path, jsonData);
         ZookeeperContext.createOrUpdateData(path, jsonData);
+    }
+
+    private ConfigGray getConfigGray(String serviceId) {
+        return configGrayMapper.getByColumn("service_id", serviceId);
     }
 
 }

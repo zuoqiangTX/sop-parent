@@ -38,13 +38,17 @@ public enum ChannelOperation {
     ROUTE_PERMISSION_RELOAD("reload"),
 
     /**
-     * 灰度发布用户key设置
+     * 灰度发布设置
      */
     GRAY_USER_KEY_SET("set"),
     /**
-     * 灰度发布用户key清除
+     * 灰度发布-开启
      */
-    GRAY_USER_KEY_CLEAR("clear"),
+    GRAY_USER_KEY_OPEN("open"),
+    /**
+     * 灰度发布-关闭
+     */
+    GRAY_USER_KEY_CLOSE("close"),
 
     ;
 

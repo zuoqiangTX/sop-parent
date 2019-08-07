@@ -54,7 +54,7 @@
         width="100"
       >
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="success">已启用</el-tag>
+          <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="success">正常</el-tag>
           <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'STARTING'" type="info">正在启动</el-tag>
           <el-tag v-if="scope.row.parentId > 0 && scope.row.status === 'UNKNOWN'">未知</el-tag>
           <el-tag v-if="scope.row.parentId > 0 && (scope.row.status === 'OUT_OF_SERVICE' || scope.row.status === 'DOWN')" type="danger">已禁用</el-tag>
@@ -74,7 +74,7 @@
           <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="text" size="mini" @click="onEnvGrayClose(scope.row)">结束灰度</el-button>
           <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvPreOpen(scope.row)">开启预发布</el-button>
           <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvGrayOpen(scope.row)">开启灰度</el-button>
-          <el-button v-if="scope.row.parentId === 0" type="text" size="mini" @click="onGrayConfigUpdate(scope.row)">灰度设置</el-button>
+          <el-button v-if="scope.row.parentId === 0" type="text" size="mini" @click="onGrayConfigUpdate(scope.row)">设置灰度参数</el-button>
           <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
           <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
         </template>
@@ -281,15 +281,12 @@ export default {
     },
     doEnvOnline: function(row, callback) {
       this.post('service.instance.env.online', row, function() {
-        callback && callback()
+        callback && callback.call(this)
       })
     },
     onEnvPreOpen: function(row) {
       this.confirm(`确定要开启 ${row.instanceId} 预发布吗?`, function(done) {
-        this.post('service.instance.env.pre.open', {
-          serviceId: row.serviceId,
-          instanceId: row.instanceId
-        }, function() {
+        this.post('service.instance.env.pre.open', row, function() {
           this.tip('预发布成功')
           done()
         })
@@ -305,10 +302,7 @@ export default {
     },
     onEnvGrayOpen: function(row) {
       this.confirm(`确定要开启 ${row.instanceId} 灰度吗?`, function(done) {
-        this.post('service.instance.env.gray.open', {
-          serviceId: row.serviceId,
-          instanceId: row.instanceId
-        }, function() {
+        this.post('service.instance.env.gray.open', row, function() {
           this.tip('开启成功')
           done()
         })

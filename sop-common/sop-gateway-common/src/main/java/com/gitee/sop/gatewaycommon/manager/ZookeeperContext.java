@@ -69,8 +69,8 @@ public class ZookeeperContext {
         return SOP_MSG_CHANNEL_PATH + "/isvinfo";
     }
 
-    public static String getUserKeyChannelPath() {
-        return SOP_MSG_CHANNEL_PATH + "/userkey";
+    public static String getServiceGrayChannelPath() {
+        return SOP_MSG_CHANNEL_PATH + "/gray";
     }
 
     public static String getIsvRoutePermissionChannelPath() {

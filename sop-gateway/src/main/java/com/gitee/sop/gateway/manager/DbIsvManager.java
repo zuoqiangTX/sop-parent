@@ -61,7 +61,6 @@ public class DbIsvManager extends CacheIsvManager {
                     remove(isvDefinition.getAppKey());
                     break;
                 default:
-                    log.error("ISV信息，错误的消息指令，nodeData：{}", nodeData);
 
             }
         });

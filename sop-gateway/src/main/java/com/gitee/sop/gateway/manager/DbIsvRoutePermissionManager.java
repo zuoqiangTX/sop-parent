@@ -152,6 +152,8 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
                     log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
                     remove(isvRoutePermission.getAppKey());
                     break;
+                default:
+
             }
         });
     }

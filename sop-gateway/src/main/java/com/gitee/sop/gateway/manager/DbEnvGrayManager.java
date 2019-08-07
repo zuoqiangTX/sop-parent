@@ -2,13 +2,16 @@ package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.fastmybatis.core.query.Query;
-import com.gitee.sop.gateway.entity.ConfigGrayUserkey;
-import com.gitee.sop.gateway.mapper.ConfigGrayUserkeyMapper;
+import com.gitee.sop.gateway.entity.ConfigGray;
+import com.gitee.sop.gateway.entity.ConfigGrayInstance;
+import com.gitee.sop.gateway.mapper.ConfigGrayInstanceMapper;
+import com.gitee.sop.gateway.mapper.ConfigGrayMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
-import com.gitee.sop.gatewaycommon.bean.UserKeyDefinition;
+import com.gitee.sop.gatewaycommon.bean.ServiceGrayDefinition;
 import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,82 +38,86 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     private static final int STATUS_ENABLE = 1;
 
+    private static final Function<String[], String> FUNCTION_KEY = arr -> arr[0];
+    private static final Function<String[], String> FUNCTION_VALUE = arr -> arr[1];
+
     @Autowired
     private Environment environment;
 
     @Autowired
-    private ConfigGrayUserkeyMapper configGrayUserkeyMapper;
+    private ConfigGrayMapper configGrayMapper;
+
+    @Autowired
+    private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
     @Override
     public void load() {
+
+        List<ConfigGray> list = configGrayMapper.list(new Query());
+        for (ConfigGray configGray : list) {
+            this.setServiceGrayConfig(configGray);
+        }
+
         Query query = new Query();
         query.eq("status", STATUS_ENABLE);
-        List<ConfigGrayUserkey> list = configGrayUserkeyMapper.list(query);
-        for (ConfigGrayUserkey configGrayUserkey : list) {
-            this.setServiceGrayConfig(configGrayUserkey);
+        List<ConfigGrayInstance> grayInstanceList = configGrayInstanceMapper.list(query);
+        for (ConfigGrayInstance configGrayInstance : grayInstanceList) {
+            this.openGray(configGrayInstance.getInstanceId(), configGrayInstance.getServiceId());
         }
     }
 
     /**
      * 设置用户key
      *
-     * @param configGrayUserkey 灰度配置
+     * @param configGray 灰度配置
      */
-    public void setServiceGrayConfig(ConfigGrayUserkey configGrayUserkey) {
-        if (configGrayUserkey == null) {
+    public void setServiceGrayConfig(ConfigGray configGray) {
+        if (configGray == null) {
             return;
         }
-        String instanceId = configGrayUserkey.getInstanceId();
-        this.clear(instanceId);
-        String userKeyData = configGrayUserkey.getUserKeyContent();
-        String nameVersionContent = configGrayUserkey.getNameVersionContent();
+        String userKeyData = configGray.getUserKeyContent();
+        String nameVersionContent = configGray.getNameVersionContent();
         String[] userKeys = StringUtils.split(userKeyData, ',');
         String[] nameVersionList = StringUtils.split(nameVersionContent, ',');
-        log.info("添加userKey，userKeys.length:{}, nameVersionList:{}", userKeys.length, Arrays.toString(nameVersionList));
+        log.info("灰度配置，userKeys.length:{}, nameVersionList:{}", userKeys.length, Arrays.toString(nameVersionList));
 
-        List<String> list = Stream.of(userKeys).collect(Collectors.toList());
-        ServiceGrayConfig serviceGrayConfig = getServiceGrayConfig(instanceId);
-        serviceGrayConfig.setServiceId(configGrayUserkey.getServiceId());
-        serviceGrayConfig.getUserKeys().addAll(list);
+        Set<String> userKeySet = Stream.of(userKeys)
+                .collect(Collectors.toCollection(Sets::newConcurrentHashSet));
 
-        Map<String, String> grayNameVersion = serviceGrayConfig.getGrayNameVersion();
-        for (String nameVersion : nameVersionList) {
-            String[] nameVersionInfo = StringUtils.split(nameVersion, '=');
-            String name = nameVersionInfo[0];
-            String version = nameVersionInfo[1];
-            grayNameVersion.put(name, version);
-        }
+        Map<String, String> grayNameVersionMap = Stream.of(nameVersionList)
+                .map(nameVersion -> StringUtils.split(nameVersion, '='))
+                .collect(Collectors.toConcurrentMap(FUNCTION_KEY, FUNCTION_VALUE));
 
-    }
-
-    /**
-     * 清空用户key
-     */
-    public void clear(String instanceId) {
-        getServiceGrayConfig(instanceId).clear();
+        ServiceGrayConfig serviceGrayConfig = new ServiceGrayConfig();
+        serviceGrayConfig.setServiceId(configGray.getServiceId());
+        serviceGrayConfig.setUserKeys(userKeySet);
+        serviceGrayConfig.setGrayNameVersion(grayNameVersionMap);
+        this.saveServiceGrayConfig(serviceGrayConfig);
     }
 
 
     @PostConstruct
     protected void after() throws Exception {
         ZookeeperContext.setEnvironment(environment);
-        String isvChannelPath = ZookeeperContext.getUserKeyChannelPath();
+        String isvChannelPath = ZookeeperContext.getServiceGrayChannelPath();
         ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
             String nodeData = new String(nodeCache.getCurrentData().getData());
             ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
             String data = channelMsg.getData();
-            UserKeyDefinition userKeyDefinition = JSON.parseObject(data, UserKeyDefinition.class);
-            String instanceId = userKeyDefinition.getInstanceId();
+            ServiceGrayDefinition userKeyDefinition = JSON.parseObject(data, ServiceGrayDefinition.class);
+            String serviceId = userKeyDefinition.getServiceId();
             switch (channelMsg.getOperation()) {
                 case "set":
-                    ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", instanceId);
-                    this.setServiceGrayConfig(configGrayUserkey);
+                    ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
+                    this.setServiceGrayConfig(configGray);
                     break;
-                case "clear":
-                    clear(instanceId);
+                case "open":
+                    openGray(userKeyDefinition.getInstanceId(), serviceId);
+                    break;
+                case "close":
+                    closeGray(userKeyDefinition.getInstanceId());
                     break;
                 default:
-                    log.error("userKey消息，错误的消息指令，nodeData：{}", nodeData);
 
             }
         });

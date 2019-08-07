@@ -6,7 +6,8 @@ import lombok.Data;
  * @author tanghc
  */
 @Data
-public class UserKeyDefinition {
+public class ServiceGrayDefinition {
+    private String serviceId;
     private String instanceId;
     private String data;
 }

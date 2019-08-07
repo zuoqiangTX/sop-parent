@@ -10,8 +10,6 @@ import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
 /**
  * @author tanghc
  */
@@ -38,17 +36,11 @@ public class PreVersionDecisionFilter extends BaseZuulFilter {
         if (targetRoute == null) {
             return null;
         }
-        String serviceId = targetRoute.getServiceRouteInfo().getServiceId();
-        List<String> instanceIdList = envGrayManager.listGrayInstanceId(serviceId);
-        String appKey = apiParam.fetchAppKey();
-        for (String instanceId : instanceIdList) {
-            if (envGrayManager.containsKey(instanceId, appKey)) {
-                String version = envGrayManager.getVersion(instanceId, nameVersion);
-                if (version != null) {
-                    requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, version);
-                    break;
-                }
-            }
+        String serviceId = targetRoute.getServiceRouteInfo().fetchServiceIdLowerCase();
+        // 如果服务在灰度阶段，返回一个灰度版本号
+        String version = envGrayManager.getVersion(serviceId, nameVersion);
+        if (version != null) {
+            requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, version);
         }
         return null;
     }

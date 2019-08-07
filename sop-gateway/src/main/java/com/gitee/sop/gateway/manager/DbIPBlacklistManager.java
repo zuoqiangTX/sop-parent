@@ -56,7 +56,6 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
                     remove(ip);
                     break;
                 default:
-                    log.error("IP黑名单，错误的消息指令，nodeData：{}", nodeData);
             }
         });
     }

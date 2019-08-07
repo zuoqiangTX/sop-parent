@@ -25,10 +25,8 @@ import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.ConfigGray;
 import com.gitee.sop.adminserver.entity.ConfigGrayInstance;
-import com.gitee.sop.adminserver.entity.ConfigGrayUserkey;
 import com.gitee.sop.adminserver.mapper.ConfigGrayInstanceMapper;
 import com.gitee.sop.adminserver.mapper.ConfigGrayMapper;
-import com.gitee.sop.adminserver.mapper.ConfigGrayUserkeyMapper;
 import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
@@ -58,9 +56,6 @@ public class ServiceApi {
 
     @Autowired
     private RegistryService registryService;
-
-    @Autowired
-    private ConfigGrayUserkeyMapper configGrayUserkeyMapper;
 
     @Autowired
     private ConfigGrayMapper configGrayMapper;
@@ -289,11 +284,6 @@ public class ServiceApi {
         }
     }
 
-    @Api(name = "service.instance.gray.userkey.get")
-    ConfigGrayUserkey getGrayUserkey(ServiceSearchParam param) {
-        return configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
-    }
-
     private void sendServiceGrayMsg(String serviceId, ChannelOperation channelOperation) {
         this.sendServiceGrayMsg(null, serviceId, channelOperation);
     }
@@ -305,7 +295,7 @@ public class ServiceApi {
         ChannelMsg channelMsg = new ChannelMsg(channelOperation, serviceGrayDefinition);
         String jsonData = JSON.toJSONString(channelMsg);
         String path = ZookeeperContext.getServiceGrayChannelPath();
-        log.info("消息推送--灰度发布({}), path:{}, data:{}",channelOperation.getOperation(), path, jsonData);
+        log.info("消息推送--灰度发布({}), path:{}, data:{}", channelOperation.getOperation(), path, jsonData);
         ZookeeperContext.createOrUpdateData(path, jsonData);
     }
 

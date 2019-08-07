@@ -63,13 +63,7 @@ public class ApiMappingRequestCondition implements RequestCondition<ApiMappingRe
      */
     @Override
     public int compareTo(ApiMappingRequestCondition other, HttpServletRequest request) {
-        if (null != apiMappingInfo && null == other.apiMappingInfo) {
-            return 1;
-        } else if (null == apiMappingInfo && null != other.apiMappingInfo) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return this.apiMappingInfo.getVersion().compareTo(other.apiMappingInfo.getVersion());
     }
 
 }

@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.gitee.sop</groupId>
             <artifactId>sop-registry-api</artifactId>
-            <version>1.13.5-SNAPSHOT</version>
+            <version>1.13.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>

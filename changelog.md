@@ -1,5 +1,9 @@
 # changelog
 
+## 1.13.6
+
+- 修复@RequestBody不能绑定问题
+
 ## 1.13.5
 
 - 修复postJson下version获取不到问题

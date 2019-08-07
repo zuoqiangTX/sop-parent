@@ -6,7 +6,8 @@ import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
 import com.gitee.sop.adminserver.api.service.param.ServiceAddParam;
-import com.gitee.sop.adminserver.api.service.param.ServiceInstanceGrayParam;
+import com.gitee.sop.adminserver.api.service.param.ServiceGrayConfigParam;
+import com.gitee.sop.adminserver.api.service.param.ServiceIdParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
 import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
@@ -22,7 +23,11 @@ import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.StatusEnum;
 import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
 import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
+import com.gitee.sop.adminserver.entity.ConfigGray;
+import com.gitee.sop.adminserver.entity.ConfigGrayInstance;
 import com.gitee.sop.adminserver.entity.ConfigGrayUserkey;
+import com.gitee.sop.adminserver.mapper.ConfigGrayInstanceMapper;
+import com.gitee.sop.adminserver.mapper.ConfigGrayMapper;
 import com.gitee.sop.adminserver.mapper.ConfigGrayUserkeyMapper;
 import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
@@ -56,6 +61,12 @@ public class ServiceApi {
 
     @Autowired
     private ConfigGrayUserkeyMapper configGrayUserkeyMapper;
+
+    @Autowired
+    private ConfigGrayMapper configGrayMapper;
+
+    @Autowired
+    private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
     @Api(name = "zookeeper.service.list")
     @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
@@ -189,7 +200,7 @@ public class ServiceApi {
         }
     }
 
-    @Api(name = "service.instance.env.pre")
+    @Api(name = "service.instance.env.pre.open")
     @ApiDocMethod(description = "预发布")
     void serviceEnvPre(ServiceInstanceParam param) throws IOException {
         try {
@@ -201,35 +212,51 @@ public class ServiceApi {
         }
     }
 
-    @Api(name = "service.instance.env.gray")
-    @ApiDocMethod(description = "灰度发布")
-    void serviceEnvGray(ServiceInstanceGrayParam param) throws IOException {
+    @Api(name = "service.gray.config.get")
+    @ApiDocMethod(description = "灰度配置--获取")
+    ConfigGray serviceEnvGrayConfigGet(ServiceIdParam param) throws IOException {
+        String serviceId = param.getServiceId();
+        return configGrayMapper.getByColumn("service_id", serviceId);
+    }
+
+    @Api(name = "service.gray.config.save")
+    @ApiDocMethod(description = "灰度配置--保存")
+    void serviceEnvGrayConfigSave(ServiceGrayConfigParam param) throws IOException {
+        String serviceId = param.getServiceId();
+        ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
+        if (configGray == null) {
+            configGray = new ConfigGray();
+            configGray.setServiceId(serviceId);
+            configGray.setNameVersionContent(param.getNameVersionContent());
+            configGray.setUserKeyContent(param.getUserKeyContent());
+            configGrayMapper.save(configGray);
+        } else {
+            configGray.setNameVersionContent(param.getNameVersionContent());
+            configGray.setUserKeyContent(param.getUserKeyContent());
+            configGrayMapper.update(configGray);
+        }
+    }
+
+    @Api(name = "service.instance.env.gray.open")
+    @ApiDocMethod(description = "开启灰度发布")
+    void serviceEnvGray(ServiceInstanceParam param) throws IOException {
         try {
-            Boolean onlyUpdateGrayUserkey = param.getOnlyUpdateGrayUserkey();
-            if (onlyUpdateGrayUserkey == null || !onlyUpdateGrayUserkey) {
-                MetadataEnum envPre = MetadataEnum.ENV_GRAY;
-                registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
-            }
+            MetadataEnum envPre = MetadataEnum.ENV_GRAY;
+            registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
 
             String serviceId = param.getServiceId();
             String instanceId = param.getInstanceId();
-            String userKeyContent = param.getUserKeyContent();
-            String nameVersionContent = param.getNameVersionContent();
 
-            ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", instanceId);
-            if (configGrayUserkey == null) {
-                configGrayUserkey = new ConfigGrayUserkey();
-                configGrayUserkey.setServiceId(serviceId);
-                configGrayUserkey.setInstanceId(instanceId);
-                configGrayUserkey.setUserKeyContent(userKeyContent);
-                configGrayUserkey.setNameVersionContent(nameVersionContent);
-                configGrayUserkey.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
-                configGrayUserkeyMapper.save(configGrayUserkey);
+            ConfigGrayInstance configGrayInstance = configGrayInstanceMapper.getByColumn("instance_id", instanceId);
+            if (configGrayInstance == null) {
+                configGrayInstance = new ConfigGrayInstance();
+                configGrayInstance.setServiceId(serviceId);
+                configGrayInstance.setInstanceId(instanceId);
+                configGrayInstance.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
+                configGrayInstanceMapper.save(configGrayInstance);
             } else {
-                configGrayUserkey.setUserKeyContent(userKeyContent);
-                configGrayUserkey.setNameVersionContent(nameVersionContent);
-                configGrayUserkey.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
-                configGrayUserkeyMapper.update(configGrayUserkey);
+                configGrayInstance.setStatus(StatusEnum.STATUS_ENABLE.getStatus());
+                configGrayInstanceMapper.update(configGrayInstance);
             }
             this.sendUserKeyMsg(instanceId, ChannelOperation.GRAY_USER_KEY_SET);
         } catch (Exception e) {
@@ -245,10 +272,10 @@ public class ServiceApi {
             MetadataEnum envPre = MetadataEnum.ENV_ONLINE;
             registryService.setMetadata(param, envPre.getKey(), envPre.getValue());
 
-            ConfigGrayUserkey configGrayUserkey = configGrayUserkeyMapper.getByColumn("instance_id", param.getInstanceId());
-            if (configGrayUserkey != null && configGrayUserkey.getStatus() == StatusEnum.STATUS_ENABLE.getStatus()) {
-                configGrayUserkey.setStatus(StatusEnum.STATUS_DISABLE.getStatus());
-                configGrayUserkeyMapper.update(configGrayUserkey);
+            ConfigGrayInstance configGrayInstance = configGrayInstanceMapper.getByColumn("instance_id", param.getInstanceId());
+            if (configGrayInstance != null) {
+                configGrayInstance.setStatus(StatusEnum.STATUS_DISABLE.getStatus());
+                configGrayInstanceMapper.update(configGrayInstance);
             }
             this.sendUserKeyMsg(param.getInstanceId(), ChannelOperation.GRAY_USER_KEY_CLEAR);
         } catch (Exception e) {

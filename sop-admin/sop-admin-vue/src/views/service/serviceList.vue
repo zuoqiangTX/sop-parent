@@ -67,13 +67,14 @@
       />
       <el-table-column
         label="操作"
-        width="200"
+        width="250"
       >
         <template slot-scope="scope">
-          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env" type="text" size="mini" @click="onEnvOnline(scope.row)">上线</el-button>
-          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvPre(scope.row)">预发布</el-button>
-          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvGray(scope.row)">灰度发布</el-button>
-          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="text" size="mini" @click="onUpdateUserkey(scope.row)">灰度设置</el-button>
+          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'pre'" type="text" size="mini" @click="onEnvPreClose(scope.row)">结束预发布</el-button>
+          <el-button v-if="scope.row.parentId > 0 && scope.row.metadata.env === 'gray'" type="text" size="mini" @click="onEnvGrayClose(scope.row)">结束灰度</el-button>
+          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvPreOpen(scope.row)">开启预发布</el-button>
+          <el-button v-if="scope.row.parentId > 0 && !scope.row.metadata.env" type="text" size="mini" @click="onEnvGrayOpen(scope.row)">开启灰度</el-button>
+          <el-button v-if="scope.row.parentId === 0" type="text" size="mini" @click="onGrayConfigUpdate(scope.row)">灰度设置</el-button>
           <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
           <el-button v-if="scope.row.parentId > 0 && scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
         </template>
@@ -92,8 +93,8 @@
         :rules="grayFormRules"
         size="mini"
       >
-        <el-form-item label="服务器实例">
-          {{ grayForm.serviceId + ' (' + grayForm.ipPort + ')' }}
+        <el-form-item label="serviceId">
+          {{ grayForm.serviceId }}
         </el-form-item>
         <el-tabs v-model="tabsActiveName" type="card">
           <el-tab-pane label="灰度用户" name="first">
@@ -172,7 +173,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="grayDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="onAddUserKey">确 定</el-button>
+        <el-button type="primary" @click="onGrayConfigSave">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -199,8 +200,6 @@ export default {
       grayDialogVisible: false,
       grayForm: {
         serviceId: '',
-        instanceId: '',
-        ipPort: '',
         userKeyContent: '',
         onlyUpdateGrayUserkey: false,
         grayRouteConfigList: []
@@ -280,43 +279,77 @@ export default {
         })
       })
     },
-    onEnvOnline: function(row) {
-      this.confirm('确定要上线【' + row.serviceId + '】吗?', function(done) {
-        this.post('service.instance.env.online', row, function() {
-          this.tip('上线成功')
-          done()
-        })
+    doEnvOnline: function(row, callback) {
+      this.post('service.instance.env.online', row, function() {
+        callback && callback()
       })
     },
-    onEnvPre: function(row) {
-      this.confirm('确定要预发布【' + row.serviceId + '】吗?', function(done) {
-        this.post('service.instance.env.pre', row, function() {
+    onEnvPreOpen: function(row) {
+      this.confirm(`确定要开启 ${row.instanceId} 预发布吗?`, function(done) {
+        this.post('service.instance.env.pre.open', {
+          serviceId: row.serviceId,
+          instanceId: row.instanceId
+        }, function() {
           this.tip('预发布成功')
           done()
         })
       })
     },
-    onEnvGray: function(row) {
-      this.grayForm.onlyUpdateGrayUserkey = false
-      this.openGrayDialog(row)
+    onEnvPreClose: function(row) {
+      this.confirm(`确定要结束 ${row.instanceId} 预发布吗?`, function(done) {
+        this.doEnvOnline(row, function() {
+          this.tip('操作成功')
+          done()
+        })
+      })
     },
-    onUpdateUserkey: function(row) {
-      this.grayForm.onlyUpdateGrayUserkey = true
-      this.openGrayDialog(row)
+    onEnvGrayOpen: function(row) {
+      this.confirm(`确定要开启 ${row.instanceId} 灰度吗?`, function(done) {
+        this.post('service.instance.env.gray.open', {
+          serviceId: row.serviceId,
+          instanceId: row.instanceId
+        }, function() {
+          this.tip('开启成功')
+          done()
+        })
+      })
     },
-    openGrayDialog: function(row) {
+    onEnvGrayClose: function(row) {
+      this.confirm(`确定要结束 ${row.instanceId} 灰度吗?`, function(done) {
+        this.doEnvOnline(row, function() {
+          this.tip('操作成功')
+          done()
+        })
+      })
+    },
+    onGrayConfigUpdate: function(row) {
       const serviceId = row.serviceId
       this.loadRouteList(serviceId)
-      this.post('service.instance.gray.userkey.get', { instanceId: row.instanceId }, function(resp) {
+      this.post('service.gray.config.get', { serviceId: serviceId }, function(resp) {
         this.grayDialogVisible = true
         const data = resp.data
         Object.assign(this.grayForm, {
           serviceId: serviceId,
-          instanceId: row.instanceId,
-          ipPort: row.ipPort,
           userKeyContent: data.userKeyContent || '',
           grayRouteConfigList: this.createGrayRouteConfigList(data.nameVersionContent)
         })
+      })
+    },
+    onGrayConfigSave: function() {
+      this.$refs.grayForm.validate((valid) => {
+        if (valid) {
+          const nameVersionContents = []
+          const grayRouteConfigList = this.grayForm.grayRouteConfigList
+          for (let i = 0; i < grayRouteConfigList.length; i++) {
+            const config = grayRouteConfigList[i]
+            nameVersionContents.push(config.oldRouteId + '=' + config.newVersion)
+          }
+          this.grayForm.nameVersionContent = nameVersionContents.join(',')
+          this.post('service.gray.config.save', this.grayForm, function() {
+            this.grayDialogVisible = false
+            this.tip('保存成功')
+          })
+        }
       })
     },
     createGrayRouteConfigList: function(nameVersionContent) {
@@ -339,23 +372,6 @@ export default {
         })
       }
       return list
-    },
-    onAddUserKey: function() {
-      this.$refs.grayForm.validate((valid) => {
-        if (valid) {
-          const nameVersionContents = []
-          const grayRouteConfigList = this.grayForm.grayRouteConfigList
-          for (let i = 0; i < grayRouteConfigList.length; i++) {
-            const config = grayRouteConfigList[i]
-            nameVersionContents.push(config.oldRouteId + '=' + config.newVersion)
-          }
-          this.grayForm.nameVersionContent = nameVersionContents.join(',')
-          this.post('service.instance.env.gray', this.grayForm, function() {
-            this.grayDialogVisible = false
-            this.tip('灰度发布发成功')
-          })
-        }
-      })
     },
     onChangeOldRoute: function(config) {
       config.newVersion = ''

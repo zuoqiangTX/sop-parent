@@ -60,7 +60,7 @@ public class EnvironmentServerChooser extends BaseServerChooser {
     }
 
     /**
-     * 能否进入灰度环境，可修改此方法实现自己想要的
+     * 能否进入灰度环境
      *
      * @param request request
      * @return 返回true：可以进入到预发环境
@@ -68,23 +68,12 @@ public class EnvironmentServerChooser extends BaseServerChooser {
     protected boolean canVisitGray(Server server, HttpServletRequest request) {
         ApiParam apiParam = ZuulContext.getApiParam();
         DbEnvGrayManager userKeyManager = SpringContext.getBean(DbEnvGrayManager.class);
-        boolean canVisit = false;
-        /*if (this.isGrayUser(apiParam, userKeyManager, server, request)) {
-            // 指定灰度版本号
-            String instanceId = server.getMetaInfo().getInstanceId();
-            String newVersion = userKeyManager.getVersion(instanceId, apiParam.fetchNameVersion());
-            if (newVersion != null) {
-                // 在header中设置新的版本号，然后微服务端先获取这个新版本号
-                RequestContext.getCurrentContext().addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, newVersion);
-                canVisit = true;
-            }
-        }*/
         return this.isGrayUser(apiParam, userKeyManager, server, request);
     }
 
 
     /**
-     * 是否是灰度用户
+     * 是否是灰度用户，可修改此方法实现自己想要的
      *
      * @param param          接口参数
      * @param userKeyManager userKey管理

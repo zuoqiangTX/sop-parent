@@ -5,18 +5,19 @@ import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResultExecutor;
 import com.gitee.sop.gatewaycommon.limit.DefaultLimitManager;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
+import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultLimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.DefaultServiceErrorManager;
-import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
+import com.gitee.sop.gatewaycommon.manager.EnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.IPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
 import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
+import com.gitee.sop.gatewaycommon.manager.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.ServiceErrorManager;
-import com.gitee.sop.gatewaycommon.manager.EnvGrayManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.DefaultDataNameBuilder;
@@ -148,6 +149,8 @@ public class ApiConfig {
      * zuul网关全局异常处理
      */
     private ZuulErrorController zuulErrorController = new ZuulErrorController();
+
+    private ParameterFormatter<RequestContext> zuulParametersFormatter;
 
     // -------- fields ---------
 

@@ -1,6 +1,7 @@
 package com.gitee.sop.gatewaycommon.zuul.filter;
 
 import com.gitee.sop.gatewaycommon.exception.ApiException;
+import com.gitee.sop.gatewaycommon.manager.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.validate.Validator;
@@ -18,6 +19,9 @@ public class PreValidateFilter extends BaseZuulFilter {
 
     @Autowired
     private ParamBuilder<RequestContext> paramBuilder;
+
+    @Autowired(required = false)
+    private ParameterFormatter<RequestContext> parameterFormatter;
 
     @Autowired
     private Validator validator;
@@ -40,6 +44,10 @@ public class PreValidateFilter extends BaseZuulFilter {
         // 验证操作，这里有负责验证签名参数
         try {
             validator.validate(param);
+            // 校验成功后进行参数转换
+            if (parameterFormatter != null) {
+                parameterFormatter.format(param, requestContext);
+            }
         } catch (ApiException e) {
             log.error("验证失败，ip:{}, params:{}", param.fetchIp(), param.toJSONString(), e);
             throw e;

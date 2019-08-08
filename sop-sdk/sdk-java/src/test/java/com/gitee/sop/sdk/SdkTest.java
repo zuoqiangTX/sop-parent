@@ -100,11 +100,9 @@ public class SdkTest extends TestCase {
         if (response.isSuccess()) {
             List<DemoFileUploadResponse.FileMeta> responseFiles = response.getFiles();
             System.out.println("您上传的文件信息：");
-            responseFiles.stream().forEach(file->{
-                System.out.println(file);
-            });
+            responseFiles.forEach(System.out::println);
         } else {
-            System.out.println("errorCode:" + response.getCode() + ",errorMsg:" + response.getMsg());
+            System.out.println(JSON.toJSONString(response));
         }
         System.out.println("--------------------");
     }

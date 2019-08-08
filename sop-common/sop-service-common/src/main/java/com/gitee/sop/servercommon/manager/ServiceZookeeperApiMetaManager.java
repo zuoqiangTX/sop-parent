@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.bean.ZookeeperTool;
 import com.gitee.sop.servercommon.exception.ZookeeperPathNotExistException;
+import com.gitee.sop.servercommon.route.GatewayPredicateDefinition;
 import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +40,15 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     private static final String PATH_SPLIT = "/";
 
     private static final String DEFAULT_CONTEXT_PATH = "/";
+
+    /**
+     * NameVersion=alipay.story.get1.0
+     * see com.gitee.sop.gatewaycommon.routeDefinition.NameVersionRoutePredicateFactory
+     */
+    private static String QUERY_PREDICATE_DEFINITION_TPL = "NameVersion=%s";
+
+    private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first.route_", "/", "v_000");
+
 
     private Environment environment;
 
@@ -94,6 +105,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
     protected ServiceRouteInfo buildServiceGatewayInfo(ServiceApiInfo serviceApiInfo) {
         List<ServiceApiInfo.ApiMeta> apis = serviceApiInfo.getApis();
         List<GatewayRouteDefinition> routeDefinitionList = new ArrayList<>(apis.size());
+        routeDefinitionList.add(this.buildReadBodyRouteDefinition(serviceApiInfo));
         for (ServiceApiInfo.ApiMeta apiMeta : apis) {
             GatewayRouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
             routeDefinitionList.add(gatewayRouteDefinition);
@@ -136,11 +148,36 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         BeanUtils.copyProperties(apiMeta, gatewayRouteDefinition);
         gatewayRouteDefinition.setId(routeId);
         gatewayRouteDefinition.setFilters(Collections.emptyList());
+        gatewayRouteDefinition.setPredicates(this.buildPredicates(apiMeta));
         String uri = this.buildUri(serviceApiInfo, apiMeta);
         String path = this.buildServletPath(serviceApiInfo, apiMeta);
         gatewayRouteDefinition.setUri(uri);
         gatewayRouteDefinition.setPath(path);
         return gatewayRouteDefinition;
+    }
+
+    protected List<GatewayPredicateDefinition> buildPredicates(ServiceApiInfo.ApiMeta apiMeta) {
+        GatewayPredicateDefinition gatewayPredicateDefinition = new GatewayPredicateDefinition();
+        gatewayPredicateDefinition.setName("ReadBody");
+        return Arrays.asList(gatewayPredicateDefinition, this.buildNameVersionPredicateDefinition(apiMeta));
+    }
+
+    protected GatewayPredicateDefinition buildNameVersionPredicateDefinition(ServiceApiInfo.ApiMeta apiMeta) {
+        return new GatewayPredicateDefinition(String.format(QUERY_PREDICATE_DEFINITION_TPL, apiMeta.fetchNameVersion()));
+    }
+
+    /**
+     * 添加com.gitee.sop.gatewaycommon.routeDefinition.ReadBodyRoutePredicateFactory,解决form表单获取不到问题
+     *
+     * @return 返回路由定义
+     */
+    protected GatewayRouteDefinition buildReadBodyRouteDefinition(ServiceApiInfo serviceApiInfo) {
+        GatewayRouteDefinition readBodyRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
+        readBodyRouteDefinition.setOrder(Integer.MIN_VALUE);
+
+        readBodyRouteDefinition.setPredicates(this.buildPredicates(FIRST_API_META));
+
+        return readBodyRouteDefinition;
     }
 
     protected String buildUri(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {

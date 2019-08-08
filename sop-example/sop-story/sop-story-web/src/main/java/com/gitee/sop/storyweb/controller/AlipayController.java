@@ -127,11 +127,24 @@ public class AlipayController {
 
     // http://localhost:2222/alipay.story.get/
     @ApiMapping(value = "alipay.story.get")
-    public Story getStory() {
+    public Story getStory(Story param) {
         Story story = new Story();
         story.setId(1);
-        story.setName("海底小纵队(alipay.story.get1.0)");
+        story.setName("海底小纵队(alipay.story.get1.0), param:" + param);
         return story;
+    }
+
+    /**
+     *
+     * @param param 对应biz_content中的内容，并自动JSR-303校验
+     * @return
+     */
+    @ApiMapping(value = "alipay.story.get", version = "1.2")
+    public Story getStory11(Story param) {
+        Story story2 = new Story();
+        story2.setId(1);
+        story2.setName("海底小纵队(alipay.story.get1.2), param:" + param);
+        return story2;
     }
 
     /**
@@ -151,19 +164,6 @@ public class AlipayController {
         storyVO.name = "白雪公主, app_id:" + app_id;
         storyVO.gmt_create = new Date();
         return storyVO;
-    }
-
-    /**
-     *
-     * @param story 对应biz_content中的内容，并自动JSR-303校验
-     * @return
-     */
-    @ApiMapping(value = "alipay.story.get", version = "1.2")
-    public Story getStory11(Story story) {
-        Story story2 = new Story();
-        story2.setId(1);
-        story2.setName("海底小纵队(alipay.story.get1.2)");
-        return story2;
     }
 
     /**

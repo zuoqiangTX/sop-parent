@@ -67,12 +67,8 @@ public class OpenUtil {
         for (Map.Entry<String, String[]> entry : entrySet) {
             String name = entry.getKey();
             String[] values = entry.getValue();
-            if (values.length == 1) {
+            if (values.length >= 1) {
                 retMap.put(name, values[0]);
-            } else if (values.length > 1) {
-                retMap.put(name, values);
-            } else {
-                retMap.put(name, "");
             }
         }
 

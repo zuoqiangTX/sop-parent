@@ -11,8 +11,10 @@ import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.bean.ZookeeperContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,9 @@ public class DocManagerImpl implements DocManager {
 
     @Autowired
     private RegistryService registryService;
+
+    @Value("${doc.refresh-seconds:60}")
+    private String refreshSeconds;
 
     private volatile boolean listenInited;
 
@@ -169,7 +174,7 @@ public class DocManagerImpl implements DocManager {
                 ZKServiceInfo serviceInfo = JSON.parseObject(serviceInfoJson, ZKServiceInfo.class);
                 String serviceId = serviceInfo.getServiceId();
                 log.info("微服务[{}]推送更新", serviceId);
-                Msg msg = new Msg(id, 1000 * 20);
+                Msg msg = new Msg(id, 1000 * NumberUtils.toInt(refreshSeconds, 60));
                 msg.serviceId = serviceId;
                 // 延迟20秒执行
                 queue.offer(msg);

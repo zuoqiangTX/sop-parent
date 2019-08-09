@@ -23,11 +23,14 @@ public abstract class BaseZuulFilter extends ZuulFilter {
     /** 签名验证过滤 */
     public static final int PRE_VALIDATE_FILTER_ORDER = -1000;
 
+    /** 参数格式化过滤器 */
+    public static final int PRE_PARAMETER_FORMATTER_FILTER_ORDER = PRE_VALIDATE_FILTER_ORDER + 1;
+
     /** 权限验证过滤 */
-    public static final int PRE_ROUTE_PERMISSION_FILTER_ORDER = PRE_VALIDATE_FILTER_ORDER + 1;
+    public static final int PRE_ROUTE_PERMISSION_FILTER_ORDER = PRE_VALIDATE_FILTER_ORDER + 100;
 
     /** 限流过滤 */
-    public static final int PRE_LIMIT_FILTER_ORDER = PRE_ROUTE_PERMISSION_FILTER_ORDER + 1;
+    public static final int PRE_LIMIT_FILTER_ORDER = PRE_ROUTE_PERMISSION_FILTER_ORDER + 100;
 
     private Integer filterOrder;
 

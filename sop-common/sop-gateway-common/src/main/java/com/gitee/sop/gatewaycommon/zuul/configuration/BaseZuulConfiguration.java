@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
@@ -11,6 +12,7 @@ import com.gitee.sop.gatewaycommon.zuul.filter.FormBodyWrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.filter.PostResultFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreHttpServletRequestWrapperFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreParameterFormatterFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreVersionDecisionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
@@ -47,8 +49,8 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    ParameterFormatter<RequestContext> preParamFilter(){
-        return ApiConfig.getInstance().getZuulParametersFormatter();
+    ParameterFormatter<JSONObject> preParamFilter(){
+        return ApiConfig.getInstance().getZuulParameterFormatter();
     }
 
     /**
@@ -109,6 +111,11 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     @Bean
     PreValidateFilter preValidateFilter() {
         return new PreValidateFilter();
+    }
+
+    @Bean
+    PreParameterFormatterFilter preParameterFormatterFilter() {
+        return new PreParameterFormatterFilter();
     }
 
     /**

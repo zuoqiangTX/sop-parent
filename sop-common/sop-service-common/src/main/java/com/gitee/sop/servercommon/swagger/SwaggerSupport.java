@@ -29,6 +29,10 @@ public abstract class SwaggerSupport {
 
     @Bean
     public Docket createRestApi() {
+        return getDocket();
+    }
+
+    protected Docket getDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()

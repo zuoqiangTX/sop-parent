@@ -22,10 +22,11 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         super.addResourceHandlers(registry);
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        // 支持swagger-bootstrap-ui首页
+        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
+        // 支持默认swagger
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 
@@ -43,9 +44,10 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
 
         @Override
         protected boolean swaggerAccessProtected() {
-            return true;
+            return false;
         }
     }
+
 }
 
 /**

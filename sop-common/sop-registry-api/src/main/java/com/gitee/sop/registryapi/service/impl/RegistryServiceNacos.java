@@ -18,6 +18,8 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,9 @@ public class RegistryServiceNacos implements RegistryService {
             ServiceInfo serviceInfo = new ServiceInfo();
             serviceInfo.setServiceId(serviceName);
             List<Instance> instanceList = namingService.getAllInstances(serviceName);
-            if (!CollectionUtils.isEmpty(instanceList)) {
+            if (CollectionUtils.isEmpty(instanceList)) {
+                serviceInfo.setInstances(Collections.emptyList());
+            } else {
                 serviceInfo.setInstances(new ArrayList<>(instanceList.size()));
                 for (Instance instance : instanceList) {
                     ServiceInstance serviceInstance = new ServiceInstance();
@@ -68,6 +72,7 @@ public class RegistryServiceNacos implements RegistryService {
             }
             serviceInfoList.add(serviceInfo);
         }
+        serviceInfoList.sort(Comparator.comparingInt(o -> o.getInstances().size()));
         return serviceInfoList;
     }
 

@@ -5,7 +5,7 @@ import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.param.Param;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.BaseServerChooser;
 import com.netflix.loadbalancer.Server;
-import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
+import org.springframework.cloud.alibaba.nacos.ribbon.NacosServer;
 import org.springframework.core.env.Environment;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +41,7 @@ public class EnvironmentServerChooser extends BaseServerChooser {
 
     private String getEnvValue(Server server) {
         // eureka存储的metadata
-        Map<String, String> metadata = ((DiscoveryEnabledServer) server).getInstanceInfo().getMetadata();
+        Map<String, String> metadata = ((NacosServer) server).getMetadata();
         return metadata.get(MEDATA_KEY_ENV);
     }
 

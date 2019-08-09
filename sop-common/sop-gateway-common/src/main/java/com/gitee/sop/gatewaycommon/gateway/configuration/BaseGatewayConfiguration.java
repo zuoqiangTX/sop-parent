@@ -12,7 +12,9 @@ import com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
 import com.gitee.sop.gatewaycommon.manager.RouteManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
+import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +23,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +55,12 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
         jsonExceptionHandler.setMessageWriters(serverCodecConfigurer.getWriters());
         jsonExceptionHandler.setMessageReaders(serverCodecConfigurer.getReaders());
         return jsonExceptionHandler;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ParamBuilder<ServerWebExchange> paramBuilder() {
+        return ApiConfig.getInstance().getGatewayParamBuilder();
     }
 
     /**

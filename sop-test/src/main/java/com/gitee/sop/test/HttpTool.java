@@ -1,5 +1,6 @@
 package com.gitee.sop.test;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -111,6 +112,9 @@ public class HttpTool {
      * @throws IOException
      */
     public String request(String url, Map<String, ?> form, Map<String, String> header, HTTPMethod method) throws IOException {
+        if (method == HTTPMethod.JSON) {
+            return requestJson(url, JSON.toJSONString(form), header);
+        }
         Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
         // 添加header
         addHeader(requestBuilder, header);
@@ -260,7 +264,8 @@ public class HttpTool {
         POST,
         PUT,
         HEAD,
-        DELETE;
+        DELETE,
+        JSON;
 
         private HTTPMethod() {
         }

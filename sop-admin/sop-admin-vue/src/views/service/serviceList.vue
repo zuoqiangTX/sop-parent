@@ -236,11 +236,9 @@ export default {
       })
     },
     loadRouteList: function(serviceId) {
-      if (this.routeList.length === 0) {
-        this.post('route.list/1.2', { serviceId: serviceId.toLowerCase() }, function(resp) {
-          this.routeList = resp.data
-        })
-      }
+      this.post('route.list/1.2', { serviceId: serviceId.toLowerCase() }, function(resp) {
+        this.routeList = resp.data
+      })
     },
     getGraySelectData: function(oldRouteId) {
       return this.routeList.filter(routeNew => {
@@ -395,11 +393,14 @@ export default {
     },
     renderServiceName: function(row) {
       let instanceCount = ''
-      if (row.children && row.children.length > 0) {
-        const onlineCount = row.children.filter(el => {
+      // 如果是父节点
+      if (row.parentId === 0) {
+        const children = row.children || []
+        const childCount = children.length
+        const onlineCount = children.filter(el => {
           return el.status === 'UP'
         }).length
-        instanceCount = ` (${onlineCount}/${row.children.length})`
+        instanceCount = `(${onlineCount}/${childCount})`
       }
       return row.serviceId + instanceCount
     }

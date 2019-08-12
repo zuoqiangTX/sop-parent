@@ -190,7 +190,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         if (servletPath == null) {
             servletPath = "";
         }
-        StringUtils.trimLeadingCharacter(servletPath, '/');
+        servletPath = StringUtils.trimLeadingCharacter(servletPath, '/');
         return contextPath + servletPath;
     }
 

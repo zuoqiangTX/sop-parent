@@ -14,24 +14,57 @@ import java.util.Map;
 
 /**
  * 简易客户端
+ *
  * @author tanghc
  */
 @Data
 public class Client {
+    /**
+     * http请求工具
+     */
     private static HttpTool httpTool = new HttpTool();
 
+    /**
+     * 请求url
+     */
     private String url;
+
+    /**
+     * 平台提供的appKey
+     */
     private String appId;
+
+    /**
+     * 平台提供的私钥
+     */
     private String privateKey;
 
+    /**
+     * 请求成功后处理
+     */
     private Callback callback;
 
+    /**
+     * 创建一个客户端
+     *
+     * @param url        请求url
+     * @param appId      平台提供的appKey
+     * @param privateKey 平台提供的私钥
+     */
     public Client(String url, String appId, String privateKey) {
         this.url = url;
         this.appId = appId;
         this.privateKey = privateKey;
     }
 
+    /**
+     * 创建一个客户端
+     *
+     * @param url        请求url
+     * @param appId      平台提供的appKey
+     * @param privateKey 平台提供的私钥
+     * @param callback   请求成功后处理
+     */
     public Client(String url, String appId, String privateKey, Callback callback) {
         this.url = url;
         this.appId = appId;
@@ -39,6 +72,11 @@ public class Client {
         this.callback = callback;
     }
 
+    /**
+     * 发送请求
+     * @param requestBuilder 请求信息
+     * @return 返回结果
+     */
     public String execute(RequestBuilder requestBuilder) {
         RequestInfo requestInfo = requestBuilder.build(appId, privateKey);
         HttpTool.HTTPMethod httpMethod = requestInfo.getHttpMethod();
@@ -57,8 +95,12 @@ public class Client {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (callback != null) {
-            callback.callback(requestInfo, responseData);
+        Callback call = requestBuilder.getCallback();
+        if (call == null) {
+            call = this.callback;
+        }
+        if (call != null) {
+            call.callback(requestInfo, responseData);
         }
         return responseData;
     }
@@ -78,47 +120,110 @@ public class Client {
         private Map<String, String> header;
         private boolean ignoreSign;
         private boolean postJson;
+        private Callback callback;
 
+        /**
+         * 设置请求url，如果指定了将会优先使用，不指定默认使用Client中的url
+         *
+         * @param url url
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder url(String url) {
             this.url = url;
             return this;
         }
 
+        /**
+         * 设置方法名
+         *
+         * @param method 方法名
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder method(String method) {
             this.method = method;
             return this;
         }
 
+        /**
+         * 设置版本号
+         *
+         * @param version 版本号
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder version(String version) {
             this.version = version;
             return this;
         }
 
+        /**
+         * 设置业务参数
+         *
+         * @param bizContent 业务参数
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder bizContent(Map<String, String> bizContent) {
             this.bizContent = bizContent;
             return this;
         }
 
+        /**
+         * 设置请求方法
+         *
+         * @param httpMethod 请求方法
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder httpMethod(HttpTool.HTTPMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }
 
+        /**
+         * 设置请求头
+         *
+         * @param header 请求头
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder header(Map<String, String> header) {
             this.header = header;
             return this;
         }
 
+        /**
+         * 是否忽略签名验证
+         *
+         * @param ignoreSign 设置true，不会构建sign字段
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder ignoreSign(boolean ignoreSign) {
             this.ignoreSign = ignoreSign;
             return this;
         }
 
+        /**
+         * 是否是json请求
+         *
+         * @param postJson 设置true，请求方式变成json（application/json）
+         * @return 返回RequestBuilder
+         */
         public RequestBuilder postJson(boolean postJson) {
             this.postJson = postJson;
             return this;
         }
 
+        /**
+         * 设置请求成功处理
+         *
+         * @param callback 回调处理
+         * @return 返回RequestBuilder
+         */
+        public RequestBuilder callback(Callback callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public Callback getCallback() {
+            return callback;
+        }
 
         public RequestInfo build(String appId, String privateKey) {
             // 公共请求参数

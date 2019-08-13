@@ -143,6 +143,24 @@ public class AllInOneTest extends TestBase {
     }
 
     /**
+     * 验证中文乱码问题
+     */
+    public void testString() {
+        Client.RequestBuilder requestBuilder = new Client.RequestBuilder()
+                .method("story.string.get")
+                .version("1.0")
+                .bizContent(new BizContent().add("name", "name111"))
+                .httpMethod(HttpTool.HTTPMethod.GET)
+                .callback((requestInfo, responseData) -> {
+                    JSONObject jsonObject = JSON.parseObject(responseData);
+                    JSONObject data = jsonObject.getJSONObject("story_string_get_response");
+                    Assert.assertEquals("海底小纵队", data.getString("name"));
+                });
+
+        client.execute(requestBuilder);
+    }
+
+    /**
      * 限流测试，根据路由id限流
      *
      * @throws InterruptedException
@@ -161,7 +179,7 @@ public class AllInOneTest extends TestBase {
                         // 业务方法
                         Client.RequestBuilder requestBuilder = new Client.RequestBuilder()
                                 .method("alipay.story.get")
-                                .version("1.0")
+                                .version("1.2")
                                 .bizContent(new BizContent().add("id", "1").add("name", "葫芦娃"))
                                 .httpMethod(HttpTool.HTTPMethod.GET);
 

@@ -288,7 +288,7 @@ public class ZookeeperContext {
     }
 
     /**
-     * 监听一个节点
+     * 监听一个临时节点
      *
      * @param path
      * @param listenCallback 回调

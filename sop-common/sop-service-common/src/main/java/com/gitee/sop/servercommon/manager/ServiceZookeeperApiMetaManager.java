@@ -10,7 +10,6 @@ import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.DigestUtils;
@@ -81,6 +80,7 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
             String nodeData = JSON.toJSONString(serviceRouteInfo);
             log.info("serviceId:{}, zookeeper保存路径:{}", serviceId, savePath);
             this.zookeeperTool.createPath(savePath, nodeData);
+            this.zookeeperTool.createPath(serviceRouteInfo.getZookeeperTempServiceIdPath(), "");
         } catch (Exception e) {
             throw new IllegalStateException("zookeeper操作失败");
         }
@@ -91,8 +91,11 @@ public class ServiceZookeeperApiMetaManager implements ApiMetaManager {
         try {
             ServiceRouteInfo serviceRouteInfo = this.buildServiceGatewayInfo(serviceApiInfo);
             this.uploadServiceRouteInfoToZookeeper(serviceRouteInfo);
-        } finally {
-            IOUtils.closeQuietly(zookeeperTool);
+            // 同时上传一个临时节点
+            String tempPath = serviceRouteInfo.getZookeeperTempServiceIdChildPath();
+            this.zookeeperTool.createOrUpdateEphemeralSequentialPath(tempPath, JSON.toJSONString(serviceRouteInfo));
+        } catch (Exception e) {
+            log.error("上传一个临时节点失败, serviceApiInfo:{}", serviceApiInfo, e);
         }
     }
 

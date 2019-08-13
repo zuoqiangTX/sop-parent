@@ -31,4 +31,22 @@ public class CuratorTest extends TestCase {
         } catch (Exception e) {
         }
     }
+
+    /**
+     * 删除临时节点
+     */
+    public void testDelTemp() {
+        String tempRoot = "/com.gitee.sop.service.tmp";
+        CuratorFramework client = CuratorFrameworkFactory.builder()
+                .connectString(zookeeperServerAddr)
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .build();
+
+        client.start();
+
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(tempRoot);
+        } catch (Exception e) {
+        }
+    }
 }

@@ -7,12 +7,12 @@ import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
 import com.gitee.sop.websiteserver.bean.DocInfo;
-import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.bean.ZookeeperContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -43,21 +43,17 @@ import java.util.stream.Collectors;
 public class DocManagerImpl implements DocManager {
 
     // key:title
-    Map<String, DocInfo> docDefinitionMap = new HashMap<>();
+    private Map<String, DocInfo> docDefinitionMap = new HashMap<>();
 
-    // key: name+version
-    Map<String, DocItem> docItemMap = new HashMap<>();
+    private RestTemplate restTemplate = new RestTemplate();
 
+    private DocParser swaggerDocParser = new SwaggerDocParser();
 
-    RestTemplate restTemplate = new RestTemplate();
+    private DocParser easyopenDocParser = new EasyopenDocParser();
 
-    DocParser swaggerDocParser = new SwaggerDocParser();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    DocParser easyopenDocParser = new EasyopenDocParser();
-
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    DelayQueue<Msg> queue = new DelayQueue<>();
+    private DelayQueue<Msg> queue = new DelayQueue<>();
 
     private String secret = "b749a2ec000f4f29";
 
@@ -70,14 +66,10 @@ public class DocManagerImpl implements DocManager {
     @Value("${doc.refresh-seconds:60}")
     private String refreshSeconds;
 
-    private volatile boolean listenInited;
-
     @Override
     public void load(String serviceId) {
         try {
             List<ServiceInfo> serviceInfoList = registryService.listAllService(1, 9999);
-            log.info("服务列表：{}", serviceInfoList);
-
             serviceInfoList
                     .stream()
                     // 网关没有文档提供，需要排除
@@ -110,6 +102,7 @@ public class DocManagerImpl implements DocManager {
             JSONObject docRoot = JSON.parseObject(docInfoJson, Feature.OrderedField, Feature.DisableCircularReferenceDetect);
             DocParser docParser = this.buildDocParser(docRoot);
             DocInfo docInfo = docParser.parseJson(docRoot);
+            docInfo.setServiceId(serviceInstance.getServiceId());
             docDefinitionMap.put(docInfo.getTitle(), docInfo);
         } catch (Exception e) {
             // 这里报错可能是因为有些微服务没有配置swagger文档，导致404访问不到
@@ -132,11 +125,6 @@ public class DocManagerImpl implements DocManager {
         } else {
             return swaggerDocParser;
         }
-    }
-
-    @Override
-    public DocItem get(String method, String version) {
-        return docItemMap.get(method + version);
     }
 
     @Override
@@ -164,26 +152,71 @@ public class DocManagerImpl implements DocManager {
         executorService.execute(new Consumer(queue, this));
 
         ZookeeperContext.setEnvironment(environment);
-        String routeRootPath = ZookeeperContext.getRouteRootPath();
+        String serviceTempRootPath = ZookeeperContext.getServiceTempRootPath();
+        ZookeeperContext.createPath(serviceTempRootPath, "{}");
         // 如果节点内容有变化则自动更新文档
-        ZookeeperContext.listenChildren(routeRootPath, 1, (client, event) -> {
-            if (listenInited) {
+
+        ZookeeperContext.getChildrenAndListen(serviceTempRootPath, childDataList -> {
+            for (ChildData childData : childDataList) {
+                String serviceIdPath = childData.getPath();
+                try {
+                    boolean hasChildren = ZookeeperContext.hasChildren(serviceIdPath);
+                    if (hasChildren) {
+                        log.info("加载文档服务器，path:{}", serviceIdPath);
+                        listenServiceIdPath(serviceIdPath);
+                    }
+                } catch (Exception e) {
+                    log.error("监听路径失败，serviceIdPath：{}", serviceIdPath);
+                }
+            }
+        }, (client, event) -> {
+            PathChildrenCacheEvent.Type type = event.getType();
+            if (type == PathChildrenCacheEvent.Type.CHILD_ADDED) {
+                String serviceIdPath = event.getData().getPath();
+                log.info("新增文档服务器，path:{}", serviceIdPath);
+                listenServiceIdPath(serviceIdPath);
+            }
+        });
+    }
+
+    private void listenServiceIdPath(String serviceIdPath) throws Exception {
+        ZookeeperContext.listenChildren(serviceIdPath, (client, event) -> {
+            String path = event.getData().getPath();
+            PathChildrenCacheEvent.Type type = event.getType();
+            log.info("服务节点变更，path:{}, eventType:{}", path, event.getType().name());
+            if (type == PathChildrenCacheEvent.Type.CHILD_ADDED
+                    || type == PathChildrenCacheEvent.Type.CHILD_UPDATED) {
+                byte[] data = event.getData().getData();
+                String serviceInfoJson = new String(data);
+                if (StringUtils.isEmpty(serviceInfoJson)) {
+                    return;
+                }
+                ZKServiceInfo serviceInfo = JSON.parseObject(serviceInfoJson, ZKServiceInfo.class);
+                String serviceId = serviceInfo.getServiceId();
+                int delaySeconds = NumberUtils.toInt(refreshSeconds, 60);
+                log.info("微服务[{}]推送更新，{}秒后加载文档内容", serviceId, delaySeconds);
                 long id = System.currentTimeMillis();
+                Msg msg = new Msg(id, delaySeconds * 1000);
+                msg.serviceId = serviceId;
+                // 延迟20秒执行
+                queue.offer(msg);
+            } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
                 byte[] data = event.getData().getData();
                 String serviceInfoJson = new String(data);
                 ZKServiceInfo serviceInfo = JSON.parseObject(serviceInfoJson, ZKServiceInfo.class);
                 String serviceId = serviceInfo.getServiceId();
-                log.info("微服务[{}]推送更新", serviceId);
-                Msg msg = new Msg(id, 1000 * NumberUtils.toInt(refreshSeconds, 60));
-                msg.serviceId = serviceId;
-                // 延迟20秒执行
-                queue.offer(msg);
-            }
-            TreeCacheEvent.Type type = event.getType();
-            if (type == TreeCacheEvent.Type.INITIALIZED) {
-                listenInited = true;
+                boolean hasChildren = ZookeeperContext.hasChildren(serviceIdPath);
+                // 如果没有子节点就删除
+                if (!hasChildren) {
+                    log.info("服务节点已删除，删除对应文档信息,path:{}", event.getData().getPath());
+                    removeDoc(serviceId);
+                }
             }
         });
+    }
+
+    public void removeDoc(String serviceId) {
+        docDefinitionMap.entrySet().removeIf(entry -> serviceId.equalsIgnoreCase(entry.getValue().getServiceId()));
     }
 
     static class Msg implements Delayed {
@@ -202,8 +235,7 @@ public class DocManagerImpl implements DocManager {
         @Override
         public int compareTo(Delayed delayed) {
             Msg msg = (Msg) delayed;
-            return Long.valueOf(this.id) > Long.valueOf(msg.id) ? 1
-                    : (Long.valueOf(this.id) < Long.valueOf(msg.id) ? -1 : 0);
+            return Long.compare(this.id, msg.id);
         }
 
         // 延迟任务是否到时就是按照这个方法判断如果返回的是负数则说明到期否则还没到期

@@ -31,7 +31,7 @@ public class OpenServiceConfig extends AlipayServiceConfiguration {
 
 
     /**
-     * 开启文档
+     * 开启文档，本地微服务文档地址：http://localhost:2222/doc.html
      * http://ip:port/v2/api-docs
      */
     @Configuration

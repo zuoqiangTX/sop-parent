@@ -82,8 +82,10 @@
               <el-button v-if="!scope.row.metadata.env" type="text" size="mini" @click="onEnvPreOpen(scope.row)">开启预发布</el-button>
               <el-button v-if="!scope.row.metadata.env" type="text" size="mini" @click="onEnvGrayOpen(scope.row)">开启灰度</el-button>
             </span>
-            <el-button v-if="scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
-            <el-button v-if="scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
+            <span style="margin-left: 10px;">
+              <el-button v-if="scope.row.status === 'UP'" type="text" size="mini" @click="onDisable(scope.row)">禁用</el-button>
+              <el-button v-if="scope.row.status === 'OUT_OF_SERVICE'" type="text" size="mini" @click="onEnable(scope.row)">启用</el-button>
+            </span>
           </div>
         </template>
       </el-table-column>
@@ -234,11 +236,9 @@ export default {
       })
     },
     loadRouteList: function(serviceId) {
-      if (this.routeList.length === 0) {
-        this.post('route.list/1.2', { serviceId: serviceId.toLowerCase() }, function(resp) {
-          this.routeList = resp.data
-        })
-      }
+      this.post('route.list/1.2', { serviceId: serviceId.toLowerCase() }, function(resp) {
+        this.routeList = resp.data
+      })
     },
     getGraySelectData: function(oldRouteId) {
       return this.routeList.filter(routeNew => {
@@ -393,11 +393,14 @@ export default {
     },
     renderServiceName: function(row) {
       let instanceCount = ''
-      if (row.children && row.children.length > 0) {
-        const onlineCount = row.children.filter(el => {
+      // 如果是父节点
+      if (row.parentId === 0) {
+        const children = row.children || []
+        const childCount = children.length
+        const onlineCount = children.filter(el => {
           return el.status === 'UP'
         }).length
-        instanceCount = ` (${onlineCount}/${row.children.length})`
+        instanceCount = `(${onlineCount}/${childCount})`
       }
       return row.serviceId + instanceCount
     }

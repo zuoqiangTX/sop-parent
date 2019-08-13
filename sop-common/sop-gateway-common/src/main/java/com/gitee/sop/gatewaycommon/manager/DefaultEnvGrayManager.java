@@ -40,7 +40,7 @@ public class DefaultEnvGrayManager implements EnvGrayManager {
         if (serviceId == null || nameVersion == null) {
             return null;
         }
-        boolean opened = instanceIdServiceIdMap.values().contains(serviceId);
+        boolean opened = instanceIdServiceIdMap.containsValue(serviceId);
         // 没有开启灰度
         if (!opened) {
             return null;

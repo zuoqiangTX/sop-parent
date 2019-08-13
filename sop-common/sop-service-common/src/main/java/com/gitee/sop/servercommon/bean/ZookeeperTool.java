@@ -9,6 +9,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 import org.springframework.core.env.Environment;
 
 import java.io.Closeable;
@@ -91,6 +92,23 @@ public class ZookeeperTool implements Closeable {
         return getClient().create()
                 // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
                 .creatingParentContainersIfNeeded()
+                .forPath(path, data.getBytes());
+    }
+
+    /**
+     * 创建临时序列节点
+     * @param path 节点路径
+     * @param data 数据
+     * @return 返回节点路径
+     * @throws Exception
+     */
+    public String createOrUpdateEphemeralSequentialPath(String path, String data) throws Exception {
+        return getClient().create()
+                // 如果节点存在则Curator将会使用给出的数据设置这个节点的值
+                .orSetData()
+                // 如果指定节点的父节点不存在，则Curator将会自动级联创建父节点
+                .creatingParentContainersIfNeeded()
+                .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
                 .forPath(path, data.getBytes());
     }
 

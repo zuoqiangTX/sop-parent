@@ -14,11 +14,15 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.PostConstruct;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author tanghc
@@ -42,6 +46,12 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
         // 添加拦截器
         registry.addInterceptor(new ServiceContextInterceptor());
         super.addInterceptors(registry);
+    }
+
+    @Override
+    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        // 解决controller返回字符串中文乱码问题
+        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
     }
 
     /**

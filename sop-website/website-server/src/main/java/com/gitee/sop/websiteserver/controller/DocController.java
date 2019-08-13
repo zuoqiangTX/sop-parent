@@ -1,7 +1,6 @@
 package com.gitee.sop.websiteserver.controller;
 
 import com.gitee.sop.websiteserver.bean.DocInfo;
-import com.gitee.sop.websiteserver.bean.DocItem;
 import com.gitee.sop.websiteserver.manager.DocManager;
 import com.gitee.sop.websiteserver.vo.DocBaseInfoVO;
 import com.gitee.sop.websiteserver.vo.DocInfoVO;
@@ -57,11 +56,6 @@ public class DocController {
     @GetMapping("/docinfo/{title}")
     public DocInfo getDocModule(@PathVariable("title") String title) {
         return docManager.getByTitle(title);
-    }
-
-    @GetMapping("/item/{method}/{version}/")
-    public DocItem getDocItem(@PathVariable("method") String method, @PathVariable("version") String version) {
-        return docManager.get(method, version);
     }
 
 

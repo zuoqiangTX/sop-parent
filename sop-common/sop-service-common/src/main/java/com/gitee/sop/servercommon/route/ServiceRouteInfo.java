@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class ServiceRouteInfo {
     private static final String SOP_SERVICE_ROUTE_PATH = ServiceConstants.SOP_SERVICE_ROUTE_PATH;
+    private static final String SOP_SERVICE_TEMP_PATH = ServiceConstants.SOP_SERVICE_TEMP_PATH;
 
     /** 服务名称，对应spring.application.name */
     private String serviceId;
@@ -38,5 +39,23 @@ public class ServiceRouteInfo {
     @JSONField(serialize = false)
     public String getZookeeperPath() {
         return SOP_SERVICE_ROUTE_PATH + '/' + serviceId;
+    }
+
+    /**
+     * 返回zookeeper路径
+     * @return 返回zookeeper路径
+     */
+    @JSONField(serialize = false)
+    public String getZookeeperTempServiceIdPath() {
+        return SOP_SERVICE_TEMP_PATH + '/' + serviceId;
+    }
+
+    /**
+     * 返回zookeeper路径
+     * @return 返回zookeeper路径
+     */
+    @JSONField(serialize = false)
+    public String getZookeeperTempServiceIdChildPath() {
+        return getZookeeperTempServiceIdPath() + "/" + serviceId;
     }
 }

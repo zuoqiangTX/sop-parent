@@ -1,8 +1,6 @@
 package com.gitee.sop.gateway.controller;
 
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
-import com.gitee.sop.gatewaycommon.param.ParamNames;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +29,7 @@ public class RedirectController {
     ) throws ServletException, IOException {
         request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, method);
         request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, version);
-        String queryString = request.getQueryString();
-        String versionQuery = ParamNames.VERSION_NAME + '=' + version;
-        if (StringUtils.isBlank(queryString)) {
-            queryString = versionQuery;
-        } else {
-            queryString = queryString + '&' + versionQuery;
-        }
-        request.getRequestDispatcher(path + '?' + queryString).forward(request, response);
+        request.getRequestDispatcher(path).forward(request, response);
     }
 
 }

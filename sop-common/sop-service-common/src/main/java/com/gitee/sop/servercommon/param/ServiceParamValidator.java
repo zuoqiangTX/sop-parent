@@ -22,11 +22,10 @@ public class ServiceParamValidator implements ParamValidator {
     public static final String COMMA = ",";
     private static Object[] EMPTY_OBJ_ARRAY = {};
 
-    private static ValidatorFactory factory;
     private static javax.validation.Validator validator;
 
     static {
-        factory = Validation.buildDefaultValidatorFactory();
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 

@@ -93,6 +93,14 @@ public class ApiValidator implements Validator {
      * @param param 接口参数
      */
     protected void checkEnable(ApiParam param) {
+        String name = param.fetchName();
+        if (name == null) {
+            throw ErrorEnum.ISV_MISSING_METHOD.getErrorMeta().getException();
+        }
+        String version = param.fetchVersion();
+        if (version == null) {
+            throw ErrorEnum.ISV_MISSING_VERSION.getErrorMeta().getException();
+        }
         String routeId = param.fetchNameVersion();
         // 检查路由是否存在
         RouteRepositoryContext.checkExist(routeId, ErrorEnum.ISV_INVALID_METHOD);

@@ -1,6 +1,7 @@
 package com.gitee.sop.sdk.client;
 
 import com.gitee.sop.sdk.common.OpenConfig;
+import com.gitee.sop.sdk.common.RequestMethod;
 import com.gitee.sop.sdk.common.UploadFile;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -118,7 +119,7 @@ public class OpenHttp {
      * @return
      * @throws IOException
      */
-    public String request(String url, Map<String, String> form, Map<String, String> header, HTTPMethod method) throws IOException {
+    public String request(String url, Map<String, String> form, Map<String, String> header, RequestMethod method) throws IOException {
         Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
         // 添加header
         addHeader(requestBuilder, header);
@@ -134,7 +135,7 @@ public class OpenHttp {
         }
     }
 
-    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, HTTPMethod method) {
+    public static Request.Builder buildRequestBuilder(String url, Map<String, String> form, RequestMethod method) {
         switch (method) {
             case GET:
                 return new Request.Builder()
@@ -241,22 +242,4 @@ public class OpenHttp {
         this.httpClient = httpClient;
     }
 
-    public enum HTTPMethod {
-        GET,
-        POST,
-        PUT,
-        HEAD,
-        DELETE;
-
-        private HTTPMethod() {
-        }
-
-        public String value() {
-            return this.name();
-        }
-
-        public static HTTPMethod fromValue(String v) {
-            return valueOf(v.toUpperCase());
-        }
-    }
 }

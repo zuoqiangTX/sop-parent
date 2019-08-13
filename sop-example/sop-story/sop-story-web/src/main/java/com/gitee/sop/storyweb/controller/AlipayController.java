@@ -1,5 +1,6 @@
 package com.gitee.sop.storyweb.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.OpenContext;
@@ -127,11 +128,37 @@ public class AlipayController {
 
     // http://localhost:2222/alipay.story.get/
     @ApiMapping(value = "alipay.story.get")
-    public Story getStory() {
+    public Story getStory(Story param) {
         Story story = new Story();
         story.setId(1);
-        story.setName("海底小纵队(alipay.story.get1.0)");
+        story.setName("海底小纵队(alipay.story.get1.0), param:" + param);
         return story;
+    }
+
+    /**
+     *
+     * @param param 对应biz_content中的内容，并自动JSR-303校验
+     * @return
+     */
+    @ApiMapping(value = "alipay.story.get", version = "1.2")
+    public Story getStory11(Story param) {
+        Story story2 = new Story();
+        story2.setId(1);
+        story2.setName("海底小纵队(alipay.story.get1.2), param:" + param);
+        return story2;
+    }
+
+    /**
+     * 验证字符串乱码问题
+     * @param param
+     * @return
+     */
+    @ApiMapping(value = "story.string.get", version = "1.0")
+    public String string(Story param) {
+        Story story2 = new Story();
+        story2.setId(1);
+        story2.setName("海底小纵队");
+        return JSON.toJSONString(story2);
     }
 
     /**
@@ -151,19 +178,6 @@ public class AlipayController {
         storyVO.name = "白雪公主, app_id:" + app_id;
         storyVO.gmt_create = new Date();
         return storyVO;
-    }
-
-    /**
-     *
-     * @param story 对应biz_content中的内容，并自动JSR-303校验
-     * @return
-     */
-    @ApiMapping(value = "alipay.story.get", version = "1.2")
-    public Story getStory11(Story story) {
-        Story story2 = new Story();
-        story2.setId(1);
-        story2.setName("海底小纵队(alipay.story.get1.2)");
-        return story2;
     }
 
     /**

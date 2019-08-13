@@ -1,5 +1,6 @@
 package com.gitee.sop.websiteserver.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.util.List;
@@ -10,5 +11,7 @@ import java.util.List;
 @Data
 public class DocInfo {
     private String title;
+    @JSONField(serialize = false)
+    private String serviceId;
     private List<DocModule> docModuleList;
 }

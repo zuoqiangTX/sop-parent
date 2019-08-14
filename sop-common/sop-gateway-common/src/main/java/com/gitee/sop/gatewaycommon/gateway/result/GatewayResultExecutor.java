@@ -8,11 +8,9 @@ import com.gitee.sop.gatewaycommon.message.Error;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.result.BaseExecutorAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 
 import java.util.List;
@@ -54,21 +52,11 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
 
     @Override
     public GatewayResult buildErrorResult(ServerWebExchange exchange, Throwable ex) {
-        Error error = null;
+        Error error;
         if (ex instanceof ApiException) {
             ApiException apiException = (ApiException) ex;
             error = apiException.getError();
-        } else if (ex instanceof NotFoundException) {
-            error = ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getError();
-        } else if (ex instanceof ResponseStatusException) {
-            ResponseStatusException responseStatusException = (ResponseStatusException) ex;
-            HttpStatus status = responseStatusException.getStatus();
-            if (status == HttpStatus.NOT_FOUND) {
-                error = ErrorEnum.ISV_INVALID_METHOD.getErrorMeta().getError();
-            }
-        }
-
-        if (error == null) {
+        } else {
             error = ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getError();
         }
 

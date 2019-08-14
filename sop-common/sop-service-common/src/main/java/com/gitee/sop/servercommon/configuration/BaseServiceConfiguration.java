@@ -49,9 +49,13 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     }
 
     @Override
-    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         // 解决controller返回字符串中文乱码问题
-        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof StringHttpMessageConverter) {
+                ((StringHttpMessageConverter)converter).setDefaultCharset(StandardCharsets.UTF_8);
+            }
+        }
     }
 
     /**

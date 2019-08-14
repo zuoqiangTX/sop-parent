@@ -52,7 +52,7 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
 
     @Override
     public GatewayResult buildErrorResult(ServerWebExchange exchange, Throwable ex) {
-        Error error = null;
+        Error error;
         if (ex instanceof ApiException) {
             ApiException apiException = (ApiException) ex;
             error = apiException.getError();

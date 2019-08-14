@@ -48,18 +48,14 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
         super.addInterceptors(registry);
     }
 
-    /*@Override
-    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
-    }*/
-
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         // 解决controller返回字符串中文乱码问题
-        // 移除老的
-        //converters.removeIf(converter -> converter instanceof StringHttpMessageConverter);
-        // 添加信息的
-        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof StringHttpMessageConverter) {
+                ((StringHttpMessageConverter)converter).setDefaultCharset(StandardCharsets.UTF_8);
+            }
+        }
     }
 
     /**

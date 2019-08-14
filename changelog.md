@@ -1,5 +1,9 @@
 # changelog
 
+## 1.15.1
+
+- 修复未配置正确MessageConverter导致的异常
+
 ## 1.15.0
 
 - 优化预发布、灰度

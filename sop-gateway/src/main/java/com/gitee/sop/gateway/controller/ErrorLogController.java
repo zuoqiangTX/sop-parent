@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tanghc
@@ -60,8 +62,14 @@ public class ErrorLogController {
 
     private void check(ServerWebExchange request) {
         MultiValueMap<String, String> queryParams = request.getRequest().getQueryParams();
-        ApiParam apiParam = ApiParam.build(queryParams);
-        signer.checkSign(apiParam, secret);
+        ApiParam apiParam = new ApiParam();
+        for (Map.Entry<String, List<String>> entry : queryParams.entrySet()) {
+            apiParam.put(entry.getKey(), entry.getValue().get(0));
+        }
+        boolean right = signer.checkSign(apiParam, secret);
+        if (!right) {
+            throw new RuntimeException("签名校验失败");
+        }
     }
 
 }

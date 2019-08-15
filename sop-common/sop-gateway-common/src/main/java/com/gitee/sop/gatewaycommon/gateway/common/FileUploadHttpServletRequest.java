@@ -55,6 +55,14 @@ public class FileUploadHttpServletRequest implements HttpServletRequest {
         return data.length;
     }
 
+    /**
+     * 最关键这个要返回正确
+     */
+    @Override
+    public String getContentType() {
+        return serverHttpRequest.getHeaders().getContentType().toString();
+    }
+
     @Override
     public String getAuthType() {
         return null;
@@ -233,11 +241,6 @@ public class FileUploadHttpServletRequest implements HttpServletRequest {
     @Override
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
 
-    }
-
-    @Override
-    public String getContentType() {
-        return serverHttpRequest.getHeaders().getContentType().toString();
     }
 
     @Override

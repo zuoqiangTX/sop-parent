@@ -4,7 +4,6 @@ import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.configuration.AlipayServiceConfiguration;
 import com.gitee.sop.servercommon.swagger.SwaggerSupport;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -14,19 +13,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 public class OpenServiceConfig extends AlipayServiceConfiguration {
 
-
     static {
         ServiceConfig.getInstance().getI18nModules().add("i18n/isp/goods_error");
-    }
-
-    @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        super.addResourceHandlers(registry);
-        // 支持swagger-bootstrap-ui首页
-        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        // 支持默认swagger
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 

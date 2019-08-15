@@ -62,7 +62,10 @@ public class ErrorLogController {
     private void check(HttpServletRequest request) {
         Map<String, String> params = RequestUtil.convertRequestParamsToMap(request);
         ApiParam apiParam = ApiParam.build(params);
-        signer.checkSign(apiParam, secret);
+        boolean right = signer.checkSign(apiParam, secret);
+        if (!right) {
+            throw new RuntimeException("签名校验失败");
+        }
     }
 
 }

@@ -101,9 +101,8 @@ public class RequestUtil {
      * @return 返回表单中的字段内容
      */
     public static Map<String, String> convertMultipartRequestToMap(HttpServletRequest request) {
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        //2、创建一个文件上传解析器
-        ServletFileUpload upload = new ServletFileUpload(factory);
+        // 创建一个文件上传解析器
+        ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
         Map<String, String> params = new HashMap<>(16);
         try {
             List<FileItem> fileItems = upload.parseRequest(request);

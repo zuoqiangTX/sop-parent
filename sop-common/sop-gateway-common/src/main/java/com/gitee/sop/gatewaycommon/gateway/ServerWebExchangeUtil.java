@@ -2,6 +2,7 @@ package com.gitee.sop.gatewaycommon.gateway;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.gateway.common.FileUploadHttpServletRequest;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,10 +64,14 @@ public class ServerWebExchangeUtil {
             String cachedBody = exchange.getAttribute(CACHE_REQUEST_BODY_OBJECT_KEY);
             if (cachedBody != null) {
                 MediaType contentType = exchange.getRequest().getHeaders().getContentType();
+                String contentTypeStr = contentType == null ? "" : contentType.toString().toLowerCase();
                 // 如果是json方式提交
-                if (contentType != null
-                        && StringUtils.containsAny(contentType.toString().toLowerCase(), "json", "text")) {
+                if (StringUtils.containsAny(contentTypeStr, "json", "text")) {
                     params = JSON.parseObject(cachedBody);
+                } else if (StringUtils.containsIgnoreCase(contentTypeStr, "multipart")) {
+                    // 如果是文件上传请求
+                    HttpServletRequest fileUploadRequest = getFileUploadRequest(exchange, cachedBody);
+                    params = RequestUtil.convertMultipartRequestToMap(fileUploadRequest);
                 } else {
                     params = RequestUtil.parseQueryToMap(cachedBody);
                 }
@@ -105,4 +112,18 @@ public class ServerWebExchangeUtil {
                 .request(serverHttpRequestNew)
                 .build();
     }
+
+    /**
+     * 获取一个文件上传request
+     *
+     * @param exchange 当前ServerWebExchange
+     * @param requestBody 上传文件请求体内容
+     * @return 返回文件上传request
+     */
+    public static HttpServletRequest getFileUploadRequest(ServerWebExchange exchange, String requestBody) {
+        byte[] data = requestBody.getBytes(StandardCharsets.UTF_8);
+        return  new FileUploadHttpServletRequest(exchange.getRequest(), data);
+    }
+
+
 }

@@ -3,7 +3,7 @@ package com.gitee.sop.gatewaycommon.gateway.filter;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ConfigLimitDto;
 import com.gitee.sop.gatewaycommon.exception.ApiException;
-import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
+import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.limit.LimitType;
 import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
@@ -34,7 +34,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
         if (!apiConfig.isOpenLimit()) {
             return chain.filter(exchange);
         }
-        ApiParam apiParam = GatewayContext.getApiParam(exchange);
+        ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         ConfigLimitDto configLimitDto = this.findConfigLimitDto(apiConfig, apiParam, exchange);
         if (configLimitDto == null) {
             return null;

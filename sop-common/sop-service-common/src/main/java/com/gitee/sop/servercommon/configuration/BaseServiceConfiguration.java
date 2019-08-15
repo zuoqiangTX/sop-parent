@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -40,6 +41,15 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
 
     private ApiMappingHandlerMapping apiMappingHandlerMapping = new ApiMappingHandlerMapping();
 
+    @Override
+    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        super.addResourceHandlers(registry);
+        // 支持swagger-bootstrap-ui首页
+        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
+        // 支持默认swagger
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {

@@ -6,15 +6,14 @@ import com.gitee.sop.gatewaycommon.manager.ServiceErrorManager;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.result.ApiResult;
 import com.gitee.sop.gatewaycommon.result.JsonResult;
-import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.gitee.sop.gatewaycommon.validate.taobao.TaobaoSigner;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author tanghc
@@ -28,7 +27,7 @@ public class ErrorLogController {
     private String secret;
 
     @GetMapping("listErrors")
-    public ApiResult listErrors(HttpServletRequest request) {
+    public ApiResult listErrors(ServerWebExchange request) {
         try {
             this.check(request);
             ServiceErrorManager serviceErrorManager = ApiConfig.getInstance().getServiceErrorManager();
@@ -45,7 +44,7 @@ public class ErrorLogController {
     }
 
     @GetMapping("clearErrors")
-    public ApiResult clearErrors(HttpServletRequest request) {
+    public ApiResult clearErrors(ServerWebExchange request) {
         try {
             this.check(request);
             ServiceErrorManager serviceErrorManager = ApiConfig.getInstance().getServiceErrorManager();
@@ -59,9 +58,9 @@ public class ErrorLogController {
         }
     }
 
-    private void check(HttpServletRequest request) {
-        Map<String, String> params = RequestUtil.convertRequestParamsToMap(request);
-        ApiParam apiParam = ApiParam.build(params);
+    private void check(ServerWebExchange request) {
+        MultiValueMap<String, String> queryParams = request.getRequest().getQueryParams();
+        ApiParam apiParam = ApiParam.build(queryParams);
         signer.checkSign(apiParam, secret);
     }
 

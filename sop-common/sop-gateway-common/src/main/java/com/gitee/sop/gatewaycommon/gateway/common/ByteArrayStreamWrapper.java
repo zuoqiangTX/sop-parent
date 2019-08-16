@@ -4,13 +4,18 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import java.io.IOException;
 
+/**
+ * byte数组流包装
+ *
+ * @author tanghc
+ */
 public class ByteArrayStreamWrapper extends ServletInputStream {
 
     private byte[] data;
     private int idx = 0;
 
     /**
-     * Creates a new <code>ServletInputStreamWrapper</code> instance.
+     * Creates a new <code>ByteArrayStreamWrapper</code> instance.
      *
      * @param data a <code>byte[]</code> value
      */

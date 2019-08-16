@@ -25,7 +25,7 @@ public class PreVersionDecisionFilter extends BaseZuulFilter {
 
     @Override
     protected int getFilterOrder() {
-        return PRE_LIMIT_FILTER_ORDER + 1;
+        return PRE_VERSION_DECISION_FILTER_ORDER;
     }
 
     @Override

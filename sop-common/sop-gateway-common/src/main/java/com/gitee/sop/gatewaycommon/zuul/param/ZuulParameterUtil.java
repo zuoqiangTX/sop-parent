@@ -2,7 +2,7 @@ package com.gitee.sop.gatewaycommon.zuul.param;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.param.FormHttpOutputMessage;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
@@ -10,9 +10,7 @@ import com.netflix.zuul.http.ServletInputStreamWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.cloud.netflix.zuul.util.RequestContentDataExtractor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.util.MultiValueMap;
@@ -21,14 +19,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -63,24 +55,7 @@ public class ZuulParameterUtil {
             byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
             requestContext.setRequest(new ChangeParamsHttpServletRequestWrapper(request, bytes));
         } else if(StringUtils.containsIgnoreCase(contentType, MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
-            List<String> list = new ArrayList<>(apiParam.size());
-            try {
-                for (Map.Entry<String, Object> entry : apiParam.entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
-                    if (value instanceof Collection) {
-                        Collection collection = (Collection) value;
-                        for (Object el : collection) {
-                            list.add(key + "=" + URLEncoder.encode(String.valueOf(el), SopConstants.UTF8));
-                        }
-                    } else {
-                        list.add(key + "=" + URLEncoder.encode(String.valueOf(value), SopConstants.UTF8));
-                    }
-                }
-            } catch (UnsupportedEncodingException e) {
-                log.error("字符集不支持", e);
-            }
-            String paramsStr = StringUtils.join(list, "&");
+            String paramsStr = RequestUtil.convertMapToQueryString(apiParam);
             byte[] data = paramsStr.getBytes(StandardCharsets.UTF_8);
             requestContext.setRequest(new ChangeParamsHttpServletRequestWrapper(request, data));
         } else if(RequestUtil.isMultipart(request)) {
@@ -126,29 +101,6 @@ public class ZuulParameterUtil {
             }
             requestContext.setRequestQueryParams(newParams);
         }
-    }
-
-
-    private static class FormHttpOutputMessage implements HttpOutputMessage {
-
-        private HttpHeaders headers = new HttpHeaders();
-        private ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-        @Override
-        public HttpHeaders getHeaders() {
-            return this.headers;
-        }
-
-        @Override
-        public OutputStream getBody() throws IOException {
-            return this.output;
-        }
-
-        public byte[] getInput() throws IOException {
-            this.output.flush();
-            return this.output.toByteArray();
-        }
-
     }
 
     private static class ChangeParamsHttpServletRequestWrapper extends HttpServletRequestWrapper {

@@ -32,6 +32,9 @@ public abstract class BaseZuulFilter extends ZuulFilter {
     /** 限流过滤 */
     public static final int PRE_LIMIT_FILTER_ORDER = PRE_ROUTE_PERMISSION_FILTER_ORDER + 100;
 
+    /** 决定版本号过滤器 */
+    public static final int PRE_VERSION_DECISION_FILTER_ORDER = PRE_LIMIT_FILTER_ORDER + 100;
+
     private Integer filterOrder;
 
     /**

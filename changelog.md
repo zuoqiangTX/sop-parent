@@ -1,5 +1,10 @@
 # changelog
 
+## 1.15.2
+
+- 优化SpringCloudGateway上传文件功能
+- 优化SpringCloudGateway动态修改参数功能
+
 ## 1.15.1
 
 - 修复未配置正确MessageConverter导致的异常

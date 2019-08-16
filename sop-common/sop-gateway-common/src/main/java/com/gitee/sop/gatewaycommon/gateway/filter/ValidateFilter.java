@@ -1,7 +1,7 @@
 package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.exception.ApiException;
-import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
+import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.validate.Validator;
@@ -29,7 +29,7 @@ public class ValidateFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 解析参数
         ApiParam param = paramBuilder.build(exchange);
-        GatewayContext.setApiParam(exchange, param);
+        ServerWebExchangeUtil.setApiParam(exchange, param);
         // 验证操作，这里有负责验证签名参数
         try {
             validator.validate(param);
@@ -43,6 +43,6 @@ public class ValidateFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         // 最优先执行
-        return Orders.VALIDATE_ORDER;
+        return Orders.VALIDATE_FILTER_ORDER;
     }
 }

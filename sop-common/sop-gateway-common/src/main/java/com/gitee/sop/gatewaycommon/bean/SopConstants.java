@@ -34,6 +34,8 @@ public class SopConstants {
 
     public static final String CACHE_API_PARAM = "cacheApiParam";
 
+    public static final String CACHE_UPLOAD_REQUEST = "cacheUploadRequest";
+
     public static final String X_SERVICE_ERROR_CODE = "x-service-error-code";
 
     public static final String X_SERVICE_ERROR_MESSAGE = "x-service-error-message";

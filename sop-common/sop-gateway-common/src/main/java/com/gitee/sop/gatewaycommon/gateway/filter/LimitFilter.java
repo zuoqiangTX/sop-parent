@@ -59,7 +59,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return Orders.LIMIT_ORDER;
+        return Orders.LIMIT_FILTER_ORDER;
     }
 
     protected ConfigLimitDto findConfigLimitDto(ApiConfig apiConfig, ApiParam apiParam, ServerWebExchange exchange) {

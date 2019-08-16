@@ -43,6 +43,6 @@ public class ValidateFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         // 最优先执行
-        return Orders.VALIDATE_ORDER;
+        return Orders.VALIDATE_FILTER_ORDER;
     }
 }

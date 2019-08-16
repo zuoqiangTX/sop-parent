@@ -23,10 +23,11 @@ public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
 
     /**
      * ServerHttpRequest包装，作用类似于HttpServletRequestWrapper
-     * @param delegate 老的request
+     *
+     * @param delegate    老的request
      * @param queryString get请求后面的参数
      */
-    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, HttpHeaders newHeaders, String queryString) {
+    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, String queryString) {
         super(delegate);
         if (delegate.getMethod() != HttpMethod.GET) {
             throw new IllegalArgumentException("this constructor must be used by GET request.");
@@ -34,11 +35,8 @@ public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
         if (queryString == null) {
             throw new IllegalArgumentException("queryString can not be null.");
         }
-        if (newHeaders == null) {
-            throw new IllegalArgumentException("newHeaders can not be null.");
-        }
-
-        this.httpHeaders = newHeaders;
+        // 默认header是只读的，把它改成可写，方便后面的过滤器使用
+        this.httpHeaders = HttpHeaders.writableHttpHeaders(delegate.getHeaders());
         this.uri = UriComponentsBuilder.fromUri(delegate.getURI())
                 .replaceQuery(queryString)
                 .build(true)
@@ -46,23 +44,19 @@ public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
     }
 
 
-
     /**
      * ServerHttpRequest包装，作用类似于HttpServletRequestWrapper
+     *
      * @param delegate 老的request
-     * @param newHeaders 新的headers
      * @param bodyData 请求体内容
      */
-    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, HttpHeaders newHeaders, byte[] bodyData) {
-        // 将请求体再次封装写回到request里，传到下一级，否则，由于请求体已被消费，后续的服务将取不到值
+    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, byte[] bodyData) {
         super(delegate);
         if (bodyData == null) {
             throw new IllegalArgumentException("bodyData can not be null.");
         }
-        if (newHeaders == null) {
-            throw new IllegalArgumentException("newHeaders can not be null.");
-        }
-        this.httpHeaders = newHeaders;
+        // 默认header是只读的，把它改成可写，方便后面的过滤器使用
+        this.httpHeaders = HttpHeaders.writableHttpHeaders(delegate.getHeaders());
         // 由于请求体已改变，这里要重新设置contentLength
         int contentLength = bodyData.length;
         httpHeaders.setContentLength(contentLength);
@@ -75,6 +69,7 @@ public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
 
     /**
      * 字符串转DataBuffer
+     *
      * @param bytes 请求体
      * @return 返回buffer
      */

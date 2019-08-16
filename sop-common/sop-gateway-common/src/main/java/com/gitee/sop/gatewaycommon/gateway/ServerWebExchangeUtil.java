@@ -3,24 +3,27 @@ package com.gitee.sop.gatewaycommon.gateway;
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.gateway.common.FileUploadHttpServletRequest;
+import com.gitee.sop.gatewaycommon.gateway.common.RequestContentDataExtractor;
 import com.gitee.sop.gatewaycommon.gateway.common.SopServerHttpRequestDecorator;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
+import com.gitee.sop.gatewaycommon.param.FormHttpOutputMessage;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
-import io.netty.buffer.ByteBufAllocator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +35,14 @@ import static com.gitee.sop.gatewaycommon.bean.SopConstants.CACHE_REQUEST_BODY_O
 /**
  * @author tanghc
  */
+@Slf4j
 public class ServerWebExchangeUtil {
+
+    private static FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
 
     /**
      * 获取请求参数
+     *
      * @param exchange ServerWebExchange
      * @return 返回请求参数
      */
@@ -45,6 +52,7 @@ public class ServerWebExchangeUtil {
 
     /**
      * 设置请求参数
+     *
      * @param exchange ServerWebExchange
      * @param apiParam 请求参数
      */
@@ -54,6 +62,7 @@ public class ServerWebExchangeUtil {
 
     /**
      * 获取Spring Cloud Gateway请求的原始参数。前提是要使用ReadBodyRoutePredicateFactory
+     *
      * @param exchange ServerWebExchange
      * @return 没有参数返回null
      * @see com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory
@@ -77,6 +86,7 @@ public class ServerWebExchangeUtil {
                 } else if (StringUtils.containsIgnoreCase(contentTypeStr, "multipart")) {
                     // 如果是文件上传请求
                     HttpServletRequest fileUploadRequest = getFileUploadRequest(exchange, cachedBody);
+                    setFileUploadRequest(exchange, fileUploadRequest);
                     params = RequestUtil.convertMultipartRequestToMap(fileUploadRequest);
                 } else {
                     params = RequestUtil.parseQueryToMap(cachedBody);
@@ -88,6 +98,7 @@ public class ServerWebExchangeUtil {
         }
         return params;
     }
+
 
     public static Map<String, String> buildParams(MultiValueMap<String, String> queryParams) {
         if (queryParams == null || queryParams.size() == 0) {
@@ -102,7 +113,8 @@ public class ServerWebExchangeUtil {
 
     /**
      * 添加header
-     * @param exchange 当前ServerWebExchange
+     *
+     * @param exchange        当前ServerWebExchange
      * @param headersConsumer headers
      * @return 返回一个新的ServerWebExchange
      */
@@ -112,7 +124,7 @@ public class ServerWebExchangeUtil {
                 .mutate()
                 .headers(headersConsumer)
                 .build();
-        // 将现在的request 变成 change对象
+        // 创建一个新的exchange对象
         return exchange
                 .mutate()
                 .request(serverHttpRequestNew)
@@ -122,23 +134,32 @@ public class ServerWebExchangeUtil {
     /**
      * 获取一个文件上传request
      *
-     * @param exchange 当前ServerWebExchange
+     * @param exchange    当前ServerWebExchange
      * @param requestBody 上传文件请求体内容
      * @return 返回文件上传request
      */
     public static HttpServletRequest getFileUploadRequest(ServerWebExchange exchange, String requestBody) {
         byte[] data = requestBody.getBytes(StandardCharsets.UTF_8);
-        return  new FileUploadHttpServletRequest(exchange.getRequest(), data);
+        return new FileUploadHttpServletRequest(exchange.getRequest(), data);
+    }
+
+    public static HttpServletRequest getFileUploadRequest(ServerWebExchange exchange) {
+        return exchange.getAttribute(SopConstants.CACHE_UPLOAD_REQUEST);
+    }
+
+    public static void setFileUploadRequest(ServerWebExchange exchange, HttpServletRequest request) {
+        exchange.getAttributes().put(SopConstants.CACHE_UPLOAD_REQUEST, request);
     }
 
     /**
      * 修改请求参数。参考自：https://blog.csdn.net/fuck487/article/details/85166162
-     * @param exchange ServerWebExchange
-     * @param apiParam 请求参数
+     *
+     * @param exchange       ServerWebExchange
+     * @param apiParam       原始请求参数
      * @param paramsConsumer 执行参数更改
      * @param headerConsumer header更改
-     * @param <T> 参数类型
-     * @return 返回新的ServerWebExchange，参数没有被修改则返回null
+     * @param <T>            参数类型
+     * @return 返回新的ServerWebExchange
      */
     public static <T extends Map<String, Object>> ServerWebExchange format(
             ServerWebExchange exchange
@@ -147,55 +168,72 @@ public class ServerWebExchangeUtil {
             , Consumer<HttpHeaders> headerConsumer
     ) {
         ServerHttpRequest serverHttpRequest = exchange.getRequest();
+        HttpHeaders newHeaders = HttpHeaders.writableHttpHeaders(serverHttpRequest.getHeaders());
+        // 新的request
+        ServerHttpRequest newRequest;
         if (serverHttpRequest.getMethod() == HttpMethod.GET) {
             paramsConsumer.accept(apiParam);
-
+            // 新的查询参数
+            String queryString = RequestUtil.convertMapToQueryString(apiParam);
+            // 创建一个新的request，并使用新的uri
+            newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, queryString);
         } else {
             MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
             if (mediaType == null) {
-                return null;
+                mediaType = MediaType.APPLICATION_FORM_URLENCODED;
             }
             paramsConsumer.accept(apiParam);
             String contentType = mediaType.toString().toLowerCase();
+            // 修改后的请求体
+            // 处理json请求（application/json）
             if (StringUtils.containsAny(contentType, "json", "text")) {
-                //下面的将请求体再次封装写回到request里，传到下一级，否则，由于请求体已被消费，后续的服务将取不到值
-                URI uri = serverHttpRequest.getURI();
-                URI newUri = UriComponentsBuilder.fromUri(uri).build(true).toUri();
-                ServerHttpRequest request = exchange.getRequest().mutate().uri(newUri).build();
-
-                // 定义新的消息头
-                HttpHeaders headers = new HttpHeaders();
-                headers.putAll(exchange.getRequest().getHeaders());
-
-                // 自定义header
-                headerConsumer.accept(headers);
-                // 修改后的请求体
                 String bodyStr = JSON.toJSONString(apiParam);
-                byte[] bodyStrBytes = bodyStr.getBytes(StandardCharsets.UTF_8);
-
-                // 由于post的body只能订阅一次，由于上面代码中已经订阅过一次body。
-                // 所以要再次封装请求到request才行，不然会报错请求已经订阅过
-                request = new SopServerHttpRequestDecorator(request, bodyStrBytes, headers);
-
-                return exchange.mutate().request(request).build();
+                byte[] bodyBytes = bodyStr.getBytes(StandardCharsets.UTF_8);
+                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
+            } else if (StringUtils.contains(contentType, "multipart")) {
+                // 处理文件上传请求
+                FormHttpOutputMessage outputMessage = new FormHttpOutputMessage();
+                HttpServletRequest request = ServerWebExchangeUtil.getFileUploadRequest(exchange);
+                try {
+                    // 转成MultipartRequest
+                    if (!(request instanceof MultipartHttpServletRequest)) {
+                        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+                        request = commonsMultipartResolver.resolveMultipart(request);
+                    }
+                    // 重写新的值
+                    MultiValueMap<String, Object> builder = RequestContentDataExtractor.extract(request);
+                    for (Map.Entry<String, Object> entry : apiParam.entrySet()) {
+                        Object value = entry.getValue();
+                        if (value instanceof List) {
+                            builder.put(entry.getKey(), (List) value);
+                        } else {
+                            builder.put(entry.getKey(), Collections.singletonList(String.valueOf(value)));
+                        }
+                    }
+                    // 将字段以及上传文件重写写入到流中
+                    formHttpMessageConverter.write(builder, mediaType, outputMessage);
+                    // 获取新的上传文件流
+                    byte[] bodyBytes = outputMessage.getInput();
+                    newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
+                    // 必须要重新指定content-type，因为此时的boundary已经发生改变
+                    MediaType contentTypeMultipart = outputMessage.getHeaders().getContentType();
+                    newRequest.getHeaders().setContentType(contentTypeMultipart);
+                } catch (IOException e) {
+                    log.error("修改上传文件请求参数失败, apiParam:{}", apiParam, e);
+                    throw new RuntimeException(e);
+                }
             } else {
-
+                // 否则一律按表单请求处理
+                String bodyStr = RequestUtil.convertMapToQueryString(apiParam);
+                byte[] bodyBytes = bodyStr.getBytes(StandardCharsets.UTF_8);
+                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
             }
         }
-        return null;
-    }
-
-    /**
-     * 字符串转DataBuffer
-     * @param value 值
-     * @return 返回buffer
-     */
-    private static DataBuffer stringBuffer(String value) {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
-        DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
-        buffer.write(bytes);
-        return buffer;
+        HttpHeaders headers = newRequest.getHeaders();
+        // 自定义header
+        headerConsumer.accept(headers);
+        // 创建一个新的exchange
+        return exchange.mutate().request(newRequest).build();
     }
 
 }

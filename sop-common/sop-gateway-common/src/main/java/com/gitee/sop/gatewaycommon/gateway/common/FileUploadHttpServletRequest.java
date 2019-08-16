@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -250,7 +251,7 @@ public class FileUploadHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Enumeration<String> getParameterNames() {
-        return null;
+        return Collections.emptyEnumeration();
     }
 
     @Override

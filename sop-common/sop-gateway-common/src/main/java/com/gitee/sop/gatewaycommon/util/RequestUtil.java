@@ -1,6 +1,7 @@
 package com.gitee.sop.gatewaycommon.util;
 
 import com.alibaba.fastjson.JSON;
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -14,7 +15,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +69,31 @@ public class RequestUtil {
             }
         }
         return params;
+    }
+
+    /**
+     * 将map参数转换成查询参数
+     * @return 返回aa=1&b=c...
+     */
+    public static String convertMapToQueryString(Map<String, ?> apiParam) {
+        List<String> list = new ArrayList<>(apiParam.size());
+        try {
+            for (Map.Entry<String, ?> entry : apiParam.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (value instanceof Collection) {
+                    Collection collection = (Collection) value;
+                    for (Object el : collection) {
+                        list.add(key + "=" + URLEncoder.encode(String.valueOf(el), SopConstants.UTF8));
+                    }
+                } else {
+                    list.add(key + "=" + URLEncoder.encode(String.valueOf(value), SopConstants.UTF8));
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            log.error("字符集不支持", e);
+        }
+        return org.apache.commons.lang.StringUtils.join(list, "&");
     }
 
     /**

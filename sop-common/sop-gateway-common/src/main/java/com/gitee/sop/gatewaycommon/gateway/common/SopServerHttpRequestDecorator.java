@@ -4,37 +4,73 @@ import io.netty.buffer.ByteBufAllocator;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
+
+import java.net.URI;
 
 /**
  * @author tanghc
  */
 public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
 
-    private Flux<DataBuffer> bodyData;
+    private Flux<DataBuffer> bodyDataBuffer;
     private HttpHeaders httpHeaders;
+    private URI uri;
 
-    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, byte[] bodyData, HttpHeaders httpHeaders) {
+    /**
+     * ServerHttpRequest包装，作用类似于HttpServletRequestWrapper
+     * @param delegate 老的request
+     * @param queryString get请求后面的参数
+     */
+    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, HttpHeaders newHeaders, String queryString) {
         super(delegate);
-        if (httpHeaders == null) {
-            throw new IllegalArgumentException("httpHeaders can not be null.");
+        if (delegate.getMethod() != HttpMethod.GET) {
+            throw new IllegalArgumentException("this constructor must be used by GET request.");
         }
+        if (queryString == null) {
+            throw new IllegalArgumentException("queryString can not be null.");
+        }
+        if (newHeaders == null) {
+            throw new IllegalArgumentException("newHeaders can not be null.");
+        }
+
+        this.httpHeaders = newHeaders;
+        this.uri = UriComponentsBuilder.fromUri(delegate.getURI())
+                .replaceQuery(queryString)
+                .build(true)
+                .toUri();
+    }
+
+
+
+    /**
+     * ServerHttpRequest包装，作用类似于HttpServletRequestWrapper
+     * @param delegate 老的request
+     * @param newHeaders 新的headers
+     * @param bodyData 请求体内容
+     */
+    public SopServerHttpRequestDecorator(ServerHttpRequest delegate, HttpHeaders newHeaders, byte[] bodyData) {
+        // 将请求体再次封装写回到request里，传到下一级，否则，由于请求体已被消费，后续的服务将取不到值
+        super(delegate);
         if (bodyData == null) {
             throw new IllegalArgumentException("bodyData can not be null.");
         }
+        if (newHeaders == null) {
+            throw new IllegalArgumentException("newHeaders can not be null.");
+        }
+        this.httpHeaders = newHeaders;
         // 由于请求体已改变，这里要重新设置contentLength
         int contentLength = bodyData.length;
         httpHeaders.setContentLength(contentLength);
-
         if (contentLength <= 0) {
             // TODO: this causes a 'HTTP/1.1 411 Length Required' on httpbin.org
             httpHeaders.set(HttpHeaders.TRANSFER_ENCODING, "chunked");
         }
-
-        this.httpHeaders = httpHeaders;
-        this.bodyData = stringBuffer(bodyData);
+        this.bodyDataBuffer = stringBuffer(bodyData);
     }
 
     /**
@@ -49,17 +85,18 @@ public class SopServerHttpRequestDecorator extends ServerHttpRequestDecorator {
         return Flux.just(buffer);
     }
 
-    private SopServerHttpRequestDecorator(ServerHttpRequest delegate) {
-        super(delegate);
-    }
-
     @Override
-    public Flux<DataBuffer> getBody() {
-        return bodyData == null ? super.getBody() : bodyData;
+    public URI getURI() {
+        return uri == null ? super.getURI() : uri;
     }
 
     @Override
     public HttpHeaders getHeaders() {
-        return httpHeaders == null ? super.getHeaders() : httpHeaders;
+        return this.httpHeaders;
+    }
+
+    @Override
+    public Flux<DataBuffer> getBody() {
+        return bodyDataBuffer == null ? super.getBody() : bodyDataBuffer;
     }
 }

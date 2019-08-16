@@ -1,10 +1,8 @@
 package com.gitee.sop.gatewaycommon.zuul.configuration;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
-import com.gitee.sop.gatewaycommon.manager.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import com.gitee.sop.gatewaycommon.zuul.filter.ErrorFilter;
@@ -45,12 +43,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     @ConditionalOnMissingBean
     ParamBuilder<RequestContext> paramBuilder() {
         return ApiConfig.getInstance().getZuulParamBuilder();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    ParameterFormatter<JSONObject> preParamFilter(){
-        return ApiConfig.getInstance().getZuulParameterFormatter();
     }
 
     /**

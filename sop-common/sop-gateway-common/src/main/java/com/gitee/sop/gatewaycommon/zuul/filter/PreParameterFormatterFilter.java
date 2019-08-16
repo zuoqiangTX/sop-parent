@@ -2,8 +2,8 @@ package com.gitee.sop.gatewaycommon.zuul.filter;
 
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
+import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
-import com.gitee.sop.gatewaycommon.zuul.param.ZuulParameterFormatter;
 import com.gitee.sop.gatewaycommon.zuul.param.ZuulParameterUtil;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PreParameterFormatterFilter extends BaseZuulFilter {
 
     @Autowired(required = false)
-    private ZuulParameterFormatter zuulParameterFormatter;
+    private ParameterFormatter sopParameterFormatter;
 
     @Override
     protected FilterType getFilterType() {
@@ -33,8 +33,8 @@ public class PreParameterFormatterFilter extends BaseZuulFilter {
     protected Object doRun(RequestContext requestContext) throws ZuulException {
         ApiParam apiParam = ZuulContext.getApiParam();
         // 校验成功后进行参数转换
-        if (zuulParameterFormatter != null) {
-            ZuulParameterUtil.format(apiParam, zuulParameterFormatter::format);
+        if (sopParameterFormatter != null) {
+            ZuulParameterUtil.format(apiParam, sopParameterFormatter::format);
             requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
         }
         return null;

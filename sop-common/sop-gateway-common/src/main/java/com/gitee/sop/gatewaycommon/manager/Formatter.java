@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @author tanghc
  */
-public interface ParameterFormatter<T extends Map<String, Object>> {
+public interface Formatter<T extends Map<String, Object>> {
 
     /**
      * 参数格式化，即动态修改请求参数

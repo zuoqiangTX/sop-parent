@@ -1,7 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
-import com.gitee.sop.gatewaycommon.bean.SopConstants;
-import com.gitee.sop.gatewaycommon.gateway.GatewayContext;
+import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
@@ -45,14 +44,17 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
     public Predicate<ServerWebExchange> apply(Config config) {
 
         return exchange -> {
-            Map<String, String> params = GatewayContext.getRequestParams(exchange);
+            Map<String, ?> params = ServerWebExchangeUtil.getRequestParams(exchange);
             if (CollectionUtils.isEmpty(params)) {
                 return false;
             }
             String nameVersion = config.param;
-            String name = params.getOrDefault(ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
-            String version = params.getOrDefault(ParamNames.VERSION_NAME, "");
-            return (name + version).equals(nameVersion);
+            Object name = params.get(ParamNames.API_NAME);
+            Object version = params.get(ParamNames.VERSION_NAME);
+            if (name == null || version == null) {
+                return false;
+            }
+            return (name.toString() + version).equals(nameVersion);
         };
     }
 

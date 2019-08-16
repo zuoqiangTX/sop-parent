@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
+import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.session.SessionManager;
 import com.gitee.sop.gatewaycommon.validate.Validator;
@@ -92,6 +93,13 @@ public class AbstractConfiguration implements ApplicationContextAware {
     SessionManager sessionManager() {
         return ApiConfig.getInstance().getSessionManager();
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ParameterFormatter sopParameterFormatter(){
+        return ApiConfig.getInstance().getParameterFormatter();
+    }
+
 
     /**
      * 跨域过滤器

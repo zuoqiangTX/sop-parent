@@ -18,6 +18,7 @@ import com.gitee.sop.gatewaycommon.manager.LimitConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.ServiceErrorManager;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
+import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
 import com.gitee.sop.gatewaycommon.result.DataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.DefaultDataNameBuilder;
 import com.gitee.sop.gatewaycommon.result.ResultAppender;
@@ -34,7 +35,6 @@ import com.gitee.sop.gatewaycommon.validate.Signer;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import com.gitee.sop.gatewaycommon.zuul.configuration.ZuulErrorController;
 import com.gitee.sop.gatewaycommon.zuul.param.ZuulParamBuilder;
-import com.gitee.sop.gatewaycommon.zuul.param.ZuulParameterFormatter;
 import com.gitee.sop.gatewaycommon.zuul.result.ZuulResultExecutor;
 import com.netflix.zuul.context.RequestContext;
 import lombok.Data;
@@ -150,7 +150,7 @@ public class ApiConfig {
      */
     private ZuulErrorController zuulErrorController = new ZuulErrorController();
 
-    private ZuulParameterFormatter zuulParameterFormatter;
+    private ParameterFormatter parameterFormatter;
 
     // -------- fields ---------
 

@@ -3,6 +3,7 @@ package com.gitee.sop.gatewaycommon.gateway.configuration;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.gateway.filter.GatewayModifyResponseGatewayFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.LoadBalancerClientExtFilter;
+import com.gitee.sop.gatewaycommon.gateway.filter.ParameterFormatterFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.ValidateFilter;
 import com.gitee.sop.gatewaycommon.gateway.handler.GatewayExceptionHandler;
 import com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteRepository;
@@ -104,6 +105,11 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
         GatewayRouteRepository gatewayRouteRepository = new GatewayRouteRepository();
         RouteRepositoryContext.setRouteRepository(gatewayRouteRepository);
         return gatewayRouteRepository;
+    }
+
+    @Bean
+    ParameterFormatterFilter parameterFormatterFilter() {
+        return new ParameterFormatterFilter();
     }
 
 }

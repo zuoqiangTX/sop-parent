@@ -125,5 +125,17 @@ public class ServerWebExchangeUtil {
         return  new FileUploadHttpServletRequest(exchange.getRequest(), data);
     }
 
+    /**
+     * 修改请求参数
+     * @param exchange ServerWebExchange
+     * @param apiParam 请求参数
+     * @param consumer 执行参数更改
+     * @param <T> 参数类型
+     * @return 返回新的ServerWebExchange
+     */
+    public static <T extends Map<String, Object>> ServerWebExchange format(ServerWebExchange exchange, T apiParam, Consumer<T> consumer) {
+
+        return null;
+    }
 
 }

@@ -36,9 +36,6 @@ public class ParameterFormatterFilter implements GlobalFilter, Ordered {
                     , apiParam
                     , sopParameterFormatter::format
                     , httpHeaders -> httpHeaders.set(ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion()));
-            if (formatExchange == null) {
-                return chain.filter(exchange);
-            }
             return chain.filter(formatExchange);
         }
         return chain.filter(exchange);

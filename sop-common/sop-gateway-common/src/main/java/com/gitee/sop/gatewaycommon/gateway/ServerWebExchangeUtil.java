@@ -168,28 +168,26 @@ public class ServerWebExchangeUtil {
             , Consumer<HttpHeaders> headerConsumer
     ) {
         ServerHttpRequest serverHttpRequest = exchange.getRequest();
-        HttpHeaders newHeaders = HttpHeaders.writableHttpHeaders(serverHttpRequest.getHeaders());
         // 新的request
         ServerHttpRequest newRequest;
+        paramsConsumer.accept(apiParam);
         if (serverHttpRequest.getMethod() == HttpMethod.GET) {
-            paramsConsumer.accept(apiParam);
             // 新的查询参数
             String queryString = RequestUtil.convertMapToQueryString(apiParam);
             // 创建一个新的request，并使用新的uri
-            newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, queryString);
+            newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, queryString);
         } else {
             MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
             if (mediaType == null) {
                 mediaType = MediaType.APPLICATION_FORM_URLENCODED;
             }
-            paramsConsumer.accept(apiParam);
             String contentType = mediaType.toString().toLowerCase();
             // 修改后的请求体
             // 处理json请求（application/json）
             if (StringUtils.containsAny(contentType, "json", "text")) {
                 String bodyStr = JSON.toJSONString(apiParam);
                 byte[] bodyBytes = bodyStr.getBytes(StandardCharsets.UTF_8);
-                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
+                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, bodyBytes);
             } else if (StringUtils.contains(contentType, "multipart")) {
                 // 处理文件上传请求
                 FormHttpOutputMessage outputMessage = new FormHttpOutputMessage();
@@ -214,7 +212,7 @@ public class ServerWebExchangeUtil {
                     formHttpMessageConverter.write(builder, mediaType, outputMessage);
                     // 获取新的上传文件流
                     byte[] bodyBytes = outputMessage.getInput();
-                    newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
+                    newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, bodyBytes);
                     // 必须要重新指定content-type，因为此时的boundary已经发生改变
                     MediaType contentTypeMultipart = outputMessage.getHeaders().getContentType();
                     newRequest.getHeaders().setContentType(contentTypeMultipart);
@@ -226,7 +224,7 @@ public class ServerWebExchangeUtil {
                 // 否则一律按表单请求处理
                 String bodyStr = RequestUtil.convertMapToQueryString(apiParam);
                 byte[] bodyBytes = bodyStr.getBytes(StandardCharsets.UTF_8);
-                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, newHeaders, bodyBytes);
+                newRequest = new SopServerHttpRequestDecorator(serverHttpRequest, bodyBytes);
             }
         }
         HttpHeaders headers = newRequest.getHeaders();

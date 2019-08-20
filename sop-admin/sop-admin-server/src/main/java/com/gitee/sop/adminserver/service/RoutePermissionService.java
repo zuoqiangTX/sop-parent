@@ -5,8 +5,7 @@ import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.service.param.RoutePermissionParam;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.IsvRoutePermission;
-import com.gitee.sop.adminserver.bean.SopAdminConstants;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
 import com.gitee.sop.adminserver.entity.PermRolePermission;
@@ -42,6 +41,9 @@ public class RoutePermissionService {
     @Autowired
     PermRolePermissionMapper permRolePermissionMapper;
 
+    @Autowired
+    private ConfigPushService configPushService;
+
     /**
      * 获取客户端角色码列表
      *
@@ -70,10 +72,8 @@ public class RoutePermissionService {
         isvRoutePermission.setRouteIdList(routeIdList);
         isvRoutePermission.setRouteIdListMd5(roleCodeListMd5);
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_PERMISSION_UPDATE, isvRoutePermission);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getIsvRoutePermissionChannelPath();
-        log.info("消息推送--路由权限(update), path:{}, data:{}", path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, channelMsg);
+
     }
 
     /**
@@ -98,19 +98,9 @@ public class RoutePermissionService {
      * 推送所有路由权限到zookeeper
      */
     public void sendRoutePermissionReloadMsg(RoutePermissionParam oldRoutePermission) throws Exception {
-        String listenPath = SopAdminConstants.RELOAD_ROUTE_PERMISSION_PATH + "/" + System.currentTimeMillis();
-        ZookeeperContext.listenTempPath(listenPath, errorMsg -> {
-            log.error("推送所有路由权限到zookeeper失败，进行回滚，errorMsg: {}，oldRoutePermission：{}", errorMsg, JSON.toJSONString(oldRoutePermission));
-            // 回滚
-            updateRoutePermission(oldRoutePermission);
-        });
         IsvRoutePermission isvRoutePermission = new IsvRoutePermission();
-        isvRoutePermission.setListenPath(listenPath);
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_PERMISSION_RELOAD, isvRoutePermission);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getIsvRoutePermissionChannelPath();
-        log.info("消息推送--路由权限(reload), path:{}, data:{}", path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 
     /**

@@ -15,8 +15,8 @@ import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreVersionDecisionFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
+import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteCache;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteRepository;
-import com.gitee.sop.gatewaycommon.zuul.route.ZuulZookeeperRouteManager;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -26,7 +26,6 @@ import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 /**
  * @author tanghc
@@ -46,8 +45,7 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     }
 
     /**
-     * 路由存储
-     * @return
+     * 路由仓库
      */
     @Bean
     ZuulRouteRepository zuulRouteRepository() {
@@ -89,12 +87,11 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
 
     /**
      * 路由管理
-     * @param environment
-     * @param zuulRouteRepository
+     * @param zuulRouteRepository 路由仓库
      */
     @Bean
-    ZuulZookeeperRouteManager zuulZookeeperRouteManager(Environment environment, ZuulRouteRepository zuulRouteRepository) {
-        return new ZuulZookeeperRouteManager(environment, zuulRouteRepository);
+    ZuulRouteCache zuulRouteLoader(ZuulRouteRepository zuulRouteRepository) {
+        return new ZuulRouteCache(zuulRouteRepository);
     }
 
     /**
@@ -125,8 +122,6 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
     PreVersionDecisionFilter preVersionDecisionFilter() {
         return new PreVersionDecisionFilter();
     }
-
-
 
     /**
      * 错误处理扩展

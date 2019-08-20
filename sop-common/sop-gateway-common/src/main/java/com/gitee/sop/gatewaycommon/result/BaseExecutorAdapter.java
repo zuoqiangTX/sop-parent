@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
-import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.ErrorDefinition;
+import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
+import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
@@ -139,7 +139,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return defaultSetting;
         }
         ApiInfo apiInfo = this.getApiInfo(request);
-        BaseRouteDefinition baseRouteDefinition = apiInfo.baseRouteDefinition;
+        GatewayRouteDefinition baseRouteDefinition = apiInfo.gatewayRouteDefinition;
         return Optional.ofNullable(baseRouteDefinition)
                 .map(routeDefinition -> {
                     int mergeResult = baseRouteDefinition.getMergeResult();
@@ -157,10 +157,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
         String serviceId = Optional.ofNullable(targetRoute)
                 .flatMap(route -> Optional.ofNullable(route.getServiceRouteInfo()))
-                .map(BaseServiceRouteInfo::getServiceId)
+                .map(ServiceRouteInfo::getServiceId)
                 .orElse(SopConstants.UNKNOWN_SERVICE);
 
-        BaseRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
+        GatewayRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
                 .map(route -> route.getRouteDefinition())
                 .orElse(null);
 
@@ -168,7 +168,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         apiInfo.name = name;
         apiInfo.version = version;
         apiInfo.serviceId = serviceId;
-        apiInfo.baseRouteDefinition = baseRouteDefinition;
+        apiInfo.gatewayRouteDefinition = baseRouteDefinition;
         return apiInfo;
     }
 
@@ -276,7 +276,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         private String name;
         private String version;
         private String serviceId;
-        private BaseRouteDefinition baseRouteDefinition;
+        private GatewayRouteDefinition gatewayRouteDefinition;
     }
 
     enum ErrorType {

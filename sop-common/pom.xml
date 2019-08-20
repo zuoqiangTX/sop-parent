@@ -28,8 +28,6 @@
 		<commons-collection.version>3.2.2</commons-collection.version>
 		<commons-lang3.version>3.8.1</commons-lang3.version>
 		<commons-codec.version>1.11</commons-codec.version>
-		<zookeeper.version>3.4.12</zookeeper.version>
-		<curator-recipes.version>4.0.1</curator-recipes.version>
 		<validation-api.version>2.0.1.Final</validation-api.version>
 		<hibernate-validator.version>6.0.13.Final</hibernate-validator.version>
 	</properties>
@@ -57,36 +55,24 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
+				<version>0.9.0.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+				<version>0.9.0.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
-		<!-- zookeeper客户端针对zookeeper-3.4.x
-		 如果zookeeper使用3.5.x，可以直接使用curator-recipes最高版本
-		 详情：http://curator.apache.org/zk-compatibility.html
-		 -->
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-recipes</artifactId>
-			<version>${curator-recipes.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.zookeeper</groupId>
-					<artifactId>zookeeper</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-			<version>${zookeeper.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<dependency>
 			<groupId>com.alibaba</groupId>

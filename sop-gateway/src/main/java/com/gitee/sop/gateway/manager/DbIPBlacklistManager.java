@@ -1,13 +1,16 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.config.ConfigService;
+import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.sop.gateway.mapper.IPBlacklistMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
+import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.manager.DefaultIPBlacklistManager;
-import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,9 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
     @Autowired
     Environment environment;
 
+    @Autowired
+    private NacosConfigProperties nacosConfigProperties;
+
     @Override
     public void load() {
         List<String> ipList = ipBlacklistMapper.listAllIP();
@@ -39,7 +45,7 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ZookeeperContext.setEnvironment(environment);
+        /*ZookeeperContext.setEnvironment(environment);
         String path = ZookeeperContext.getIpBlacklistChannelPath();
         ZookeeperContext.listenPath(path, nodeCache -> {
             String nodeData = new String(nodeCache.getCurrentData().getData());
@@ -56,6 +62,27 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
                     remove(ip);
                     break;
                 default:
+            }
+        });*/
+        // nacos
+        ConfigService configService = nacosConfigProperties.configServiceInstance();
+        configService.addListener(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String configInfo) {
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                final IPDto ipDto = JSON.parseObject(channelMsg.getData(), IPDto.class);
+                String ip = ipDto.getIp();
+                switch (channelMsg.getOperation()) {
+                    case "add":
+                        log.info("添加IP黑名单，ip:{}", ip);
+                        add(ip);
+                        break;
+                    case "delete":
+                        log.info("移除IP黑名单，ip:{}", ip);
+                        remove(ip);
+                        break;
+                    default:
+                }
             }
         });
     }

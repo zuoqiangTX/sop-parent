@@ -2,18 +2,13 @@ package com.gitee.sop.servercommon.configuration;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.interceptor.ServiceContextInterceptor;
-import com.gitee.sop.servercommon.manager.ApiMetaManager;
-import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
-import com.gitee.sop.servercommon.manager.RequestMappingEvent;
-import com.gitee.sop.servercommon.manager.ServiceZookeeperApiMetaManager;
+import com.gitee.sop.servercommon.manager.ServiceRouteController;
 import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -35,9 +30,6 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     public BaseServiceConfiguration() {
         ServiceConfig.getInstance().getI18nModules().add("i18n/isp/bizerror");
     }
-
-    @Autowired
-    private Environment environment;
 
     private ApiMappingHandlerMapping apiMappingHandlerMapping = new ApiMappingHandlerMapping();
 
@@ -77,17 +69,14 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
         return apiMappingHandlerMapping;
     }
 
-    protected RequestMappingEvent getRequestMappingEvent(ApiMetaManager apiMetaManager, Environment environment) {
-        return new DefaultRequestMappingEvent(apiMetaManager, environment);
-    }
-
-    protected ApiMetaManager getApiMetaManager(Environment environment) {
-        return new ServiceZookeeperApiMetaManager(environment);
-    }
-
     @Bean
     GlobalExceptionHandler globalExceptionHandler() {
         return ServiceConfig.getInstance().getGlobalExceptionHandler();
+    }
+
+    @Bean
+    ServiceRouteController serviceRouteController() {
+        return new ServiceRouteController();
     }
 
     @PostConstruct
@@ -105,9 +94,6 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("-----服务器启动完毕-----");
-        ApiMetaManager apiMetaManager = getApiMetaManager(environment);
-        RequestMappingEvent requestMappingEvent = getRequestMappingEvent(apiMetaManager, environment);
-        requestMappingEvent.onRegisterSuccess(apiMappingHandlerMapping);
         this.onStartup(args);
     }
 

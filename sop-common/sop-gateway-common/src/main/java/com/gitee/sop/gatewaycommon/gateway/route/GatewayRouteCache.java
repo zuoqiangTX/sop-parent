@@ -1,14 +1,15 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
-import com.gitee.sop.gatewaycommon.manager.BaseRouteManager;
+import com.gitee.sop.gatewaycommon.bean.GatewayFilterDefinition;
+import com.gitee.sop.gatewaycommon.bean.GatewayPredicateDefinition;
+import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
+import com.gitee.sop.gatewaycommon.manager.BaseRouteCache;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
-import org.springframework.core.env.Environment;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -16,30 +17,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 从zookeeper监听route信息
- *
  * @author tanghc
  */
-@Getter
-@Slf4j
-public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServiceRouteInfo, GatewayRouteDefinition, GatewayTargetRoute> {
+public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
 
-    public GatewayZookeeperRouteManager(Environment environment, RouteRepository<GatewayTargetRoute> routeRepository) {
-        super(environment, routeRepository);
+    public GatewayRouteCache(RouteRepository<GatewayTargetRoute> routeRepository) {
+        super(routeRepository);
     }
 
     @Override
-    protected Class<GatewayServiceRouteInfo> getServiceRouteInfoClass() {
-        return GatewayServiceRouteInfo.class;
-    }
-
-    @Override
-    protected Class<GatewayRouteDefinition> getRouteDefinitionClass() {
-        return GatewayRouteDefinition.class;
-    }
-
-    @Override
-    protected GatewayTargetRoute buildRouteDefinition(GatewayServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
+    protected GatewayTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
         RouteDefinition routeDefinition = new RouteDefinition();
         routeDefinition.setId(gatewayRouteDefinition.getId());
         routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri() + "#" + gatewayRouteDefinition.getPath()));
@@ -80,5 +67,4 @@ public class GatewayZookeeperRouteManager extends BaseRouteManager<GatewayServic
         }
         predicateDefinitionList.addFirst(new PredicateDefinition(name + "=" + args));
     }
-
 }

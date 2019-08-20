@@ -28,6 +28,17 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.alibaba.boot</groupId>
+			<artifactId>nacos-config-spring-boot-starter</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.boot</groupId>
+			<artifactId>nacos-discovery-spring-boot-starter</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.gitee.sop</groupId>
 			<artifactId>sop-registry-api</artifactId>
 			<version>1.15.2-SNAPSHOT</version>
@@ -45,37 +56,11 @@
 			<artifactId>fastmybatis-spring-boot-starter</artifactId>
 			<version>1.8.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-
-		<!-- zookeeper客户端针对zookeeper-3.4.x
-		 如果zookeeper使用3.5.x，可以直接使用curator-recipes最高版本
-		 详情：http://curator.apache.org/zk-compatibility.html
-		 -->
-		<dependency>
-			<groupId>org.apache.curator</groupId>
-			<artifactId>curator-recipes</artifactId>
-			<version>${curator-recipes.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.zookeeper</groupId>
-					<artifactId>zookeeper</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-			<version>${zookeeper.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -122,5 +107,12 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
 
 </project>

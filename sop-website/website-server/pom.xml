@@ -12,20 +12,17 @@
     <artifactId>website-server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>website-server</name>
-    <description>Demo project for Spring Boot</description>
+    <description>website-server</description>
 
     <properties>
         <java.version>1.8</java.version>
-        <zookeeper.version>3.4.12</zookeeper.version>
-        <curator-recipes.version>4.0.1</curator-recipes.version>
     </properties>
 
     <dependencies>
-
         <dependency>
-            <groupId>com.gitee.sop</groupId>
-            <artifactId>sop-registry-api</artifactId>
-            <version>1.15.2-SNAPSHOT</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
+            <version>0.9.0.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -33,38 +30,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- zookeeper客户端针对zookeeper-3.4.x
-		 如果zookeeper使用3.5.x，可以直接使用curator-recipes最高版本
-		 详情：http://curator.apache.org/zk-compatibility.html
-		 -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>${curator-recipes.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.zookeeper</groupId>
-                    <artifactId>zookeeper</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.zookeeper</groupId>
-            <artifactId>zookeeper</artifactId>
-            <version>${zookeeper.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
@@ -77,12 +42,7 @@
             <version>3.14.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -93,6 +53,19 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

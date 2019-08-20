@@ -1,6 +1,6 @@
 package com.gitee.sop.gatewaycommon.param;
 
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
@@ -65,7 +65,7 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
         TargetRoute targetRoute = routeRepository.get(nameVersion);
         Integer ignoreValidate = Optional.ofNullable(targetRoute)
                 .map(t -> t.getRouteDefinition())
-                .map(BaseRouteDefinition::getIgnoreValidate)
+                .map(GatewayRouteDefinition::getIgnoreValidate)
                 // 默认不忽略
                 .orElse(BooleanUtils.toInteger(false));
         apiParam.setIgnoreValidate(BooleanUtils.toBoolean(ignoreValidate));

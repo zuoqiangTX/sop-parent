@@ -9,9 +9,11 @@ import java.util.Collection;
  */
 public interface DocManager {
 
-    void load(String serviceId);
+    void addDocInfo(String serviceId, String docJson);
 
     DocInfo getByTitle(String title);
 
     Collection<DocInfo> listAll();
+
+    void remove(String serviceId);
 }

@@ -1,6 +1,5 @@
 package com.gitee.sop.adminserver.api.isv;
 
-import com.alibaba.fastjson.JSON;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.DataType;
@@ -24,12 +23,11 @@ import com.gitee.sop.adminserver.api.isv.result.IsvKeysGenVO;
 import com.gitee.sop.adminserver.api.isv.result.IsvKeysVO;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.IdGen;
 import com.gitee.sop.adminserver.common.RSATool;
-import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.IsvInfo;
 import com.gitee.sop.adminserver.entity.IsvKeys;
 import com.gitee.sop.adminserver.entity.PermIsvRole;
@@ -38,6 +36,7 @@ import com.gitee.sop.adminserver.mapper.IsvInfoMapper;
 import com.gitee.sop.adminserver.mapper.IsvKeysMapper;
 import com.gitee.sop.adminserver.mapper.PermIsvRoleMapper;
 import com.gitee.sop.adminserver.mapper.PermRoleMapper;
+import com.gitee.sop.adminserver.service.ConfigPushService;
 import com.gitee.sop.adminserver.service.RoutePermissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -85,6 +84,9 @@ public class IsvApi {
 
     @Autowired
     RoutePermissionService routePermissionService;
+
+    @Autowired
+    private ConfigPushService configPushService;
 
     @Value("${sop.sign-type}")
     private String sopSignType;
@@ -231,15 +233,7 @@ public class IsvApi {
             return;
         }
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ISV_INFO_UPDATE, isvDetail);
-        String path = ZookeeperContext.getIsvInfoChannelPath();
-        String data = JSON.toJSONString(channelMsg);
-        try {
-            log.info("消息推送--ISV信息(update), path:{}, data:{}", path, data);
-            ZookeeperContext.updatePathData(path, data);
-        } catch (ZookeeperPathNotExistException e) {
-            log.error("发送isvChannelMsg失败, path:{}, msg:{}", path, data, e);
-            throw new BizException("路径不存在");
-        }
+        configPushService.publishConfig(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 
     private IsvKeysGenVO createIsvKeys() throws Exception {

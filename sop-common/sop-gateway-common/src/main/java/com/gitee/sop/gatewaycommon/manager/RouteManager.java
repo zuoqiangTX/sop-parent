@@ -4,6 +4,7 @@ package com.gitee.sop.gatewaycommon.manager;
  * 管理各服务路由信息
  * @author tanghc
  */
+@Deprecated
 public interface RouteManager {
 
     /**

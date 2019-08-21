@@ -14,7 +14,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,15 +35,9 @@ public class DocDiscovery {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    private volatile long lastUpdateTime;
+    private Map<String, Long> updateTimeMap = new HashMap<>(16);
 
     public synchronized void refresh(DocManager docManager) {
-        long now = System.currentTimeMillis();
-        // 5秒内只能执行一次，解决重启应用连续加载4次问题
-        if (now - lastUpdateTime < FIVE_SECONDS) {
-            return;
-        }
-        lastUpdateTime = now;
         NamingService namingService = nacosDiscoveryProperties.namingServiceInstance();
         List<ServiceInfo> subscribes = null;
         try {
@@ -60,6 +56,14 @@ public class DocDiscovery {
             if (Objects.equals(thisServiceId, serviceName) || "api-gateway".equalsIgnoreCase(serviceName)) {
                 continue;
             }
+            // nacos会不停的触发事件，这里做了一层拦截
+            // 同一个serviceId5秒内允许访问一次
+            Long lastUpdateTime = updateTimeMap.getOrDefault(serviceName, 0L);
+            long now = System.currentTimeMillis();
+            if (now - lastUpdateTime < FIVE_SECONDS) {
+                continue;
+            }
+            updateTimeMap.put(serviceName, now);
             try {
                 List<Instance> allInstances = namingService.getAllInstances(serviceName);
                 if (CollectionUtils.isEmpty(allInstances)) {

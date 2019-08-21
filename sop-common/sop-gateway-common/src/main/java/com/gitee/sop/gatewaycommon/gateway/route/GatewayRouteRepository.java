@@ -4,6 +4,7 @@ import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.event.PredicateArgsEvent;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinition;
@@ -100,6 +101,7 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     @Override
     public void deleteAll(String serviceId) {
         List<String> idList = this.routes.values().stream()
+                .filter(zuulTargetRoute -> StringUtils.equalsIgnoreCase(serviceId, zuulTargetRoute.getServiceRouteInfo().getServiceId()))
                 .map(zuulTargetRoute -> zuulTargetRoute.getRouteDefinition().getId())
                 .collect(Collectors.toList());
 

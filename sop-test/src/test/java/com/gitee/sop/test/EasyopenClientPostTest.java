@@ -35,7 +35,7 @@ public class EasyopenClientPostTest extends TestBase {
 
         // 系统参数
         Map<String, String> params = new HashMap<>();
-        params.put("name", "goods.get");
+        params.put("name", "easyopen.goods.get");
         params.put("app_key", appKey);
         params.put("data", json);
         params.put("timestamp", getTime());

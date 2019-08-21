@@ -1,7 +1,7 @@
 package com.gitee.easyopen.server.config;
 
 import com.gitee.sop.servercommon.configuration.EasyopenDocSupportController;
-import com.gitee.sop.servercommon.configuration.EasyopenServiceConfiguration;
+import com.gitee.sop.servercommon.easyopen.EasyopenServiceConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @ApiDoc("商品接口")
 public class GoodsApi {
 
-    @Api(name = "goods.get")
+    @Api(name = "easyopen.goods.get")
     @ApiDocMethod(description = "获取商品")
     Goods getGoods(GoodsParam param) {
         Goods goods = new Goods();

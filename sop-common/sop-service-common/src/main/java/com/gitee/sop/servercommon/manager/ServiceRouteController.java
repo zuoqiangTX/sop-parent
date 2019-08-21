@@ -40,9 +40,13 @@ public class ServiceRouteController {
         return getServiceRouteInfo(request, response);
     }
 
+    protected ApiMetaBuilder getApiMetaBuilder() {
+        return new ApiMetaBuilder();
+    }
+
     protected ServiceRouteInfo getServiceRouteInfo(HttpServletRequest request, HttpServletResponse response) {
         String serviceId = environment.getProperty("spring.application.name");
-        ApiMetaBuilder apiMetaBuilder = new ApiMetaBuilder();
+        ApiMetaBuilder apiMetaBuilder = getApiMetaBuilder();
         ServiceApiInfo serviceApiInfo = apiMetaBuilder.getServiceApiInfo(serviceId, requestMappingHandlerMapping);
         ServiceRouteInfoBuilder serviceRouteInfoBuilder = new ServiceRouteInfoBuilder(environment);
         return serviceRouteInfoBuilder.build(serviceApiInfo);

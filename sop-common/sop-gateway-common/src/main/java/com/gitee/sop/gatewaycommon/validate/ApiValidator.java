@@ -48,7 +48,7 @@ public class ApiValidator implements Validator {
     private IsvManager isvManager;
 
     @Autowired
-    private  IsvRoutePermissionManager isvRoutePermissionManager;
+    private IsvRoutePermissionManager isvRoutePermissionManager;
 
     @Autowired
     private IPBlacklistManager ipBlacklistManager;
@@ -59,7 +59,6 @@ public class ApiValidator implements Validator {
     @Override
     public void validate(ApiParam param) {
         checkIP(param);
-        checkEnable(param);
 
         ApiConfig apiConfig = ApiContext.getApiConfig();
         if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
@@ -68,6 +67,7 @@ public class ApiValidator implements Validator {
             }
             return;
         }
+        checkEnable(param);
         // 需要验证签名,先校验appKey，后校验签名,顺序不能变
         checkAppKey(param);
         checkSign(param);

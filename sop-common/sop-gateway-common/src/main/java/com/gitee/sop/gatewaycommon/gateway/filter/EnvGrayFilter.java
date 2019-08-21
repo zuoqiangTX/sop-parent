@@ -1,36 +1,29 @@
-package com.gitee.sop.gatewaycommon.zuul.filter;
+package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.manager.EnvGrayManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
-import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
-import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 /**
  * @author tanghc
  */
-public class PreVersionDecisionFilter extends BaseZuulFilter {
+public class EnvGrayFilter implements GlobalFilter, Ordered {
 
     @Autowired
     private EnvGrayManager envGrayManager;
 
     @Override
-    protected FilterType getFilterType() {
-        return FilterType.PRE;
-    }
-
-    @Override
-    protected int getFilterOrder() {
-        return PRE_VERSION_DECISION_FILTER_ORDER;
-    }
-
-    @Override
-    protected Object doRun(RequestContext requestContext) throws ZuulException {
-        ApiParam apiParam = ZuulContext.getApiParam();
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         String nameVersion = apiParam.fetchNameVersion();
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(nameVersion);
         if (targetRoute == null) {
@@ -40,8 +33,14 @@ public class PreVersionDecisionFilter extends BaseZuulFilter {
         // 如果服务在灰度阶段，返回一个灰度版本号
         String version = envGrayManager.getVersion(serviceId, nameVersion);
         if (version != null && envGrayManager.containsKey(serviceId, apiParam.fetchAppKey())) {
-            requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, version);
+            ServerWebExchange serverWebExchange = ServerWebExchangeUtil.addHeaders(exchange, httpHeaders -> httpHeaders.set(ParamNames.HEADER_VERSION_NAME, version));
+            return chain.filter(serverWebExchange);
         }
-        return null;
+        return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return Orders.ENV_GRAY_FILTER_ORDER;
     }
 }

@@ -12,7 +12,7 @@ import com.gitee.sop.gatewaycommon.zuul.filter.PreHttpServletRequestWrapperFilte
 import com.gitee.sop.gatewaycommon.zuul.filter.PreLimitFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreParameterFormatterFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.PreValidateFilter;
-import com.gitee.sop.gatewaycommon.zuul.filter.PreVersionDecisionFilter;
+import com.gitee.sop.gatewaycommon.zuul.filter.PreEnvGrayFilter;
 import com.gitee.sop.gatewaycommon.zuul.filter.Servlet30WrapperFilterExt;
 import com.gitee.sop.gatewaycommon.zuul.route.SopRouteLocator;
 import com.gitee.sop.gatewaycommon.zuul.route.ZuulRouteCache;
@@ -119,8 +119,8 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      * 决定版本号
      */
     @Bean
-    PreVersionDecisionFilter preVersionDecisionFilter() {
-        return new PreVersionDecisionFilter();
+    PreEnvGrayFilter preEnvGrayFilter() {
+        return new PreEnvGrayFilter();
     }
 
     /**

@@ -105,7 +105,7 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
 
     @Bean
     @ConditionalOnMissingBean
-    EnvGrayManager userKeyManager() {
+    EnvGrayManager envGrayManager() {
         return ApiConfig.getInstance().getUserKeyManager();
     }
 

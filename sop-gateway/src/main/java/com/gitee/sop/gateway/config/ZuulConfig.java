@@ -6,7 +6,6 @@ package com.gitee.sop.gateway.config;
  * 注意：下面两个只能使用一个
  */
 
-import com.gitee.sop.gateway.manager.ManagerInitializer;
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
 
 /**
@@ -16,9 +15,6 @@ import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
 //@Configuration
 public class ZuulConfig extends AlipayZuulConfiguration {
 
-    static {
-        new ManagerInitializer();
-    }
 
 }
 

@@ -292,10 +292,10 @@ public class IsvApi {
         }
 
         try {
-            routePermissionService.sendIsvRolePermissionToZookeeper(isvInfo.getAppKey(), roleCodeList);
+            routePermissionService.sendIsvRolePermissionMsg(isvInfo.getAppKey(), roleCodeList);
         } catch (Exception e) {
-            log.error("保存到zookeeper中失败，isvInfo:{}, roleCodeList:{}", isvInfo, roleCodeList);
-            throw new BizException("同步zookeeper失败，请查看网关日志");
+            log.error("同步角色失败，isvInfo:{}, roleCodeList:{}", isvInfo, roleCodeList);
+            throw new BizException("同步角色失败，请查看网关日志");
         }
     }
 }

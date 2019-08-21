@@ -3,6 +3,7 @@ package com.gitee.sop.servercommon.manager;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import com.gitee.sop.servercommon.util.OpenUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author tanghc
  */
 @Slf4j
+@Getter
 @RestController
 public class ServiceRouteController {
 
@@ -35,12 +37,15 @@ public class ServiceRouteController {
             log.error("签名验证失败, params:{}", request.getQueryString());
             return null;
         }
+        return getServiceRouteInfo(request, response);
+    }
+
+    protected ServiceRouteInfo getServiceRouteInfo(HttpServletRequest request, HttpServletResponse response) {
         String serviceId = environment.getProperty("spring.application.name");
         ApiMetaBuilder apiMetaBuilder = new ApiMetaBuilder();
         ServiceApiInfo serviceApiInfo = apiMetaBuilder.getServiceApiInfo(serviceId, requestMappingHandlerMapping);
         ServiceRouteInfoBuilder serviceRouteInfoBuilder = new ServiceRouteInfoBuilder(environment);
         return serviceRouteInfoBuilder.build(serviceApiInfo);
     }
-
 
 }

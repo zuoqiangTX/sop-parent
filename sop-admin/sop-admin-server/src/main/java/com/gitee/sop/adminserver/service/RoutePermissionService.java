@@ -58,12 +58,12 @@ public class RoutePermissionService {
     }
 
     /**
-     * 推送isv路由权限到zookeeper
+     * 推送isv路由权限
      *
      * @param appKey
      * @param roleCodeList
      */
-    public void sendIsvRolePermissionToZookeeper(String appKey, List<String> roleCodeList) throws Exception {
+    public void sendIsvRolePermissionMsg(String appKey, List<String> roleCodeList) throws Exception {
         Collections.sort(roleCodeList);
         List<String> routeIdList = this.getRouteIdList(roleCodeList);
         String roleCodeListMd5 = DigestUtils.md5Hex(JSON.toJSONString(routeIdList));
@@ -95,7 +95,7 @@ public class RoutePermissionService {
     }
 
     /**
-     * 推送所有路由权限到zookeeper
+     * 推送所有路由权限
      */
     public void sendRoutePermissionReloadMsg(RoutePermissionParam oldRoutePermission) throws Exception {
         IsvRoutePermission isvRoutePermission = new IsvRoutePermission();

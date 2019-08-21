@@ -46,25 +46,6 @@ public class DbIsvManager extends CacheIsvManager {
     @PostConstruct
     protected void after() throws Exception {
         ApiConfig.getInstance().setIsvManager(this);
-        /*ZookeeperContext.setEnvironment(environment);
-        String isvChannelPath = ZookeeperContext.getIsvInfoChannelPath();
-        ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final IsvDefinition isvDefinition = JSON.parseObject(channelMsg.getData(), IsvDefinition.class);
-            switch (channelMsg.getOperation()) {
-                case "update":
-                    log.info("更新ISV信息，isvDefinition:{}", isvDefinition);
-                    update(isvDefinition);
-                    break;
-                case "remove":
-                    log.info("删除ISV，isvDefinition:{}", isvDefinition);
-                    remove(isvDefinition.getAppKey());
-                    break;
-                default:
-
-            }
-        });*/
 
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {

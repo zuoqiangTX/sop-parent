@@ -4,7 +4,6 @@ import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
 import com.gitee.easyopen.doc.annotation.ApiDocMethod;
-import com.gitee.easyopen.util.CopyUtil;
 import com.gitee.sop.adminserver.api.isv.result.RoleVO;
 import com.gitee.sop.adminserver.api.service.param.RouteAddParam;
 import com.gitee.sop.adminserver.api.service.param.RouteDeleteParam;
@@ -95,46 +94,19 @@ public class RouteApi {
     @Api(name = "route.add")
     @ApiDocMethod(description = "新增路由")
     void addRoute(RouteAddParam param) {
-        // TODO:新增路由
-        String id = param.getName() + param.getVersion();
-//        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), id);
-        GatewayRouteDefinition routeDefinition = new GatewayRouteDefinition();
-        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
-        routeDefinition.setId(id);
-        routeDefinition.setCustom(1);
-//        try {
-//            ZookeeperContext.addPath(routePath, JSON.toJSONString(routeDefinition));
-//        } catch (ZookeeperPathExistException e) {
-//            throw new BizException("路由已存在");
-//        }
-        this.updateRouteConfig(routeDefinition);
+        // TODO: 新增路由
     }
 
     @Api(name = "route.update")
     @ApiDocMethod(description = "修改路由")
     void updateRoute(RouteUpdateParam param) {
-        // TODO:修改路由
-//        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
-//        GatewayRouteDefinition routeDefinition = this.getGatewayRouteDefinition(routePath);
-//        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
-//        try {
-//            ZookeeperContext.updatePathData(routePath, JSON.toJSONString(routeDefinition));
-//        } catch (ZookeeperPathNotExistException e) {
-//            throw new BizException("路由不存在");
-//        }
-//        this.updateRouteConfig(routeDefinition);
+        // TODO: 修改路由
     }
 
     @Api(name = "route.del")
     @ApiDocMethod(description = "删除路由")
     void delRoute(RouteDeleteParam param) {
-        // TODO:删除路由
-        /*String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
-        GatewayRouteDefinition routeDefinition = this.getGatewayRouteDefinition(routePath);
-        if (!BooleanUtils.toBoolean(routeDefinition.getCustom())) {
-            throw new BizException("非自定义路由，无法删除");
-        }
-        ZookeeperContext.deletePathDeep(routePath);*/
+        // TODO: 删除路由
     }
 
 

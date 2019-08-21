@@ -77,25 +77,6 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        /*ZookeeperContext.setEnvironment(environment);
-        String path = ZookeeperContext.getRouteConfigChannelPath();
-        ZookeeperContext.listenPath(path, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final RouteConfig routeConfig = JSON.parseObject(channelMsg.getData(), RouteConfig.class);
-            switch (channelMsg.getOperation()) {
-                case "reload":
-                    log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
-                    load();
-                    break;
-                case "update":
-                    log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
-                    update(routeConfig);
-                    break;
-                default:
-            }
-        });*/
-
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override

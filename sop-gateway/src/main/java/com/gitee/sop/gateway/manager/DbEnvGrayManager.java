@@ -100,31 +100,6 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        /*ZookeeperContext.setEnvironment(environment);
-        String isvChannelPath = ZookeeperContext.getServiceGrayChannelPath();
-        ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            String data = channelMsg.getData();
-            ServiceGrayDefinition userKeyDefinition = JSON.parseObject(data, ServiceGrayDefinition.class);
-            String serviceId = userKeyDefinition.getServiceId();
-            switch (channelMsg.getOperation()) {
-                case "set":
-                    ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
-                    this.setServiceGrayConfig(configGray);
-                    break;
-                case "open":
-                    openGray(userKeyDefinition.getInstanceId(), serviceId);
-                    break;
-                case "close":
-                    closeGray(userKeyDefinition.getInstanceId());
-                    break;
-                default:
-
-            }
-        });*/
-
-        // nacos
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override

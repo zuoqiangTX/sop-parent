@@ -21,8 +21,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<zookeeper.version>3.4.12</zookeeper.version>
-		<curator-recipes.version>4.0.1</curator-recipes.version>
 		<okhttp.version>3.11.0</okhttp.version>
 	</properties>
 
@@ -30,12 +28,12 @@
 		<dependency>
 			<groupId>com.alibaba.boot</groupId>
 			<artifactId>nacos-config-spring-boot-starter</artifactId>
-			<version>0.2.2</version>
+			<version>0.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba.boot</groupId>
 			<artifactId>nacos-discovery-spring-boot-starter</artifactId>
-			<version>0.2.2</version>
+			<version>0.2.3</version>
 		</dependency>
 
 		<dependency>

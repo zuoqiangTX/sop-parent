@@ -53,25 +53,6 @@ public class DbLimitConfigManager extends DefaultLimitConfigManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        /*ZookeeperContext.setEnvironment(environment);
-        String path = ZookeeperContext.getLimitConfigChannelPath();
-        ZookeeperContext.listenPath(path, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final ConfigLimitDto configLimitDto = JSON.parseObject(channelMsg.getData(), ConfigLimitDto.class);
-            switch (channelMsg.getOperation()) {
-                case "reload":
-                    log.info("重新加载限流配置信息，configLimitDto:{}", configLimitDto);
-                    load();
-                    break;
-                case "update":
-                    log.info("更新限流配置信息，configLimitDto:{}", configLimitDto);
-                    update(configLimitDto);
-                    break;
-                default:
-            }
-        });*/
-
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_LIMIT_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override

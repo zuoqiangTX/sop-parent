@@ -8,6 +8,7 @@ import com.gitee.sop.servercommon.message.ServiceErrorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -70,12 +71,20 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     }
 
     @Bean
+    @ConditionalOnMissingBean
     GlobalExceptionHandler globalExceptionHandler() {
-        return ServiceConfig.getInstance().getGlobalExceptionHandler();
+        return new GlobalExceptionHandler();
     }
 
     @Bean
-    ServiceRouteController serviceRouteController() {
+    @ConditionalOnMissingBean
+    ErrorController errorController() {
+        return new ErrorController();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ServiceRouteController serviceRouteInfoHandler() {
         return new ServiceRouteController();
     }
 

@@ -37,7 +37,7 @@ public class SpringMvcServiceConfiguration {
 
     @Bean
     GlobalExceptionHandler globalExceptionHandler() {
-        return ServiceConfig.getInstance().getGlobalExceptionHandler();
+        return new GlobalExceptionHandler();
     }
 
     @PostConstruct

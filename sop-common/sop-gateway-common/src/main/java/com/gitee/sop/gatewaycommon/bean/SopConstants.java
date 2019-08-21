@@ -42,17 +42,6 @@ public class SopConstants {
 
     public static final int BIZ_ERROR_STATUS = 4000;
 
-    /**
-     * zookeeper存放接口路由信息的根目录
-     */
-    public static final String SOP_SERVICE_ROUTE_PATH = "/com.gitee.sop.route";
-
-    /**
-     * 消息监听路径
-     */
-    public static final String SOP_MSG_CHANNEL_PATH = "/com.gitee.sop.channel";
-
-
     public static final String UNKNOWN_SERVICE= "_sop_unknown_service_";
     public static final String UNKNOWN_METHOD = "_sop_unknown_method_";
     public static final String UNKNOWN_VERSION = "_sop_unknown_version_";

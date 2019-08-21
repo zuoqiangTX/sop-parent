@@ -41,26 +41,6 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        /*ZookeeperContext.setEnvironment(environment);
-        String path = ZookeeperContext.getIpBlacklistChannelPath();
-        ZookeeperContext.listenPath(path, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final IPDto ipDto = JSON.parseObject(channelMsg.getData(), IPDto.class);
-            String ip = ipDto.getIp();
-            switch (channelMsg.getOperation()) {
-                case "add":
-                    log.info("添加IP黑名单，ip:{}", ip);
-                    add(ip);
-                    break;
-                case "delete":
-                    log.info("移除IP黑名单，ip:{}", ip);
-                    remove(ip);
-                    break;
-                default:
-            }
-        });*/
-        // nacos
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override

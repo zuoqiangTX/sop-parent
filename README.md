@@ -62,7 +62,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 工程说明
 
-> 运行环境：JDK8，Maven3，Zookeeper
+> 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)
 
 - doc：开发文档
 - sop-admin：后台管理
@@ -76,9 +76,9 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 分支说明
 
+- master：发版分支
+- spring-cloud-gateway：Spring Cloud Gateway作为网关
 - develop：日常开发分支
-- registry-nacos：nacos作为注册中心
-- SpringCloudGateway：SpringCloudGateway作为网关
 
 ## 相关文档
 

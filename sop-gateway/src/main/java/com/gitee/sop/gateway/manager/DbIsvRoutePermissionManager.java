@@ -127,42 +127,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
 
     @PostConstruct
     protected void after() throws Exception {
-        /*ZookeeperContext.setEnvironment(environment);
-        String isvChannelPath = ZookeeperContext.getIsvRoutePermissionChannelPath();
-        ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final IsvRoutePermission isvRoutePermission = JSON.parseObject(channelMsg.getData(), IsvRoutePermission.class);
-            switch (channelMsg.getOperation()) {
-                case "reload":
-                    log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    String listenPath = isvRoutePermission.getListenPath();
-                    String code = "";
-                    try {
-                        load();
-                    } catch (Exception e) {
-                        log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
-                        code = e.getMessage();
-                    }
-                    try {
-                        ZookeeperContext.updatePath(listenPath, code);
-                    } catch (Exception e1) {
-                        log.error("重新加载路由权限信息, zookeeper操作失败， path: {}", listenPath, e1);
-                    }
-                    break;
-                case "update":
-                    log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    update(isvRoutePermission);
-                    break;
-                case "remove":
-                    log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    remove(isvRoutePermission.getAppKey());
-                    break;
-                default:
-
-            }
-        });*/
-
         ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override

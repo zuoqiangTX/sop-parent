@@ -1,8 +1,6 @@
 # 使用SpringCloudGateway
 
-SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway，完整代码见`SpringCloudGateway`分支。
-
-**注：**：SOP对Spring Cloud Gateway的支持目前处于beta阶段，推荐使用zuul。
+SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway，完整代码见`spring-cloud-gateway`分支。
 
 步骤如下：
 

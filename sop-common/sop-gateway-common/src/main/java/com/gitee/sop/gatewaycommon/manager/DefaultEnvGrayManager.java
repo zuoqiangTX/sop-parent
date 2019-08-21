@@ -22,15 +22,14 @@ public class DefaultEnvGrayManager implements EnvGrayManager {
 
     @Override
     public void saveServiceGrayConfig(ServiceGrayConfig serviceGrayConfig) {
-        serviceGrayConfigMap.putIfAbsent(serviceGrayConfig.getServiceId(), serviceGrayConfig);
+        serviceGrayConfigMap.put(serviceGrayConfig.getServiceId(), serviceGrayConfig);
     }
 
     @Override
-    public boolean containsKey(String instanceId, Object userKey) {
-        if (instanceId == null || userKey == null) {
+    public boolean containsKey(String serviceId, Object userKey) {
+        if (serviceId == null || userKey == null) {
             return false;
         }
-        String serviceId = instanceIdServiceIdMap.get(instanceId);
         ServiceGrayConfig grayConfig = this.getGrayConfig(serviceId);
         return grayConfig != null && grayConfig.containsKey(userKey);
     }

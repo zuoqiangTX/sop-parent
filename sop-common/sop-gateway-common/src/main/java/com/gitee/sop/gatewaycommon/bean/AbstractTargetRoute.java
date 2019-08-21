@@ -3,25 +3,25 @@ package com.gitee.sop.gatewaycommon.bean;
 /**
  * @author tanghc
  */
-public abstract class AbstractTargetRoute<R extends BaseServiceRouteInfo, E extends BaseRouteDefinition, T> implements TargetRoute<R,E, T> {
+public abstract class AbstractTargetRoute<T> implements TargetRoute<T> {
 
-    private R serviceRouteInfo;
-    private E routeDefinition;
+    private ServiceRouteInfo serviceRouteInfo;
+    private GatewayRouteDefinition routeDefinition;
     private T targetRoute;
 
-    public AbstractTargetRoute(R serviceRouteInfo, E routeDefinition, T targetRoute) {
+    public AbstractTargetRoute(ServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition routeDefinition, T targetRoute) {
         this.serviceRouteInfo = serviceRouteInfo;
         this.routeDefinition = routeDefinition;
         this.targetRoute = targetRoute;
     }
 
     @Override
-    public R getServiceRouteInfo() {
+    public ServiceRouteInfo getServiceRouteInfo() {
         return serviceRouteInfo;
     }
 
     @Override
-    public E getRouteDefinition() {
+    public GatewayRouteDefinition getRouteDefinition() {
         return routeDefinition;
     }
 

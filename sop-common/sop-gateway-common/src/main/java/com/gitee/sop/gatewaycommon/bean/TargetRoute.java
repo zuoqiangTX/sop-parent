@@ -3,21 +3,21 @@ package com.gitee.sop.gatewaycommon.bean;
 /**
  * @author tanghc
  */
-public interface TargetRoute<R extends BaseServiceRouteInfo, E extends BaseRouteDefinition, T> {
+public interface TargetRoute<T> {
 
     /**
      * 返回服务信息
      *
      * @return 返回服务信息
      */
-    R getServiceRouteInfo();
+    ServiceRouteInfo getServiceRouteInfo();
 
     /**
      * 返回微服务路由对象
      *
      * @return 返回微服务路由对象
      */
-    E getRouteDefinition();
+    GatewayRouteDefinition getRouteDefinition();
 
     /**
      * 返回网关路由对象

@@ -1,4 +1,4 @@
-package com.gitee.sop.gatewaycommon.gateway.route;
+package com.gitee.sop.gatewaycommon.bean;
 
 import lombok.Data;
 
@@ -9,9 +9,9 @@ import java.util.Map;
  * @author tanghc
  */
 @Data
-public class GatewayPredicateDefinition {
-    /** 断言对应的Name */
+public class GatewayFilterDefinition {
+    /** Filter Name */
     private String name;
-    /** 配置的断言规则 */
+    /** 对应的路由规则 */
     private Map<String, String> args = new LinkedHashMap<>();
 }

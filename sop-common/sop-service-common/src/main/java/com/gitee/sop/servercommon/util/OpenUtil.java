@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
+import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -75,4 +76,14 @@ public class OpenUtil {
         return retMap;
     }
 
+    public static boolean validateSimpleSign(HttpServletRequest request, String secret) {
+        String time = request.getParameter("time");
+        String sign = request.getParameter("sign");
+        if (StringUtils.isAnyBlank(time, sign)) {
+            return false;
+        }
+        String source = secret + time + secret;
+        String serverSign = DigestUtils.md5DigestAsHex(source.getBytes());
+        return serverSign.equals(sign);
+    }
 }

@@ -1,21 +1,23 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.config.ConfigService;
+import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.entity.ConfigGray;
 import com.gitee.sop.gateway.entity.ConfigGrayInstance;
 import com.gitee.sop.gateway.mapper.ConfigGrayInstanceMapper;
 import com.gitee.sop.gateway.mapper.ConfigGrayMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
+import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.ServiceGrayDefinition;
 import com.gitee.sop.gatewaycommon.manager.DefaultEnvGrayManager;
-import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.ServiceGrayConfig;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -42,13 +44,13 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
     private static final Function<String[], String> FUNCTION_VALUE = arr -> arr[1];
 
     @Autowired
-    private Environment environment;
-
-    @Autowired
     private ConfigGrayMapper configGrayMapper;
 
     @Autowired
     private ConfigGrayInstanceMapper configGrayInstanceMapper;
+
+    @Autowired
+    private NacosConfigProperties nacosConfigProperties;
 
     @Override
     public void load() {
@@ -98,7 +100,7 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ZookeeperContext.setEnvironment(environment);
+        /*ZookeeperContext.setEnvironment(environment);
         String isvChannelPath = ZookeeperContext.getServiceGrayChannelPath();
         ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
             String nodeData = new String(nodeCache.getCurrentData().getData());
@@ -119,6 +121,31 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
                     break;
                 default:
 
+            }
+        });*/
+
+        // nacos
+        ConfigService configService = nacosConfigProperties.configServiceInstance();
+        configService.addListener(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String configInfo) {
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                String data = channelMsg.getData();
+                ServiceGrayDefinition userKeyDefinition = JSON.parseObject(data, ServiceGrayDefinition.class);
+                String serviceId = userKeyDefinition.getServiceId();
+                switch (channelMsg.getOperation()) {
+                    case "set":
+                        ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
+                        setServiceGrayConfig(configGray);
+                        break;
+                    case "open":
+                        openGray(userKeyDefinition.getInstanceId(), serviceId);
+                        break;
+                    case "close":
+                        closeGray(userKeyDefinition.getInstanceId());
+                        break;
+                    default:
+                }
             }
         });
     }

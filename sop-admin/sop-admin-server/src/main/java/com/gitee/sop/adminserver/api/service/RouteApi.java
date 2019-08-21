@@ -1,6 +1,5 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -15,10 +14,7 @@ import com.gitee.sop.adminserver.api.service.param.RouteUpdateParam;
 import com.gitee.sop.adminserver.api.service.result.RouteVO;
 import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.BizException;
-import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
-import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.ConfigRouteBase;
 import com.gitee.sop.adminserver.entity.PermRole;
 import com.gitee.sop.adminserver.mapper.ConfigRouteBaseMapper;
@@ -28,7 +24,6 @@ import com.gitee.sop.adminserver.service.RouteConfigService;
 import com.gitee.sop.adminserver.service.RoutePermissionService;
 import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +66,10 @@ public class RouteApi {
                     RouteVO vo = new RouteVO();
                     BeanUtils.copyProperties(gatewayRouteDefinition, vo);
                     vo.setRoles(this.getRouteRole(gatewayRouteDefinition.getId()));
+                    ConfigRouteBase configRouteBase = configRouteBaseMapper.getByColumn("route_id", gatewayRouteDefinition.getId());
+                    if (configRouteBase != null) {
+                        vo.setStatus(configRouteBase.getStatus());
+                    }
                     return vo;
                 })
                 .collect(Collectors.toList());
@@ -96,54 +95,48 @@ public class RouteApi {
     @Api(name = "route.add")
     @ApiDocMethod(description = "新增路由")
     void addRoute(RouteAddParam param) {
+        // TODO:新增路由
         String id = param.getName() + param.getVersion();
-        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), id);
+//        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), id);
         GatewayRouteDefinition routeDefinition = new GatewayRouteDefinition();
         CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
         routeDefinition.setId(id);
         routeDefinition.setCustom(1);
-        try {
-            ZookeeperContext.addPath(routePath, JSON.toJSONString(routeDefinition));
-        } catch (ZookeeperPathExistException e) {
-            throw new BizException("路由已存在");
-        }
+//        try {
+//            ZookeeperContext.addPath(routePath, JSON.toJSONString(routeDefinition));
+//        } catch (ZookeeperPathExistException e) {
+//            throw new BizException("路由已存在");
+//        }
         this.updateRouteConfig(routeDefinition);
     }
 
     @Api(name = "route.update")
     @ApiDocMethod(description = "修改路由")
     void updateRoute(RouteUpdateParam param) {
-        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
-        GatewayRouteDefinition routeDefinition = this.getGatewayRouteDefinition(routePath);
-        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
-        try {
-            ZookeeperContext.updatePathData(routePath, JSON.toJSONString(routeDefinition));
-        } catch (ZookeeperPathNotExistException e) {
-            throw new BizException("路由不存在");
-        }
-        this.updateRouteConfig(routeDefinition);
+        // TODO:修改路由
+//        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
+//        GatewayRouteDefinition routeDefinition = this.getGatewayRouteDefinition(routePath);
+//        CopyUtil.copyPropertiesIgnoreNull(param, routeDefinition);
+//        try {
+//            ZookeeperContext.updatePathData(routePath, JSON.toJSONString(routeDefinition));
+//        } catch (ZookeeperPathNotExistException e) {
+//            throw new BizException("路由不存在");
+//        }
+//        this.updateRouteConfig(routeDefinition);
     }
 
     @Api(name = "route.del")
     @ApiDocMethod(description = "删除路由")
     void delRoute(RouteDeleteParam param) {
-        String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
+        // TODO:删除路由
+        /*String routePath = ZookeeperContext.buildRoutePath(param.getServiceId(), param.getId());
         GatewayRouteDefinition routeDefinition = this.getGatewayRouteDefinition(routePath);
         if (!BooleanUtils.toBoolean(routeDefinition.getCustom())) {
             throw new BizException("非自定义路由，无法删除");
         }
-        ZookeeperContext.deletePathDeep(routePath);
+        ZookeeperContext.deletePathDeep(routePath);*/
     }
 
-    private GatewayRouteDefinition getGatewayRouteDefinition(String zookeeperRoutePath) {
-        String data = null;
-        try {
-            data = ZookeeperContext.getData(zookeeperRoutePath);
-        } catch (ZookeeperPathNotExistException e) {
-            throw new BizException("路由不存在");
-        }
-        return JSON.parseObject(data, GatewayRouteDefinition.class);
-    }
 
     private void updateRouteConfig(GatewayRouteDefinition routeDefinition) {
         try {

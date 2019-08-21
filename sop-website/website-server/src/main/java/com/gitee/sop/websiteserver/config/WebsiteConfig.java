@@ -40,6 +40,6 @@ public class WebsiteConfig implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        docManager.load(null);
+//        docManager.load(null);
     }
 }

@@ -4,7 +4,6 @@ import com.gitee.sop.websiteserver.bean.DocInfo;
 import com.gitee.sop.websiteserver.manager.DocManager;
 import com.gitee.sop.websiteserver.vo.DocBaseInfoVO;
 import com.gitee.sop.websiteserver.vo.DocInfoVO;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,14 +57,4 @@ public class DocController {
         return docManager.getByTitle(title);
     }
 
-
-    // 后门地址，可手动更新文档内容，一般情况下用不到
-    @GetMapping("/reload")
-    public String reload(String pwd) {
-        boolean correct = StringUtils.equals(this.pwd, pwd);
-        if (correct) {
-            docManager.load(null);
-        }
-        return String.valueOf(correct);
-    }
 }

@@ -6,7 +6,6 @@ import com.gitee.easyopen.util.ReflectionUtil;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.manager.ApiMetaManager;
 import com.gitee.sop.servercommon.manager.DefaultRequestMappingEvent;
-import com.gitee.sop.servercommon.manager.RequestMappingEvent;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -28,11 +27,6 @@ public class EasyopenServiceConfiguration extends BaseServiceConfiguration {
 
     static {
         ApiContext.getApiConfig().setIgnoreValidate(true);
-    }
-
-    @Override
-    protected RequestMappingEvent getRequestMappingEvent(ApiMetaManager apiMetaManager, Environment environment) {
-        return new EasyopenRequestMappingEvent(apiMetaManager, environment);
     }
 
     class EasyopenRequestMappingEvent extends DefaultRequestMappingEvent {

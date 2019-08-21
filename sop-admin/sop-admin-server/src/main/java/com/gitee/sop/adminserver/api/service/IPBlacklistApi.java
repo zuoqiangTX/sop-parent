@@ -1,6 +1,5 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -14,11 +13,12 @@ import com.gitee.sop.adminserver.api.service.param.ConfigIpBlackForm;
 import com.gitee.sop.adminserver.api.service.param.ConfigIpBlacklistPageParam;
 import com.gitee.sop.adminserver.api.service.result.ConfigIpBlacklistVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.entity.ConfigIpBlacklist;
 import com.gitee.sop.adminserver.mapper.ConfigIpBlacklistMapper;
+import com.gitee.sop.adminserver.service.ConfigPushService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +32,9 @@ public class IPBlacklistApi {
 
     @Autowired
     ConfigIpBlacklistMapper configIpBlacklistMapper;
+
+    @Autowired
+    private ConfigPushService configPushService;
 
     @ApiDocMethod(description = "获取IP黑名单，分页")
     @Api(name = "ip.blacklist.page")
@@ -85,20 +88,7 @@ public class IPBlacklistApi {
 
     public void sendIpBlacklistMsg(ConfigIpBlacklist configIpBlacklist, ChannelOperation channelOperation) throws Exception {
         ChannelMsg channelMsg = new ChannelMsg(channelOperation, configIpBlacklist);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getIpBlacklistChannelPath();
-        log.info("消息推送--IP黑名单设置({}), path:{}, data:{}",channelOperation.getOperation(), path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 
-    enum BlacklistMsgType {
-        /**
-         * 黑名单消息类型：添加
-         */
-        ADD,
-        /**
-         * 黑名单消息类型：删除
-         */
-        DELETE
-    }
 }

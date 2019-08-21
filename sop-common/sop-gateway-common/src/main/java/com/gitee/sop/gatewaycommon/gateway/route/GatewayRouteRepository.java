@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
+import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
@@ -216,7 +216,7 @@ public class ApiValidator implements Validator {
     protected void checkPermission(ApiParam apiParam) {
         String routeId = apiParam.fetchNameVersion();
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(routeId);
-        BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        GatewayRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
         boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
         if (needCheckPermission) {
             String appKey = apiParam.fetchAppKey();

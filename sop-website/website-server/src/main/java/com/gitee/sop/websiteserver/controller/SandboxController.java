@@ -1,7 +1,6 @@
 package com.gitee.sop.websiteserver.controller;
 
-import com.gitee.sop.registryapi.bean.HttpTool;
-import com.gitee.sop.registryapi.bean.HttpTool.*;
+import com.gitee.sop.websiteserver.bean.HttpTool;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
 import com.gitee.sop.websiteserver.util.UploadUtil;
@@ -97,10 +96,10 @@ public class SandboxController {
         params.put("sign", sign);
 
         Collection<MultipartFile> uploadFiles = UploadUtil.getUploadFiles(request);
-        List<UploadFile> files = uploadFiles.stream()
+        List<HttpTool.UploadFile> files = uploadFiles.stream()
                 .map(multipartFile -> {
                     try {
-                        return new UploadFile(multipartFile.getName(), multipartFile.getOriginalFilename(), multipartFile.getBytes());
+                        return new HttpTool.UploadFile(multipartFile.getName(), multipartFile.getOriginalFilename(), multipartFile.getBytes());
                     } catch (IOException e) {
                         log.error("封装文件失败", e);
                         return null;
@@ -114,7 +113,7 @@ public class SandboxController {
             if (!CollectionUtils.isEmpty(files)) {
                 responseData = httpTool.requestFile(url, params, Collections.emptyMap(), files);
             } else {
-                responseData = httpTool.request(url, params, Collections.emptyMap(), HTTPMethod.fromValue(httpMethod));
+                responseData = httpTool.request(url, params, Collections.emptyMap(), HttpTool.HTTPMethod.fromValue(httpMethod));
             }
             result.apiResult = responseData;
             return result;

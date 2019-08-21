@@ -11,6 +11,7 @@ import com.gitee.sop.registryapi.bean.HttpTool;
 import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
@@ -19,7 +20,6 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,7 @@ import java.util.Map;
  * nacos接口实现, https://nacos.io/zh-cn/docs/open-api.html
  * @author tanghc
  */
+@Slf4j
 public class RegistryServiceNacos implements RegistryService {
 
     static HttpTool httpTool = new HttpTool();
@@ -35,10 +36,16 @@ public class RegistryServiceNacos implements RegistryService {
     @Value("${registry.nacos-server-addr:}")
     private String nacosAddr;
 
+    @Value("${nacos.discovery.server-addr:}")
+    private String nacosAddrNew;
+
     private NamingService namingService;
 
     @PostConstruct
     public void after() throws NacosException {
+        if (StringUtils.isNotBlank(nacosAddrNew)) {
+            nacosAddr = nacosAddrNew;
+        }
         if (StringUtils.isNotBlank(nacosAddr)) {
             namingService = NamingFactory.createNamingService(nacosAddr);
         }
@@ -72,7 +79,7 @@ public class RegistryServiceNacos implements RegistryService {
             }
             serviceInfoList.add(serviceInfo);
         }
-        serviceInfoList.sort(Comparator.comparingInt(o -> o.getInstances().size()));
+        serviceInfoList.sort((o1, o2) -> o2.getInstances().size() - o1.getInstances().size());
         return serviceInfoList;
     }
 
@@ -107,7 +114,10 @@ public class RegistryServiceNacos implements RegistryService {
     protected void updateInstance(Instance instance) throws IOException {
         String json = JSON.toJSONString(instance);
         JSONObject jsonObject = JSON.parseObject(json);
-        httpTool.request("http://" + nacosAddr + "/nacos/v1/ns/instance", jsonObject, null, HttpTool.HTTPMethod.PUT);
+        String response = httpTool.request("http://" + nacosAddr + "/nacos/v1/ns/instance", jsonObject, null, HttpTool.HTTPMethod.PUT);
+        if (!"ok".equalsIgnoreCase(response)) {
+            throw new RuntimeException(response);
+        }
     }
 
     /**
@@ -122,6 +132,8 @@ public class RegistryServiceNacos implements RegistryService {
         params.put("ip", serviceInstance.getIp());
         params.put("port", String.valueOf(serviceInstance.getPort()));
         String instanceJson = httpTool.request("http://" + nacosAddr + "/nacos/v1/ns/instance", params, null, HttpTool.HTTPMethod.GET);
-        return JSON.parseObject(instanceJson, Instance.class);
+        Instance instance = JSON.parseObject(instanceJson, Instance.class);
+        instance.setServiceName(serviceInstance.getServiceId());
+        return instance;
     }
 }

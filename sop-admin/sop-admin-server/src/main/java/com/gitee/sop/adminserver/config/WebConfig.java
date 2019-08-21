@@ -8,7 +8,6 @@ import com.gitee.easyopen.ApiParamParser;
 import com.gitee.easyopen.ParamNames;
 import com.gitee.easyopen.interceptor.ApiInterceptor;
 import com.gitee.easyopen.session.ApiSessionManager;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.interceptor.LoginInterceptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -68,7 +67,6 @@ public class WebConfig {
 
     @PostConstruct
     public void after() {
-        ZookeeperContext.setEnvironment(environment);
     }
 
 }

@@ -33,23 +33,34 @@
         </dependency>
 
         <!-- 注册中心【只能用一个，不用的注释掉】 -->
-        <!-- 使用eureka注册中心  -->
+        <!-- 使用eureka注册中心
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
+         -->
 
         <!-- 使用nacos注册中心
             版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本，版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
            https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-alibaba-nacos-discovery
-
+        -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
             <version>0.2.2.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba.nacos</groupId>
+                    <artifactId>nacos-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        -->
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
         <!-- 注册中心end -->
 
         <dependency>
@@ -73,6 +84,11 @@
             <artifactId>netty-all</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.1-jre</version>
+        </dependency>
 
         <!-- swagger2 -->
         <dependency>

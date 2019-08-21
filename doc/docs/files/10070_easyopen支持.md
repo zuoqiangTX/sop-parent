@@ -10,21 +10,39 @@ SOP对easyopen项目提供了很好的支持，如果您的服务端使用了eas
 
 ```xml
 <!-- sop接入依赖 -->
-<dependency>
-    <groupId>com.gitee.sop</groupId>
-    <artifactId>sop-service-common</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-</dependency>
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-</dependency>
-<dependency>
-    <groupId>net.oschina.durcframework</groupId>
-    <artifactId>easyopen</artifactId>
-    <version>1.16.1</version>
-</dependency>
-<!-- sop接入依赖 end -->
+		<dependency>
+			<groupId>com.gitee.sop</groupId>
+			<artifactId>sop-service-common</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- 使用nacos注册中心
+            版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本，版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
+           https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-alibaba-nacos-discovery
+        -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<version>0.2.2.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.alibaba.nacos</groupId>
+					<artifactId>nacos-client</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.nacos</groupId>
+			<artifactId>nacos-client</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.oschina.durcframework</groupId>
+			<artifactId>easyopen</artifactId>
+			<version>1.16.1</version>
+		</dependency>
+        <!-- sop接入依赖 end -->
 ```
 
 easyopen版本必须升级到1.16.1
@@ -49,9 +67,7 @@ public class SopConfig extends EasyopenServiceConfiguration {
 ```java
 @Configuration
 public class ZuulConfig extends EasyopenZuulConfiguration {
-    static {
-        new ManagerInitializer();
-    }
+
 }
 ```
 

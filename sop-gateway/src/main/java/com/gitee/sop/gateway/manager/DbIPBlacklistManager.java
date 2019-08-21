@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -27,10 +26,7 @@ import java.util.List;
 public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
 
     @Autowired
-    IPBlacklistMapper ipBlacklistMapper;
-
-    @Autowired
-    Environment environment;
+    private IPBlacklistMapper ipBlacklistMapper;
 
     @Autowired
     private NacosConfigProperties nacosConfigProperties;

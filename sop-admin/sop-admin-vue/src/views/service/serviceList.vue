@@ -192,7 +192,7 @@
 <script>
 export default {
   data() {
-    const regex = /^\w+(,\w+)*$/
+    const regex = /^\S+(,\S+)*$/
     const userKeyContentValidator = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('不能为空'))
@@ -272,18 +272,20 @@ export default {
       this.loadTable()
     },
     onDisable: function(row) {
-      this.confirm('确定要禁用【' + row.serviceId + '】吗?', function(done) {
+      this.confirm(`确定要禁用 ${row.serviceId}(${row.ipPort}) 吗?`, function(done) {
         this.post('service.instance.offline', row, function() {
           this.tip('禁用成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
     onEnable: function(row) {
-      this.confirm('确定要启用【' + row.serviceId + '】吗?', function(done) {
+      this.confirm(`确定要启用 ${row.serviceId}(${row.ipPort}) 吗?`, function(done) {
         this.post('service.instance.online', row, function() {
           this.tip('启用成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
@@ -293,34 +295,38 @@ export default {
       })
     },
     onEnvPreOpen: function(row) {
-      this.confirm(`确定要开启 ${row.instanceId} 预发布吗?`, function(done) {
+      this.confirm(`确定要开启 ${row.serviceId}(${row.ipPort}) 预发布吗?`, function(done) {
         this.post('service.instance.env.pre.open', row, function() {
           this.tip('预发布成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
     onEnvPreClose: function(row) {
-      this.confirm(`确定要结束 ${row.instanceId} 预发布吗?`, function(done) {
+      this.confirm(`确定要结束 ${row.serviceId}(${row.ipPort}) 预发布吗?`, function(done) {
         this.doEnvOnline(row, function() {
           this.tip('操作成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
     onEnvGrayOpen: function(row) {
-      this.confirm(`确定要开启 ${row.instanceId} 灰度吗?`, function(done) {
+      this.confirm(`确定要开启 ${row.serviceId}(${row.ipPort}) 灰度吗?`, function(done) {
         this.post('service.instance.env.gray.open', row, function() {
           this.tip('开启成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
     onEnvGrayClose: function(row) {
-      this.confirm(`确定要结束 ${row.instanceId} 灰度吗?`, function(done) {
+      this.confirm(`确定要结束 ${row.serviceId}(${row.ipPort}) 灰度吗?`, function(done) {
         this.doEnvOnline(row, function() {
           this.tip('操作成功')
           done()
+          this.loadTableDelay()
         })
       })
     },
@@ -329,11 +335,13 @@ export default {
       this.loadRouteList(serviceId)
       this.post('service.gray.config.get', { serviceId: serviceId }, function(resp) {
         this.grayDialogVisible = true
-        const data = resp.data
-        Object.assign(this.grayForm, {
-          serviceId: serviceId,
-          userKeyContent: data.userKeyContent || '',
-          grayRouteConfigList: this.createGrayRouteConfigList(data.nameVersionContent)
+        this.$nextTick(() => {
+          const data = resp.data
+          Object.assign(this.grayForm, {
+            serviceId: serviceId,
+            userKeyContent: data.userKeyContent || '',
+            grayRouteConfigList: this.createGrayRouteConfigList(data.nameVersionContent)
+          })
         })
       })
     },
@@ -403,6 +411,12 @@ export default {
         instanceCount = `(${onlineCount}/${childCount})`
       }
       return row.serviceId + instanceCount
+    },
+    loadTableDelay: function() {
+      const that = this
+      setTimeout(function() {
+        that.loadTable()
+      }, 2000)
     }
   }
 }

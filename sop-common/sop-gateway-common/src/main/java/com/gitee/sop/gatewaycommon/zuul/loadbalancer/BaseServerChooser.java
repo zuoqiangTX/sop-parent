@@ -42,6 +42,7 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
      */
     protected abstract boolean canVisitPre(Server server, HttpServletRequest request);
 
+
     @Override
     public Server choose(Object key) {
         ILoadBalancer lb = getLoadBalancer();
@@ -60,8 +61,6 @@ public abstract class BaseServerChooser extends ZoneAvoidanceRule {
 
         List<Server> grayServers = allServers.stream()
                 .filter(this::isGrayServer)
-                // 这句暂时不需要，放到了PreVersionDecisionFilter中判断
-                //.filter(server -> canVisitGray(server, request))
                 .collect(Collectors.toList());
         if (!grayServers.isEmpty()) {
             return doChoose(grayServers, key);

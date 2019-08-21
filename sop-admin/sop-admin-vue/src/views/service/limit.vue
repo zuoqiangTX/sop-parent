@@ -337,7 +337,7 @@ export default {
   methods: {
     // 加载树
     loadTree: function() {
-      this.post('zookeeper.service.list', {}, function(resp) {
+      this.post('registry.service.list', {}, function(resp) {
         const respData = resp.data
         this.treeData = this.convertToTreeData(respData, 0)
       })

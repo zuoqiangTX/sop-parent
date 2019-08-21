@@ -33,13 +33,19 @@ public class RegistryServiceNacos implements RegistryService {
 
     static HttpTool httpTool = new HttpTool();
 
-    @Value("${nacos.discovery.server-addr:}")
+    @Value("${registry.nacos-server-addr:}")
     private String nacosAddr;
+
+    @Value("${nacos.discovery.server-addr:}")
+    private String nacosAddrNew;
 
     private NamingService namingService;
 
     @PostConstruct
     public void after() throws NacosException {
+        if (StringUtils.isNotBlank(nacosAddrNew)) {
+            nacosAddr = nacosAddrNew;
+        }
         if (StringUtils.isNotBlank(nacosAddr)) {
             namingService = NamingFactory.createNamingService(nacosAddr);
         }

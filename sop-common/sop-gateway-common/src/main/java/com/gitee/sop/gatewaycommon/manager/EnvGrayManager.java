@@ -16,11 +16,11 @@ public interface EnvGrayManager extends BeanInitializer {
 
     /**
      * 实例是否允许
-     * @param instanceId 实例id
+     * @param serviceId serviceId
      * @param userKey 用户key，如appKey
      * @return true：允许访问
      */
-    boolean containsKey(String instanceId, Object userKey);
+    boolean containsKey(String serviceId, Object userKey);
 
     /**
      * 获取灰度发布新版本号

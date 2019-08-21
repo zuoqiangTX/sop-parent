@@ -39,11 +39,13 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
     @Override
     public void load(ServiceRouteInfo serviceRouteInfo) {
         try {
+            String serviceId = serviceRouteInfo.getServiceId();
             String newMd5 = serviceRouteInfo.getMd5();
-            String md5 = serviceIdMd5Map.putIfAbsent(serviceRouteInfo.getServiceId(), newMd5);
-            if (Objects.equals(newMd5, md5)) {
+            String oldMd5 = serviceIdMd5Map.get(serviceId);
+            if (Objects.equals(newMd5, oldMd5)) {
                 return;
             }
+            serviceIdMd5Map.put(serviceId, newMd5);
             List<GatewayRouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
             for (GatewayRouteDefinition gatewayRouteDefinition : routeDefinitionList) {
                 T routeDefinition = this.buildRouteDefinition(serviceRouteInfo, gatewayRouteDefinition);

@@ -1,8 +1,6 @@
 package com.gitee.sop.gateway.loadbalancer;
 
-import com.gitee.sop.gateway.manager.DbEnvGrayManager;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
-import com.gitee.sop.gatewaycommon.param.Param;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.BaseServerChooser;
 import com.netflix.loadbalancer.Server;
 import org.springframework.cloud.alibaba.nacos.ribbon.NacosServer;
@@ -59,19 +57,4 @@ public class EnvironmentServerChooser extends BaseServerChooser {
         return domain.equals(serverName);
     }
 
-    /**
-     * 是否是灰度用户，可修改此方法实现自己想要的
-     *
-     * @param param          接口参数
-     * @param userKeyManager userKey管理
-     * @param server         服务器实例
-     * @param request        request
-     * @return true：是
-     */
-    protected boolean isGrayUser(Param param, DbEnvGrayManager userKeyManager, Server server, HttpServletRequest request) {
-        String instanceId = server.getMetaInfo().getInstanceId();
-        // 这里的灰度用户为appKey，包含此appKey则为灰度用户，允许访问
-        String appKey = param.fetchAppKey();
-        return userKeyManager.containsKey(instanceId, appKey);
-    }
 }

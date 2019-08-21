@@ -1,6 +1,5 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.gitee.easyopen.annotation.Api;
@@ -19,7 +18,6 @@ import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.MetadataEnum;
 import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.bean.ServiceGrayDefinition;
-import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.StatusEnum;
@@ -32,7 +30,6 @@ import com.gitee.sop.registryapi.bean.ServiceInfo;
 import com.gitee.sop.registryapi.bean.ServiceInstance;
 import com.gitee.sop.registryapi.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +38,6 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -70,14 +66,14 @@ public class ServiceApi {
     @NacosInjected
     private NamingService namingService;
 
-    @Api(name = "zookeeper.service.list")
-    @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
+    @Api(name = "registry.service.list")
+    @ApiDocMethod(description = "注册中心的服务列表", elementClass = RouteServiceInfo.class)
     List<RouteServiceInfo> listServiceInfo(ServiceSearchParam param) {
         List<ServiceInfo> servicesOfServer = null;
         try {
             servicesOfServer = registryService.listAllService(1, Integer.MAX_VALUE);
         } catch (Exception e) {
-            log.error("nacos获取服务列表失败", e);
+            log.error("获取服务列表失败", e);
             throw new BizException("获取服务列表失败");
         }
 
@@ -109,46 +105,15 @@ public class ServiceApi {
     @Api(name = "service.custom.add")
     @ApiDocMethod(description = "添加服务")
     void addService(ServiceAddParam param) {
-        // TODO:添加服务
-        String serviceId = param.getServiceId();
-//        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
-        ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
-        Date now = new Date();
-        serviceRouteInfo.setServiceId(serviceId);
-        serviceRouteInfo.setDescription("自定义服务");
-        serviceRouteInfo.setCreateTime(now);
-        serviceRouteInfo.setUpdateTime(now);
-        serviceRouteInfo.setCustom(BooleanUtils.toInteger(true));
-        String serviceData = JSON.toJSONString(serviceRouteInfo);
-
-       /* try {
-            ZookeeperContext.addPath(servicePath, serviceData);
-        } catch (ZookeeperPathExistException e) {
-            throw new BizException("服务已存在");
-        }*/
+        // TODO: 添加服务
+        throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.custom.del")
     @ApiDocMethod(description = "删除自定义服务")
     void delService(ServiceSearchParam param) {
-        // TODO:删除自定义服务
-        /*String serviceId = param.getServiceId();
-        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
-        String data = null;
-        try {
-            data = ZookeeperContext.getData(servicePath);
-        } catch (ZookeeperPathNotExistException e) {
-            throw new BizException("服务不存在");
-        }
-        if (StringUtils.isBlank(data)) {
-            throw new BizException("非自定义服务，无法删除");
-        }
-        ServiceRouteInfo serviceRouteInfo = JSON.parseObject(data, ServiceRouteInfo.class);
-        int custom = serviceRouteInfo.getCustom();
-        if (!BooleanUtils.toBoolean(custom)) {
-            throw new BizException("非自定义服务，无法删除");
-        }
-        ZookeeperContext.deletePathDeep(servicePath);*/
+        // TODO: 删除自定义服务
+        throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.instance.list")
@@ -257,12 +222,12 @@ public class ServiceApi {
     @Api(name = "service.instance.env.gray.open")
     @ApiDocMethod(description = "开启灰度发布")
     void serviceEnvGray(ServiceInstanceParam param) throws IOException {
+        String serviceId = param.getServiceId().toLowerCase();
+        ConfigGray configGray = this.getConfigGray(serviceId);
+        if (configGray == null) {
+            throw new BizException("请先设置灰度参数");
+        }
         try {
-            String serviceId = param.getServiceId().toLowerCase();
-            ConfigGray configGray = this.getConfigGray(serviceId);
-            if (configGray == null) {
-                throw new BizException("请先设置灰度参数");
-            }
             MetadataEnum envPre = MetadataEnum.ENV_GRAY;
             registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
 

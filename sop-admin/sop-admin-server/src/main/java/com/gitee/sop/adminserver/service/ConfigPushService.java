@@ -21,10 +21,10 @@ public class ConfigPushService {
 
     public void publishConfig(String dataId, String groupId, ChannelMsg channelMsg) {
         try {
-            log.info("nacos配置, dataId:{}, groupId:{}, operation:{}", dataId, groupId, channelMsg.getOperation());
+            log.info("nacos配置, dataId={}, groupId={}, operation={}", dataId, groupId, channelMsg.getOperation());
             configService.publishConfig(dataId, groupId, JSON.toJSONString(channelMsg));
         } catch (NacosException e) {
-            log.error("nacos配置失败, dataId:{}, groupId:{}, operation:{}", dataId, groupId, channelMsg.getOperation(), e);
+            log.error("nacos配置失败, dataId={}, groupId={}, operation={}", dataId, groupId, channelMsg.getOperation(), e);
             throw new BizException("nacos配置失败");
         }
     }

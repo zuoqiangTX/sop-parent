@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -43,9 +42,6 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     private static final Function<String[], String> FUNCTION_KEY = arr -> arr[0];
     private static final Function<String[], String> FUNCTION_VALUE = arr -> arr[1];
-
-    @Autowired
-    private Environment environment;
 
     @Autowired
     private ConfigGrayMapper configGrayMapper;

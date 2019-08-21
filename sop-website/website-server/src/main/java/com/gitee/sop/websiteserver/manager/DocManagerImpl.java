@@ -42,10 +42,11 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
     @Override
     public void addDocInfo(String serviceId, String docInfoJson) {
         String newMd5 = DigestUtils.md5DigestAsHex(docInfoJson.getBytes(StandardCharsets.UTF_8));
-        String md5 = serviceIdMd5Map.putIfAbsent(serviceId, newMd5);
-        if (Objects.equals(newMd5, md5)) {
+        String oldMd5 = serviceIdMd5Map.get(serviceId);
+        if (Objects.equals(newMd5, oldMd5)) {
             return;
         }
+        serviceIdMd5Map.put(serviceId, newMd5);
         JSONObject docRoot = JSON.parseObject(docInfoJson, Feature.OrderedField, Feature.DisableCircularReferenceDetect);
         DocParser docParser = this.buildDocParser(docRoot);
         DocInfo docInfo = docParser.parseJson(docRoot);

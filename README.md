@@ -24,7 +24,8 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 架构图
 
-![架构图](https://images.gitee.com/uploads/images/2019/0610/183127_408bc054_332975.png "sop.png")
+![架构图](https://images.gitee.com/uploads/images/2019/0821/201531_0f605f7c_332975.png "sop2.png")
+
 ## 已完成列表
 
 - 签名验证
@@ -66,7 +67,6 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 - doc：开发文档
 - sop-admin：后台管理
-- sop-registry：注册中心，eureka实现
 - sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能
 - sop-example：微服务示例，含springboot,springmvc示例
@@ -79,6 +79,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 - master：发版分支
 - spring-cloud-gateway：Spring Cloud Gateway作为网关
 - develop：日常开发分支
+- 1.x：老的1.x版本代码
 
 ## 相关文档
 

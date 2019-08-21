@@ -15,7 +15,6 @@
 		<module>sop-common</module>
 		<module>sop-example</module>
 		<module>sop-admin</module>
-		<module>sop-registry</module>
 		<module>sop-gateway</module>
 		<module>sop-test</module>
 		<module>sop-sdk</module>

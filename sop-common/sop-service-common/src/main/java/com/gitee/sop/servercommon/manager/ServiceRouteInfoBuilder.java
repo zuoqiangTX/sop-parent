@@ -147,4 +147,8 @@ public class ServiceRouteInfoBuilder {
             throw new IllegalArgumentException(errorMsg);
         }
     }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
 }

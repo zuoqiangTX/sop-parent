@@ -69,5 +69,3 @@ public class GatewayConfig extends AlipayGatewayConfiguration {...}
 ```
 
 修改完毕，重启sop-gateway
-
-运行SpringCloudGatewayClientPostTest测试用例。

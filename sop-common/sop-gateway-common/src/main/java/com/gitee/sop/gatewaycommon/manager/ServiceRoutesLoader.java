@@ -112,7 +112,6 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
                                     log.error("nacos推送失败，serviceId:{}, instance:{}",serviceName, instance);
                                 }
                             });
-
                         }
                     }
                 }

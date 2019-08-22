@@ -1,5 +1,6 @@
 package com.gitee.sop.servercommon.bean;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -28,11 +29,12 @@ public class OpenContextImpl<T> implements OpenContext<T> {
     public OpenContextImpl(JSONObject rootJsonObject, Class<?> bizClass) {
         this.rootJsonObject = rootJsonObject;
         if (bizClass != null) {
-            JSONObject bizJsonObj = this.rootJsonObject.getJSONObject(BIZ_CONTENT_NAME);
-            if (bizJsonObj == null) {
-                bizJsonObj = rootJsonObject;
+            String bizContent = this.rootJsonObject.getString(BIZ_CONTENT_NAME);
+            if (bizContent == null) {
+                bizObject = (T) rootJsonObject.toJavaObject(bizClass);
+            } else {
+                bizObject = (T) JSON.parseObject(bizContent, bizClass);
             }
-            bizObject = (T) bizJsonObj.toJavaObject(bizClass);
         }
     }
 

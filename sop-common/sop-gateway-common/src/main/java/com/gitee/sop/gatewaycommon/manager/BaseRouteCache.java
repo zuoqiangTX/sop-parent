@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * @author tanghc
@@ -37,7 +38,7 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
     }
 
     @Override
-    public void load(ServiceRouteInfo serviceRouteInfo) {
+    public void load(ServiceRouteInfo serviceRouteInfo, Consumer<Object> callback) {
         try {
             String serviceId = serviceRouteInfo.getServiceId();
             String newMd5 = serviceRouteInfo.getMd5();
@@ -51,6 +52,7 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
                 T routeDefinition = this.buildRouteDefinition(serviceRouteInfo, gatewayRouteDefinition);
                 routeRepository.add(routeDefinition);
             }
+            callback.accept(null);
         } catch (Exception e) {
             log.error("加载路由信息失败，serviceRouteInfo:{}", serviceRouteInfo, e);
         }

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -49,6 +50,16 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
     private RestTemplate restTemplate = new RestTemplate();
 
     private Map<String, Long> updateTimeMap = new HashMap<>(16);
+
+    public ServiceRoutesLoader() {
+        // 解决statusCode不等于200，就抛异常问题
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+            @Override
+            protected boolean hasError(HttpStatus statusCode) {
+                return statusCode == null;
+            }
+        });
+    }
 
     public synchronized void load(ApplicationEvent event) {
         NamingService namingService = nacosDiscoveryProperties.namingServiceInstance();
@@ -88,15 +99,20 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
                     configService.removeConfig(dataId, groupId);
                 } else {
                     for (Instance instance : allInstances) {
-                        log.info("加载服务路由，serviceId:{}, instance:{}",serviceName, instance);
                         String url = getRouteRequestUrl(instance);
                         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
                         if (responseEntity.getStatusCode() == HttpStatus.OK) {
                             String body = responseEntity.getBody();
-                            log.debug("加载{}路由，路由信息：{}", serviceName, body);
                             ServiceRouteInfo serviceRouteInfo = JSON.parseObject(body, ServiceRouteInfo.class);
-                            baseRouteCache.load(serviceRouteInfo);
-                            configService.publishConfig(dataId, groupId, body);
+                            baseRouteCache.load(serviceRouteInfo, callback -> {
+                                try {
+                                    log.info("加载服务路由，serviceId:{}, instance:{}",serviceName, instance);
+                                    configService.publishConfig(dataId, groupId, body);
+                                } catch (NacosException e) {
+                                    log.error("nacos推送失败，serviceId:{}, instance:{}",serviceName, instance);
+                                }
+                            });
+
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -138,6 +139,23 @@ public class AllInOneTest extends TestBase {
                 .url("http://localhost:8081/alipay.story.get/1.0/")
                 .bizContent(new BizContent().add("name", "name111"))
                 .httpMethod(HttpTool.HTTPMethod.GET);
+
+        client.execute(requestBuilder);
+    }
+
+    /**
+     * 演示文件上传
+     */
+    public void testFile() {
+        String root = System.getProperty("user.dir");
+        Client.RequestBuilder requestBuilder = new Client.RequestBuilder()
+                .method("demo.file.upload")
+                .version("1.0")
+                .bizContent(new BizContent().add("remark", "test file upload"))
+                // 添加文件
+                .addFile("file1", new File(root + "/src/main/resources/file1.txt"))
+                .addFile("file2", new File(root + "/src/main/resources/file2.txt"))
+                ;
 
         client.execute(requestBuilder);
     }

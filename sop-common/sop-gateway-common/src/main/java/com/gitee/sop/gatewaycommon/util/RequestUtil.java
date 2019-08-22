@@ -2,6 +2,7 @@ package com.gitee.sop.gatewaycommon.util;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.netflix.zuul.http.HttpServletRequestWrapper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -103,11 +104,14 @@ public class RequestUtil {
      * @return 返回参数键值对
      */
     public static Map<String, String> convertRequestParamsToMap(HttpServletRequest request) {
+        if (request instanceof HttpServletRequestWrapper) {
+            request = ((HttpServletRequestWrapper) request).getRequest();
+        }
         Map<String, String[]> paramMap = request.getParameterMap();
         if (paramMap == null || paramMap.isEmpty()) {
             return Collections.emptyMap();
         }
-        Map<String, String> retMap = new HashMap<>(paramMap.size());
+        Map<String, String> retMap = new HashMap<>(paramMap.size() * 2);
 
         Set<Map.Entry<String, String[]>> entrySet = paramMap.entrySet();
 

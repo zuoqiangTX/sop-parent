@@ -83,7 +83,6 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
                 String groupId = NacosConfigs.GROUP_ROUTE;
                 List<Instance> allInstances = namingService.getAllInstances(serviceName);
                 if (CollectionUtils.isEmpty(allInstances)) {
-                    log.info("{}服务下线，删除路由信息", serviceName);
                     // 如果没有服务列表，则删除所有路由信息
                     baseRouteCache.remove(serviceName);
                     configService.removeConfig(dataId, groupId);

@@ -5,7 +5,6 @@ import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.BaseParamBuilder;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -27,9 +26,6 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
     @Override
     public Map<String, ?> buildRequestParams(RequestContext ctx) {
         HttpServletRequest request = ctx.getRequest();
-        if (request instanceof HttpServletRequestWrapper) {
-            request = ((HttpServletRequestWrapper) request).getRequest();
-        }
         Map<String, ?> params;
         if (GET.equalsIgnoreCase(request.getMethod())) {
             params = RequestUtil.convertRequestParamsToMap(request);

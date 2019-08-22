@@ -204,7 +204,7 @@ public class HttpTool {
      * @return
      * @throws IOException
      */
-    public String requestFile(String url, Map<String, String> form, Map<String, String> header, List<UploadFile> files)
+    public String requestFile(String url, Map<String, ?> form, Map<String, String> header, List<UploadFile> files)
             throws IOException {
         // 创建MultipartBody.Builder，用于添加请求的数据
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
@@ -217,9 +217,8 @@ public class HttpTool {
             );
         }
 
-        Set<Map.Entry<String, String>> entrySet = form.entrySet();
-        for (Map.Entry<String, String> entry : entrySet) {
-            bodyBuilder.addFormDataPart(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, ?> entry : form.entrySet()) {
+            bodyBuilder.addFormDataPart(entry.getKey(), String.valueOf(entry.getValue()));
         }
 
         RequestBody requestBody = bodyBuilder.build();

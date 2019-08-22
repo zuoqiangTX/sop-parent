@@ -211,7 +211,6 @@ public class IsvApi {
 
     @Api(name = "isv.keys.update")
     @ApiDocMethod(description = "修改isv")
-    @Transactional(rollbackFor = Exception.class)
     public void updateIsvKeys(IsvKeysFormUpdate param) {
         IsvKeys isvKeys = isvKeysMapper.getByColumn("app_key", param.getAppKey());
         if (isvKeys == null) {

@@ -11,7 +11,6 @@ import com.gitee.sop.adminserver.api.service.param.RoutePermissionParam;
 import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
 import com.gitee.sop.adminserver.api.service.param.RouteUpdateParam;
 import com.gitee.sop.adminserver.api.service.result.RouteVO;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.entity.ConfigRouteBase;
@@ -100,7 +99,7 @@ public class RouteApi {
     @Api(name = "route.update")
     @ApiDocMethod(description = "修改路由")
     void updateRoute(RouteUpdateParam param) {
-        // TODO: 修改路由
+        this.updateRouteConfig(param);
     }
 
     @Api(name = "route.del")
@@ -110,32 +109,32 @@ public class RouteApi {
     }
 
 
-    private void updateRouteConfig(GatewayRouteDefinition routeDefinition) {
+    private void updateRouteConfig(RouteUpdateParam routeUpdateParam) {
         try {
-            String routeId = routeDefinition.getId();
+            String routeId = routeUpdateParam.getId();
             ConfigRouteBase configRouteBase = configRouteBaseMapper.getByColumn("route_id", routeId);
             boolean doSave = configRouteBase == null;
             if (doSave) {
                 configRouteBase = new ConfigRouteBase();
                 configRouteBase.setRouteId(routeId);
             }
-            configRouteBase.setStatus((byte) routeDefinition.getStatus());
+            configRouteBase.setStatus(routeUpdateParam.getStatus().byteValue());
 
             int i = doSave ? configRouteBaseMapper.save(configRouteBase)
                     : configRouteBaseMapper.update(configRouteBase);
 
             if (i > 0) {
-                this.sendMsg(routeDefinition);
+                this.sendMsg(configRouteBase);
             }
         } catch (Exception e) {
             log.error("发送msg失败", e);
         }
     }
 
-    private void sendMsg(GatewayRouteDefinition routeDefinition) {
+    private void sendMsg(ConfigRouteBase routeDefinition) {
         RouteConfigDto routeConfigDto = new RouteConfigDto();
-        routeConfigDto.setRouteId(routeDefinition.getId());
-        routeConfigDto.setStatus(routeDefinition.getStatus());
+        routeConfigDto.setRouteId(routeDefinition.getRouteId());
+        routeConfigDto.setStatus(routeDefinition.getStatus().intValue());
         routeConfigService.sendRouteConfigMsg(routeConfigDto);
     }
 

@@ -67,7 +67,6 @@ public class DocDiscovery {
             try {
                 List<Instance> allInstances = namingService.getAllInstances(serviceName);
                 if (CollectionUtils.isEmpty(allInstances)) {
-                    log.info("{}服务下线，删除文档信息", serviceName);
                     // 如果没有服务列表，则删除所有路由信息
                     docManager.remove(serviceName);
                 } else {

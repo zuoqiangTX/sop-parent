@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * @author tanghc
@@ -40,7 +41,7 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
     private DocDiscovery docDiscovery;
 
     @Override
-    public void addDocInfo(String serviceId, String docInfoJson) {
+    public void addDocInfo(String serviceId, String docInfoJson, Consumer<DocInfo> callback) {
         String newMd5 = DigestUtils.md5DigestAsHex(docInfoJson.getBytes(StandardCharsets.UTF_8));
         String oldMd5 = serviceIdMd5Map.get(serviceId);
         if (Objects.equals(newMd5, oldMd5)) {
@@ -52,6 +53,7 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
         DocInfo docInfo = docParser.parseJson(docRoot);
         docInfo.setServiceId(serviceId);
         docDefinitionMap.put(docInfo.getTitle(), docInfo);
+        callback.accept(docInfo);
     }
 
     protected DocParser buildDocParser(JSONObject rootDoc) {

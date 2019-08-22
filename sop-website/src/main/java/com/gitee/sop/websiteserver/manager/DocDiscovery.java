@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -36,6 +37,16 @@ public class DocDiscovery {
     private RestTemplate restTemplate = new RestTemplate();
 
     private Map<String, Long> updateTimeMap = new HashMap<>(16);
+
+    public DocDiscovery() {
+        // 解决statusCode不等于200，就抛异常问题
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+            @Override
+            protected boolean hasError(HttpStatus statusCode) {
+                return statusCode == null;
+            }
+        });
+    }
 
     public synchronized void refresh(DocManager docManager) {
         NamingService namingService = nacosDiscoveryProperties.namingServiceInstance();
@@ -71,13 +82,15 @@ public class DocDiscovery {
                     docManager.remove(serviceName);
                 } else {
                     for (Instance instance : allInstances) {
-                        log.info("加载服务文档，instance:{}", instance);
                         String url = getRouteRequestUrl(instance);
                         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
                         if (responseEntity.getStatusCode() == HttpStatus.OK) {
                             String body = responseEntity.getBody();
-                            log.debug("加载{}文档，文档信息：{}", serviceName, body);
-                            docManager.addDocInfo(serviceName, body);
+                            docManager.addDocInfo(
+                                    serviceName
+                                    , body
+                                    , callback -> log.info("加载服务文档，instance:{}", instance)
+                            );
                         }
                     }
                 }

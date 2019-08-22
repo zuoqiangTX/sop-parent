@@ -1,9 +1,11 @@
 package com.gitee.sop.servercommon.configuration;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
+import com.gitee.sop.servercommon.manager.ServiceRouteController;
 import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -36,8 +38,21 @@ public class SpringMvcServiceConfiguration {
 
 
     @Bean
+    @ConditionalOnMissingBean
     GlobalExceptionHandler globalExceptionHandler() {
         return new GlobalExceptionHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ErrorController errorController() {
+        return new ErrorController();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ServiceRouteController serviceRouteInfoHandler() {
+        return new ServiceRouteController();
     }
 
     @PostConstruct

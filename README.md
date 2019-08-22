@@ -66,13 +66,14 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 > 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)
 
 - doc：开发文档
-- sop-admin：后台管理
-- sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能
+- sop-gateway：网关，统一访问入口，Spring Cloud Zuul实现，可切换成Spring Cloud Gateway
 - sop-example：微服务示例，含springboot,springmvc示例
+- sop-website：开放平台对应网站，提供文档API、沙箱测试等内容
+- sop-auth：应用授权服务
+- sop-admin：后台管理
 - sop-sdk：基础sdk，含Java、C#版本
 - sop-test：接口调用测试用例
-- sop-website：开放平台对应网站，提供文档API、沙箱测试等内容
 
 ## 分支说明
 

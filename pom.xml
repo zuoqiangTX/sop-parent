@@ -13,6 +13,7 @@
 	<modules>
 		<module>doc</module>
 		<module>sop-common</module>
+		<module>sop-auth</module>
 		<module>sop-example</module>
 		<module>sop-admin</module>
 		<module>sop-gateway</module>

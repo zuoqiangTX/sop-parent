@@ -203,7 +203,18 @@ public class SwaggerDocParser implements DocParser {
         String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
-                .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getString("originalRef")))
+                .flatMap(jsonObject -> {
+                    // #/definitions/Category
+                    String $ref = jsonObject.getString("$ref");
+                    if ($ref == null) {
+                        return Optional.empty();
+                    }
+                    int index = $ref.lastIndexOf("/");
+                    if (index > -1) {
+                        $ref = $ref.substring(index + 1);
+                    }
+                    return Optional.of($ref);
+                })
                 .orElse("");
         return ref;
     }

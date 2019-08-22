@@ -117,7 +117,7 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
 
     @Bean
     @ConditionalOnMissingBean
-    ParameterFormatter sopParameterFormatter() {
+    ParameterFormatter parameterFormatter() {
         return ApiConfig.getInstance().getParameterFormatter();
     }
 

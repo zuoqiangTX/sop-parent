@@ -200,7 +200,7 @@ public class SwaggerDocParser implements DocParser {
     }
 
     protected String getResponseRef(JSONObject docInfo) {
-        String ref = Optional.ofNullable(docInfo.getJSONObject("responses"))
+        return Optional.ofNullable(docInfo.getJSONObject("responses"))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
                 .flatMap(jsonObject -> {
@@ -216,7 +216,6 @@ public class SwaggerDocParser implements DocParser {
                     return Optional.of($ref);
                 })
                 .orElse("");
-        return ref;
     }
 
 }

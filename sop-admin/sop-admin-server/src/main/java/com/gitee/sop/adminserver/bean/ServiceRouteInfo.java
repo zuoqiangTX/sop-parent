@@ -23,7 +23,7 @@ public class ServiceRouteInfo {
     private String description;
 
     @JSONField(serialize = false)
-    private List<GatewayRouteDefinition> routeDefinitionList;
+    private List<RouteDefinition> routeDefinitionList;
 
     /** 是否是自定义服务，1：是，0：否 */
     private int custom;

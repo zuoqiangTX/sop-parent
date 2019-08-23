@@ -9,7 +9,7 @@ import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.adminserver.api.service.param.LimitParam;
 import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
 import com.gitee.sop.adminserver.api.service.result.LimitVO;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
+import com.gitee.sop.adminserver.bean.RouteDefinition;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.LimitEnum;
@@ -51,7 +51,7 @@ public class LimitApi {
     @Api(name = "route.limit.list")
     @ApiDocMethod(description = "限流列表", elementClass = LimitVO.class)
     List<LimitVO> listLimit(RouteSearchParam param) throws Exception {
-        List<GatewayRouteDefinition> routeDefinitionList = routeService.getRouteDefinitionList(param);
+        List<RouteDefinition> routeDefinitionList = routeService.getRouteDefinitionList(param);
         if (CollectionUtils.isEmpty(routeDefinitionList)) {
             return Collections.emptyList();
         }
@@ -74,10 +74,10 @@ public class LimitApi {
         return gatewayRouteDefinitions;
     }
 
-    private List<String> getRouteIdList(List<GatewayRouteDefinition> routeDefinitionList) {
+    private List<String> getRouteIdList(List<RouteDefinition> routeDefinitionList) {
         return routeDefinitionList
                 .stream()
-                .map(GatewayRouteDefinition::getId)
+                .map(RouteDefinition::getId)
                 .collect(Collectors.toList());
     }
 

@@ -17,7 +17,7 @@ public interface TargetRoute<T> {
      *
      * @return 返回微服务路由对象
      */
-    GatewayRouteDefinition getRouteDefinition();
+    RouteDefinition getRouteDefinition();
 
     /**
      * 返回网关路由对象

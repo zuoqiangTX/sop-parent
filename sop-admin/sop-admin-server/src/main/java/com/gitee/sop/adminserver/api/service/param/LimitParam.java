@@ -1,7 +1,6 @@
 package com.gitee.sop.adminserver.api.service.param;
 
 import com.gitee.easyopen.doc.annotation.ApiDocField;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

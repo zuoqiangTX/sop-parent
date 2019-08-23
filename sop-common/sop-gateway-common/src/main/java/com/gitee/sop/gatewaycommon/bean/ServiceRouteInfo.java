@@ -30,7 +30,7 @@ public class ServiceRouteInfo {
      */
     private String md5;
 
-    private List<GatewayRouteDefinition> routeDefinitionList;
+    private List<RouteDefinition> routeDefinitionList;
 
     public String fetchServiceIdLowerCase() {
         return serviceId.toLowerCase();

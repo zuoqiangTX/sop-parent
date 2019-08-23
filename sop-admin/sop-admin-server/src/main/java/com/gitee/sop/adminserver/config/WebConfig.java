@@ -9,6 +9,8 @@ import com.gitee.easyopen.ParamNames;
 import com.gitee.easyopen.interceptor.ApiInterceptor;
 import com.gitee.easyopen.session.ApiSessionManager;
 import com.gitee.sop.adminserver.interceptor.LoginInterceptor;
+import com.gitee.sop.adminserver.service.RegistryService;
+import com.gitee.sop.adminserver.service.impl.RegistryServiceNacosImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,16 @@ public class WebConfig {
         });
 
         return apiConfig;
+    }
+
+    /**
+     * 当配置了registry.name=nacos生效。没有配置同样生效
+     *
+     * @return
+     */
+    @Bean
+    RegistryService registryServiceNacos() {
+        return new RegistryServiceNacosImpl();
     }
 
     @PostConstruct

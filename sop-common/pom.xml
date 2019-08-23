@@ -35,7 +35,6 @@
 	<modules>
 		<module>sop-gateway-common</module>
 		<module>sop-service-common</module>
-        <module>sop-registry-api</module>
     </modules>
 
 	<dependencyManagement>

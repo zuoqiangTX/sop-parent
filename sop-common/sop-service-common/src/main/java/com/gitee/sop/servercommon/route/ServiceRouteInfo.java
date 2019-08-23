@@ -31,6 +31,6 @@ public class ServiceRouteInfo {
     private String md5;
 
     @JSONField(serialize = false)
-    private List<GatewayRouteDefinition> routeDefinitionList;
+    private List<RouteDefinition> routeDefinitionList;
 
 }

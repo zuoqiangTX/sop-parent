@@ -7,7 +7,7 @@ import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.mapper.ConfigRouteBaseMapper;
 import com.gitee.sop.gateway.mapper.ConfigRouteLimitMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
-import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
@@ -47,7 +47,6 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
         Query query = new Query();
         configRouteBaseMapper.list(query)
-                .stream()
                 .forEach(configRouteBase -> {
                     String key = configRouteBase.getRouteId();
                     putVal(key, configRouteBase);
@@ -56,14 +55,13 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     protected void loadAllRoute() {
         Collection<? extends TargetRoute> targetRoutes = RouteRepositoryContext.getRouteRepository().getAll();
-        targetRoutes.stream()
-                .forEach(targetRoute -> {
-                    GatewayRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        targetRoutes.forEach(targetRoute -> {
+                    RouteDefinition routeDefinition = targetRoute.getRouteDefinition();
                     initRouteConfig(routeDefinition);
                 });
     }
 
-    protected void initRouteConfig(GatewayRouteDefinition routeDefinition) {
+    protected void initRouteConfig(RouteDefinition routeDefinition) {
         String routeId = routeDefinition.getId();
         RouteConfig routeConfig = newRouteConfig();
         routeConfig.setRouteId(routeId);

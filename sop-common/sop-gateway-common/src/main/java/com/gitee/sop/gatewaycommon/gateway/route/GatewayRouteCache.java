@@ -2,14 +2,13 @@ package com.gitee.sop.gatewaycommon.gateway.route;
 
 import com.gitee.sop.gatewaycommon.bean.GatewayFilterDefinition;
 import com.gitee.sop.gatewaycommon.bean.GatewayPredicateDefinition;
-import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.manager.BaseRouteCache;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -26,8 +25,8 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
     }
 
     @Override
-    protected GatewayTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
-        RouteDefinition routeDefinition = new RouteDefinition();
+    protected GatewayTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, RouteDefinition gatewayRouteDefinition) {
+        org.springframework.cloud.gateway.route.RouteDefinition routeDefinition = new org.springframework.cloud.gateway.route.RouteDefinition();
         routeDefinition.setId(gatewayRouteDefinition.getId());
         routeDefinition.setUri(URI.create(gatewayRouteDefinition.getUri() + "#" + gatewayRouteDefinition.getPath()));
         routeDefinition.setOrder(gatewayRouteDefinition.getOrder());

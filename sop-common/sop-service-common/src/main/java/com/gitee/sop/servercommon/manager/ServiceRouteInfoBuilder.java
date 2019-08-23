@@ -3,7 +3,7 @@ package com.gitee.sop.servercommon.manager;
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.route.GatewayPredicateDefinition;
-import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
+import com.gitee.sop.servercommon.route.RouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -59,10 +59,10 @@ public class ServiceRouteInfoBuilder {
      */
     protected ServiceRouteInfo buildServiceGatewayInfo(ServiceApiInfo serviceApiInfo) {
         List<ServiceApiInfo.ApiMeta> apis = serviceApiInfo.getApis();
-        List<GatewayRouteDefinition> routeDefinitionList = new ArrayList<>(apis.size());
+        List<RouteDefinition> routeDefinitionList = new ArrayList<>(apis.size());
         routeDefinitionList.add(this.buildReadBodyRouteDefinition(serviceApiInfo));
         for (ServiceApiInfo.ApiMeta apiMeta : apis) {
-            GatewayRouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
+            RouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
             routeDefinitionList.add(gatewayRouteDefinition);
         }
         ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
@@ -79,7 +79,7 @@ public class ServiceRouteInfoBuilder {
      * @param routeDefinitionList 路由列表
      * @return 返回MD5
      */
-    protected String buildMd5(List<GatewayRouteDefinition> routeDefinitionList) {
+    protected String buildMd5(List<RouteDefinition> routeDefinitionList) {
         List<String> routeIdList = routeDefinitionList.stream()
                 .map(JSON::toJSONString)
                 .sorted()
@@ -88,8 +88,8 @@ public class ServiceRouteInfoBuilder {
         return DigestUtils.md5DigestAsHex(md5Source.getBytes(StandardCharsets.UTF_8));
     }
 
-    protected GatewayRouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        GatewayRouteDefinition gatewayRouteDefinition = new GatewayRouteDefinition();
+    protected RouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
+        RouteDefinition gatewayRouteDefinition = new RouteDefinition();
         // 唯一id规则：接口名 + 版本号
         String routeId = apiMeta.fetchNameVersion();
         this.checkPath(routeId, "接口定义（" + routeId + "）不能有斜杠字符'/'");
@@ -119,8 +119,8 @@ public class ServiceRouteInfoBuilder {
      *
      * @return 返回路由定义
      */
-    protected GatewayRouteDefinition buildReadBodyRouteDefinition(ServiceApiInfo serviceApiInfo) {
-        GatewayRouteDefinition readBodyRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
+    protected RouteDefinition buildReadBodyRouteDefinition(ServiceApiInfo serviceApiInfo) {
+        RouteDefinition readBodyRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
         readBodyRouteDefinition.setOrder(Integer.MIN_VALUE);
 
         readBodyRouteDefinition.setPredicates(this.buildPredicates(FIRST_API_META));

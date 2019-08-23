@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.ErrorDefinition;
-import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
@@ -39,18 +39,18 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     private static final ErrorMeta ISP_BIZ_ERROR = ErrorEnum.BIZ_ERROR.getErrorMeta();
     private static final ErrorMeta ISV_MISSING_METHOD_META = ErrorEnum.ISV_MISSING_METHOD.getErrorMeta();
 
-    public static final String GATEWAY_CODE_NAME = "code";
-    public static final String GATEWAY_MSG_NAME = "msg";
-    public static final String ARRAY_START = "[";
-    public static final String ARRAY_END = "]";
-    public static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
-    public static final String ERROR_METHOD = "error";
+    private static final String GATEWAY_CODE_NAME = "code";
+    private static final String GATEWAY_MSG_NAME = "msg";
+    private static final String ARRAY_START = "[";
+    private static final String ARRAY_END = "]";
+    private static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
+    private static final String ERROR_METHOD = "error";
 
 
     /**
      * 获取业务方约定的返回码
      *
-     * @param t
+     * @param t request
      * @return 返回返回码
      */
     public abstract int getResponseStatus(T t);
@@ -58,15 +58,15 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 获取微服务端的错误信息
      *
-     * @param t
-     * @return
+     * @param t request
+     * @return 返回错误信息
      */
     public abstract String getResponseErrorMessage(T t);
 
     /**
      * 返回Api参数
      *
-     * @param t
+     * @param t request
      * @return 返回api参数
      */
     public abstract Map<String, Object> getApiParam(T t);
@@ -139,7 +139,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return defaultSetting;
         }
         ApiInfo apiInfo = this.getApiInfo(request);
-        GatewayRouteDefinition baseRouteDefinition = apiInfo.gatewayRouteDefinition;
+        RouteDefinition baseRouteDefinition = apiInfo.gatewayRouteDefinition;
         return Optional.ofNullable(baseRouteDefinition)
                 .map(routeDefinition -> {
                     int mergeResult = baseRouteDefinition.getMergeResult();
@@ -160,8 +160,8 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
                 .map(ServiceRouteInfo::getServiceId)
                 .orElse(SopConstants.UNKNOWN_SERVICE);
 
-        GatewayRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
-                .map(route -> route.getRouteDefinition())
+        RouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
+                .map(TargetRoute::getRouteDefinition)
                 .orElse(null);
 
         ApiInfo apiInfo = new ApiInfo();
@@ -276,7 +276,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         private String name;
         private String version;
         private String serviceId;
-        private GatewayRouteDefinition gatewayRouteDefinition;
+        private RouteDefinition gatewayRouteDefinition;
     }
 
     enum ErrorType {

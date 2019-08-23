@@ -1,6 +1,6 @@
 package com.gitee.sop.gatewaycommon.manager;
 
-import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
      * @param gatewayRouteDefinition 路由对象
      * @return 返回目标路由对象
      */
-    protected abstract T buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition);
+    protected abstract T buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, RouteDefinition gatewayRouteDefinition);
 
     public BaseRouteCache(RouteRepository<T> routeRepository) {
         this.routeRepository = routeRepository;
@@ -47,8 +47,8 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
                 return;
             }
             serviceIdMd5Map.put(serviceId, newMd5);
-            List<GatewayRouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
-            for (GatewayRouteDefinition gatewayRouteDefinition : routeDefinitionList) {
+            List<RouteDefinition> routeDefinitionList = serviceRouteInfo.getRouteDefinitionList();
+            for (RouteDefinition gatewayRouteDefinition : routeDefinitionList) {
                 T routeDefinition = this.buildRouteDefinition(serviceRouteInfo, gatewayRouteDefinition);
                 routeRepository.add(routeDefinition);
             }

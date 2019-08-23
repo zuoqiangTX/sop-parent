@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
+import com.gitee.sop.adminserver.bean.RouteDefinition;
 import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +24,7 @@ public class RouteService {
     @NacosInjected
     private ConfigService configService;
 
-    public List<GatewayRouteDefinition> getRouteDefinitionList(RouteSearchParam param) throws Exception {
+    public List<RouteDefinition> getRouteDefinitionList(RouteSearchParam param) throws Exception {
         String serviceId = param.getServiceId();
         if (StringUtils.isBlank(serviceId)) {
             return Collections.emptyList();

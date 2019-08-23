@@ -84,19 +84,10 @@
           <el-table-column
             prop="name"
             label="接口名 (版本号)"
-            width="200"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.name + (scope.row.version ? ' (' + scope.row.version + ')' : '') }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="uri"
-            label="LoadBalance"
             width="350"
           >
             <template slot-scope="scope">
-              {{ scope.row.uri + scope.row.path }}
+              {{ scope.row.name + (scope.row.version ? ' (' + scope.row.version + ')' : '') }}
             </template>
           </el-table-column>
           <el-table-column
@@ -141,7 +132,6 @@
           </el-table-column>
           <el-table-column
             label="操作"
-            fixed="right"
             width="100"
           >
             <template slot-scope="scope">

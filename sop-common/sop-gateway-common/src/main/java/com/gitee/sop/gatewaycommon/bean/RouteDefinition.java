@@ -1,4 +1,4 @@
-package com.gitee.sop.servercommon.route;
+package com.gitee.sop.gatewaycommon.bean;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * @author tanghc
  */
 @Data
-public class GatewayRouteDefinition {
+public class RouteDefinition {
     /**
      * 路由的Id（接口名+版本号），确保此id全局唯一
      */

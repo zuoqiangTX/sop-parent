@@ -1,6 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
-import com.gitee.sop.gatewaycommon.bean.GatewayRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.manager.BaseRouteCache;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
@@ -20,7 +20,7 @@ public class ZuulRouteCache extends BaseRouteCache<ZuulTargetRoute> {
     }
 
     @Override
-    protected ZuulTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, GatewayRouteDefinition gatewayRouteDefinition) {
+    protected ZuulTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, RouteDefinition gatewayRouteDefinition) {
         Route route = new Route(
                 gatewayRouteDefinition.getId()
                 , gatewayRouteDefinition.getPath()

@@ -22,7 +22,7 @@
       />
       <el-table-column
         prop="appKey"
-        label="appKey"
+        label="appId(appKey)"
         width="250"
       />
       <el-table-column

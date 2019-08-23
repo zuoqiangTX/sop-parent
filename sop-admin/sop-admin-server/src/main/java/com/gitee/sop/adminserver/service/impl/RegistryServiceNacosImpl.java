@@ -1,4 +1,4 @@
-package com.gitee.sop.registryapi.service.impl;
+package com.gitee.sop.adminserver.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -7,10 +7,10 @@ import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ListView;
-import com.gitee.sop.registryapi.bean.HttpTool;
-import com.gitee.sop.registryapi.bean.ServiceInfo;
-import com.gitee.sop.registryapi.bean.ServiceInstance;
-import com.gitee.sop.registryapi.service.RegistryService;
+import com.gitee.sop.adminserver.bean.HttpTool;
+import com.gitee.sop.adminserver.bean.ServiceInfo;
+import com.gitee.sop.adminserver.bean.ServiceInstance;
+import com.gitee.sop.adminserver.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +29,9 @@ import java.util.Map;
  * @author tanghc
  */
 @Slf4j
-public class RegistryServiceNacos implements RegistryService {
+public class RegistryServiceNacosImpl implements RegistryService {
 
-    static HttpTool httpTool = new HttpTool();
+    private static HttpTool httpTool = new HttpTool();
 
     @Value("${nacos.discovery.server-addr:${registry.nacos-server-addr:}}")
     private String nacosAddr;
@@ -40,9 +40,10 @@ public class RegistryServiceNacos implements RegistryService {
 
     @PostConstruct
     public void after() throws NacosException {
-        if (StringUtils.isNotBlank(nacosAddr)) {
-            namingService = NamingFactory.createNamingService(nacosAddr);
+        if (StringUtils.isBlank(nacosAddr)) {
+            throw new IllegalArgumentException("请在配置文件中指定nacos.discovery.server-addr参数");
         }
+        namingService = NamingFactory.createNamingService(nacosAddr);
     }
 
     @Override

@@ -1,7 +1,7 @@
-package com.gitee.sop.registryapi.service;
+package com.gitee.sop.adminserver.service;
 
-import com.gitee.sop.registryapi.bean.ServiceInfo;
-import com.gitee.sop.registryapi.bean.ServiceInstance;
+import com.gitee.sop.adminserver.bean.ServiceInfo;
+import com.gitee.sop.adminserver.bean.ServiceInstance;
 
 import java.util.List;
 

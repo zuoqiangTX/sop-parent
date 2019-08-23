@@ -1,4 +1,4 @@
-package com.gitee.sop.registryapi.bean;
+package com.gitee.sop.adminserver.bean;
 
 import lombok.Data;
 import lombok.Getter;

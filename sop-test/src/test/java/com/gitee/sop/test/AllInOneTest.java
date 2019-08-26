@@ -109,11 +109,18 @@ public class AllInOneTest extends TestBase {
      * JSR-303参数校验
      */
     public void testJSR303() {
+        Client client = new Client(url, appId, privateKey);
         Client.RequestBuilder requestBuilder = new Client.RequestBuilder()
                 .method("goods.add")
                 .version("1.0")
                 .bizContent(new BizContent().add("goods_name", "iphone6").add("goods_remark", "iphone6").add("goods_comment", "1"))
-                .httpMethod(HttpTool.HTTPMethod.POST);
+                .httpMethod(HttpTool.HTTPMethod.POST)
+                .callback((requestInfo, responseData) -> {
+                    System.out.println(responseData);
+                    JSONObject jsonObject = JSON.parseObject(responseData);
+                    String sub_msg = jsonObject.getJSONObject("goods_add_response").getString("sub_msg");
+                    Assert.assertEquals(sub_msg, "商品评论长度必须在3和20之间");
+                });
 
         client.execute(requestBuilder);
     }

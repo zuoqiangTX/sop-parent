@@ -77,6 +77,7 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
 
     @Override
     public void remove(String serviceId) {
+        serviceIdMd5Map.remove(serviceId);
         docDefinitionMap.entrySet().removeIf(entry -> serviceId.equalsIgnoreCase(entry.getValue().getServiceId()));
     }
 

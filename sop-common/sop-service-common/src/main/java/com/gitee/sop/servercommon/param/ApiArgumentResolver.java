@@ -12,13 +12,17 @@ import org.springframework.core.MethodParameter;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -95,9 +99,27 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
      * @return 没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
+        Class<?> parameterType = methodParameter.getParameterType();
+        // WebRequest / NativeWebRequest / ServletWebRequest
+        if (WebRequest.class.isAssignableFrom(parameterType)) {
+            if (!parameterType.isInstance(nativeWebRequest)) {
+                throw new IllegalStateException(
+                        "Current request is not of type [" + parameterType.getName() + "]: " + nativeWebRequest);
+            }
+            return nativeWebRequest;
+        }
+
+        // ServletRequest / HttpServletRequest / MultipartRequest / MultipartHttpServletRequest
+        if (ServletRequest.class.isAssignableFrom(parameterType) || MultipartRequest.class.isAssignableFrom(parameterType)) {
+            return resolveNativeRequest(nativeWebRequest, parameterType);
+        }
+
+        // ServletResponse, HttpServletResponse
+        if (ServletResponse.class.isAssignableFrom(parameterType)) {
+            return resolveNativeResponse(nativeWebRequest, parameterType);
+        }
         HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         JSONObject requestParams = OpenUtil.getRequestParams(request);
-        Class<?> parameterType = methodParameter.getParameterType();
         // 方法参数类型
         Class<?> bizObjClass = parameterType;
         boolean isOpenRequestParam = parameterType == OpenContext.class;
@@ -110,6 +132,24 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         Object bizObj = openContext.getBizObject();
         this.bindUploadFile(bizObj, nativeWebRequest);
         return isOpenRequestParam ? openContext : bizObj;
+    }
+
+    private <T> T resolveNativeRequest(NativeWebRequest webRequest, Class<T> requiredType) {
+        T nativeRequest = webRequest.getNativeRequest(requiredType);
+        if (nativeRequest == null) {
+            throw new IllegalStateException(
+                    "Current request is not of type [" + requiredType.getName() + "]: " + webRequest);
+        }
+        return nativeRequest;
+    }
+
+    private <T> T resolveNativeResponse(NativeWebRequest webRequest, Class<T> requiredType) {
+        T nativeResponse = webRequest.getNativeResponse(requiredType);
+        if (nativeResponse == null) {
+            throw new IllegalStateException(
+                    "Current response is not of type [" + requiredType.getName() + "]: " + webRequest);
+        }
+        return nativeResponse;
     }
 
     /**

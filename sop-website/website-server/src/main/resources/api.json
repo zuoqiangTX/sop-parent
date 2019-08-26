@@ -6,7 +6,7 @@
     "title": "故事API",
     "termsOfService": "文档"
   },
-  "host": "10.1.30.157:2222",
+  "host": "localhost:2222",
   "basePath": "/",
   "tags": [
     {
@@ -24,145 +24,6 @@
   ],
   "paths": {
     "/alipay.category.get/": {
-      "get": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingGET",
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
-      "head": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingHEAD",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
       "post": {
         "tags": [
           "故事接口"
@@ -216,8 +77,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
+              "$ref": "#/definitions/Category"
             }
           },
           "201": {
@@ -231,290 +91,6 @@
           },
           "404": {
             "description": "Not Found"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
-      "put": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingPUT",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "201": {
-            "description": "Created"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
-      "delete": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingDELETE",
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
-      "options": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingOPTIONS",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "deprecated": false,
-        "sop_name": "alipay.category.get",
-        "sop_version": "1.0"
-      },
-      "patch": {
-        "tags": [
-          "故事接口"
-        ],
-        "summary": "获取分类信息",
-        "description": "演示表格树",
-        "operationId": "getCategoryUsingPATCH",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "*/*"
-        ],
-        "parameters": [
-          {
-            "name": "categoryName",
-            "in": "query",
-            "description": "分类名称",
-            "required": false,
-            "type": "string",
-            "x-example": "娱乐"
-          },
-          {
-            "name": "story.gmt_create",
-            "in": "query",
-            "description": "创建时间",
-            "required": false,
-            "type": "string",
-            "format": "date-time",
-            "x-example": "2019-04-14 19:02:12"
-          },
-          {
-            "name": "story.id",
-            "in": "query",
-            "description": "故事ID",
-            "required": false,
-            "type": "integer",
-            "format": "int64",
-            "x-example": 1
-          },
-          {
-            "name": "story.name",
-            "in": "query",
-            "description": "故事名称",
-            "required": false,
-            "type": "string",
-            "x-example": "海底小纵队"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Category",
-              "originalRef": "Category"
-            }
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           }
         },
         "deprecated": false,
@@ -556,8 +132,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "401": {
@@ -610,8 +185,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "204": {
@@ -664,8 +238,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "201": {
@@ -721,8 +294,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "201": {
@@ -775,8 +347,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "204": {
@@ -829,8 +400,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "204": {
@@ -883,8 +453,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/StoryVO",
-              "originalRef": "StoryVO"
+              "$ref": "#/definitions/StoryVO"
             }
           },
           "204": {
@@ -899,6 +468,400 @@
         },
         "deprecated": false,
         "sop_name": "alipay.story.find",
+        "sop_version": "1.0"
+      }
+    },
+    "/alipay.story.find2/": {
+      "get": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "head": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingHEAD",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "post": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "put": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "delete": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingDELETE",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "options": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingOPTIONS",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
+        "sop_version": "1.0"
+      },
+      "patch": {
+        "tags": [
+          "故事接口"
+        ],
+        "summary": "返回数组结果",
+        "description": "返回数组结果",
+        "operationId": "getStory3UsingPATCH",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "故事ID",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-example": 111
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "故事名称",
+            "required": true,
+            "type": "string",
+            "x-example": "白雪公主"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StoryVO"
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false,
+        "sop_name": "alipay.story.find2",
         "sop_version": "1.0"
       }
     },
@@ -939,8 +902,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "401": {
@@ -996,8 +958,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1053,8 +1014,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "201": {
@@ -1113,8 +1073,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "201": {
@@ -1170,8 +1129,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1227,8 +1185,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1284,8 +1241,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1326,8 +1282,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "401": {
@@ -1370,8 +1325,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1414,8 +1368,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "201": {
@@ -1461,8 +1414,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "201": {
@@ -1505,8 +1457,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1549,8 +1500,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1593,8 +1543,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/FileUploadVO",
-              "originalRef": "FileUploadVO"
+              "$ref": "#/definitions/FileUploadVO"
             }
           },
           "204": {
@@ -1628,8 +1577,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "401": {
@@ -1663,8 +1611,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "204": {
@@ -1698,8 +1645,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "201": {
@@ -1736,8 +1682,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "201": {
@@ -1771,8 +1716,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "204": {
@@ -1806,8 +1750,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "204": {
@@ -1841,8 +1784,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Story",
-              "originalRef": "Story"
+              "$ref": "#/definitions/Story"
             }
           },
           "204": {
@@ -1872,8 +1814,7 @@
         },
         "story": {
           "description": "分类故事",
-          "$ref": "#/definitions/StoryVO",
-          "originalRef": "StoryVO"
+          "$ref": "#/definitions/StoryVO"
         }
       },
       "title": "Category"
@@ -1900,8 +1841,7 @@
         "files": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/FileMeta",
-            "originalRef": "FileMeta"
+            "$ref": "#/definitions/FileMeta"
           }
         }
       },

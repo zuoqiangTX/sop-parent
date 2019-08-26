@@ -119,6 +119,7 @@ public class SandboxController {
             result.apiResult = responseData;
             return result;
         } catch (Exception e) {
+            log.error("请求失败", e);
             throw new RuntimeException("请求失败");
         }
     }

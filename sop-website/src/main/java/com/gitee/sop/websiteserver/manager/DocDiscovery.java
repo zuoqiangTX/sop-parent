@@ -62,24 +62,24 @@ public class DocDiscovery {
         // subscribe
         String thisServiceId = nacosDiscoveryProperties.getService();
         for (ServiceInfo serviceInfo : subscribes) {
-            String serviceName = serviceInfo.getName();
+            String serviceId = serviceInfo.getName();
             // 如果是本机服务，跳过
-            if (Objects.equals(thisServiceId, serviceName) || "api-gateway".equalsIgnoreCase(serviceName)) {
+            if (Objects.equals(thisServiceId, serviceId) || "api-gateway".equalsIgnoreCase(serviceId)) {
                 continue;
             }
             // nacos会不停的触发事件，这里做了一层拦截
             // 同一个serviceId5秒内允许访问一次
-            Long lastUpdateTime = updateTimeMap.getOrDefault(serviceName, 0L);
+            Long lastUpdateTime = updateTimeMap.getOrDefault(serviceId, 0L);
             long now = System.currentTimeMillis();
             if (now - lastUpdateTime < FIVE_SECONDS) {
                 continue;
             }
-            updateTimeMap.put(serviceName, now);
+            updateTimeMap.put(serviceId, now);
             try {
-                List<Instance> allInstances = namingService.getAllInstances(serviceName);
+                List<Instance> allInstances = namingService.getAllInstances(serviceId);
                 if (CollectionUtils.isEmpty(allInstances)) {
                     // 如果没有服务列表，则删除所有路由信息
-                    docManager.remove(serviceName);
+                    docManager.remove(serviceId);
                 } else {
                     for (Instance instance : allInstances) {
                         String url = getRouteRequestUrl(instance);
@@ -87,16 +87,16 @@ public class DocDiscovery {
                         if (responseEntity.getStatusCode() == HttpStatus.OK) {
                             String body = responseEntity.getBody();
                             docManager.addDocInfo(
-                                    serviceName
+                                    serviceId
                                     , body
                                     , callback -> log.info("加载服务文档，serviceId={}, 机器={}"
-                                            , serviceName, instance.getIp() + ":" + instance.getPort())
+                                            , serviceId, instance.getIp() + ":" + instance.getPort())
                             );
                         }
                     }
                 }
             } catch (NacosException e) {
-                log.error("选择服务实例失败，serviceName:{}", serviceName, e);
+                log.error("选择服务实例失败，serviceId:{}", serviceId, e);
             }
         }
     }

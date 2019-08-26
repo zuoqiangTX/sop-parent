@@ -89,7 +89,8 @@ public class DocDiscovery {
                             docManager.addDocInfo(
                                     serviceName
                                     , body
-                                    , callback -> log.info("加载服务文档，instance:{}", instance)
+                                    , callback -> log.info("加载服务文档，serviceId={}, 机器={}"
+                                            , serviceName, instance.getIp() + ":" + instance.getPort())
                             );
                         }
                     }

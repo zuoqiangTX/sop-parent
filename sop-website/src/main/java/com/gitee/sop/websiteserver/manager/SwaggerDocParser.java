@@ -137,14 +137,13 @@ public class SwaggerDocParser implements DocParser {
                 })
                 .collect(Collectors.groupingBy(DocParameter::getModule));
 
-        collect.entrySet()
-                .forEach(entry -> {
-                    DocParameter moduleDoc = new DocParameter();
-                    moduleDoc.setName(entry.getKey());
-                    moduleDoc.setType("object");
-                    moduleDoc.setRefs(entry.getValue());
-                    docParameterList.add(moduleDoc);
-                });
+        collect.forEach((key, value) -> {
+            DocParameter moduleDoc = new DocParameter();
+            moduleDoc.setName(key);
+            moduleDoc.setType("object");
+            moduleDoc.setRefs(value);
+            docParameterList.add(moduleDoc);
+        });
 
         return docParameterList.stream()
                 .filter(docParameter -> !docParameter.getName().contains("."))
@@ -242,32 +241,29 @@ public class SwaggerDocParser implements DocParser {
         return Optional.ofNullable(docInfo.getJSONObject("responses"))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("200")))
                 .flatMap(jsonObject -> Optional.ofNullable(jsonObject.getJSONObject("schema")))
-                .flatMap(schema -> {
-                    RefInfo refInfo = getRefInfo(schema);
-                    return Optional.ofNullable(refInfo);
-                })
+                .map(this::getRefInfo)
                 .orElse(null);
     }
 
     private RefInfo getRefInfo(JSONObject jsonObject) {
-        String $ref;
+        String ref;
         boolean isArray = "array".equals(jsonObject.getString("type"));
         if (isArray) {
-            $ref = jsonObject.getJSONObject("items").getString("$ref");
+            ref = jsonObject.getJSONObject("items").getString("$ref");
         } else {
             // #/definitions/Category
-            $ref = jsonObject.getString("$ref");
+            ref = jsonObject.getString("$ref");
         }
-        if ($ref == null) {
+        if (ref == null) {
             return null;
         }
-        int index = $ref.lastIndexOf("/");
+        int index = ref.lastIndexOf("/");
         if (index > -1) {
-            $ref = $ref.substring(index + 1);
+            ref = ref.substring(index + 1);
         }
         RefInfo refInfo = new RefInfo();
         refInfo.isArray = isArray;
-        refInfo.ref = $ref;
+        refInfo.ref = ref;
         return refInfo;
     }
 

@@ -1,5 +1,6 @@
 package com.gitee.sop.storyweb.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -25,8 +26,11 @@ public class FileUploadVO {
         public FileMeta() {
         }
 
+        @ApiModelProperty(value = "文件名称", example = "1.txt")
         private String filename;
+        @ApiModelProperty(value = "文件大小", example = "109")
         private long size;
+        @ApiModelProperty(value = "文件内容", example = "啊啊啊")
         private String content;
     }
 }

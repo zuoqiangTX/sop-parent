@@ -109,6 +109,8 @@ public class AlipayController {
     @ApiAbility
     @GetMapping("getStory2")
     public Story getStory2_0() {
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        System.out.println(openContext.getAppId());
         Story story = new Story();
         story.setId(1);
         story.setName("海底小纵队(默认版本号)");

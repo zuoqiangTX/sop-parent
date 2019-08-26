@@ -25,6 +25,10 @@ public class OpenContextImpl<T> implements OpenContext<T> {
     private JSONObject rootJsonObject;
     private T bizObject;
 
+    public OpenContextImpl(JSONObject rootJsonObject) {
+        this(rootJsonObject, null);
+    }
+
     public OpenContextImpl(JSONObject rootJsonObject, Class<?> bizClass) {
         this.rootJsonObject = rootJsonObject;
         if (bizClass != null) {

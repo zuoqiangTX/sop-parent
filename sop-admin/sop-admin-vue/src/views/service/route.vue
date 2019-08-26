@@ -93,7 +93,7 @@
           <el-table-column
             prop="roles"
             label="访问权限"
-            width="100"
+            width="150"
           >
             <template slot-scope="scope">
               <span v-html="roleRender(scope.row)"></span>
@@ -105,7 +105,7 @@
             width="80"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.ignoreValidate === 0" style="color:#67C23A">校验</span>
+              <span v-if="scope.row.ignoreValidate === 0">校验</span>
               <span v-if="scope.row.ignoreValidate === 1" style="color:#E6A23C">不校验</span>
             </template>
           </el-table-column>
@@ -115,7 +115,7 @@
             width="120"
           >
             <template slot-scope="scope">
-              <span v-if="scope.row.mergeResult === 1" style="color:#67C23A">是</span>
+              <span v-if="scope.row.mergeResult === 1">是</span>
               <span v-if="scope.row.mergeResult === 0" style="color:#E6A23C">否</span>
             </template>
           </el-table-column>
@@ -154,33 +154,18 @@
         ref="routeDialogFormRef"
         :model="routeDialogFormData"
         :rules="routeDialogFormRules"
-        label-width="120px"
+        label-width="180px"
         size="mini"
       >
         <el-input v-show="false" v-model="routeDialogFormData.id" />
-        <el-form-item label="接口名" prop="name">
-          <el-input v-model="routeDialogFormData.name" placeholder="接口名，如：product.goods.list" :disabled="Boolean(routeDialogFormData.id)" />
-        </el-form-item>
-        <el-form-item label="版本号" prop="version">
-          <el-input v-model="routeDialogFormData.version" placeholder="版本号，如：1.0" :disabled="Boolean(routeDialogFormData.id)" />
-        </el-form-item>
-        <el-form-item label="uri" prop="uri">
-          <el-input v-model="routeDialogFormData.uri" placeholder="如：http://www.xx.com" :disabled="routePropDisabled()" />
-        </el-form-item>
-        <el-form-item label="path" prop="path">
-          <el-input v-model="routeDialogFormData.path" placeholder="如：/order/list" :disabled="routePropDisabled()" />
+        <el-form-item label="接口名 (版本号)">
+          {{ routeDialogFormData.name + (routeDialogFormData.version ? ' (' + routeDialogFormData.version + ')' : '') }}
         </el-form-item>
         <el-form-item label="签名校验">
-          <el-radio-group v-model="routeDialogFormData.ignoreValidate" :disabled="routePropDisabled()">
-            <el-radio :label="0" name="ignoreValidate">校验</el-radio>
-            <el-radio :label="1" name="ignoreValidate">不校验</el-radio>
-          </el-radio-group>
+          {{ routeDialogFormData.ignoreValidate ? '不校验' : '校验' }}
         </el-form-item>
         <el-form-item label="统一格式输出">
-          <el-radio-group v-model="routeDialogFormData.mergeResult" :disabled="routePropDisabled()">
-            <el-radio :label="1" name="mergeResult">是</el-radio>
-            <el-radio :label="0" name="mergeResult">否</el-radio>
-          </el-radio-group>
+          {{ routeDialogFormData.mergeResult === 1 ? '是' : '否' }}
         </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="routeDialogFormData.status">

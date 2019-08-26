@@ -90,9 +90,9 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     /**
      * 获取参数对象，将request中的参数绑定到实体对象中去
      *
-     * @param methodParameter
-     * @param nativeWebRequest
-     * @return 没有返回null
+     * @param methodParameter 方法参数
+     * @param nativeWebRequest request
+     * @return 返回参数绑定的对象，没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
         HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();

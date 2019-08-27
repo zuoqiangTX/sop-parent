@@ -10,7 +10,6 @@ import com.gitee.sop.servercommon.util.OpenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -40,8 +39,10 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 解析request参数中的业务参数，绑定到方法参数上
@@ -51,10 +52,13 @@ import java.util.TimeZone;
 @Slf4j
 public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
+    private Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache = new ConcurrentHashMap<>(256);
+
     private ParamValidator paramValidator = new ServiceParamValidator();
 
-    @Nullable
     private static Class<?> pushBuilder;
+
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     static {
         try {
@@ -69,7 +73,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     @Override
     public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         List<HandlerMethodArgumentResolver> argumentResolversNew = new ArrayList<>(64);
-        // 先加自己
+        // 先加自己，确保在第一个位置
         argumentResolversNew.add(this);
         HandlerMethodArgumentResolver lastOne = null;
         for (HandlerMethodArgumentResolver argumentResolver : Objects.requireNonNull(requestMappingHandlerAdapter.getArgumentResolvers())) {
@@ -84,6 +88,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
             argumentResolversNew.add(lastOne);
         }
         requestMappingHandlerAdapter.setArgumentResolvers(argumentResolversNew);
+        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
     }
 
     @Override
@@ -122,14 +127,29 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter methodParameter
+            , ModelAndViewContainer modelAndViewContainer
+            , NativeWebRequest nativeWebRequest
+            , WebDataBinderFactory webDataBinderFactory
+    ) throws Exception {
         Object paramObj = this.getParamObject(methodParameter, nativeWebRequest);
         if (paramObj != null) {
             // JSR-303验证
             paramValidator.validateBizParam(paramObj);
             return paramObj;
+        } else {
+            HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
+            if (resolver != null) {
+                return resolver.resolveArgument(
+                        methodParameter
+                        , modelAndViewContainer
+                        , nativeWebRequest
+                        , webDataBinderFactory
+                );
+            }
+            return null;
         }
-        return null;
     }
 
 
@@ -202,6 +222,29 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         return request instanceof MultipartRequest;
     }
 
+    /**
+     * 获取其它的参数解析器
+     *
+     * @param parameter 业务参数
+     * @return 返回合适参数解析器，没有返回null
+     */
+    protected HandlerMethodArgumentResolver getOtherArgumentResolver(MethodParameter parameter) {
+        HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
+        if (result == null) {
+            List<HandlerMethodArgumentResolver> argumentResolvers = this.requestMappingHandlerAdapter.getArgumentResolvers();
+            for (HandlerMethodArgumentResolver methodArgumentResolver : argumentResolvers) {
+                if (methodArgumentResolver instanceof SopHandlerMethodArgumentResolver) {
+                    continue;
+                }
+                if (methodArgumentResolver.supportsParameter(parameter)) {
+                    result = methodArgumentResolver;
+                    this.argumentResolverCache.put(parameter, result);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 
     public void setParamValidator(ParamValidator paramValidator) {
         this.paramValidator = paramValidator;

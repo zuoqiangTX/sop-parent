@@ -105,22 +105,21 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         }
         // 排除的
         boolean exclude = (
-                paramType.isInterface() ||
-                        WebRequest.class.isAssignableFrom(paramType) ||
-                        ServletRequest.class.isAssignableFrom(paramType) ||
-                        MultipartRequest.class.isAssignableFrom(paramType) ||
-                        HttpSession.class.isAssignableFrom(paramType) ||
-                        (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
-                        Principal.class.isAssignableFrom(paramType) ||
-                        InputStream.class.isAssignableFrom(paramType) ||
-                        Reader.class.isAssignableFrom(paramType) ||
-                        HttpMethod.class == paramType ||
-                        Locale.class == paramType ||
-                        TimeZone.class == paramType ||
-                        ZoneId.class == paramType ||
-                        ServletResponse.class.isAssignableFrom(paramType) ||
-                        OutputStream.class.isAssignableFrom(paramType) ||
-                        Writer.class.isAssignableFrom(paramType)
+            WebRequest.class.isAssignableFrom(paramType) ||
+            ServletRequest.class.isAssignableFrom(paramType) ||
+            MultipartRequest.class.isAssignableFrom(paramType) ||
+            HttpSession.class.isAssignableFrom(paramType) ||
+            (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
+            Principal.class.isAssignableFrom(paramType) ||
+            InputStream.class.isAssignableFrom(paramType) ||
+            Reader.class.isAssignableFrom(paramType) ||
+            HttpMethod.class == paramType ||
+            Locale.class == paramType ||
+            TimeZone.class == paramType ||
+            ZoneId.class == paramType ||
+            ServletResponse.class.isAssignableFrom(paramType) ||
+            OutputStream.class.isAssignableFrom(paramType) ||
+            Writer.class.isAssignableFrom(paramType)
         );
         // 除此之外都匹配
         return !exclude;

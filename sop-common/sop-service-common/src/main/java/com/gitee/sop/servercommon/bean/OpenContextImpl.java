@@ -31,13 +31,15 @@ public class OpenContextImpl<T> implements OpenContext<T> {
     }
 
     public OpenContextImpl(JSONObject rootJsonObject, Class<?> bizClass) {
+        if (rootJsonObject == null) {
+            throw new IllegalArgumentException("rootJsonObject can not be null");
+        }
         this.rootJsonObject = rootJsonObject;
         if (bizClass != null) {
-            JSONObject bizJsonObj = this.rootJsonObject.getJSONObject(BIZ_CONTENT_NAME);
-            if (bizJsonObj == null) {
-                bizJsonObj = rootJsonObject;
+            String bizContent = getBizContent();
+            if (bizContent != null) {
+                bizObject = (T) JSON.parseObject(bizContent, bizClass);
             }
-            bizObject = (T) bizJsonObj.toJavaObject(bizClass);
         }
     }
 
@@ -106,10 +108,10 @@ public class OpenContextImpl<T> implements OpenContext<T> {
         if (bizObject != null && bizObject.getClass() == clazz) {
             return (E) bizObject;
         }
-        String bizJsonObj = this.rootJsonObject.getString(BIZ_CONTENT_NAME);
-        if (bizJsonObj == null) {
+        String bizContent = getBizContent();
+        if (bizContent == null) {
             return null;
         }
-        return JSON.parseObject(bizJsonObj, clazz);
+        return JSON.parseObject(bizContent, clazz);
     }
 }

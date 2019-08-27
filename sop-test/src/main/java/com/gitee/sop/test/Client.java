@@ -344,6 +344,14 @@ public class Client {
         private Map<String, ?> form;
         private Map<String, String> header;
         private HttpTool.HTTPMethod httpMethod;
+
+        /**
+         * 返回json跟节点名称
+         * @return 返回json跟节点名称
+         */
+        public String getDataNode() {
+            return method == null ? null : method.replace('.', '_') + "_response";
+        }
     }
 
 }

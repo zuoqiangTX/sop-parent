@@ -7,6 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author tanghc
+ */
 @RestController
 public class EasyopenServiceRouteController extends ServiceRouteController implements ApplicationContextAware {
 

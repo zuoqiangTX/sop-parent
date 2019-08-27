@@ -78,7 +78,10 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
         this.update(isvRoutePermission);
     }
 
-    // 获取ISV对应的角色
+    /**
+     * 获取ISV对应的角色
+     * @return 返回ISV角色信息，key：appId，value：角色code列表
+     */
     public Map<String, List<String>> getIsvRoleCode() {
         Query query = new Query();
         List<PermIsvRole> permIsvRoles = permIsvRoleMapper.list(query);

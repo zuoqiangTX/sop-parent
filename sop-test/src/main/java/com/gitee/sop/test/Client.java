@@ -118,6 +118,12 @@ public class Client {
     }
 
     public interface Callback {
+        /**
+         * 请求成功后回调
+         *
+         * @param requestInfo  请求信息
+         * @param responseData 返回结果
+         */
         void callback(RequestInfo requestInfo, String responseData);
     }
 
@@ -347,6 +353,7 @@ public class Client {
 
         /**
          * 返回json跟节点名称
+         *
          * @return 返回json跟节点名称
          */
         public String getDataNode() {

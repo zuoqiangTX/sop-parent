@@ -51,14 +51,17 @@ public class HttpTool {
 
     protected void initHttpClient(HttpToolConfig httpToolConfig) {
         httpClient = new OkHttpClient.Builder()
-                .connectTimeout(httpToolConfig.connectTimeoutSeconds, TimeUnit.SECONDS) // 设置链接超时时间，默认10秒
+                // 设置链接超时时间，默认10秒
+                .connectTimeout(httpToolConfig.connectTimeoutSeconds, TimeUnit.SECONDS)
                 .readTimeout(httpToolConfig.readTimeoutSeconds, TimeUnit.SECONDS)
                 .writeTimeout(httpToolConfig.writeTimeoutSeconds, TimeUnit.SECONDS)
                 .cookieJar(new CookieJar() {
+                    @Override
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         cookieStore.put(httpUrl.host(), list);
                     }
 
+                    @Override
                     public List<Cookie> loadForRequest(HttpUrl httpUrl) {
                         List<Cookie> cookies = cookieStore.get(httpUrl.host());
                         return cookies != null ? cookies : new ArrayList<Cookie>();
@@ -211,9 +214,12 @@ public class HttpTool {
         bodyBuilder.setType(MultipartBody.FORM);
 
         for (UploadFile uploadFile : files) {
-            bodyBuilder.addFormDataPart(uploadFile.getName(), // 请求的名字
-                    uploadFile.getFileName(), // 文件的文字，服务器端用来解析的
-                    RequestBody.create(null, uploadFile.getFileData()) // 创建RequestBody，把上传的文件放入
+            // 请求的名字
+            bodyBuilder.addFormDataPart(uploadFile.getName(),
+                    // 文件的文字，服务器端用来解析的
+                    uploadFile.getFileName(),
+                    // 创建RequestBody，把上传的文件放入
+                    RequestBody.create(null, uploadFile.getFileData())
             );
         }
 
@@ -255,10 +261,15 @@ public class HttpTool {
     }
 
     public enum HTTPMethod {
+        /** http GET */
         GET,
+        /** http POST */
         POST,
+        /** http PUT */
         PUT,
+        /** http HEAD */
         HEAD,
+        /** http DELETE */
         DELETE;
 
         private HTTPMethod() {

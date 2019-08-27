@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
-      <el-form-item label="appKey">
-        <el-input v-model="searchFormData.appKey" :clearable="true" placeholder="appKey" style="width: 250px;" />
+      <el-form-item label="appId">
+        <el-input v-model="searchFormData.appKey" :clearable="true" placeholder="appId" style="width: 250px;" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="onSearchTable">查询</el-button>
@@ -22,7 +22,7 @@
       />
       <el-table-column
         prop="appKey"
-        label="appId(appKey)"
+        label="appId"
         width="250"
       />
       <el-table-column
@@ -105,7 +105,7 @@
         label-width="120px"
         size="mini"
       >
-        <el-form-item label="appKey">
+        <el-form-item label="appId">
           <span v-if="isvDialogFormData.id === 0" style="color: gray;">(系统自动生成)</span>
           <span v-else>{{ isvDialogFormData.appKey }}</span>
         </el-form-item>
@@ -149,7 +149,7 @@
             :closable="false"
           />
         </el-form-item>
-        <el-form-item :label="selfLabel('appKey')">
+        <el-form-item :label="selfLabel('appId')">
           <span>{{ isvKeysFormData.appKey }}</span>
         </el-form-item>
         <el-form-item v-show="showKeys()" label="秘钥格式">

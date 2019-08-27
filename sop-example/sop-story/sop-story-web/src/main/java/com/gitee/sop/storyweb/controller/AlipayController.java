@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -102,8 +103,17 @@ public class AlipayController {
         Story bizObject = openContext.getBizObject();
         // 获取appid，更多方法查看OpenContext类
         String appId = openContext.getAppId();
-        System.out.println(appId);
+        bizObject.setName("appId:" + appId + ", " + bizObject.getName());
         return bizObject;
+    }
+
+    @ApiMapping(value = "story.get", version = "2.3")
+    public Story getStory23(Story story, HttpServletRequest request) {
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        String appId = openContext.getAppId();
+        System.out.println(appId);
+        story.setName("appId:" + appId + ", " + story.getName() + "，ip:" + request.getLocalAddr());
+        return story;
     }
 
     // http://localhost:2222/getStory2

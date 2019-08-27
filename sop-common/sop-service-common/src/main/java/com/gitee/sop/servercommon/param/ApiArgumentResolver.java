@@ -9,6 +9,9 @@ import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.util.OpenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -20,17 +23,25 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
+import org.springframework.web.servlet.mvc.method.annotation.ServletRequestMethodArgumentResolver;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.Principal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TimeZone;
 
 /**
  * 解析request参数中的业务参数，绑定到方法参数上
@@ -40,15 +51,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
-    private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache = new ConcurrentHashMap<>(256);
-
     private ParamValidator paramValidator = new ServiceParamValidator();
 
-    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+    @Nullable
+    private static Class<?> pushBuilder;
+
+    static {
+        try {
+            pushBuilder = ClassUtils.forName("javax.servlet.http.PushBuilder",
+                    ServletRequestMethodArgumentResolver.class.getClassLoader());
+        } catch (ClassNotFoundException ex) {
+            // Servlet 4.0 PushBuilder not found - not supported for injection
+            pushBuilder = null;
+        }
+    }
 
     @Override
     public void setRequestMappingHandlerAdapter(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
-        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
         List<HandlerMethodArgumentResolver> argumentResolversNew = new ArrayList<>(64);
         // 先加自己
         argumentResolversNew.add(this);
@@ -64,14 +83,42 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         if (lastOne != null) {
             argumentResolversNew.add(lastOne);
         }
-        this.requestMappingHandlerAdapter.setArgumentResolvers(argumentResolversNew);
+        requestMappingHandlerAdapter.setArgumentResolvers(argumentResolversNew);
     }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        // 有注解
-        return methodParameter.getMethodAnnotation(ApiMapping.class) != null
-                || methodParameter.getMethodAnnotation(ApiAbility.class) != null;
+        // 是否有注解
+        boolean hasAnnotation = methodParameter.hasMethodAnnotation(ApiMapping.class)
+                || methodParameter.hasMethodAnnotation(ApiAbility.class);
+        if (!hasAnnotation) {
+            return false;
+        }
+        Class<?> paramType = methodParameter.getParameterType();
+        if (paramType == OpenContext.class) {
+            return true;
+        }
+        // 排除的
+        boolean exclude = (
+                paramType.isInterface() ||
+                        WebRequest.class.isAssignableFrom(paramType) ||
+                        ServletRequest.class.isAssignableFrom(paramType) ||
+                        MultipartRequest.class.isAssignableFrom(paramType) ||
+                        HttpSession.class.isAssignableFrom(paramType) ||
+                        (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
+                        Principal.class.isAssignableFrom(paramType) ||
+                        InputStream.class.isAssignableFrom(paramType) ||
+                        Reader.class.isAssignableFrom(paramType) ||
+                        HttpMethod.class == paramType ||
+                        Locale.class == paramType ||
+                        TimeZone.class == paramType ||
+                        ZoneId.class == paramType ||
+                        ServletResponse.class.isAssignableFrom(paramType) ||
+                        OutputStream.class.isAssignableFrom(paramType) ||
+                        Writer.class.isAssignableFrom(paramType)
+        );
+        // 除此之外都匹配
+        return !exclude;
     }
 
     @Override
@@ -81,80 +128,39 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
             // JSR-303验证
             paramValidator.validateBizParam(paramObj);
             return paramObj;
-        } else {
-            HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
-            if (resolver != null) {
-                return resolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
-            }
-            return null;
         }
+        return null;
     }
 
 
     /**
      * 获取参数对象，将request中的参数绑定到实体对象中去
      *
-     * @param methodParameter 方法参数
+     * @param methodParameter  方法参数
      * @param nativeWebRequest request
      * @return 返回参数绑定的对象，没有返回null
      */
     protected Object getParamObject(MethodParameter methodParameter, NativeWebRequest nativeWebRequest) {
-        Class<?> parameterType = methodParameter.getParameterType();
-        // WebRequest / NativeWebRequest / ServletWebRequest
-        if (WebRequest.class.isAssignableFrom(parameterType)) {
-            if (!parameterType.isInstance(nativeWebRequest)) {
-                throw new IllegalStateException(
-                        "Current request is not of type [" + parameterType.getName() + "]: " + nativeWebRequest);
-            }
-            return nativeWebRequest;
-        }
-
-        // ServletRequest / HttpServletRequest / MultipartRequest / MultipartHttpServletRequest
-        if (ServletRequest.class.isAssignableFrom(parameterType) || MultipartRequest.class.isAssignableFrom(parameterType)) {
-            return resolveNativeRequest(nativeWebRequest, parameterType);
-        }
-
-        // ServletResponse, HttpServletResponse
-        if (ServletResponse.class.isAssignableFrom(parameterType)) {
-            return resolveNativeResponse(nativeWebRequest, parameterType);
-        }
-
         HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         JSONObject requestParams = OpenUtil.getRequestParams(request);
         // 方法参数类型
+        Class<?> parameterType = methodParameter.getParameterType();
+        boolean isOpenContextParam = parameterType == OpenContext.class;
         Class<?> bizObjClass = parameterType;
-        boolean isOpenRequestParam = parameterType == OpenContext.class;
         // 参数是OpenRequest，则取OpenRequest的泛型参数类型
-        if (isOpenRequestParam) {
+        if (isOpenContextParam) {
             bizObjClass = this.getOpenRequestGenericParameterClass(methodParameter);
         }
         OpenContext openContext = new OpenContextImpl(requestParams, bizObjClass);
         ServiceContext.getCurrentContext().setOpenContext(openContext);
         Object bizObj = openContext.getBizObject();
-        this.bindUploadFile(bizObj, nativeWebRequest);
-        return isOpenRequestParam ? openContext : bizObj;
-    }
-
-    private <T> T resolveNativeRequest(NativeWebRequest webRequest, Class<T> requiredType) {
-        T nativeRequest = webRequest.getNativeRequest(requiredType);
-        if (nativeRequest == null) {
-            throw new IllegalStateException(
-                    "Current request is not of type [" + requiredType.getName() + "]: " + webRequest);
-        }
-        return nativeRequest;
-    }
-
-    private <T> T resolveNativeResponse(NativeWebRequest webRequest, Class<T> requiredType) {
-        T nativeResponse = webRequest.getNativeResponse(requiredType);
-        if (nativeResponse == null) {
-            throw new IllegalStateException(
-                    "Current response is not of type [" + requiredType.getName() + "]: " + webRequest);
-        }
-        return nativeResponse;
+        this.bindUploadFile(bizObj, request);
+        return isOpenContextParam ? openContext : bizObj;
     }
 
     /**
      * 获取泛型参数类型
+     *
      * @param methodParameter 参数
      * @return 返回泛型参数class
      */
@@ -173,16 +179,15 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
     /**
      * 将上传文件对象绑定到属性中
      *
-     * @param bizObj           业务参数
-     * @param nativeWebRequest
+     * @param bizObj             业务参数
+     * @param httpServletRequest
      */
-    protected void bindUploadFile(Object bizObj, NativeWebRequest nativeWebRequest) {
+    protected void bindUploadFile(Object bizObj, HttpServletRequest httpServletRequest) {
         if (bizObj == null) {
             return;
         }
-        if (this.isMultipartRequest(nativeWebRequest)) {
-            Object nativeRequest = nativeWebRequest.getNativeRequest();
-            MultipartHttpServletRequest request = (MultipartHttpServletRequest) nativeRequest;
+        if (this.isMultipartRequest(httpServletRequest)) {
+            MultipartHttpServletRequest request = (MultipartHttpServletRequest) httpServletRequest;
             Class<?> bizClass = bizObj.getClass();
             ReflectionUtils.doWithFields(bizClass, field -> {
                 ReflectionUtils.makeAccessible(field);
@@ -193,33 +198,10 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         }
     }
 
-    protected boolean isMultipartRequest(NativeWebRequest nativeWebRequest) {
-        return nativeWebRequest.getNativeRequest() instanceof MultipartHttpServletRequest;
+    protected boolean isMultipartRequest(HttpServletRequest request) {
+        return request instanceof MultipartRequest;
     }
 
-    /**
-     * 获取其它的参数解析器
-     *
-     * @param parameter 业务参数
-     * @return 返回合适参数解析器，没有返回null
-     */
-    protected HandlerMethodArgumentResolver getOtherArgumentResolver(MethodParameter parameter) {
-        HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
-        if (result == null) {
-            List<HandlerMethodArgumentResolver> argumentResolvers = this.requestMappingHandlerAdapter.getArgumentResolvers();
-            for (HandlerMethodArgumentResolver methodArgumentResolver : argumentResolvers) {
-                if (methodArgumentResolver instanceof SopHandlerMethodArgumentResolver) {
-                    continue;
-                }
-                if (methodArgumentResolver.supportsParameter(parameter)) {
-                    result = methodArgumentResolver;
-                    this.argumentResolverCache.put(parameter, result);
-                    break;
-                }
-            }
-        }
-        return result;
-    }
 
     public void setParamValidator(ParamValidator paramValidator) {
         this.paramValidator = paramValidator;

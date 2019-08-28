@@ -1,21 +1,21 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.mapper.ConfigRouteBaseMapper;
 import com.gitee.sop.gateway.mapper.ConfigRouteLimitMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
-import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +38,8 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
     @Autowired
     Environment environment;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+    @NacosInjected
+    private ConfigService configService;
 
     @Override
     public void load() {
@@ -75,7 +75,6 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {

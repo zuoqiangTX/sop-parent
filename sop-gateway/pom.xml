@@ -17,6 +17,12 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <!-- nacos spring cloud版本号 -->
+        <spring-cloud-alibaba-nacos.version>0.9.0.RELEASE</spring-cloud-alibaba-nacos.version>
+        <!-- nacos客户端版本号 -->
+        <nacos-client.version>1.1.0</nacos-client.version>
+        <!-- springboot for nacos,https://nacos.io/zh-cn/docs/quick-start-spring-boot.html -->
+        <nacos-spring-boot-starter.version>0.2.3</nacos-spring-boot-starter.version>
     </properties>
 
     <dependencies>
@@ -26,20 +32,7 @@
             <version>2.0.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- ↓↓↓ 使用spring cloud zuul ↓↓↓
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
-        -->
-        <!-- ↑↑↑ 使用spring cloud zuul ↑↑↑ -->
-
-
-        <!-- ↓↓↓ 使用spring cloud gateway，处于beta阶段，推荐使用zuul ↓↓↓ -->
+        <!-- ↓↓↓ 使用spring cloud gateway ↓↓↓ -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -72,21 +65,24 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-            <version>0.2.2.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.alibaba.nacos</groupId>
-                    <artifactId>nacos-client</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${spring-cloud-alibaba-nacos.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.nacos</groupId>
             <artifactId>nacos-client</artifactId>
-            <version>1.1.0</version>
+            <version>${nacos-client.version}</version>
         </dependency>
-
         <!-- 注册中心end -->
+
+        <!--
+            这里依赖springboot版本，非cloud版本。
+            如果依赖了spring-cloud-starter-alibaba-nacos-config，需要额外配置一个bootstrap.properties
+        -->
+        <dependency>
+            <groupId>com.alibaba.boot</groupId>
+            <artifactId>nacos-config-spring-boot-starter</artifactId>
+            <version>${nacos-spring-boot-starter.version}</version>
+        </dependency>
 
         <!-- test -->
         <dependency>

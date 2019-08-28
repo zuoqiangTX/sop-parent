@@ -1,6 +1,7 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.sop.gateway.entity.IsvDetailDTO;
@@ -13,7 +14,6 @@ import com.gitee.sop.gatewaycommon.secret.CacheIsvManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,8 +29,8 @@ public class DbIsvManager extends CacheIsvManager {
     @Autowired
     private IsvInfoMapper isvInfoMapper;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+    @NacosInjected
+    private ConfigService configService;
 
     @Override
     public void load() {
@@ -47,7 +47,6 @@ public class DbIsvManager extends CacheIsvManager {
     protected void after() throws Exception {
         ApiConfig.getInstance().setIsvManager(this);
 
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {

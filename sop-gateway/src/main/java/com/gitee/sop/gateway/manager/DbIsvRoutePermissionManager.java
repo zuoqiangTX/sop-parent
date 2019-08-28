@@ -1,6 +1,7 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
@@ -18,7 +19,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -54,8 +54,8 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+    @NacosInjected
+    private ConfigService configService;
 
     @Override
     public void load() {
@@ -130,7 +130,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
 
     @PostConstruct
     protected void after() throws Exception {
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {

@@ -22,18 +22,20 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<okhttp.version>3.11.0</okhttp.version>
+		<!-- springboot for nacos,https://nacos.io/zh-cn/docs/quick-start-spring-boot.html -->
+		<nacos-spring-boot-starter.version>0.2.3</nacos-spring-boot-starter.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.alibaba.boot</groupId>
 			<artifactId>nacos-config-spring-boot-starter</artifactId>
-			<version>0.2.3</version>
+			<version>${nacos-spring-boot-starter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba.boot</groupId>
 			<artifactId>nacos-discovery-spring-boot-starter</artifactId>
-			<version>0.2.3</version>
+			<version>${nacos-spring-boot-starter.version}</version>
 		</dependency>
 
 		<!-- easyopen starter -->

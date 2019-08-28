@@ -13,7 +13,7 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 public class ZuulRouteCache extends BaseRouteCache<ZuulTargetRoute> {
 
     /** 路由重试 */
-    public static final boolean RETRYABLE = true;
+    private static final boolean RETRYABLE = true;
 
     public ZuulRouteCache(RouteRepository<ZuulTargetRoute> routeRepository) {
         super(routeRepository);

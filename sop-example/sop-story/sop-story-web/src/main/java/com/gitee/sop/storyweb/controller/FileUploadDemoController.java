@@ -4,7 +4,7 @@ import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.util.UploadUtil;
 import com.gitee.sop.storyweb.controller.param.FileUploadParam;
 import com.gitee.sop.storyweb.controller.param.FileUploadParam2;
-import com.gitee.sop.storyweb.vo.FileUploadVO;
+import com.gitee.sop.storyweb.controller.result.FileUploadResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Extension;
@@ -33,19 +33,19 @@ public class FileUploadDemoController {
      */
     @ApiOperation(value = "文件上传例1", notes = "上传文件demo")
     @ApiMapping(value = "demo.file.upload")
-    public FileUploadVO file1(FileUploadParam param) {
+    public FileUploadResult file1(FileUploadParam param) {
         System.out.println(param.getRemark());
         // 获取上传的文件
         MultipartFile file1 = param.getFile1();
         MultipartFile file2 = param.getFile2();
 
-        FileUploadVO vo = new FileUploadVO();
-        FileUploadVO.FileMeta fileMeta1 = buildFileMeta(file1);
-        FileUploadVO.FileMeta fileMeta2 = buildFileMeta(file2);
+        FileUploadResult result = new FileUploadResult();
+        FileUploadResult.FileMeta fileMeta1 = buildFileMeta(file1);
+        FileUploadResult.FileMeta fileMeta2 = buildFileMeta(file2);
 
-        vo.getFiles().add(fileMeta1);
-        vo.getFiles().add(fileMeta2);
-        return vo;
+        result.getFiles().add(fileMeta1);
+        result.getFiles().add(fileMeta2);
+        return result;
     }
 
     /**
@@ -58,19 +58,19 @@ public class FileUploadDemoController {
             // 多文件上传、不确定文件数量上传，必须申明下面这句，否则沙盒界面不会出现上传控件
             , extensions = @Extension(properties = @ExtensionProperty(name = "multiple", value = "multiple")))
     @ApiMapping(value = "demo.file.upload2")
-    public FileUploadVO file2(FileUploadParam2 param, HttpServletRequest request) {
+    public FileUploadResult file2(FileUploadParam2 param, HttpServletRequest request) {
         System.out.println(param.getRemark());
-        FileUploadVO vo = new FileUploadVO();
+        FileUploadResult result = new FileUploadResult();
         // 获取上传的文件
         Collection<MultipartFile> uploadFiles = UploadUtil.getUploadFiles(request);
         for (MultipartFile multipartFile : uploadFiles) {
-            FileUploadVO.FileMeta fileMeta = buildFileMeta(multipartFile);
-            vo.getFiles().add(fileMeta);
+            FileUploadResult.FileMeta fileMeta = buildFileMeta(multipartFile);
+            result.getFiles().add(fileMeta);
         }
-        return vo;
+        return result;
     }
 
-    private FileUploadVO.FileMeta buildFileMeta(MultipartFile multipartFile) {
+    private FileUploadResult.FileMeta buildFileMeta(MultipartFile multipartFile) {
         // 文件名
         String fileName = multipartFile.getOriginalFilename();
         // 文件大小
@@ -82,6 +82,6 @@ public class FileUploadDemoController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new FileUploadVO.FileMeta(fileName, size, fileContent);
+        return new FileUploadResult.FileMeta(fileName, size, fileContent);
     }
 }

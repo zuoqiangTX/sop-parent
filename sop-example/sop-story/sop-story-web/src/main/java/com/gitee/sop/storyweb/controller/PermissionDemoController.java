@@ -2,6 +2,7 @@ package com.gitee.sop.storyweb.controller;
 
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.story.api.domain.Story;
+import com.gitee.sop.storyweb.controller.result.StoryResult;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -13,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PermissionDemoController {
 
     @ApiMapping(value = "permission.story.get", permission = true)
-    public Story getStory() {
-        Story story = new Story();
-        story.setId(1);
+    public StoryResult getStory() {
+        StoryResult story = new StoryResult();
+        story.setId(1L);
         story.setName("海底小纵队(permission.story.get)");
         return story;
     }

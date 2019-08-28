@@ -1,6 +1,7 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.sop.gateway.mapper.IPBlacklistMapper;
@@ -10,7 +11,6 @@ import com.gitee.sop.gatewaycommon.manager.DefaultIPBlacklistManager;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -28,8 +28,8 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
     @Autowired
     private IPBlacklistMapper ipBlacklistMapper;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+    @NacosInjected
+    private ConfigService configService;
 
     @Override
     public void load() {
@@ -41,7 +41,6 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {

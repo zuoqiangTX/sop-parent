@@ -30,6 +30,7 @@
 		<commons-codec.version>1.11</commons-codec.version>
 		<validation-api.version>2.0.1.Final</validation-api.version>
 		<hibernate-validator.version>6.0.13.Final</hibernate-validator.version>
+		<spring-cloud-alibaba-nacos.version>0.9.0.RELEASE</spring-cloud-alibaba-nacos.version>
 	</properties>
 
 	<modules>
@@ -57,14 +58,14 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
-				<version>0.9.0.RELEASE</version>
+				<version>${spring-cloud-alibaba-nacos.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-				<version>0.9.0.RELEASE</version>
+				<artifactId>spring-cloud-alibaba-nacos-config</artifactId>
+				<version>${spring-cloud-alibaba-nacos.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

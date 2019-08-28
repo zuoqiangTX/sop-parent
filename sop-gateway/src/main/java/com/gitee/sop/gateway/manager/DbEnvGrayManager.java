@@ -1,6 +1,7 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
@@ -17,7 +18,6 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -49,8 +49,8 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
     @Autowired
     private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+    @NacosInjected
+    private ConfigService configService;
 
     @Override
     public void load() {
@@ -100,7 +100,6 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
         configService.addListener(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {

@@ -1,6 +1,7 @@
 package com.gitee.sop.gatewaycommon.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
@@ -11,7 +12,6 @@ import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.alibaba.nacos.NacosConfigProperties;
 import org.springframework.cloud.alibaba.nacos.NacosDiscoveryProperties;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.http.HttpStatus;
@@ -41,8 +41,14 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
     @Autowired
     private NacosDiscoveryProperties nacosDiscoveryProperties;
 
-    @Autowired
-    private NacosConfigProperties nacosConfigProperties;
+//    @NacosInjected
+//    private NamingService namingService;
+
+//    @Autowired
+//    private NacosConfigProperties nacosConfigProperties;
+
+    @NacosInjected
+    private ConfigService configService;
 
     @Autowired
     private BaseRouteCache<T> baseRouteCache;
@@ -74,7 +80,7 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
         }
         // subscribe
         String thisServiceId = nacosDiscoveryProperties.getService();
-        ConfigService configService = nacosConfigProperties.configServiceInstance();
+//        ConfigService configService = nacosConfigProperties.configServiceInstance();
         for (ServiceInfo serviceInfo : subscribes) {
             String serviceName = serviceInfo.getName();
             // 如果是本机服务，跳过

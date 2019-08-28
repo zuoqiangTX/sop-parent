@@ -1,4 +1,4 @@
-package com.gitee.sop.storyweb.vo;
+package com.gitee.sop.storyweb.controller.result;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.util.List;
  * @author tanghc
  */
 @Data
-public class FileUploadVO {
+public class FileUploadResult {
 
     private List<FileMeta> files = new ArrayList();
 

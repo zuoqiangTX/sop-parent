@@ -37,7 +37,11 @@ public class OpenUtil {
         if (StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE)) {
             try {
                 String requestJson = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-                jsonObject = JSON.parseObject(requestJson);
+                if (StringUtils.isBlank(requestJson)) {
+                    jsonObject = new JSONObject();
+                } else {
+                    jsonObject = JSON.parseObject(requestJson);
+                }
             } catch (Exception e) {
                 jsonObject = new JSONObject();
                 log.error("获取文本数据流失败", e);

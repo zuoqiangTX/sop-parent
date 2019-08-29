@@ -78,7 +78,7 @@ public class GetStoryRequest extends BaseRequest<GetStoryResponse> {
 ## 使用方式
 
 ```java
-String url = "http://localhost:8081/api"; // zuul
+String url = "http://localhost:8081/api";
 String appId = "2019032617262200001";
 String privateKey = "你的私钥";
 

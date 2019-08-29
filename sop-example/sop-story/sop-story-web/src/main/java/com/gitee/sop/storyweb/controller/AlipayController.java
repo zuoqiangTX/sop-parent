@@ -123,7 +123,7 @@ public class AlipayController {
         String appId = openContext.getAppId();
         System.out.println(appId);
         StoryResult story = new StoryResult();
-        story.setName("appId:" + appId + ", " + story.getName() + "，ip:" + request.getLocalAddr());
+        story.setName("appId:" + appId + ", " + param.getName() + "，ip:" + request.getLocalAddr());
         return story;
     }
 
@@ -198,10 +198,10 @@ public class AlipayController {
         // 获取其它参数
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         String app_id = openContext.getAppId();
-        StoryResult storyVO = new StoryResult();
-        storyVO.setName("白雪公主, app_id:" + app_id);
-        storyVO.setGmt_create(new Date());
-        return storyVO;
+        StoryResult result = new StoryResult();
+        result.setName("白雪公主, app_id:" + app_id);
+        result.setGmt_create(new Date());
+        return result;
     }
 
     @ApiOperation(value = "返回数组结果", notes = "返回数组结果")

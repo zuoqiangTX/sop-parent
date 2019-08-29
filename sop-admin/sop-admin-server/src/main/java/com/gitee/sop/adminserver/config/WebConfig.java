@@ -41,9 +41,11 @@ public class WebConfig {
     ApiConfig apiConfig() {
         ApiConfig apiConfig = new ApiConfig();
         apiConfig.setJsonResultSerializer(obj -> JSON.toJSONString(obj,
-                SerializerFeature.WriteDateUseDateFormat
-                , SerializerFeature.WriteNullStringAsEmpty
-                , SerializerFeature.WriteMapNullValue));
+                SerializerFeature.WriteNullStringAsEmpty
+                , SerializerFeature.WriteMapNullValue
+                , SerializerFeature.WriteDateUseDateFormat)
+        );
+
         ApiSessionManager apiSessionManager = new ApiSessionManager();
         // session有效期
         int timeout = NumberUtils.toInt(accessTokenTimeout, 30);

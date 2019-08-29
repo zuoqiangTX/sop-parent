@@ -10,5 +10,4 @@ import com.gitee.easyopen.doc.annotation.ApiDoc;
 @ApiDoc("配置列表")
 public class ConfigListApi {
 
-//    public
 }

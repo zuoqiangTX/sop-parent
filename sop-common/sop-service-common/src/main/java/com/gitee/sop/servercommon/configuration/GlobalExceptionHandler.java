@@ -26,13 +26,17 @@ public class GlobalExceptionHandler {
     /**
      * 与网关约定好的状态码，表示业务出错
      */
-    public static final int BIZ_ERROR_CODE = 4000;
-    /**
-     * 系统错误
-     */
-    public static final int SYSTEM_ERROR_CODE = 5050;
+    private static final int BIZ_ERROR_CODE = 4000;
 
-    public static final String X_SERVICE_ERROR_CODE = "x-service-error-code";
+    /**
+     * 与网关约定好的系统错误状态码
+     */
+    private static final int SYSTEM_ERROR_CODE = 5050;
+
+    /**
+     * 返回错误信息headerName
+     */
+    private static final String X_SERVICE_ERROR_HEADER_NAME = "x-service-error-code";
 
     @RequestMapping("/error")
     @ResponseBody
@@ -44,15 +48,15 @@ public class GlobalExceptionHandler {
     /**
      * 捕获手动抛出的异常
      *
-     * @param request
-     * @param response
-     * @param exception
-     * @return
+     * @param request   request
+     * @param response  response
+     * @param exception 异常信息
+     * @return 返回提示信息
      */
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
     public Object serviceExceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-        response.addHeader(X_SERVICE_ERROR_CODE, String.valueOf(BIZ_ERROR_CODE));
+        response.addHeader(X_SERVICE_ERROR_HEADER_NAME, String.valueOf(BIZ_ERROR_CODE));
         return this.processError(request, response, exception);
     }
 
@@ -67,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Object exceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-        response.addHeader(X_SERVICE_ERROR_CODE, String.valueOf(SYSTEM_ERROR_CODE));
+        response.addHeader(X_SERVICE_ERROR_HEADER_NAME, String.valueOf(SYSTEM_ERROR_CODE));
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         log.error("系统错误, openContext:{}", openContext == null ? "null" : openContext, exception);
         StringBuilder msg = new StringBuilder();

@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
  * 1、注释掉OAuth2ManagerCache的@Service。
  * 2、打开yml中redis部分
  * 3、启用这个类的@Service
+ *
+ * @author tanghc
  */
 //@Service
 public class OAuth2ManagerRedis implements OAuth2Manager {
@@ -75,7 +77,8 @@ public class OAuth2ManagerRedis implements OAuth2Manager {
             redisTemplate.opsForValue().set(
                     getRefreshTokenKey(refreshToken),
                     JSON.toJSONString(new RefreshToken(accessToken, authUser)),
-                    reExpiresIn, // refreshToken过期时间
+                    // refreshToken过期时间
+                    reExpiresIn,
                     TimeUnit.SECONDS);
         } else {
             redisTemplate.opsForValue().set(

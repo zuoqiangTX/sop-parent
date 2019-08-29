@@ -24,6 +24,8 @@ import java.net.URISyntaxException;
 
 /**
  * 授权认证
+ *
+ * @author tanghc
  */
 @Controller
 @RequestMapping("oauth2")

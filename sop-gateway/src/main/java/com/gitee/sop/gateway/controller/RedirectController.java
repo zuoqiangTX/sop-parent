@@ -17,7 +17,7 @@ import java.io.IOException;
 @Controller
 public class RedirectController {
 
-    @Value("${zuul.servlet-path}")
+    @Value("${zuul.servlet-path:/zuul}")
     private String path;
 
     @RequestMapping("/{method}/{version}/")
@@ -29,6 +29,14 @@ public class RedirectController {
     ) throws ServletException, IOException {
         request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, method);
         request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, version);
+        request.getRequestDispatcher(path).forward(request, response);
+    }
+
+    @RequestMapping("/")
+    public void index(
+             HttpServletRequest request
+            , HttpServletResponse response
+    ) throws ServletException, IOException {
         request.getRequestDispatcher(path).forward(request, response);
     }
 

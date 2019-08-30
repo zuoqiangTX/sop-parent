@@ -56,5 +56,6 @@ public class SopConstants {
     public static final String UNKNOWN_SERVICE= "_sop_unknown_service_";
     public static final String UNKNOWN_METHOD = "_sop_unknown_method_";
     public static final String UNKNOWN_VERSION = "_sop_unknown_version_";
+    public static final String UNKNOWN_APPID = "_sop_unknown_appId_";
 
 }

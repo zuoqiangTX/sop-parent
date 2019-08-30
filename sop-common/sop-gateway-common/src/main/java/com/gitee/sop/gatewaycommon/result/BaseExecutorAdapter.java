@@ -96,6 +96,11 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             responseData.put(GATEWAY_CODE_NAME, ISV_MISSING_METHOD_META.getCode());
             responseData.put(GATEWAY_MSG_NAME, ISV_MISSING_METHOD_META.getError().getCode());
         } else {
+            Map<String, Object> params = this.getApiParam(request);
+            String name = this.getParamValue(params, ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
+            String version = this.getParamValue(params, ParamNames.VERSION_NAME, SopConstants.UNKNOWN_VERSION);
+            String appId = this.getParamValue(params, ParamNames.APP_KEY_NAME, SopConstants.UNKNOWN_APPID);
+            log.error("微服务端报错，方法名:{}, 版本号:{}, appId:{}, 微服务返回结果:{}",name, version, appId, serviceResult);
             this.storeError(request, ErrorType.UNKNOWN);
             // 微服务端有可能返回500错误
             // {"path":"/book/getBook3","error":"Internal Server Error","message":"id不能为空","timestamp":"2019-02-13T07:41:00.495+0000","status":500}

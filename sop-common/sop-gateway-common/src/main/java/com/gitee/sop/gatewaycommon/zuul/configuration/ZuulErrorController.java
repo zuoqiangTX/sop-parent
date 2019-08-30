@@ -2,6 +2,7 @@ package com.gitee.sop.gatewaycommon.zuul.configuration;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
+import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -35,6 +36,7 @@ public class ZuulErrorController implements ErrorController {
         }
         ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
+        log.error("请求错误，params:{}", ZuulContext.getApiParam(), throwable);
         return this.buildResult(throwable);
     }
 

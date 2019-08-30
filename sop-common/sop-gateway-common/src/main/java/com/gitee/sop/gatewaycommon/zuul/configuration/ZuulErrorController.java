@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -29,13 +30,16 @@ public class ZuulErrorController implements ErrorController {
      */
     @RequestMapping(ERROR_PATH)
     @ResponseBody
-    public Object error(HttpServletResponse response) {
+    public Object error(HttpServletRequest request, HttpServletResponse response) {
         RequestContext ctx = RequestContext.getCurrentContext();
         if (ctx.getResponse() == null) {
             ctx.setResponse(response);
         }
         ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
+        if (throwable == null) {
+            throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        }
         log.error("请求错误，params:{}", ZuulContext.getApiParam(), throwable);
         return this.buildResult(throwable);
     }

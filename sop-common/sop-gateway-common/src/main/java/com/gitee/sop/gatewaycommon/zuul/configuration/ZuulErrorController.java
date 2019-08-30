@@ -35,12 +35,8 @@ public class ZuulErrorController implements ErrorController {
         if (ctx.getResponse() == null) {
             ctx.setResponse(response);
         }
-        ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
-        if (throwable == null) {
-            throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
-        }
-        log.error("zuul网关报错，URL:{}, params:{}",request.getRequestURL().toString(), ZuulContext.getApiParam(), throwable);
+        log.error("请求错误，URL:{}, status:{}, params:{}",request.getRequestURL().toString(), ctx.getResponseStatusCode(), ZuulContext.getApiParam(), throwable);
         return this.buildResult(throwable);
     }
 

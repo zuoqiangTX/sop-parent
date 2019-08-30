@@ -25,13 +25,12 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
     @Override
     public int getResponseStatus(RequestContext requestContext) {
         List<Pair<String, String>> bizHeaders = requestContext.getZuulResponseHeaders();
-        int status = bizHeaders.stream()
+
+        return bizHeaders.stream()
                 .filter(header -> SopConstants.X_SERVICE_ERROR_CODE.equals(header.first()))
                 .map(header -> Integer.valueOf(header.second()))
                 .findFirst()
                 .orElse(requestContext.getResponseStatusCode());
-
-        return status;
     }
 
     @Override

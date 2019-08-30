@@ -16,7 +16,7 @@ import java.io.IOException;
  * 传统web开发入口
  * @author tanghc
  */
-@WebServlet(urlPatterns = "/rest/*")
+//@WebServlet(urlPatterns = "/rest/*")
 public class RestServlet extends HttpServlet {
 
     private static final String REST_PATH = "/rest";

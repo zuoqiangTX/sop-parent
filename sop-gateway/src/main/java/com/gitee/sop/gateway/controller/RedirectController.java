@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * @author tanghc
  */
-@Controller
+//@Controller
 public class RedirectController {
 
     @Value("${zuul.servlet-path:/zuul}")

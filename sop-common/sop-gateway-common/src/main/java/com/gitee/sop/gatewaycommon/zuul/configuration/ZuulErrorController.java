@@ -40,7 +40,7 @@ public class ZuulErrorController implements ErrorController {
         if (throwable == null) {
             throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
         }
-        log.error("请求错误，params:{}", ZuulContext.getApiParam(), throwable);
+        log.error("请求错误，URL:{}, params:{}",request.getRequestURL().toString(), ZuulContext.getApiParam(), throwable);
         return this.buildResult(throwable);
     }
 

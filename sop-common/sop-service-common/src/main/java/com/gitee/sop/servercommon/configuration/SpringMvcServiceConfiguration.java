@@ -45,12 +45,6 @@ public class SpringMvcServiceConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    ErrorController errorController() {
-        return new ErrorController();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     ServiceRouteController serviceRouteInfoHandler() {
         return new ServiceRouteController();
     }

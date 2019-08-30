@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -22,21 +23,24 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class ZuulErrorController implements ErrorController {
 
-    public static final String ERROR_PATH = "/error";
+    private static final String ERROR_PATH = "/error";
 
     /**
      * 错误最终会到这里来
      */
     @RequestMapping(ERROR_PATH)
     @ResponseBody
-    public Object error(HttpServletResponse response) {
+    public Object error(HttpServletRequest request, HttpServletResponse response) {
         RequestContext ctx = RequestContext.getCurrentContext();
         if (ctx.getResponse() == null) {
             ctx.setResponse(response);
         }
         ctx.setResponseStatusCode(HttpStatus.OK.value());
         Throwable throwable = ctx.getThrowable();
-        log.error("zuul网关报错，params:{}", ZuulContext.getApiParam(), throwable);
+        if (throwable == null) {
+            throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+        }
+        log.error("zuul网关报错，URL:{}, params:{}",request.getRequestURL().toString(), ZuulContext.getApiParam(), throwable);
         return this.buildResult(throwable);
     }
 

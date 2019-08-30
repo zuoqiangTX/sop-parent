@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LimitDemoPostTest3 extends TestBase {
 
-    String url = "http://localhost:8081/api";
+    String url = "http://localhost:8081";
     String appId = "20190401562373796095328256";
     // 平台提供的私钥
     String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJvGfQSfZyPb23yL6bV1Pux4X1dDHdwRqgKVcVOWZzvxjVm5AVvJj31VLC/wlu2kbE+8FJUP1I+ZdY0FEFtIdP6DFK1x1cP1B4PeScYXL/VX7PcTZGP/osiUWaBOUaHV+YSC20+OxRbUOPvTj/J3IivD4IDIAwpDKsWDTBiY1b5RAgMBAAECgYAE27/ycPZKjATgcYyseCeqQGbY1eMMhhCDXB3YuYwmtnXuInMEZdjv08Q5CovqhYJLSlZp/8BlaifcahgEgNIFQXmxAF0U0HsNC6W4Dk1gGgQaVmYaZv5ex7uIcFB1qFvlO60kWf82YeRnO5KsFBODOJ1XSNwqjL2GeLSHBSVyQQJBAOsvDmClBsETSdiNSFMz+D9WCnCh1Ip4AoCzA/yG+PRSwYjZDdceP2DXieiZXPlxTFZ7MIXxAafgeyeQA2hpkQUCQQCpkCUSbrZ+nd4BYdnxZOSf0//cUT0o6+3kROX7gsXV7zRAWWxojT6DkGVlduDLZM/hjWeHRjWUxKC/jgbzvundAkBckhUSrWJPNQxoFJRXS6l3JKLPWqOSLVKu3ce/6lCrurc66lSsS9eegrhhuZwDAzmNAMhEsGx6a72OAP2WZ5cRAkBd8cT4X2qw4BpePa6YdcPNYZHCqSfvgje9XwbkwGGH1A3pESJlEsxt7BShkKmfRu1+E/AmHJoXIJHHT5M+fKnpAkA+VfyAAviKeCwUSq+5oUa0B+ozEA3frp/40cKQP7k02aamocAQCDRaC1ZlWffeQqYMnYe1/Mjr/SdX/Ut3X0CC";

@@ -245,6 +245,26 @@ public class HttpTool {
     }
 
     /**
+     * 请求数据
+     *
+     * @param url    请求url
+     * @param form   请求数据
+     * @param header header
+     * @return 返回Response
+     * @throws IOException
+     */
+    public Response requestForResponse(String url, Map<String, ?> form, Map<String, String> header, HTTPMethod method) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
+        // 添加header
+        addHeader(requestBuilder, header);
+
+        Request request = requestBuilder.build();
+        return httpClient
+                .newCall(request)
+                .execute();
+    }
+
+    /**
      * 下载文件
      *
      * @param url    请求url

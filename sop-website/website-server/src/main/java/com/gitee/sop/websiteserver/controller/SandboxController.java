@@ -1,12 +1,16 @@
 package com.gitee.sop.websiteserver.controller;
 
 import com.gitee.sop.registryapi.bean.HttpTool;
-import com.gitee.sop.registryapi.bean.HttpTool.*;
+import com.gitee.sop.registryapi.bean.HttpTool.HTTPMethod;
+import com.gitee.sop.registryapi.bean.HttpTool.UploadFile;
 import com.gitee.sop.websiteserver.sign.AlipayApiException;
 import com.gitee.sop.websiteserver.sign.AlipaySignature;
 import com.gitee.sop.websiteserver.util.UploadUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Headers;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -60,7 +65,10 @@ public class SandboxController {
             , @RequestParam String version
             , @RequestParam String bizContent
             , @RequestParam(defaultValue = "get") String httpMethod
-            , HttpServletRequest request) throws AlipayApiException {
+            , @RequestParam(defaultValue = "false") boolean isDownloadRequest
+            , HttpServletRequest request
+            , HttpServletResponse response
+    ) throws AlipayApiException {
 
         Assert.isTrue(StringUtils.isNotBlank(appId), "AppId不能为空");
         Assert.isTrue(StringUtils.isNotBlank(privateKey), "PrivateKey不能为空");
@@ -111,7 +119,21 @@ public class SandboxController {
 
         try {
             String responseData;
-            if (!CollectionUtils.isEmpty(files)) {
+            if (isDownloadRequest) {
+                Response resp = httpTool.requestForResponse(url, params, Collections.emptyMap(), HTTPMethod.GET);
+                Headers respHeaders = resp.headers();
+                ResponseBody body = resp.body();
+                if (body == null) {
+                    return null;
+                }
+                respHeaders
+                        .names()
+                        .forEach(name -> response.setHeader(name, respHeaders.get(name)));
+
+                IOUtils.copy(body.byteStream(), response.getOutputStream());
+                response.flushBuffer();
+                return null;
+            } else if (!CollectionUtils.isEmpty(files)) {
                 responseData = httpTool.requestFile(url, params, Collections.emptyMap(), files);
             } else {
                 responseData = httpTool.request(url, params, Collections.emptyMap(), HTTPMethod.fromValue(httpMethod));

@@ -20,6 +20,10 @@ public class DocItem {
     /** http method列表 */
     private Collection<String> httpMethodList;
 
+    private Collection<String> produces;
+
+
+
     List<DocParameter> requestParameters;
     List<DocParameter> responseParameters;
 

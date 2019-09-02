@@ -138,6 +138,12 @@ function doTest() {
         }
     });
     data.bizContent = JSON.stringify(bizContent);
+    if (isDownloadRequest(currentItem)) {
+        data.isDownloadRequest = true;
+        downloadFile(data);
+        // window.open()
+        return;
+    }
     // 确定文件数量，并且知道参数名称
     if (uploadFileObjects.length > 0) {
         var formData = new FormData();
@@ -149,6 +155,20 @@ function doTest() {
     } else {
         postJson(data);
     }
+}
+
+function isDownloadRequest(currentItem) {
+    var produces = currentItem.produces;
+    if (!produces) {
+        return false;
+    }
+    for (var i = 0; i < produces.length; i++) {
+        var produce = produces[i];
+        if (produce.indexOf('application/octet-stream') > -1) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function putVal(obj, input) {
@@ -202,6 +222,16 @@ function postFile(data, formData) {
         , success: successHandler
         , error: errorHandler
     });
+}
+
+function downloadFile(data) {
+    $('.dl-form').remove();
+    var url = SopConfig.url + '/sandbox/test';
+    var form = $('<form class="dl-form"></form>').attr("action", url).attr("method", "get");
+    for(var key in data) {
+        form.append($("<input>").attr("type", "hidden").attr("name", key).attr("value", data[key]));
+    }
+    form.appendTo('body').submit();
 }
 
 function successHandler(resp) {

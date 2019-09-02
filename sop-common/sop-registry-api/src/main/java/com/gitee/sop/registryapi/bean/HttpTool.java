@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -51,14 +52,17 @@ public class HttpTool {
 
     protected void initHttpClient(HttpToolConfig httpToolConfig) {
         httpClient = new OkHttpClient.Builder()
-                .connectTimeout(httpToolConfig.connectTimeoutSeconds, TimeUnit.SECONDS) // 设置链接超时时间，默认10秒
+                // 设置链接超时时间，默认10秒
+                .connectTimeout(httpToolConfig.connectTimeoutSeconds, TimeUnit.SECONDS)
                 .readTimeout(httpToolConfig.readTimeoutSeconds, TimeUnit.SECONDS)
                 .writeTimeout(httpToolConfig.writeTimeoutSeconds, TimeUnit.SECONDS)
                 .cookieJar(new CookieJar() {
+                    @Override
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         cookieStore.put(httpUrl.host(), list);
                     }
 
+                    @Override
                     public List<Cookie> loadForRequest(HttpUrl httpUrl) {
                         List<Cookie> cookies = cookieStore.get(httpUrl.host());
                         return cookies != null ? cookies : new ArrayList<Cookie>();
@@ -204,22 +208,24 @@ public class HttpTool {
      * @return
      * @throws IOException
      */
-    public String requestFile(String url, Map<String, String> form, Map<String, String> header, List<UploadFile> files)
+    public String requestFile(String url, Map<String, ?> form, Map<String, String> header, List<UploadFile> files)
             throws IOException {
         // 创建MultipartBody.Builder，用于添加请求的数据
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         bodyBuilder.setType(MultipartBody.FORM);
 
         for (UploadFile uploadFile : files) {
-            bodyBuilder.addFormDataPart(uploadFile.getName(), // 请求的名字
-                    uploadFile.getFileName(), // 文件的文字，服务器端用来解析的
-                    RequestBody.create(null, uploadFile.getFileData()) // 创建RequestBody，把上传的文件放入
+            // 请求的名字
+            bodyBuilder.addFormDataPart(uploadFile.getName(),
+                    // 文件的文字，服务器端用来解析的
+                    uploadFile.getFileName(),
+                    // 创建RequestBody，把上传的文件放入
+                    RequestBody.create(null, uploadFile.getFileData())
             );
         }
 
-        Set<Map.Entry<String, String>> entrySet = form.entrySet();
-        for (Map.Entry<String, String> entry : entrySet) {
-            bodyBuilder.addFormDataPart(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, ?> entry : form.entrySet()) {
+            bodyBuilder.addFormDataPart(entry.getKey(), String.valueOf(entry.getValue()));
         }
 
         RequestBody requestBody = bodyBuilder.build();
@@ -236,6 +242,51 @@ public class HttpTool {
         } finally {
             response.close();
         }
+    }
+
+    /**
+     * 请求数据
+     *
+     * @param url    请求url
+     * @param form   请求数据
+     * @param header header
+     * @return 返回Response
+     * @throws IOException
+     */
+    public Response requestForResponse(String url, Map<String, ?> form, Map<String, String> header, HTTPMethod method) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, method);
+        // 添加header
+        addHeader(requestBuilder, header);
+
+        Request request = requestBuilder.build();
+        return httpClient
+                .newCall(request)
+                .execute();
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param url    请求url
+     * @param form   请求数据
+     * @param header header
+     * @return 返回文件流
+     * @throws IOException
+     */
+    public InputStream downloadFile(String url, Map<String, ?> form, Map<String, String> header) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, HTTPMethod.GET);
+        // 添加header
+        addHeader(requestBuilder, header);
+
+        Request request = requestBuilder.build();
+        Response response = httpClient
+                .newCall(request)
+                .execute();
+        if (response.isSuccessful()) {
+            ResponseBody body = response.body();
+            return body == null ? null : body.byteStream();
+        }
+        return null;
     }
 
     private void addHeader(Request.Builder builder, Map<String, String> header) {
@@ -256,10 +307,15 @@ public class HttpTool {
     }
 
     public enum HTTPMethod {
+        /** http GET */
         GET,
+        /** http POST */
         POST,
+        /** http PUT */
         PUT,
+        /** http HEAD */
         HEAD,
+        /** http DELETE */
         DELETE;
 
         private HTTPMethod() {

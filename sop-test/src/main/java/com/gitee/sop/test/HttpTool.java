@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -241,6 +242,31 @@ public class HttpTool {
         } finally {
             response.close();
         }
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param url    请求url
+     * @param form   请求数据
+     * @param header header
+     * @return 返回文件流
+     * @throws IOException
+     */
+    public InputStream downloadFile(String url, Map<String, ?> form, Map<String, String> header) throws IOException {
+        Request.Builder requestBuilder = buildRequestBuilder(url, form, HTTPMethod.GET);
+        // 添加header
+        addHeader(requestBuilder, header);
+
+        Request request = requestBuilder.build();
+        Response response = httpClient
+                .newCall(request)
+                .execute();
+        if (response.isSuccessful()) {
+            ResponseBody body = response.body();
+            return body == null ? null : body.byteStream();
+        }
+        return null;
     }
 
     private void addHeader(Request.Builder builder, Map<String, String> header) {

@@ -41,7 +41,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
         }
         // 单个限流功能未开启
         if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
-            return null;
+            return chain.filter(exchange);
         }
         byte limitType = configLimitDto.getLimitType().byteValue();
         LimitManager limitManager = ApiConfig.getInstance().getLimitManager();
@@ -82,12 +82,15 @@ public class LimitFilter implements GlobalFilter, Ordered {
         List<ConfigLimitDto> limitConfigList = new ArrayList<>();
         for (String limitKey : limitKeys) {
             ConfigLimitDto configLimitDto = limitConfigManager.get(limitKey);
+            if (configLimitDto == null) {
+                continue;
+            }
             limitConfigList.add(configLimitDto);
         }
         if (limitConfigList.isEmpty()) {
             return null;
         }
-        Collections.sort(limitConfigList, Comparator.comparing(ConfigLimitDto::getOrderIndex));
+        limitConfigList.sort(Comparator.comparing(ConfigLimitDto::getOrderIndex));
         return limitConfigList.get(0);
     }
 }

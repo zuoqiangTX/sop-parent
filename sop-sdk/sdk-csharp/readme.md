@@ -1,9 +1,8 @@
 # sdk-csharp
 
-C#对应的SDK
+C#对应的SDK，由于本人使用mac开发，因此使用了.Net Core
 
-- SDKCSharp： SDK源码，在此基础上添加接口
-- SDKTest：  测试用例
+测试用例在`Program.cs`
 
 
 ## 接口封装步骤

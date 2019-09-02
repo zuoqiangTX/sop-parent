@@ -1,7 +1,9 @@
 package com.gitee.sop.gatewaycommon.gateway.handler;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
+import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.gateway.result.GatewayResult;
+import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +37,9 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ResultExecutor<ServerWebExchange, GatewayResult> resultExecutor = ApiContext.getApiConfig().getGatewayResultExecutor();
         GatewayResult errorResult = resultExecutor.buildErrorResult(exchange, ex);
-
+        ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         // 错误记录
-        ServerHttpRequest request = exchange.getRequest();
-        log.error("[全局异常处理]异常请求路径:{}, msg:{}", request.getPath(), ex.getMessage(), ex);
+        log.error("gateway网关报错，params:{}, errorMsg:{}", apiParam, ex.getMessage(), ex);
         // 参考AbstractErrorWebExceptionHandler
         if (exchange.getResponse().isCommitted()) {
             return Mono.error(ex);

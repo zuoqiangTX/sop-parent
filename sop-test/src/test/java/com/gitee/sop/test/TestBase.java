@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
@@ -45,6 +46,20 @@ public class TestBase extends TestCase {
     public static String get(String url, Map<String, String> params) {
         try {
             return httpTool.request(url, params, Collections.emptyMap(), HttpTool.HTTPMethod.GET);
+        } catch (IOException e) {
+            throw new RuntimeException("网络请求异常", e);
+        }
+    }
+
+    /**
+     * 下载文件
+     * @param url
+     * @param params
+     * @return 返回文件流
+     */
+    public static InputStream download(String url, Map<String, String> params) {
+        try {
+            return httpTool.downloadFile(url, params, null);
         } catch (IOException e) {
             throw new RuntimeException("网络请求异常", e);
         }

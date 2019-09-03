@@ -5,6 +5,8 @@ import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.mapping.RouteUtil;
 import com.google.common.base.Optional;
+import io.swagger.annotations.Api;
+import org.springframework.core.annotation.Order;
 import springfox.documentation.service.Operation;
 import springfox.documentation.service.StringVendorExtension;
 import springfox.documentation.service.VendorExtension;
@@ -20,6 +22,7 @@ public class DocumentationPluginsManagerExt extends DocumentationPluginsManager 
 
     public static final String SOP_NAME = "sop_name";
     public static final String SOP_VERSION = "sop_version";
+    public static final String MODULE_ORDER = "module_order";
 
     @Override
     public Operation operation(OperationContext operationContext) {
@@ -48,6 +51,17 @@ public class DocumentationPluginsManagerExt extends DocumentationPluginsManager 
                 vendorExtensions.add(new StringVendorExtension(SOP_VERSION, version));
             }
         }
+        Optional<Api> apiOptional = operationContext.findControllerAnnotation(Api.class);
+        int order = 0;
+        if (apiOptional.isPresent()) {
+            order = apiOptional.get().position();
+        } else {
+            Optional<Order> orderOptional = operationContext.findControllerAnnotation(Order.class);
+            if (orderOptional.isPresent()) {
+                order = orderOptional.get().value();
+            }
+        }
+        vendorExtensions.add(new StringVendorExtension(MODULE_ORDER, String.valueOf(order)));
     }
 
     private String buildVersion(String version) {

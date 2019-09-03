@@ -22,7 +22,7 @@ public class DocItem {
 
     private Collection<String> produces;
 
-
+    private int moduleOrder;
 
     List<DocParameter> requestParameters;
     List<DocParameter> responseParameters;

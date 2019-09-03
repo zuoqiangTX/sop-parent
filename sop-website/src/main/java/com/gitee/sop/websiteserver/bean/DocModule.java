@@ -11,4 +11,5 @@ import java.util.List;
 public class DocModule {
     private String module;
     private List<DocItem> docItems;
+    private int order;
 }

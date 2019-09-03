@@ -23,7 +23,7 @@ import java.util.Collection;
  * @author tanghc
  */
 @RestController
-@Api(tags = "文件上传")
+@Api(tags = "文件上传", position = 2)
 public class FileUploadDemoController {
 
     /**

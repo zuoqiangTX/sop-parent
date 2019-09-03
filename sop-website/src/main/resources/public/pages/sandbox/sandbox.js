@@ -227,9 +227,16 @@ function postFile(data, formData) {
 function downloadFile(data) {
     $('.dl-form').remove();
     var url = SopConfig.url + '/sandbox/test';
-    var form = $('<form class="dl-form"></form>').attr("action", url).attr("method", "get");
+    var form = $('<form></form>')
+        .addClass('dl-form')
+        .attr("action", url)
+        .attr("method", "post");
+
     for(var key in data) {
-        form.append($("<input>").attr("type", "hidden").attr("name", key).attr("value", data[key]));
+        form.append($("<input>")
+            .attr("type", "hidden")
+            .attr("name", key)
+            .attr("value", data[key]));
     }
     form.appendTo('body').submit();
 }

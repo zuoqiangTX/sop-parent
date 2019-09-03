@@ -143,4 +143,43 @@ biz_content	String	是		请求参数的集合，最大长度不限，除公共�
         System.out.println(responseData);
     }
 
+    public void testPost2() throws Exception {
+
+        // 公共请求参数
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("app_id", appId);
+        params.put("method", "alipay.category.get");
+        params.put("format", "json");
+        params.put("charset", "utf-8");
+        params.put("sign_type", "RSA2");
+        params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        params.put("version", "1.0");
+
+        // 业务参数
+        Map<String, Object> bizContent = new HashMap<>();
+        bizContent.put("categoryName", "啊啊啊");
+        Map<String, String> storyParam = new HashMap<>();
+        storyParam.put("id", "1");
+        storyParam.put("name", "葫芦娃啊啊啊");
+        bizContent.put("storyParam", storyParam);
+
+
+
+        params.put("biz_content", JSON.toJSONString(bizContent));
+
+        System.out.println("----------- 请求信息 -----------");
+        System.out.println("请求参数：" + buildParamQuery(params));
+        System.out.println("商户秘钥：" + privateKey);
+        String content = AlipaySignature.getSignContent(params);
+        System.out.println("待签名内容：" + content);
+        String sign = AlipaySignature.rsa256Sign(content, privateKey, "utf-8");
+        System.out.println("签名(sign)：" + sign);
+
+        params.put("sign", sign);
+
+        System.out.println("----------- 返回结果 -----------");
+        String responseData = post(url, params);// 发送请求
+        System.out.println(responseData);
+    }
+
 }

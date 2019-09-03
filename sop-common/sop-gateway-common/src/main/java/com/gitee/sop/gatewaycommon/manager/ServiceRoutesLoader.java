@@ -41,12 +41,6 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
     @Autowired
     private NacosDiscoveryProperties nacosDiscoveryProperties;
 
-//    @NacosInjected
-//    private NamingService namingService;
-
-//    @Autowired
-//    private NacosConfigProperties nacosConfigProperties;
-
     @NacosInjected
     private ConfigService configService;
 

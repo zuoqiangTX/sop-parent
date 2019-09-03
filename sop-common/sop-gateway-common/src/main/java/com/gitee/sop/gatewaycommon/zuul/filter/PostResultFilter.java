@@ -4,7 +4,7 @@ import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
-import com.netflix.util.Pair;
+import com.gitee.sop.gatewaycommon.zuul.RequestContextUtil;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * 合并微服务结果，统一返回格式
@@ -39,12 +38,9 @@ public class PostResultFilter extends BaseZuulFilter {
         if (response.isCommitted()) {
             return null;
         }
-        List<Pair<String, String>> zuulResponseHeaders = requestContext.getZuulResponseHeaders();
-        boolean isDownloadRequest = zuulResponseHeaders
-                .stream()
-                .anyMatch(pair -> StringUtils.contains(pair.second(), MediaType.APPLICATION_OCTET_STREAM_VALUE));
+        String contentType = RequestContextUtil.getZuulContentType(requestContext);
         // 如果是文件下载直接返回
-        if (isDownloadRequest) {
+        if (StringUtils.containsIgnoreCase(contentType, MediaType.APPLICATION_OCTET_STREAM_VALUE)) {
             return null;
         }
         InputStream responseDataStream = requestContext.getResponseDataStream();
@@ -61,5 +57,6 @@ public class PostResultFilter extends BaseZuulFilter {
         requestContext.setResponseBody(finalResult);
         return null;
     }
+
 
 }

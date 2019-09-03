@@ -18,7 +18,7 @@ import java.io.IOException;
  *
  * @author tanghc
  */
-@Api(tags = "文件下载")
+@Api(tags = "文件下载", position = 3)
 @Controller
 public class DownloadController {
 

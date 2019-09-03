@@ -48,7 +48,7 @@ layui.config({
                 html.push('<li><h2>' + module.module + '</h2></li>');
                 for (var i = 0; i < docItems.length; i++) {
                     var docItem = docItems[i];
-                    var first = j == 0 && j == 0;
+                    var first = j === 0 && i === 0;
                     if (first) {
                         firstItem = docItem;
                     }

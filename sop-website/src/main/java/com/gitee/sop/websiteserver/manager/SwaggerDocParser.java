@@ -8,11 +8,14 @@ import com.gitee.sop.websiteserver.bean.DocModule;
 import com.gitee.sop.websiteserver.bean.DocParameter;
 import com.gitee.sop.websiteserver.bean.DocParserContext;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,18 +58,28 @@ public class SwaggerDocParser implements DocParser {
                 .entrySet()
                 .stream()
                 .map(entry -> {
+                    List<DocItem> docItemList = entry.getValue();
                     DocModule docModule = new DocModule();
                     docModule.setModule(entry.getKey());
-                    docModule.setDocItems(entry.getValue());
+                    docModule.setDocItems(docItemList);
+                    docModule.setOrder(getMuduleOrder(docItemList));
                     return docModule;
-                })
+                }).sorted(Comparator.comparing(DocModule::getOrder))
                 .collect(Collectors.toList());
-
 
         DocInfo docInfo = new DocInfo();
         docInfo.setTitle(title);
         docInfo.setDocModuleList(docModuleList);
         return docInfo;
+    }
+
+    private int getMuduleOrder(List<DocItem> items) {
+        if (CollectionUtils.isEmpty(items)) {
+            return Integer.MAX_VALUE;
+        }
+        List<DocItem> docItemList = new ArrayList<>(items);
+        docItemList.sort(Comparator.comparing(DocItem::getModuleOrder));
+        return docItemList.get(0).getModuleOrder();
     }
 
     protected Collection<String> getHttpMethods(JSONObject pathInfo) {
@@ -93,6 +106,7 @@ public class SwaggerDocParser implements DocParser {
         docItem.setDescription(docInfo.getString("description"));
         docItem.setMultiple(docInfo.getString("multiple") != null);
         docItem.setProduces(docInfo.getJSONArray("produces").toJavaList(String.class));
+        docItem.setModuleOrder(NumberUtils.toInt(docInfo.getString("module_order"), 0));
         String moduleName = this.buildModuleName(docInfo, docRoot);
         docItem.setModule(moduleName);
         List<DocParameter> docParameterList = this.buildRequestParameterList(docInfo, docRoot);

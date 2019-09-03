@@ -37,7 +37,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
         ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         ConfigLimitDto configLimitDto = this.findConfigLimitDto(apiConfig, apiParam, exchange);
         if (configLimitDto == null) {
-            return null;
+            return chain.filter(exchange);
         }
         // 单个限流功能未开启
         if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {

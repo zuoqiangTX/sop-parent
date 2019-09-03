@@ -36,6 +36,10 @@ import static org.springframework.cloud.gateway.filter.AdaptCachedBodyGlobalFilt
  *
  * @see org.springframework.cloud.gateway.handler.predicate.ReadBodyPredicateFactory
  * 详见：https://blog.51cto.com/thinklili/2329184
+ *
+ * 使用地方：
+ * @see com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteCache
+ *
  * @author tanghc
  */
 public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory<ReadBodyRoutePredicateFactory.Config> {

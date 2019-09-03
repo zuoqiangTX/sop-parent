@@ -20,7 +20,7 @@ public class ZuulRouteCache extends BaseRouteCache<ZuulTargetRoute> {
     }
 
     @Override
-    protected ZuulTargetRoute buildRouteDefinition(ServiceRouteInfo serviceRouteInfo, RouteDefinition gatewayRouteDefinition) {
+    protected ZuulTargetRoute buildTargetRoute(ServiceRouteInfo serviceRouteInfo, RouteDefinition gatewayRouteDefinition) {
         Route route = new Route(
                 gatewayRouteDefinition.getId()
                 , gatewayRouteDefinition.getPath()

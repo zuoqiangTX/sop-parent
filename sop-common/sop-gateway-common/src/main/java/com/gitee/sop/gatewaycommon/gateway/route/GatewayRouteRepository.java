@@ -6,7 +6,6 @@ import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.event.PredicateArgsEvent;
-import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -40,7 +39,6 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     public Flux<org.springframework.cloud.gateway.route.RouteDefinition> getRouteDefinitions() {
         List<org.springframework.cloud.gateway.route.RouteDefinition> list = routes.values().parallelStream()
                 .map(TargetRoute::getTargetRouteDefinition)
-                .filter(routeDefinition -> !routeDefinition.getId().contains("_first.route_"))
                 .collect(Collectors.toList());
         return Flux.fromIterable(list);
     }
@@ -76,9 +74,8 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
      */
     @Override
     public String add(GatewayTargetRoute targetRoute) {
-        RouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
-        routes.put(baseRouteDefinition.getId(), targetRoute);
-        this.publisher.publishEvent(new RefreshRoutesEvent(this));
+        RouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        routes.put(routeDefinition.getId(), targetRoute);
         return "success";
     }
 

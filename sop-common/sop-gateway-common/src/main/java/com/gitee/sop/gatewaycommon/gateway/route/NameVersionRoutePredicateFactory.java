@@ -17,6 +17,9 @@ import java.util.function.Predicate;
 /**
  * 此断言决定执行哪个路由
  *
+ * 使用地方：
+ * @see com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteCache
+ *
  * @author tanghc
  */
 @Slf4j

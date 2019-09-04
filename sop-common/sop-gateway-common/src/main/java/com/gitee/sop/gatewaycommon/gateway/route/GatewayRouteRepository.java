@@ -1,11 +1,11 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.event.PredicateArgsEvent;
-import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
-import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -36,16 +36,15 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     private ApplicationEventPublisher publisher;
 
     @Override
-    public Flux<RouteDefinition> getRouteDefinitions() {
-        List<RouteDefinition> list = routes.values().parallelStream()
+    public Flux<org.springframework.cloud.gateway.route.RouteDefinition> getRouteDefinitions() {
+        List<org.springframework.cloud.gateway.route.RouteDefinition> list = routes.values().parallelStream()
                 .map(TargetRoute::getTargetRouteDefinition)
-                .filter(routeDefinition -> !routeDefinition.getId().contains("_first.route_"))
                 .collect(Collectors.toList());
         return Flux.fromIterable(list);
     }
 
     @Override
-    public Mono<Void> save(Mono<RouteDefinition> route) {
+    public Mono<Void> save(Mono<org.springframework.cloud.gateway.route.RouteDefinition> route) {
         return null;
     }
 
@@ -75,15 +74,14 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
      */
     @Override
     public String add(GatewayTargetRoute targetRoute) {
-        GatewayRouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
-        routes.put(baseRouteDefinition.getId(), targetRoute);
-        this.publisher.publishEvent(new RefreshRoutesEvent(this));
+        RouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        routes.put(routeDefinition.getId(), targetRoute);
         return "success";
     }
 
     @Override
     public void update(GatewayTargetRoute targetRoute) {
-        GatewayRouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
+        RouteDefinition baseRouteDefinition = targetRoute.getRouteDefinition();
         routes.put(baseRouteDefinition.getId(), targetRoute);
     }
 
@@ -99,6 +97,7 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     @Override
     public void deleteAll(String serviceId) {
         List<String> idList = this.routes.values().stream()
+                .filter(zuulTargetRoute -> StringUtils.equalsIgnoreCase(serviceId, zuulTargetRoute.getServiceRouteInfo().getServiceId()))
                 .map(zuulTargetRoute -> zuulTargetRoute.getRouteDefinition().getId())
                 .collect(Collectors.toList());
 

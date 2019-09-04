@@ -5,7 +5,6 @@ import com.gitee.sop.servercommon.bean.OpenContext;
 import com.gitee.sop.servercommon.bean.OpenContextImpl;
 import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.util.OpenUtil;
-import lombok.Setter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author tanghc
  */
-@Setter
 public class ServiceContextInterceptor extends HandlerInterceptorAdapter {
 
     @Override
@@ -44,7 +42,6 @@ public class ServiceContextInterceptor extends HandlerInterceptorAdapter {
         OpenContext openContext = new OpenContextImpl(requestParams);
         ServiceContext.getCurrentContext().setOpenContext(openContext);
     }
-
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {

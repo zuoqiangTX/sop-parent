@@ -1,6 +1,7 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
+import com.alibaba.nacos.api.naming.NamingService;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -15,32 +16,28 @@ import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.MetadataEnum;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.bean.ServiceGrayDefinition;
-import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.bean.ServiceInfo;
+import com.gitee.sop.adminserver.bean.ServiceInstance;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import com.gitee.sop.adminserver.common.StatusEnum;
-import com.gitee.sop.adminserver.common.ZookeeperPathExistException;
-import com.gitee.sop.adminserver.common.ZookeeperPathNotExistException;
 import com.gitee.sop.adminserver.entity.ConfigGray;
 import com.gitee.sop.adminserver.entity.ConfigGrayInstance;
 import com.gitee.sop.adminserver.mapper.ConfigGrayInstanceMapper;
 import com.gitee.sop.adminserver.mapper.ConfigGrayMapper;
-import com.gitee.sop.registryapi.bean.ServiceInfo;
-import com.gitee.sop.registryapi.bean.ServiceInstance;
-import com.gitee.sop.registryapi.service.RegistryService;
+import com.gitee.sop.adminserver.service.ConfigPushService;
+import com.gitee.sop.adminserver.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -63,70 +60,60 @@ public class ServiceApi {
     @Autowired
     private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
-    @Api(name = "zookeeper.service.list")
-    @ApiDocMethod(description = "zk中的服务列表", elementClass = RouteServiceInfo.class)
+    @Autowired
+    private ConfigPushService configPushService;
+
+    @NacosInjected
+    private NamingService namingService;
+
+    @Api(name = "registry.service.list")
+    @ApiDocMethod(description = "注册中心的服务列表", elementClass = RouteServiceInfo.class)
     List<RouteServiceInfo> listServiceInfo(ServiceSearchParam param) {
-        String routeRootPath = ZookeeperContext.getSopRouteRootPath();
-        List<ChildData> childDataList = ZookeeperContext.getChildrenData(routeRootPath);
-        List<RouteServiceInfo> serviceInfoList = childDataList.stream()
-                .filter(childData -> childData.getData() != null && childData.getData().length > 0)
-                .map(childData -> {
-                    String serviceNodeData = new String(childData.getData());
-                    RouteServiceInfo serviceInfo = JSON.parseObject(serviceNodeData, RouteServiceInfo.class);
-                    return serviceInfo;
-                })
+        List<ServiceInfo> servicesOfServer = null;
+        try {
+            servicesOfServer = registryService.listAllService(1, Integer.MAX_VALUE);
+        } catch (Exception e) {
+            log.error("获取服务列表失败", e);
+            throw new BizException("获取服务列表失败");
+        }
+
+        return servicesOfServer
+                .stream()
                 .filter(serviceInfo -> {
+                    String serviceId = serviceInfo.getServiceId();
+                    if ("api-gateway".equalsIgnoreCase(serviceId)) {
+                        return false;
+                    }
+                    // 隐藏空服务
+                    if (CollectionUtils.isEmpty(serviceInfo.getInstances())) {
+                        return false;
+                    }
                     if (StringUtils.isBlank(param.getServiceId())) {
                         return true;
                     } else {
-                        return serviceInfo.getServiceId().contains(param.getServiceId());
+                        return serviceId.contains(param.getServiceId());
                     }
                 })
+                .map(serviceInfo -> {
+                    RouteServiceInfo routeServiceInfo = new RouteServiceInfo();
+                    routeServiceInfo.setServiceId(serviceInfo.getServiceId());
+                    return routeServiceInfo;
+                })
                 .collect(Collectors.toList());
-
-        return serviceInfoList;
     }
 
     @Api(name = "service.custom.add")
     @ApiDocMethod(description = "添加服务")
     void addService(ServiceAddParam param) {
-        String serviceId = param.getServiceId();
-        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
-        ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
-        Date now = new Date();
-        serviceRouteInfo.setServiceId(serviceId);
-        serviceRouteInfo.setDescription("自定义服务");
-        serviceRouteInfo.setCreateTime(now);
-        serviceRouteInfo.setUpdateTime(now);
-        serviceRouteInfo.setCustom(BooleanUtils.toInteger(true));
-        String serviceData = JSON.toJSONString(serviceRouteInfo);
-        try {
-            ZookeeperContext.addPath(servicePath, serviceData);
-        } catch (ZookeeperPathExistException e) {
-            throw new BizException("服务已存在");
-        }
+        // TODO: 添加服务
+        throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.custom.del")
     @ApiDocMethod(description = "删除自定义服务")
     void delService(ServiceSearchParam param) {
-        String serviceId = param.getServiceId();
-        String servicePath = ZookeeperContext.buildServiceIdPath(serviceId);
-        String data = null;
-        try {
-            data = ZookeeperContext.getData(servicePath);
-        } catch (ZookeeperPathNotExistException e) {
-            throw new BizException("服务不存在");
-        }
-        if (StringUtils.isBlank(data)) {
-            throw new BizException("非自定义服务，无法删除");
-        }
-        ServiceRouteInfo serviceRouteInfo = JSON.parseObject(data, ServiceRouteInfo.class);
-        int custom = serviceRouteInfo.getCustom();
-        if (!BooleanUtils.toBoolean(custom)) {
-            throw new BizException("非自定义服务，无法删除");
-        }
-        ZookeeperContext.deletePathDeep(servicePath);
+        // TODO: 删除自定义服务
+        throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.instance.list")
@@ -134,7 +121,7 @@ public class ServiceApi {
     List<ServiceInstanceVO> listService(ServiceSearchParam param) {
         List<ServiceInfo> serviceInfos;
         try {
-            serviceInfos = registryService.listAllService(1, 99999);
+            serviceInfos = registryService.listAllService(1, Integer.MAX_VALUE);
         } catch (Exception e) {
             log.error("获取服务实例失败", e);
             return Collections.emptyList();
@@ -235,12 +222,12 @@ public class ServiceApi {
     @Api(name = "service.instance.env.gray.open")
     @ApiDocMethod(description = "开启灰度发布")
     void serviceEnvGray(ServiceInstanceParam param) throws IOException {
+        String serviceId = param.getServiceId().toLowerCase();
+        ConfigGray configGray = this.getConfigGray(serviceId);
+        if (configGray == null) {
+            throw new BizException("请先设置灰度参数");
+        }
         try {
-            String serviceId = param.getServiceId().toLowerCase();
-            ConfigGray configGray = this.getConfigGray(serviceId);
-            if (configGray == null) {
-                throw new BizException("请先设置灰度参数");
-            }
             MetadataEnum envPre = MetadataEnum.ENV_GRAY;
             registryService.setMetadata(param.buildServiceInstance(), envPre.getKey(), envPre.getValue());
 
@@ -293,10 +280,7 @@ public class ServiceApi {
         serviceGrayDefinition.setInstanceId(instanceId);
         serviceGrayDefinition.setServiceId(serviceId);
         ChannelMsg channelMsg = new ChannelMsg(channelOperation, serviceGrayDefinition);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getServiceGrayChannelPath();
-        log.info("消息推送--灰度发布({}), path:{}, data:{}", channelOperation.getOperation(), path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 
     private ConfigGray getConfigGray(String serviceId) {

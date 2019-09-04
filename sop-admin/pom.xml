@@ -9,7 +9,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>sop-admin-front</module>
 		<module>sop-admin-server</module>
 	</modules>
 </project>

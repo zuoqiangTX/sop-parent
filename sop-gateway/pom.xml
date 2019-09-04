@@ -17,13 +17,19 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <!-- nacos spring cloud版本号 -->
+        <spring-cloud-alibaba-nacos.version>0.9.0.RELEASE</spring-cloud-alibaba-nacos.version>
+        <!-- nacos客户端版本号 -->
+        <nacos-client.version>1.1.0</nacos-client.version>
+        <!-- springboot for nacos,https://nacos.io/zh-cn/docs/quick-start-spring-boot.html -->
+        <nacos-spring-boot-starter.version>0.2.3</nacos-spring-boot-starter.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.gitee.sop</groupId>
             <artifactId>sop-gateway-common</artifactId>
-            <version>1.15.2-SNAPSHOT</version>
+            <version>2.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- ↓↓↓ 使用spring cloud zuul ↓↓↓ -->
@@ -37,23 +43,6 @@
         </dependency>
         <!-- ↑↑↑ 使用spring cloud zuul ↑↑↑ -->
 
-
-        <!-- ↓↓↓ 使用spring cloud gateway，处于beta阶段，推荐使用zuul ↓↓↓
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-gateway</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        -->
-        <!-- ↑↑↑ 使用spring cloud gateway ↑↑↑ -->
-
         <dependency>
             <groupId>net.oschina.durcframework</groupId>
             <artifactId>fastmybatis-spring-boot-starter</artifactId>
@@ -65,25 +54,31 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- 注册中心【只能用一个，不用的注释掉】 -->
-        <!-- 使用eureka注册中心 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-
         <!-- 使用nacos注册中心
             版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本，版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
            https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-alibaba-nacos-discovery
-
+        -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-            <version>0.2.2.RELEASE</version>
+            <version>${spring-cloud-alibaba-nacos.version}</version>
         </dependency>
-        -->
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>${nacos-client.version}</version>
+        </dependency>
         <!-- 注册中心end -->
+
+        <!--
+            这里依赖springboot版本，非cloud版本。
+            如果依赖了spring-cloud-starter-alibaba-nacos-config，需要额外配置一个bootstrap.properties
+        -->
+        <dependency>
+            <groupId>com.alibaba.boot</groupId>
+            <artifactId>nacos-config-spring-boot-starter</artifactId>
+            <version>${nacos-spring-boot-starter.version}</version>
+        </dependency>
 
         <!-- test -->
         <dependency>

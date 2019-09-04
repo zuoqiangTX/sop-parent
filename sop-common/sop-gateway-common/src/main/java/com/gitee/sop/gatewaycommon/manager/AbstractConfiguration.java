@@ -13,8 +13,10 @@ import com.gitee.sop.gatewaycommon.validate.Validator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,18 +28,37 @@ import javax.annotation.PostConstruct;
 /**
  * @author tanghc
  */
-public class AbstractConfiguration implements ApplicationContextAware {
+public class AbstractConfiguration implements ApplicationContextAware, ApplicationListener<HeartbeatEvent> {
     @Autowired
     protected Environment environment;
 
     @Autowired
-    protected RouteManager apiMetaManager;
+    private ServiceRoutesLoader serviceRoutesLoader;
 
     protected ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         applicationContext = ctx;
+    }
+
+    /**
+     * nacos事件监听
+     * @see org.springframework.cloud.alibaba.nacos.discovery.NacosWatch NacosWatch
+     * @param heartbeatEvent
+     */
+    @Override
+    public void onApplicationEvent(HeartbeatEvent heartbeatEvent) {
+        serviceRoutesLoader.load(heartbeatEvent);
+    }
+
+    /**
+     * 微服务路由加载
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    ServiceRoutesLoader serviceRoutesLoader() {
+        return new ServiceRoutesLoader();
     }
 
     @Bean
@@ -84,7 +105,7 @@ public class AbstractConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
-    EnvGrayManager userKeyManager() {
+    EnvGrayManager envGrayManager() {
         return ApiConfig.getInstance().getUserKeyManager();
     }
 
@@ -96,15 +117,13 @@ public class AbstractConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
-    ParameterFormatter sopParameterFormatter(){
+    ParameterFormatter parameterFormatter() {
         return ApiConfig.getInstance().getParameterFormatter();
     }
 
 
     /**
      * 跨域过滤器
-     *
-     * @return
      */
     @Bean
     public CorsFilter corsFilter() {
@@ -136,11 +155,9 @@ public class AbstractConfiguration implements ApplicationContextAware {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
         }
         EnvironmentContext.setEnvironment(environment);
-        ZookeeperContext.setEnvironment(environment);
 
         initMessage();
         initBeanInitializer();
-        apiMetaManager.refresh();
         doAfter();
 
     }

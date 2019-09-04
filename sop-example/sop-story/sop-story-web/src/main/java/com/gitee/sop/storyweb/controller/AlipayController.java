@@ -6,23 +6,28 @@ import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.OpenContext;
 import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.story.api.domain.Story;
+import com.gitee.sop.storyweb.controller.param.CategoryParam;
 import com.gitee.sop.storyweb.controller.param.StoryParam;
+import com.gitee.sop.storyweb.controller.result.CategoryResult;
+import com.gitee.sop.storyweb.controller.result.StoryResult;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
  * 支付宝服务端，假设签名验证通过后，到达这里进行具体的业务处理。
+ *
  * @author tanghc
  */
 @RestController
@@ -33,52 +38,56 @@ public class AlipayController {
     // http://localhost:2222/story_get
     // 原生的接口，可正常调用
     @RequestMapping("story_get")
-    public Story story_get() {
-        Story story = new Story();
-        story.setId(1);
-        story.setName("海底小纵队(原生)");
-        return story;
+    public StoryResult story_get() {
+        StoryResult result = new StoryResult();
+        result.setId(1L);
+        result.setName("海底小纵队(原生)");
+        return result;
     }
 
     // http://localhost:2222/story.get/
     // 接口名，使用默认版本号
     @ApiMapping(value = "story.get")
-    public Story storyget() {
+    public StoryResult storyget() {
         // 获取开放平台参数
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         String appId = openContext.getAppId();
-        Story story = new Story();
-        story.setId(1);
-        story.setName("海底小纵队(默认版本号), app_id:" + appId);
-        return story;
+        StoryResult result = new StoryResult();
+        result.setId(1L);
+        result.setName("海底小纵队(默认版本号), app_id:" + appId);
+        return result;
     }
 
     // http://localhost:2222/story.get/?version=1.1
     // 接口名 + 版本号
     @ApiMapping(value = "story.get", version = "1.1")
-    public Story getStory2() {
-        Story story = new Story();
-        story.setId(1);
-        story.setName("海底小纵队1.0");
-        return story;
+    public StoryResult getStory2() {
+        StoryResult result = new StoryResult();
+        result.setId(1L);
+        result.setName("海底小纵队1.0");
+        return result;
     }
 
     // http://localhost:2222/story.get/?name=111&version=2.0
     // 接口名 + 版本号
+    // StoryParam对应biz_content内容
     @ApiMapping(value = "story.get", version = "2.0")
-    public Story getStory20(Story story) {
-        return story;
+    public StoryResult getStory20(StoryParam param) {
+        StoryResult result = new StoryResult();
+        BeanUtils.copyProperties(param, result);
+        return result;
     }
 
     // 忽略验证
     @ApiMapping(value = "story.get", version = "2.1", ignoreValidate = true)
-    public Story getStory21(Story story) {
+    public StoryResult getStory21(StoryParam story) {
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         // 此处的param和story参数是一样的
-        Story param = openContext.getBizObject(Story.class);
+        StoryParam param = openContext.getBizObject(StoryParam.class);
         boolean isSame = story == param;
-        story.setName(story.getName() + ", story.get2.1, ignoreValidate = true, story==param:" + isSame);
-        return story;
+        StoryResult result = new StoryResult();
+        result.setName(story.getName() + ", story.get2.1, ignoreValidate = true, story==param:" + isSame);
+        return result;
     }
 
     /**
@@ -94,27 +103,37 @@ public class AlipayController {
      *     return bizObject;
      * }
      * </pre>
+     *
      * @param openContext
      * @return
      */
     @ApiMapping(value = "story.get", version = "2.2")
-    public Story getStory22(OpenContext<Story> openContext) {
-        Story bizObject = openContext.getBizObject();
+    public StoryResult getStory22(OpenContext<StoryParam> openContext) {
+        StoryParam bizObject = openContext.getBizObject();
         // 获取appid，更多方法查看OpenContext类
         String appId = openContext.getAppId();
+        StoryResult result = new StoryResult();
+        result.setName("appId:" + appId + ", " + bizObject.getName());
+        return result;
+    }
+
+    @ApiMapping(value = "story.get", version = "2.3")
+    public StoryResult getStory23(StoryParam param, HttpServletRequest request) {
+        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
+        String appId = openContext.getAppId();
         System.out.println(appId);
-        return bizObject;
+        StoryResult story = new StoryResult();
+        story.setName("appId:" + appId + ", " + param.getName() + "，ip:" + request.getLocalAddr());
+        return story;
     }
 
     // http://localhost:2222/getStory2
     // 遗留接口具备开放平台能力
     @ApiAbility
     @GetMapping("getStory2")
-    public Story getStory2_0() {
-        OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
-        System.out.println(openContext.getAppId());
-        Story story = new Story();
-        story.setId(1);
+    public StoryResult getStory2_0() {
+        StoryResult story = new StoryResult();
+        story.setId(1L);
         story.setName("海底小纵队(默认版本号)");
         return story;
     }
@@ -123,118 +142,117 @@ public class AlipayController {
     // 遗留接口具备开放平台能力，在原来的基础上加版本号
     @ApiAbility(version = "2.1")
     @GetMapping("getStory2")
-    public Story getStory2_1() {
-        Story story = new Story();
-        story.setId(1);
+    public StoryResult getStory2_1() {
+        StoryResult story = new StoryResult();
+        story.setId(1L);
         story.setName("海底小纵队2.1");
         return story;
     }
 
     // http://localhost:2222/alipay.story.get/
+    @ApiOperation(value="获取故事信息2", notes = "获取故事信息2的详细信息")
     @ApiMapping(value = "alipay.story.get")
-    public Story getStory(Story param) {
-        Story story = new Story();
-        story.setId(1);
+    public StoryResult getStory(StoryParam param) {
+        StoryResult story = new StoryResult();
+        story.setId(1L);
         story.setName("海底小纵队(alipay.story.get1.0), param:" + param);
         return story;
     }
 
     /**
-     *
      * @param param 对应biz_content中的内容，并自动JSR-303校验
      * @return
      */
     @ApiMapping(value = "alipay.story.get", version = "1.2")
-    public Story getStory11(Story param) {
-        Story story2 = new Story();
-        story2.setId(1);
+    public StoryResult getStory11(StoryParam param) {
+        StoryResult story2 = new StoryResult();
+        story2.setId(1L);
         story2.setName("海底小纵队(alipay.story.get1.2), param:" + param);
         return story2;
     }
 
     /**
      * 验证字符串乱码问题
+     *
      * @param param
      * @return
      */
     @ApiMapping(value = "story.string.get", version = "1.0")
-    public String string(Story param) {
-        Story story2 = new Story();
-        story2.setId(1);
+    public String string(StoryParam param) {
+        StoryResult story2 = new StoryResult();
+        story2.setId(1L);
         story2.setName("海底小纵队");
         return JSON.toJSONString(story2);
     }
 
     /**
      * 参数绑定
+     *
      * @param story 对应biz_content中的内容，并自动JSR-303校验
      * @return
      */
     @ApiOperation(value = "获取故事信息", notes = "说明接口的详细信息，介绍，用途，注意事项等。")
     @ApiMapping(value = "alipay.story.find")
-    public StoryVO getStory2(StoryParam story) {
+    public StoryResult getStory2(StoryParam story) {
         log.info("获取故事信息参数, story: {}", story);
         // 获取其它参数
         OpenContext openContext = ServiceContext.getCurrentContext().getOpenContext();
         String app_id = openContext.getAppId();
-        StoryVO storyVO = new StoryVO();
-        storyVO.id = 1L;
-        storyVO.name = "白雪公主, app_id:" + app_id;
-        storyVO.gmt_create = new Date();
-        return storyVO;
+        StoryResult result = new StoryResult();
+        result.setName("白雪公主, app_id:" + app_id);
+        result.setGmt_create(new Date());
+        return result;
     }
 
     @ApiOperation(value = "返回数组结果", notes = "返回数组结果")
     @ApiMapping(value = "alipay.story.find2")
-    public List<StoryVO> getStory3(StoryParam story) {
+    public List<StoryResult> getStory3(StoryParam story) {
         int index = 0;
-        StoryVO storyVO = new StoryVO();
-        storyVO.id = 1L;
-        storyVO.name = "白雪公主, index:" + index++;
-        storyVO.gmt_create = new Date();
+        StoryResult storyVO = new StoryResult();
+        storyVO.setId(1L);
+        storyVO.setName("白雪公主, index:" + index++);
+        storyVO.setGmt_create(new Date());
 
-        StoryVO storyVO2 = new StoryVO();
-        storyVO2.id = 1L;
-        storyVO2.name = "白雪公主, index:" + index++;
-        storyVO2.gmt_create = new Date();
+        StoryResult storyVO2 = new StoryResult();
+        storyVO2.setId(1L);
+        storyVO2.setName("白雪公主, index:" + index++);
+        storyVO2.setGmt_create(new Date());
 
         return Arrays.asList(storyVO, storyVO2);
     }
 
     /**
      * 演示文档表格树
-     * @param story
+     *
+     * @param param
      * @return
      */
-    @ApiOperation(value="获取分类信息", notes = "演示表格树")
+    @ApiOperation(value = "获取分类信息", notes = "演示表格树")
     @ApiMapping(value = "alipay.category.get", method = RequestMethod.POST)
-    public Category getCategory(Category story) {
-        StoryVO storyVO = new StoryVO();
-        storyVO.id = 1L;
-        storyVO.name = "白雪公主";
-        storyVO.gmt_create = new Date();
-        Category category = new Category();
-        category.setCategoryName("娱乐");
-        category.setStory(storyVO);
-        return category;
+    public CategoryResult getCategory(CategoryParam param) {
+        StoryResult result = new StoryResult();
+        result.setId(1L);
+        result.setName("白雪公主");
+        result.setGmt_create(new Date());
+        CategoryResult categoryResult = new CategoryResult();
+        categoryResult.setCategoryName("娱乐");
+        categoryResult.setStoryResult(result);
+        return categoryResult;
+    }
+
+    // 测试参数绑定，http://localhost:2222/story/getStory4?biz_content=%7b%22id%22%3a1%2c%22name%22%3a%22aaaa%22%7d
+    @ApiAbility
+    @GetMapping("getStory4")
+    public StoryResult getStory4(Story param, P p2) {
+        System.out.println(param + ", p2=" + p2);
+        StoryResult result = new StoryResult();
+        result.setId(1L);
+        result.setName("海底小纵队(默认版本号)" + param + ", p2=" + p2);
+        return result;
     }
 
     @Data
-    public static class StoryVO {
-        @ApiModelProperty(value = "故事ID", example = "1")
-        private Long id;
-        @ApiModelProperty(value = "故事名称", example = "海底小纵队")
+    public static class P {
         private String name;
-        @ApiModelProperty(value = "创建时间", example = "2019-04-14 19:02:12")
-        private Date gmt_create;
-    }
-
-    @Data
-    public static class Category {
-        @ApiModelProperty(value = "分类名称", example = "娱乐")
-        private String categoryName;
-
-        @ApiModelProperty(value = "分类故事")
-        private StoryVO story;
     }
 }

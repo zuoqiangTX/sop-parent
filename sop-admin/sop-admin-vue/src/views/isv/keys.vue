@@ -16,7 +16,7 @@
           :closable="false"
         />
       </el-form-item>
-      <el-form-item :label="selfLabel('appKey')">
+      <el-form-item :label="selfLabel('appId')">
         <div>{{ isvKeysFormData.appKey }}</div>
       </el-form-item>
       <el-form-item v-show="showKeys()" label="秘钥格式">

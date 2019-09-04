@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PreParameterFormatterFilter extends BaseZuulFilter {
 
     @Autowired(required = false)
-    private ParameterFormatter sopParameterFormatter;
+    private ParameterFormatter parameterFormatter;
 
     @Override
     protected FilterType getFilterType() {
@@ -33,8 +33,8 @@ public class PreParameterFormatterFilter extends BaseZuulFilter {
     protected Object doRun(RequestContext requestContext) throws ZuulException {
         ApiParam apiParam = ZuulContext.getApiParam();
         // 校验成功后进行参数转换
-        if (sopParameterFormatter != null) {
-            ZuulParameterUtil.format(apiParam, sopParameterFormatter::format);
+        if (parameterFormatter != null) {
+            ZuulParameterUtil.format(apiParam, parameterFormatter::format);
             requestContext.addZuulRequestHeader(ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
         }
         return null;

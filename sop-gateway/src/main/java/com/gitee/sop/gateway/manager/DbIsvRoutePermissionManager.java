@@ -1,6 +1,9 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
+import com.alibaba.nacos.api.config.ConfigService;
+import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.entity.IsvInfo;
 import com.gitee.sop.gateway.entity.PermIsvRole;
@@ -10,8 +13,8 @@ import com.gitee.sop.gateway.mapper.PermIsvRoleMapper;
 import com.gitee.sop.gateway.mapper.PermRolePermissionMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.IsvRoutePermission;
+import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
-import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -51,6 +54,9 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
+    @NacosInjected
+    private ConfigService configService;
+
     @Override
     public void load() {
         // key: appKey, value: roleCodeList
@@ -72,7 +78,10 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
         this.update(isvRoutePermission);
     }
 
-    // 获取ISV对应的角色
+    /**
+     * 获取ISV对应的角色
+     * @return 返回ISV角色信息，key：appId，value：角色code列表
+     */
     public Map<String, List<String>> getIsvRoleCode() {
         Query query = new Query();
         List<PermIsvRole> permIsvRoles = permIsvRoleMapper.list(query);
@@ -121,39 +130,32 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
 
     @PostConstruct
     protected void after() throws Exception {
-        ZookeeperContext.setEnvironment(environment);
-        String isvChannelPath = ZookeeperContext.getIsvRoutePermissionChannelPath();
-        ZookeeperContext.listenPath(isvChannelPath, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final IsvRoutePermission isvRoutePermission = JSON.parseObject(channelMsg.getData(), IsvRoutePermission.class);
-            switch (channelMsg.getOperation()) {
-                case "reload":
-                    log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    String listenPath = isvRoutePermission.getListenPath();
-                    String code = "";
-                    try {
-                        load();
-                    } catch (Exception e) {
-                        log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
-                        code = e.getMessage();
-                    }
-                    try {
-                        ZookeeperContext.updatePath(listenPath, code);
-                    } catch (Exception e1) {
-                        log.error("重新加载路由权限信息, zookeeper操作失败， path: {}", listenPath, e1);
-                    }
-                    break;
-                case "update":
-                    log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    update(isvRoutePermission);
-                    break;
-                case "remove":
-                    log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                    remove(isvRoutePermission.getAppKey());
-                    break;
-                default:
+        configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String configInfo) {
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                final IsvRoutePermission isvRoutePermission = JSON.parseObject(channelMsg.getData(), IsvRoutePermission.class);
+                switch (channelMsg.getOperation()) {
+                    case "reload":
+                        log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                        String listenPath = isvRoutePermission.getListenPath();
+                        try {
+                            load();
+                        } catch (Exception e) {
+                            log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
+                        }
+                        break;
+                    case "update":
+                        log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                        update(isvRoutePermission);
+                        break;
+                    case "remove":
+                        log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                        remove(isvRoutePermission.getAppKey());
+                        break;
+                    default:
 
+                }
             }
         });
     }

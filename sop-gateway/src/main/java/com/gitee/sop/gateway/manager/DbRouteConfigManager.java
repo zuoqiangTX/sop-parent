@@ -1,16 +1,19 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
+import com.alibaba.nacos.api.config.ConfigService;
+import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.mapper.ConfigRouteBaseMapper;
 import com.gitee.sop.gateway.mapper.ConfigRouteLimitMapper;
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
+import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.DefaultRouteConfigManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
-import com.gitee.sop.gatewaycommon.manager.ZookeeperContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -35,13 +38,15 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
     @Autowired
     Environment environment;
 
+    @NacosInjected
+    private ConfigService configService;
+
     @Override
     public void load() {
         loadAllRoute();
 
         Query query = new Query();
         configRouteBaseMapper.list(query)
-                .stream()
                 .forEach(configRouteBase -> {
                     String key = configRouteBase.getRouteId();
                     putVal(key, configRouteBase);
@@ -50,14 +55,13 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     protected void loadAllRoute() {
         Collection<? extends TargetRoute> targetRoutes = RouteRepositoryContext.getRouteRepository().getAll();
-        targetRoutes.stream()
-                .forEach(targetRoute -> {
-                    BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        targetRoutes.forEach(targetRoute -> {
+                    RouteDefinition routeDefinition = targetRoute.getRouteDefinition();
                     initRouteConfig(routeDefinition);
                 });
     }
 
-    protected void initRouteConfig(BaseRouteDefinition routeDefinition) {
+    protected void initRouteConfig(RouteDefinition routeDefinition) {
         String routeId = routeDefinition.getId();
         RouteConfig routeConfig = newRouteConfig();
         routeConfig.setRouteId(routeId);
@@ -71,22 +75,22 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
 
     @PostConstruct
     protected void after() throws Exception {
-        ZookeeperContext.setEnvironment(environment);
-        String path = ZookeeperContext.getRouteConfigChannelPath();
-        ZookeeperContext.listenPath(path, nodeCache -> {
-            String nodeData = new String(nodeCache.getCurrentData().getData());
-            ChannelMsg channelMsg = JSON.parseObject(nodeData, ChannelMsg.class);
-            final RouteConfig routeConfig = JSON.parseObject(channelMsg.getData(), RouteConfig.class);
-            switch (channelMsg.getOperation()) {
-                case "reload":
-                    log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
-                    load();
-                    break;
-                case "update":
-                    log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
-                    update(routeConfig);
-                    break;
-                default:
+        configService.addListener(NacosConfigs.DATA_ID_ROUTE_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String configInfo) {
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                final RouteConfig routeConfig = JSON.parseObject(channelMsg.getData(), RouteConfig.class);
+                switch (channelMsg.getOperation()) {
+                    case "reload":
+                        log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
+                        load();
+                        break;
+                    case "update":
+                        log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
+                        update(routeConfig);
+                        break;
+                    default:
+                }
             }
         });
     }

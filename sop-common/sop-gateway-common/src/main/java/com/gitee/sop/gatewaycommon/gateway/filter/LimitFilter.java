@@ -17,6 +17,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class LimitFilter implements GlobalFilter, Ordered {
         ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         ConfigLimitDto configLimitDto = this.findConfigLimitDto(apiConfig, apiParam, exchange);
         if (configLimitDto == null) {
-            return null;
+            return chain.filter(exchange);
         }
         // 单个限流功能未开启
         if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {

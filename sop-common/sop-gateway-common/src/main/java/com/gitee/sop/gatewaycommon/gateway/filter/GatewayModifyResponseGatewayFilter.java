@@ -2,6 +2,7 @@ package com.gitee.sop.gatewaycommon.gateway.filter;
 
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.result.ResultExecutor;
+import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -13,6 +14,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.client.reactive.ClientHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -41,11 +43,13 @@ public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered
 
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-
+                String originalResponseContentType = exchange.getAttribute(ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
+                // 如果是下载文件，直接放行，不合并结果
+                if (StringUtils.containsIgnoreCase(originalResponseContentType, MediaType.APPLICATION_OCTET_STREAM_VALUE)) {
+                    return chain.filter(exchange);
+                }
                 Class inClass = String.class;
                 Class outClass = String.class;
-
-                String originalResponseContentType = exchange.getAttribute(ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
                 HttpHeaders httpHeaders = new HttpHeaders();
                 //explicitly add it in this way instead of 'httpHeaders.setContentType(originalResponseContentType)'
                 //this will prevent exception in case of using non-standard media types like "Content-Type: image"

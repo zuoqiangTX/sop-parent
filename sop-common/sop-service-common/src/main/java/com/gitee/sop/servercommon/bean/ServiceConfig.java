@@ -1,7 +1,5 @@
 package com.gitee.sop.servercommon.bean;
 
-import com.gitee.sop.servercommon.configuration.DefaultGlobalExceptionHandler;
-import com.gitee.sop.servercommon.configuration.GlobalExceptionHandler;
 import com.gitee.sop.servercommon.param.ApiArgumentResolver;
 import com.gitee.sop.servercommon.param.SopHandlerMethodArgumentResolver;
 import com.gitee.sop.servercommon.result.DefaultServiceResultBuilder;
@@ -44,11 +42,6 @@ public class ServiceConfig {
      * 返回结果处理
      */
     private ServiceResultBuilder serviceResultBuilder = new DefaultServiceResultBuilder();
-
-    /**
-     * 全局异常处理
-     */
-    private GlobalExceptionHandler globalExceptionHandler = new DefaultGlobalExceptionHandler();
 
     /**
      * 默认版本号

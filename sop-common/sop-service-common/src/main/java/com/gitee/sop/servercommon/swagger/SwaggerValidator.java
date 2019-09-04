@@ -1,7 +1,6 @@
 package com.gitee.sop.servercommon.swagger;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.DigestUtils;
+import com.gitee.sop.servercommon.util.OpenUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,14 +32,7 @@ public class SwaggerValidator {
     }
 
     public boolean validate(HttpServletRequest request) {
-        String time = request.getParameter("time");
-        String sign = request.getParameter("sign");
-        if (StringUtils.isAnyBlank(time, sign)) {
-            return false;
-        }
-        String source = secret + time + secret;
-        String serverSign = DigestUtils.md5DigestAsHex(source.getBytes());
-        return serverSign.equals(sign);
+        return OpenUtil.validateSimpleSign(request, secret);
     }
 
     public void writeForbidden(HttpServletResponse response) throws IOException {

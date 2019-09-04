@@ -1,12 +1,12 @@
 package com.gitee.sop.adminserver.service;
 
-import com.alibaba.fastjson.JSON;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.ConfigLimitDto;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.bean.RouteConfigDto;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
 import com.gitee.sop.adminserver.common.ChannelOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RouteConfigService {
 
+    @Autowired
+    private ConfigPushService configPushService;
+
     /**
      * 发送路由配置消息
      * @param routeConfigDto
@@ -23,10 +26,7 @@ public class RouteConfigService {
      */
     public void sendRouteConfigMsg(RouteConfigDto routeConfigDto) {
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_CONFIG_UPDATE, routeConfigDto);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getRouteConfigChannelPath();
-        log.info("消息推送--路由配置(update), path:{}, data:{}", path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_ROUTE_CONFIG, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 
     /**
@@ -36,9 +36,6 @@ public class RouteConfigService {
      */
     public void sendLimitConfigMsg(ConfigLimitDto routeConfigDto) throws Exception {
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.LIMIT_CONFIG_UPDATE, routeConfigDto);
-        String jsonData = JSON.toJSONString(channelMsg);
-        String path = ZookeeperContext.getLimitConfigChannelPath();
-        log.info("消息推送--限流配置(update), path:{}, data:{}", path, jsonData);
-        ZookeeperContext.createOrUpdateData(path, jsonData);
+        configPushService.publishConfig(NacosConfigs.DATA_ID_LIMIT_CONFIG, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 }

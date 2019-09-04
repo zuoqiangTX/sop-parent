@@ -18,7 +18,7 @@ public class Orders {
     /** 验证拦截器order */
     public static final int LIMIT_FILTER_ORDER = PRE_ROUTE_PERMISSION_FILTER_ORDER + 100;
 
-    /** 决定版本号过滤器 */
-    public static final int VERSION_DECISION_FILTER_ORDER = LIMIT_FILTER_ORDER + 100;
+    /** 灰度发布过滤器 */
+    public static final int ENV_GRAY_FILTER_ORDER = LIMIT_FILTER_ORDER + 100;
 
 }

@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
-import com.gitee.sop.gatewaycommon.bean.BaseServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.ErrorDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
+import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
@@ -39,18 +39,18 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     private static final ErrorMeta ISP_BIZ_ERROR = ErrorEnum.BIZ_ERROR.getErrorMeta();
     private static final ErrorMeta ISV_MISSING_METHOD_META = ErrorEnum.ISV_MISSING_METHOD.getErrorMeta();
 
-    public static final String GATEWAY_CODE_NAME = "code";
-    public static final String GATEWAY_MSG_NAME = "msg";
-    public static final String ARRAY_START = "[";
-    public static final String ARRAY_END = "]";
-    public static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
-    public static final String ERROR_METHOD = "error";
+    private static final String GATEWAY_CODE_NAME = "code";
+    private static final String GATEWAY_MSG_NAME = "msg";
+    private static final String ARRAY_START = "[";
+    private static final String ARRAY_END = "]";
+    private static final String ROOT_JSON = "{'items':%s}".replace("'", "\"");
+    private static final String ERROR_METHOD = "error";
 
 
     /**
      * 获取业务方约定的返回码
      *
-     * @param t
+     * @param t request
      * @return 返回返回码
      */
     public abstract int getResponseStatus(T t);
@@ -58,15 +58,15 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
     /**
      * 获取微服务端的错误信息
      *
-     * @param t
-     * @return
+     * @param t request
+     * @return 返回错误信息
      */
     public abstract String getResponseErrorMessage(T t);
 
     /**
      * 返回Api参数
      *
-     * @param t
+     * @param t request
      * @return 返回api参数
      */
     public abstract Map<String, Object> getApiParam(T t);
@@ -97,10 +97,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             responseData.put(GATEWAY_MSG_NAME, ISV_MISSING_METHOD_META.getError().getCode());
         } else {
             Map<String, Object> params = this.getApiParam(request);
-            String name = this.getParamValue(params, ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
-            String version = this.getParamValue(params, ParamNames.VERSION_NAME, SopConstants.UNKNOWN_VERSION);
-            String appId = this.getParamValue(params, ParamNames.APP_KEY_NAME, SopConstants.UNKNOWN_APPID);
-            log.error("微服务端报错，方法名:{}, 版本号:{}, appId:{}, 微服务返回结果:{}",name, version, appId, serviceResult);
+            log.error("微服务端报错，params:{}, 微服务返回结果:{}", params, serviceResult);
             this.storeError(request, ErrorType.UNKNOWN);
             // 微服务端有可能返回500错误
             // {"path":"/book/getBook3","error":"Internal Server Error","message":"id不能为空","timestamp":"2019-02-13T07:41:00.495+0000","status":500}
@@ -144,7 +141,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return defaultSetting;
         }
         ApiInfo apiInfo = this.getApiInfo(request);
-        BaseRouteDefinition baseRouteDefinition = apiInfo.baseRouteDefinition;
+        RouteDefinition baseRouteDefinition = apiInfo.gatewayRouteDefinition;
         return Optional.ofNullable(baseRouteDefinition)
                 .map(routeDefinition -> {
                     int mergeResult = baseRouteDefinition.getMergeResult();
@@ -162,18 +159,18 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
         String serviceId = Optional.ofNullable(targetRoute)
                 .flatMap(route -> Optional.ofNullable(route.getServiceRouteInfo()))
-                .map(BaseServiceRouteInfo::getServiceId)
+                .map(ServiceRouteInfo::getServiceId)
                 .orElse(SopConstants.UNKNOWN_SERVICE);
 
-        BaseRouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
-                .map(route -> route.getRouteDefinition())
+        RouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
+                .map(TargetRoute::getRouteDefinition)
                 .orElse(null);
 
         ApiInfo apiInfo = new ApiInfo();
         apiInfo.name = name;
         apiInfo.version = version;
         apiInfo.serviceId = serviceId;
-        apiInfo.baseRouteDefinition = baseRouteDefinition;
+        apiInfo.gatewayRouteDefinition = baseRouteDefinition;
         return apiInfo;
     }
 
@@ -281,7 +278,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         private String name;
         private String version;
         private String serviceId;
-        private BaseRouteDefinition baseRouteDefinition;
+        private RouteDefinition gatewayRouteDefinition;
     }
 
     enum ErrorType {

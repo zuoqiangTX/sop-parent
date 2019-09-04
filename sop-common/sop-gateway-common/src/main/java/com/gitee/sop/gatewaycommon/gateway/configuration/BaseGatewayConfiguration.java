@@ -1,18 +1,18 @@
 package com.gitee.sop.gatewaycommon.gateway.configuration;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
+import com.gitee.sop.gatewaycommon.gateway.filter.EnvGrayFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.GatewayModifyResponseGatewayFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.LimitFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.LoadBalancerClientExtFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.ParameterFormatterFilter;
 import com.gitee.sop.gatewaycommon.gateway.filter.ValidateFilter;
 import com.gitee.sop.gatewaycommon.gateway.handler.GatewayExceptionHandler;
+import com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteCache;
 import com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteRepository;
-import com.gitee.sop.gatewaycommon.gateway.route.GatewayZookeeperRouteManager;
 import com.gitee.sop.gatewaycommon.gateway.route.NameVersionRoutePredicateFactory;
 import com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory;
 import com.gitee.sop.gatewaycommon.manager.AbstractConfiguration;
-import com.gitee.sop.gatewaycommon.manager.RouteManager;
 import com.gitee.sop.gatewaycommon.manager.RouteRepositoryContext;
 import com.gitee.sop.gatewaycommon.param.ParamBuilder;
 import org.springframework.beans.factory.ObjectProvider;
@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
@@ -92,6 +91,11 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
     }
 
     @Bean
+    ParameterFormatterFilter parameterFormatterFilter() {
+        return new ParameterFormatterFilter();
+    }
+
+    @Bean
     LimitFilter limitFilter() {
         return new LimitFilter();
     }
@@ -102,8 +106,8 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
     }
 
     @Bean
-    RouteManager gatewayZookeeperRouteManager(Environment environment, GatewayRouteRepository gatewayRouteManager) {
-        return new GatewayZookeeperRouteManager(environment, gatewayRouteManager);
+    GatewayRouteCache gatewayRouteLoader(GatewayRouteRepository gatewayRouteManager) {
+        return new GatewayRouteCache(gatewayRouteManager);
     }
 
     @Bean
@@ -113,9 +117,9 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
         return gatewayRouteRepository;
     }
 
-    @Bean
-    ParameterFormatterFilter parameterFormatterFilter() {
-        return new ParameterFormatterFilter();
-    }
 
+    @Bean
+    EnvGrayFilter envGrayFilter() {
+        return new EnvGrayFilter();
+    }
 }

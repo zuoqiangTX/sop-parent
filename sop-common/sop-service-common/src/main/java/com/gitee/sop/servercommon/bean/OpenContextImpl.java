@@ -114,4 +114,9 @@ public class OpenContextImpl<T> implements OpenContext<T> {
         }
         return JSON.parseObject(bizContent, clazz);
     }
+
+    @Override
+    public String toString() {
+        return rootJsonObject.toString();
+    }
 }

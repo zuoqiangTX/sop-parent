@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 namespace SDKCSharp.Client
 {
     /// <summary>
-    /// 客户端
+    /// 客户端，申明一个即可
     /// </summary>
     public class OpenClient
     {
@@ -68,10 +68,10 @@ namespace SDKCSharp.Client
         /// <param name="url">接口url</param>
         /// <param name="appId">平台分配的appId</param>
         /// <param name="privateKey">平台分配的私钥</param>
-        public OpenClient(string url, string appId, string privateKey) 
+        public OpenClient(string url, string appId, string privateKey)
             : this(url, appId, privateKey,false, DEFAULT_CONFIG)
         {
-            
+
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace SDKCSharp.Client
         /// <param name="appId">平台分配的appId</param>
         /// <param name="privateKey">平台分配的私钥</param>
         /// <param name="priKeyFromFile">如果设置 <c>true</c> 从文件中加载私钥</param>
-        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile) 
+        public OpenClient(string url, string appId, string privateKey, bool priKeyFromFile)
             : this(url, appId, privateKey, priKeyFromFile, DEFAULT_CONFIG)
         {
 

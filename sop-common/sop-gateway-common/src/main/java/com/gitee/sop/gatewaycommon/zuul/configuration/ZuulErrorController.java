@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class ZuulErrorController implements ErrorController {
 
-    public static final String ERROR_PATH = "/error";
+    private static final String ERROR_PATH = "/error";
 
     /**
      * 错误最终会到这里来
@@ -35,7 +36,7 @@ public class ZuulErrorController implements ErrorController {
             ctx.setResponse(response);
         }
         Throwable throwable = ctx.getThrowable();
-        log.error("网关报错，URL:{}, status:{}, params:{}",
+        log.error("zuul网关报错，URL:{}, status:{}, params:{}",
                 request.getRequestURL().toString()
                 , response.getStatus()
                 , ZuulContext.getApiParam()

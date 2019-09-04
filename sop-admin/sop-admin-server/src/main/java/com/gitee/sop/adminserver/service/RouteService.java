@@ -1,11 +1,13 @@
 package com.gitee.sop.adminserver.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.annotation.NacosInjected;
+import com.alibaba.nacos.api.config.ConfigService;
 import com.gitee.sop.adminserver.api.service.param.RouteSearchParam;
-import com.gitee.sop.adminserver.bean.GatewayRouteDefinition;
-import com.gitee.sop.adminserver.bean.ZookeeperContext;
+import com.gitee.sop.adminserver.bean.RouteDefinition;
+import com.gitee.sop.adminserver.bean.NacosConfigs;
+import com.gitee.sop.adminserver.bean.ServiceRouteInfo;
 import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,21 +21,22 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class RouteService {
 
-    public List<GatewayRouteDefinition> getRouteDefinitionList(RouteSearchParam param) throws Exception {
-        if (StringUtils.isBlank(param.getServiceId())) {
+    @NacosInjected
+    private ConfigService configService;
+
+    public List<RouteDefinition> getRouteDefinitionList(RouteSearchParam param) throws Exception {
+        String serviceId = param.getServiceId();
+        if (StringUtils.isBlank(serviceId)) {
             return Collections.emptyList();
         }
+        String configData = configService.getConfig(NacosConfigs.getRouteDataId(serviceId), NacosConfigs.GROUP_ROUTE, 3000);
+        if (StringUtils.isBlank(configData)) {
+            return Collections.emptyList();
+        }
+        ServiceRouteInfo serviceRouteInfo = JSON.parseObject(configData, ServiceRouteInfo.class);
 
-        String searchPath = ZookeeperContext.getSopRouteRootPath() + "/" + param.getServiceId();
-
-        List<ChildData> childDataList = ZookeeperContext.getChildrenData(searchPath);
-
-        List<GatewayRouteDefinition> routeDefinitionStream = childDataList.stream()
-                .map(childData -> {
-                    String serviceNodeData = new String(childData.getData());
-                    GatewayRouteDefinition routeDefinition = JSON.parseObject(serviceNodeData, GatewayRouteDefinition.class);
-                    return routeDefinition;
-                })
+        return serviceRouteInfo.getRouteDefinitionList()
+                .stream()
                 .filter(gatewayRouteDefinition -> {
                     boolean isRoute = gatewayRouteDefinition.getOrder() != Integer.MIN_VALUE;
                     String id = param.getId();
@@ -44,8 +47,6 @@ public class RouteService {
                     }
                 })
                 .collect(toList());
-
-        return routeDefinitionStream;
     }
 
 }

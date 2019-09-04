@@ -42,6 +42,9 @@ import static org.springframework.util.StringUtils.isEmpty;
 import static org.springframework.util.StringUtils.tokenizeToStringArray;
 import static org.springframework.util.StringUtils.uriDecode;
 
+/**
+ * @author tanghc
+ */
 public class RequestContentDataExtractor {
 	public static MultiValueMap<String, Object> extract(HttpServletRequest request) throws IOException {
 		return (request instanceof MultipartHttpServletRequest) ?

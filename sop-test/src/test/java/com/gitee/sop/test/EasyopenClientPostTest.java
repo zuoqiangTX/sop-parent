@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class EasyopenClientPostTest extends TestBase {
 
-    String url = "http://localhost:8081/api";
+    String url = "http://localhost:8081";
     String appKey = "easyopen_test";
     String secret = "G9w0BAQEFAAOCAQ8AMIIBCgKCA";
 
@@ -35,7 +35,7 @@ public class EasyopenClientPostTest extends TestBase {
 
         // 系统参数
         Map<String, String> params = new HashMap<>();
-        params.put("name", "goods.get");
+        params.put("name", "easyopen.goods.get");
         params.put("app_key", appKey);
         params.put("data", json);
         params.put("timestamp", getTime());

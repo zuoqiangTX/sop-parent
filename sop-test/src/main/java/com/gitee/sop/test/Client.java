@@ -5,11 +5,15 @@ import com.gitee.sop.test.alipay.AlipayApiException;
 import com.gitee.sop.test.alipay.AlipaySignature;
 import lombok.Data;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,6 +78,7 @@ public class Client {
 
     /**
      * 发送请求
+     *
      * @param requestBuilder 请求信息
      * @return 返回结果
      */
@@ -84,14 +89,21 @@ public class Client {
         Map<String, ?> form = requestInfo.getForm();
         Map<String, String> header = requestInfo.getHeader();
         String requestUrl = requestInfo.getUrl() != null ? requestInfo.getUrl() : url;
+        List<HttpTool.UploadFile> uploadFileList = requestBuilder.getUploadFileList();
         String responseData = null;
+        // 发送请求
         try {
-            // 发送请求
-            if (httpMethod == HttpTool.HTTPMethod.POST && postJson) {
-                responseData = httpTool.requestJson(requestUrl, JSON.toJSONString(form), header);
+            // 如果有上传文件
+            if (uploadFileList != null && uploadFileList.size() > 0) {
+                responseData = httpTool.requestFile(url, form, header, uploadFileList);
             } else {
-                responseData = httpTool.request(requestUrl, form, header, httpMethod);
+                if (httpMethod == HttpTool.HTTPMethod.POST && postJson) {
+                    responseData = httpTool.requestJson(requestUrl, JSON.toJSONString(form), header);
+                } else {
+                    responseData = httpTool.request(requestUrl, form, header, httpMethod);
+                }
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -106,6 +118,12 @@ public class Client {
     }
 
     public interface Callback {
+        /**
+         * 请求成功后回调
+         *
+         * @param requestInfo  请求信息
+         * @param responseData 返回结果
+         */
         void callback(RequestInfo requestInfo, String responseData);
     }
 
@@ -120,6 +138,7 @@ public class Client {
         private Map<String, String> header;
         private boolean ignoreSign;
         private boolean postJson;
+        private List<HttpTool.UploadFile> uploadFileList;
         private Callback callback;
 
         /**
@@ -211,6 +230,62 @@ public class Client {
         }
 
         /**
+         * 添加文件
+         *
+         * @param paramName 表单名称
+         * @param file      文件
+         * @return 返回RequestBuilder
+         */
+        public RequestBuilder addFile(String paramName, File file) {
+            try {
+                HttpTool.UploadFile uploadFile = new HttpTool.UploadFile(paramName, file);
+                getUploadFileList().add(uploadFile);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("上传文件错误", e);
+            }
+            return this;
+        }
+
+        /**
+         * 添加文件
+         *
+         * @param paramName       表单名称
+         * @param fileName        文件名称
+         * @param fileInputStream 文件流
+         * @return 返回RequestBuilder
+         */
+        public RequestBuilder addFile(String paramName, String fileName, InputStream fileInputStream) {
+            try {
+                HttpTool.UploadFile uploadFile = new HttpTool.UploadFile(paramName, fileName, fileInputStream);
+                getUploadFileList().add(uploadFile);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("上传文件错误", e);
+            }
+            return this;
+        }
+
+        /**
+         * 添加文件
+         *
+         * @param paramName 表单名称
+         * @param fileName  文件名称
+         * @param fileData  文件数据
+         * @return 返回RequestBuilder
+         */
+        public RequestBuilder addFile(String paramName, String fileName, byte[] fileData) {
+            HttpTool.UploadFile uploadFile = new HttpTool.UploadFile(paramName, fileName, fileData);
+            getUploadFileList().add(uploadFile);
+            return this;
+        }
+
+        private List<HttpTool.UploadFile> getUploadFileList() {
+            if (uploadFileList == null) {
+                uploadFileList = new ArrayList<>(16);
+            }
+            return uploadFileList;
+        }
+
+        /**
          * 设置请求成功处理
          *
          * @param callback 回调处理
@@ -275,6 +350,15 @@ public class Client {
         private Map<String, ?> form;
         private Map<String, String> header;
         private HttpTool.HTTPMethod httpMethod;
+
+        /**
+         * 返回json跟节点名称
+         *
+         * @return 返回json跟节点名称
+         */
+        public String getDataNode() {
+            return method == null ? null : method.replace('.', '_') + "_response";
+        }
     }
 
 }

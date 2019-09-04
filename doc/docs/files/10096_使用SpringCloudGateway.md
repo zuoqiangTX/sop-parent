@@ -1,10 +1,29 @@
 # 使用SpringCloudGateway
 
-SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway，完整代码见`SpringCloudGateway`分支。
+SOP默认网关是使用Spring Cloud Zuul，您也可以切换成Spring Cloud Gateway，完整代码见`spring-cloud-gateway`分支。
 
-**注：**：SOP对Spring Cloud Gateway的支持目前处于beta阶段，推荐使用zuul。
+如果您的系统并发量不大，建议使用zuul，因为zuul的功能更全面，有新功能会优先实现在zuul上。
 
-步骤如下：
+- SOP中 Spring Cloud Zuul 和 Spring Cloud Gateway功能对比
+
+| 功能 | Spring Cloud Zuul | Spring Cloud Gateway | 
+| ----- | ---- | ----------------------- | 
+| 签名验证|√ | √ |
+| 统一异常处理|√ | √ |
+| 统一返回内容|√ | √ |
+| session管理|√ | √ |
+| 秘钥管理|√ | √ |
+| 微服务端自动验证（JSR-303）|√ | √ |
+| 文件上传|√ | √ |
+| 文件下载|√ | √ |
+| 接口限流|√ | √ |
+| 文档整合|√ | √ |
+| 应用授权|√ | √ |
+| 监控日志|√ | √ |
+| 支持nacos|√ | √ |
+| 网关动态修改参数|√ | √ |
+
+使用Spring Cloud Gateway步骤如下：
 
 - 打开sop-gateway/pom.xml，注释spring cloud zuul依赖，打开Spring Cloud Gateway依赖
 
@@ -71,5 +90,3 @@ public class GatewayConfig extends AlipayGatewayConfiguration {...}
 ```
 
 修改完毕，重启sop-gateway
-
-运行SpringCloudGatewayClientPostTest测试用例。

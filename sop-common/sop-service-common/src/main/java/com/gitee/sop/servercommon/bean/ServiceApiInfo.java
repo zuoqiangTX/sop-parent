@@ -1,6 +1,6 @@
 package com.gitee.sop.servercommon.bean;
 
-import com.gitee.sop.servercommon.route.GatewayRouteDefinition;
+import com.gitee.sop.servercommon.route.RouteDefinition;
 import lombok.Data;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 public class ServiceApiInfo {
     private String serviceId;
     private List<ApiMeta> apis;
-    private List<GatewayRouteDefinition> routeDefinitionList;
+    private List<RouteDefinition> routeDefinitionList;
 
     @Data
     public static class ApiMeta {

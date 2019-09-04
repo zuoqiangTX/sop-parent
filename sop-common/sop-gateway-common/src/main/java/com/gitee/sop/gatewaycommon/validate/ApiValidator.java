@@ -2,7 +2,7 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.BaseRouteDefinition;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
@@ -48,7 +48,7 @@ public class ApiValidator implements Validator {
     private IsvManager isvManager;
 
     @Autowired
-    private  IsvRoutePermissionManager isvRoutePermissionManager;
+    private IsvRoutePermissionManager isvRoutePermissionManager;
 
     @Autowired
     private IPBlacklistManager ipBlacklistManager;
@@ -60,7 +60,6 @@ public class ApiValidator implements Validator {
     public void validate(ApiParam param) {
         checkIP(param);
         checkEnable(param);
-
         ApiConfig apiConfig = ApiContext.getApiConfig();
         if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
             if (log.isDebugEnabled()) {
@@ -216,7 +215,7 @@ public class ApiValidator implements Validator {
     protected void checkPermission(ApiParam apiParam) {
         String routeId = apiParam.fetchNameVersion();
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(routeId);
-        BaseRouteDefinition routeDefinition = targetRoute.getRouteDefinition();
+        RouteDefinition routeDefinition = targetRoute.getRouteDefinition();
         boolean needCheckPermission = BooleanUtils.toBoolean(routeDefinition.getPermission());
         if (needCheckPermission) {
             String appKey = apiParam.fetchAppKey();

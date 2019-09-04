@@ -89,7 +89,7 @@ public class ZuulParameterUtil {
                 log.error("修改上传文件请求参数失败, apiParam:{}", apiParam, e);
             }
         } else if(HttpMethod.GET.name().equalsIgnoreCase(request.getMethod())) {
-            Map<String, List<String>> newParams = new HashMap<>();
+            Map<String, List<String>> newParams = new HashMap<>(apiParam.size() * 2);
             for (Map.Entry<String, Object> entry : apiParam.entrySet()) {
                 Object value = entry.getValue();
                 if (value instanceof List) {

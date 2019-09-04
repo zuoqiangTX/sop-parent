@@ -21,7 +21,7 @@ import static com.gitee.sop.gatewaycommon.gateway.filter.Orders.PARAMETER_FORMAT
 public class ParameterFormatterFilter implements GlobalFilter, Ordered {
 
     @Autowired(required = false)
-    private ParameterFormatter sopParameterFormatter;
+    private ParameterFormatter parameterFormatter;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -30,11 +30,11 @@ public class ParameterFormatterFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
         // 校验成功后进行参数转换
-        if (sopParameterFormatter != null) {
+        if (parameterFormatter != null) {
             ServerWebExchange formatExchange = ServerWebExchangeUtil.format(
                     exchange
                     , apiParam
-                    , sopParameterFormatter::format
+                    , parameterFormatter::format
                     , httpHeaders -> httpHeaders.set(ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion()));
             return chain.filter(formatExchange);
         }

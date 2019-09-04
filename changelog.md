@@ -1,5 +1,10 @@
 # changelog
 
+## 2.0.0
+
+- 全面使用nacos，舍弃zookeeper（1.x版本见1.x分支）
+- 可自定义文档模块显示顺序
+
 ## 1.15.2
 
 - 优化SpringCloudGateway上传文件功能

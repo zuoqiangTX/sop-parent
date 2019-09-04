@@ -47,7 +47,10 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
                     return predicateDefinition;
                 })
                 .collect(Collectors.toCollection(LinkedList::new));
-        // 添加下面两个自定义的断言到顶部
+        // 下面两个自定义的断言添加到顶部，注意：ReadBody需要放在最前面
+        // 对应断言：
+        // NameVersion ->   com.gitee.sop.gatewaycommon.gateway.route.NameVersionRoutePredicateFactory
+        // ReadBody ->      com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory
         predicateDefinitionList.addFirst(new PredicateDefinition("NameVersion=" + routeDefinition.getId()));
         predicateDefinitionList.addFirst(new PredicateDefinition("ReadBody="));
 

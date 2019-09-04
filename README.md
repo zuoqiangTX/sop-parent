@@ -63,7 +63,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 工程说明
 
-> 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)
+> 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)，Mysql
 
 - doc：开发文档
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能

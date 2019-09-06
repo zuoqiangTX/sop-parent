@@ -59,7 +59,7 @@ public class PreLimitFilter extends BaseZuulFilter {
         if (configLimitDto.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return null;
         }
-        byte limitType = configLimitDto.getLimitType().byteValue();
+        byte limitType = configLimitDto.getLimitType();
         // 如果是漏桶策略
         if (limitType == LimitType.LEAKY_BUCKET.getType()) {
             boolean acquire = limitManager.acquire(configLimitDto);
@@ -109,7 +109,7 @@ public class PreLimitFilter extends BaseZuulFilter {
         if (limitConfigList.isEmpty()) {
             return null;
         }
-        Collections.sort(limitConfigList, Comparator.comparing(ConfigLimitDto::getOrderIndex));
+        limitConfigList.sort(Comparator.comparing(ConfigLimitDto::getOrderIndex));
         return limitConfigList.get(0);
     }
 }

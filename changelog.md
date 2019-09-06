@@ -1,5 +1,9 @@
 # changelog
 
+## 2.1.0
+
+- 支持分布式限流（redis实现）
+
 ## 2.0.0
 
 - 全面使用nacos，舍弃zookeeper（1.x版本见1.x分支）

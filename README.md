@@ -1,6 +1,6 @@
 # SOP(Simple Open Platform)
 
-一个开放平台解决方案项目，基于Spring Cloud实现，目标是能够让用户快速得搭建起自己的开放平台。
+一个开放平台解决方案项目，基于Spring Cloud实现，目标让用户快速搭建自己的开放平台。
 
 SOP提供了两种接口调用方式，分别是：[支付宝开放平台](https://docs.open.alipay.com/api)的调用方式和[淘宝开放平台](http://open.taobao.com/api.htm?docId=285&docType=2)的调用方式。
 通过简单的配置后，你的项目就具备了和支付宝开放平台的一样的接口提供能力。
@@ -25,6 +25,8 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 ## 架构图
 
 ![架构图](https://images.gitee.com/uploads/images/2019/0821/201531_0f605f7c_332975.png "sop2.png")
+
+> 如上图所示，整个系统运行后，开发者只需关注微服务中的业务代码，接口变更后重新部署微服务应用即可
 
 ## 已完成列表
 
@@ -63,7 +65,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 工程说明
 
-> 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)
+> 运行环境：JDK8，Maven3，[Nacos](https://nacos.io/zh-cn/docs/what-is-nacos.html)，Mysql
 
 - doc：开发文档
 - sop-common：公共模块，封装常用功能，包含签名校验、错误处理、限流等功能

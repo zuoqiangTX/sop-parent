@@ -138,7 +138,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
                 switch (channelMsg.getOperation()) {
                     case "reload":
                         log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        String listenPath = isvRoutePermission.getListenPath();
                         try {
                             load();
                         } catch (Exception e) {

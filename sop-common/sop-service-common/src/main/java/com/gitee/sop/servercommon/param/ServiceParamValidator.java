@@ -4,6 +4,7 @@ import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.exception.ServiceException;
 import com.gitee.sop.servercommon.message.ServiceErrorEnum;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
+import com.gitee.sop.servercommon.param.validation.ValidationGroupSequence;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.ConstraintViolation;
@@ -18,8 +19,8 @@ import java.util.Set;
 public class ServiceParamValidator implements ParamValidator {
     private static final String LEFT_TOKEN = "{";
     private static final String RIGHT_TOKEN = "}";
-    public static final String EQ = "=";
-    public static final String COMMA = ",";
+    private static final String EQ = "=";
+    private static final String COMMA = ",";
     private static Object[] EMPTY_OBJ_ARRAY = {};
 
     private static javax.validation.Validator validator;
@@ -34,7 +35,7 @@ public class ServiceParamValidator implements ParamValidator {
         if (obj == null) {
             return;
         }
-        Set<ConstraintViolation<Object>> set = validator.validate(obj);
+        Set<ConstraintViolation<Object>> set = validator.validate(obj, ValidationGroupSequence.class);
         if (!CollectionUtils.isEmpty(set)) {
             ConstraintViolation<Object> oneError = set.iterator().next();
             String errorMsg = oneError.getMessage();

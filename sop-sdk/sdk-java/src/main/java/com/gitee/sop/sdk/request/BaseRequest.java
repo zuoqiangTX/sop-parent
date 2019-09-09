@@ -69,7 +69,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
     }
 
     protected String version() {
-        return null;
+        return version;
     }
 
     /**

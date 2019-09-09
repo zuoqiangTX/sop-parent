@@ -91,6 +91,7 @@ public class RoutePermissionService {
         List<PermRolePermission> rolePermissionList = permRolePermissionMapper.list(query);
         return rolePermissionList.stream()
                 .map(PermRolePermission::getRouteId)
+                .sorted()
                 .collect(Collectors.toList());
     }
 

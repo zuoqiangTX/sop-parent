@@ -56,20 +56,17 @@ public abstract class BaseRequest<T extends BaseResponse> {
     protected abstract String method();
 
     public BaseRequest() {
-        this.setMethodVersion(this.method(), this.version());
+        this.method = method();
+        this.version = version();
     }
 
     protected BaseRequest(String method, String version) {
-        this.setMethodVersion(method, version);
-    }
-
-    private void setMethodVersion(String method, String version) {
         this.method = method;
         this.version = version;
     }
 
     protected String version() {
-        return null;
+        return version;
     }
 
     /**

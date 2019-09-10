@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -170,7 +171,7 @@ public class SwaggerDocParser implements DocParser {
         List<DocParameter> respParameterList = Collections.emptyList();
         if (refInfo != null) {
             String responseRef = refInfo.ref;
-            respParameterList = this.buildDocParameters(responseRef, docRoot);
+            respParameterList = this.buildDocParameters(responseRef, docRoot, true);
             // 如果返回数组
             if (refInfo.isArray) {
                 DocParameter docParameter = new DocParameter();
@@ -183,7 +184,7 @@ public class SwaggerDocParser implements DocParser {
         return respParameterList;
     }
 
-    protected List<DocParameter> buildDocParameters(String ref, JSONObject docRoot) {
+    protected List<DocParameter> buildDocParameters(String ref, JSONObject docRoot, boolean doSubRef) {
         JSONObject responseObject = docRoot.getJSONObject("definitions").getJSONObject(ref);
         JSONObject properties = responseObject.getJSONObject("properties");
         Set<String> fieldNames = properties.keySet();
@@ -200,8 +201,11 @@ public class SwaggerDocParser implements DocParser {
             docParameter.setName(fieldName);
             docParameterList.add(docParameter);
             RefInfo refInfo = this.getRefInfo(fieldInfo);
-            if (refInfo != null) {
-                List<DocParameter> refs = buildDocParameters(refInfo.ref, docRoot);
+            if (refInfo != null && doSubRef) {
+                // 如果是树状菜单的话，这里可能触发死循环
+                String subRef = refInfo.ref;
+                boolean nextDoRef = !Objects.equals(ref, subRef);
+                List<DocParameter> refs = buildDocParameters(subRef, docRoot, nextDoRef);
                 docParameter.setRefs(refs);
             }
         }

@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class DocumentationPluginsManagerExt extends DocumentationPluginsManager {
 
-    public static final String SOP_NAME = "sop_name";
-    public static final String SOP_VERSION = "sop_version";
-    public static final String MODULE_ORDER = "module_order";
+    private static final String SOP_NAME = "sop_name";
+    private static final String SOP_VERSION = "sop_version";
+    private static final String MODULE_ORDER = "module_order";
 
     @Override
     public Operation operation(OperationContext operationContext) {

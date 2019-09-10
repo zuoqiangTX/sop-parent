@@ -39,7 +39,7 @@ namespace SDKCSharp.Request
         /// <returns></returns>
         public virtual string GetVersion()
         {
-            return null;
+            return version;
         }
 
         /// <summary>

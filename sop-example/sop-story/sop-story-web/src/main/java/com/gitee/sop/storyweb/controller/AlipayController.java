@@ -10,6 +10,7 @@ import com.gitee.sop.storyweb.controller.param.CategoryParam;
 import com.gitee.sop.storyweb.controller.param.StoryParam;
 import com.gitee.sop.storyweb.controller.result.CategoryResult;
 import com.gitee.sop.storyweb.controller.result.StoryResult;
+import com.gitee.sop.storyweb.controller.result.TreeResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
@@ -238,6 +239,18 @@ public class AlipayController {
         categoryResult.setCategoryName("娱乐");
         categoryResult.setStoryResult(result);
         return categoryResult;
+    }
+
+    /**
+     * 树状返回
+     *
+     * @param param
+     * @return
+     */
+    @ApiOperation(value = "树状返回", notes = "树状返回")
+    @ApiMapping(value = "alipay.tree.get", method = RequestMethod.POST)
+    public TreeResult tree(StoryParam param) {
+        return new TreeResult();
     }
 
     // 测试参数绑定，http://localhost:2222/story/getStory4?biz_content=%7b%22id%22%3a1%2c%22name%22%3a%22aaaa%22%7d

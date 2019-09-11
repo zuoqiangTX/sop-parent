@@ -46,6 +46,9 @@ public class ServiceRouteController {
 
     protected ServiceRouteInfo getServiceRouteInfo(HttpServletRequest request, HttpServletResponse response) {
         String serviceId = environment.getProperty("spring.application.name");
+        if (serviceId == null) {
+            throw new IllegalArgumentException("未指定spring.application.name参数");
+        }
         ApiMetaBuilder apiMetaBuilder = getApiMetaBuilder();
         ServiceApiInfo serviceApiInfo = apiMetaBuilder.getServiceApiInfo(serviceId, requestMappingHandlerMapping);
         ServiceRouteInfoBuilder serviceRouteInfoBuilder = new ServiceRouteInfoBuilder(environment);

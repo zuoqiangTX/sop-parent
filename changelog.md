@@ -4,7 +4,7 @@
 
 - 支持分布式限流（redis实现）
 - 可调整JSR-303校验顺序
-- 优化springmvc注册到nacos
+- 修复springmvc工程注册到nacos无法读取路由配置问题
 
 ## 2.0.0
 

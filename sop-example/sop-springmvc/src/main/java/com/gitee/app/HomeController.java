@@ -50,5 +50,5 @@ public class HomeController {
 		goods.setPrice(new BigDecimal(5000));
 		return goods;
 	}
-	
+
 }

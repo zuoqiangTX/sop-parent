@@ -106,7 +106,7 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
                             ServiceRouteInfo serviceRouteInfo = JSON.parseObject(body, ServiceRouteInfo.class);
                             baseRouteCache.load(serviceRouteInfo, callback -> {
                                 try {
-                                    log.info("加载服务路由，serviceId:{}, instance:{}",serviceName, instance);
+                                    log.info("推送服务路由配置到nacos，dataId:{}, groupId:{}",dataId, groupId);
                                     configService.publishConfig(dataId, groupId, body);
                                 } catch (NacosException e) {
                                     log.error("nacos推送失败，serviceId:{}, instance:{}",serviceName, instance);

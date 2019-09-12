@@ -118,8 +118,14 @@ public class ServiceRouteInfoBuilder {
         if (servletPath == null) {
             servletPath = "";
         }
-        servletPath = StringUtils.trimLeadingCharacter(servletPath, '/');
-        return contextPath + servletPath;
+        if (!servletPath.startsWith(PATH_SPLIT)) {
+            servletPath = PATH_SPLIT + servletPath;
+        }
+        if (DEFAULT_CONTEXT_PATH.equals(contextPath)) {
+            return servletPath;
+        } else {
+            return contextPath + servletPath;
+        }
     }
 
     private void checkPath(String path, String errorMsg) {

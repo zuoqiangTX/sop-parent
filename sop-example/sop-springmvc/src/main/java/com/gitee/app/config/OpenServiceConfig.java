@@ -50,7 +50,7 @@ public class OpenServiceConfig extends SpringMvcServiceConfiguration {
 
             Instance instance = this.getInstance(serviceId, ip, port, contextPath);
             namingService.registerInstance(serviceId, instance);
-            log.info("注册到nacos, serviceId:{}, ip:{}, port:{}", serviceId, ip, port);
+            log.info("注册到nacos, serviceId: {}, ip: {}, port: {}, contextPath: {}", serviceId, ip, port, contextPath);
         } catch (NacosException e) {
             log.error("注册nacos失败", e);
             throw new RuntimeException("注册nacos失败", e);

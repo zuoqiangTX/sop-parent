@@ -34,6 +34,8 @@ import java.util.Objects;
 @Slf4j
 public class ServiceRoutesLoader<T extends TargetRoute> {
 
+    private static final String SERVER_CONTEXT_PATH = "server.servlet.context-path";
+
     private static final String SECRET = "a3d9sf!1@odl90zd>fkASwq";
 
     private static final int FIVE_SECONDS = 1000 * 5;
@@ -95,35 +97,40 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
                 List<Instance> allInstances = namingService.getAllInstances(serviceName);
                 if (CollectionUtils.isEmpty(allInstances)) {
                     // 如果没有服务列表，则删除所有路由信息
+                    log.info("服务下线，删除路由配置，serviceId: {}", serviceName);
                     baseRouteCache.remove(serviceName);
                     configService.removeConfig(dataId, groupId);
                 } else {
                     for (Instance instance : allInstances) {
                         String url = getRouteRequestUrl(instance);
+                        log.info("拉取路由配置，serviceId: {}, url: {}", serviceName, url);
                         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
                         if (responseEntity.getStatusCode() == HttpStatus.OK) {
                             String body = responseEntity.getBody();
                             ServiceRouteInfo serviceRouteInfo = JSON.parseObject(body, ServiceRouteInfo.class);
                             baseRouteCache.load(serviceRouteInfo, callback -> {
                                 try {
-                                    log.info("推送路由配置到nacos，dataId={}, groupId={}",dataId, groupId);
+                                    log.info("推送路由配置到nacos，dataId: {}, groupId: {}", dataId, groupId);
                                     configService.publishConfig(dataId, groupId, body);
                                 } catch (NacosException e) {
-                                    log.error("nacos推送失败，serviceId:{}, instance:{}",serviceName, instance);
+                                    log.error("nacos推送失败，serviceId: {}, instance: {}", serviceName, instance);
                                 }
                             });
+                        } else {
+                            log.error("拉取路由配置异常，url: {}, status: {}, body: {}", url, responseEntity.getStatusCodeValue(), responseEntity.getBody());
                         }
                     }
                 }
-            } catch (NacosException e) {
-                log.error("选择服务实例失败，serviceName:{}", serviceName, e);
+            } catch (Exception e) {
+                log.error("选择服务实例失败，serviceName: {}", serviceName, e);
             }
         }
     }
 
     private static String getRouteRequestUrl(Instance instance) {
         String query = buildQuery(SECRET);
-        return "http://" + instance.getIp() + ":" + instance.getPort() + "/sop/routes" + query;
+        String contextPath = instance.getMetadata().getOrDefault(SERVER_CONTEXT_PATH, "");
+        return "http://" + instance.getIp() + ":" + instance.getPort() + contextPath + "/sop/routes" + query;
     }
 
     private static String buildQuery(String secret) {

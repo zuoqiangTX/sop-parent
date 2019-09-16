@@ -69,6 +69,7 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
         routeDefinition.setId(name + version);
         routeDefinition.setName(name);
         routeDefinition.setVersion(version);
+        routeDefinition.setUri("lb://" + serviceRouteInfo.getServiceId());
         routeDefinition.setOrder(Integer.MIN_VALUE);
 
         return Collections.singletonList(routeDefinition);

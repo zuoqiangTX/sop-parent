@@ -11,6 +11,7 @@ import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.alibaba.nacos.NacosDiscoveryProperties;
 import org.springframework.context.ApplicationEvent;
@@ -34,11 +35,15 @@ import java.util.Objects;
 @Slf4j
 public class ServiceRoutesLoader<T extends TargetRoute> {
 
-    private static final String SERVER_CONTEXT_PATH = "server.servlet.context-path";
+    private static final String SOP_ROUTES_PATH = "/sop/routes";
 
     private static final String SECRET = "a3d9sf!1@odl90zd>fkASwq";
 
     private static final int FIVE_SECONDS = 1000 * 5;
+
+    private static final String METADATA_SERVER_CONTEXT_PATH = "server.servlet.context-path";
+
+    private static final String METADATA_SOP_ROUTES_PATH = "sop.routes.path";
 
     @Autowired
     private NacosDiscoveryProperties nacosDiscoveryProperties;
@@ -76,7 +81,6 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
         }
         // subscribe
         String thisServiceId = nacosDiscoveryProperties.getService();
-//        ConfigService configService = nacosConfigProperties.configServiceInstance();
         for (ServiceInfo serviceInfo : subscribes) {
             String serviceName = serviceInfo.getName();
             // 如果是本机服务，跳过
@@ -127,10 +131,41 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
         }
     }
 
+    /**
+     * 拉取路由请求url
+     * @param instance 服务实例
+     * @return 返回最终url
+     */
     private static String getRouteRequestUrl(Instance instance) {
+        Map<String, String> metadata = instance.getMetadata();
+        String customPath = metadata.get(METADATA_SOP_ROUTES_PATH);
+        String homeUrl;
+        String servletPath;
+        // 如果metadata中指定了获取路由的url
+        if (StringUtils.isNotBlank(customPath)) {
+            // 自定义完整的url
+            if (customPath.startsWith("http")) {
+                homeUrl = customPath;
+                servletPath = "";
+            } else {
+                homeUrl = getHomeUrl(instance);
+                servletPath = customPath;
+            }
+        } else {
+            // 默认处理
+            homeUrl = getHomeUrl(instance);
+            String contextPath = metadata.getOrDefault(METADATA_SERVER_CONTEXT_PATH, "");
+            servletPath = contextPath + SOP_ROUTES_PATH;
+        }
+        if (StringUtils.isNotBlank(servletPath) && !servletPath.startsWith("/")) {
+            servletPath = '/' + servletPath;
+        }
         String query = buildQuery(SECRET);
-        String contextPath = instance.getMetadata().getOrDefault(SERVER_CONTEXT_PATH, "");
-        return "http://" + instance.getIp() + ":" + instance.getPort() + contextPath + "/sop/routes" + query;
+        return homeUrl + servletPath + query;
+    }
+
+    private static String getHomeUrl(Instance instance) {
+        return "http://" + instance.getIp() + ":" + instance.getPort();
     }
 
     private static String buildQuery(String secret) {

@@ -9,6 +9,7 @@ import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,4 +60,17 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
         return new GatewayTargetRoute(serviceRouteInfo, routeDefinition, targetRoute);
     }
 
+    @Override
+    protected List<RouteDefinition> getExtRouteDefinitionList(ServiceRouteInfo serviceRouteInfo) {
+        // 在第一个位置放一个没用的路由，SpringCloudGateway会从第二个路由开始找，原因不详
+        RouteDefinition routeDefinition = new RouteDefinition();
+        String name = "_first_route_";
+        String version = String.valueOf(System.currentTimeMillis());
+        routeDefinition.setId(name + version);
+        routeDefinition.setName(name);
+        routeDefinition.setVersion(version);
+        routeDefinition.setOrder(Integer.MIN_VALUE);
+
+        return Collections.singletonList(routeDefinition);
+    }
 }

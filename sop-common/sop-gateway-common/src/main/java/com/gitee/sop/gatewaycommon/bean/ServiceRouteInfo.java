@@ -25,11 +25,6 @@ public class ServiceRouteInfo {
 
     private String description;
 
-    /**
-     * 路由信息md5，md5(sort(routeIdList))
-     */
-    private String md5;
-
     private List<RouteDefinition> routeDefinitionList;
 
     public String fetchServiceIdLowerCase() {

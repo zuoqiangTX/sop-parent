@@ -3,6 +3,7 @@ package com.gitee.sop.gatewaycommon.bean;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,12 +29,12 @@ public class RouteDefinition {
     /**
      * 路由断言集合配置
      */
-    private List<GatewayPredicateDefinition> predicates = new ArrayList<>();
+    private List<GatewayPredicateDefinition> predicates = Collections.emptyList();
 
     /**
      * 路由过滤器集合配置
      */
-    private List<GatewayFilterDefinition> filters = new ArrayList<>();
+    private List<GatewayFilterDefinition> filters = Collections.emptyList();
 
     /**
      * 路由规则转发的目标uri

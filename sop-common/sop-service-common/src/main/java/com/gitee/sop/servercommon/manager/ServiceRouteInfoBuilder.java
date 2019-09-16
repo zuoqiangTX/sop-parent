@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -31,8 +30,6 @@ public class ServiceRouteInfoBuilder {
 
     private static final String DEFAULT_CONTEXT_PATH = "/";
 
-    private static ServiceApiInfo.ApiMeta FIRST_API_META = new ServiceApiInfo.ApiMeta("_first_route_", "/", "1.0.0");
-
     private Environment environment;
 
     public ServiceRouteInfoBuilder(Environment environment) {
@@ -51,9 +48,7 @@ public class ServiceRouteInfoBuilder {
      */
     protected ServiceRouteInfo buildServiceGatewayInfo(ServiceApiInfo serviceApiInfo) {
         List<ServiceApiInfo.ApiMeta> apis = serviceApiInfo.getApis();
-        List<RouteDefinition> routeDefinitionList = new ArrayList<>(apis.size() + 1);
-        // 在第一个位置放一个没用的路由，SpringCloudGateway会从第二个路由开始找，原因不详
-        routeDefinitionList.add(this.getFirstRoute(serviceApiInfo));
+        List<RouteDefinition> routeDefinitionList = new ArrayList<>(apis.size());
         for (ServiceApiInfo.ApiMeta apiMeta : apis) {
             RouteDefinition gatewayRouteDefinition = this.buildGatewayRouteDefinition(serviceApiInfo, apiMeta);
             routeDefinitionList.add(gatewayRouteDefinition);
@@ -61,36 +56,9 @@ public class ServiceRouteInfoBuilder {
         ServiceRouteInfo serviceRouteInfo = new ServiceRouteInfo();
         serviceRouteInfo.setServiceId(serviceApiInfo.getServiceId());
         serviceRouteInfo.setRouteDefinitionList(routeDefinitionList);
-        String md5 = buildMd5(routeDefinitionList);
-        serviceRouteInfo.setMd5(md5);
         return serviceRouteInfo;
     }
 
-    /**
-     * 添加com.gitee.sop.gatewaycommon.routeDefinition.ReadBodyRoutePredicateFactory,解决form表单获取不到问题
-     *
-     * @return 返回路由定义
-     */
-    protected RouteDefinition getFirstRoute(ServiceApiInfo serviceApiInfo) {
-        RouteDefinition firstRoute = this.buildGatewayRouteDefinition(serviceApiInfo, FIRST_API_META);
-        firstRoute.setOrder(Integer.MIN_VALUE);
-        return firstRoute;
-    }
-
-    /**
-     * 构建路由id MD5
-     *
-     * @param routeDefinitionList 路由列表
-     * @return 返回MD5
-     */
-    protected String buildMd5(List<RouteDefinition> routeDefinitionList) {
-        List<String> routeIdList = routeDefinitionList.stream()
-                .map(JSON::toJSONString)
-                .sorted()
-                .collect(Collectors.toList());
-        String md5Source = org.apache.commons.lang3.StringUtils.join(routeIdList, "");
-        return DigestUtils.md5DigestAsHex(md5Source.getBytes(StandardCharsets.UTF_8));
-    }
 
     protected RouteDefinition buildGatewayRouteDefinition(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
         RouteDefinition routeDefinition = new RouteDefinition();

@@ -1,6 +1,5 @@
 package com.gitee.sop.servercommon.route;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.util.Date;

@@ -24,7 +24,7 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 架构图
 
-![架构图](https://images.gitee.com/uploads/images/2019/0821/201531_0f605f7c_332975.png "sop2.png")
+![架构图](https://images.gitee.com/uploads/images/2019/0821/201531_0f605f7c_332975.png "SOP架构图")
 
 > 如上图所示，整个系统运行后，开发者只需关注微服务中的业务代码，接口变更后重新部署微服务应用即可
 
@@ -51,17 +51,17 @@ SOP封装了开放平台大部分功能包括：签名验证、统一异常处�
 
 ## 界面预览
 
-![服务列表](https://images.gitee.com/uploads/images/2019/0711/174825_2856281f_332975.png "admin_servicelist.png")
+![服务列表](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25fa283ca3?w=2114&h=994&f=png&s=38786 "服务列表")
 
-![路由管理](https://images.gitee.com/uploads/images/2019/0711/174843_1648591c_332975.png "admin_route.png")
+![路由管理](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25c9fbabf5?w=2812&h=1290&f=png&s=93711 "路由管理")
 
-![限流管理](https://images.gitee.com/uploads/images/2019/0711/174900_9315cc8e_332975.png "admin_limit.png")
+![限流管理](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25c6099cbf?w=2794&h=1418&f=png&s=104326 "限流管理")
 
-![秘钥信息](https://images.gitee.com/uploads/images/2019/0711/174921_bd817533_332975.png "admin_key.png")
+![秘钥信息](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25c6ff48b3?w=2404&h=1410&f=png&s=108397 "秘钥信息")
 
-![API文档](https://images.gitee.com/uploads/images/2019/0711/174939_97886883_332975.png "website_doc.png")
+![API文档](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25cc137fb8?w=2334&h=1694&f=png&s=92710 "API文档")
 
-![沙箱环境](https://images.gitee.com/uploads/images/2019/0711/175226_3f69346a_332975.png "website_sandbox.png")
+![沙箱环境](https://user-gold-cdn.xitu.io/2019/9/17/16d3dc25c68dee65?w=2354&h=1630&f=png&s=88753 "沙箱环境")
 
 ## 工程说明
 

@@ -17,15 +17,12 @@ public class ServiceRouteInfo {
      */
     private String serviceId;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createTime = new Date();
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime = new Date();
 
     private String description;
 
-    @JSONField(serialize = false)
     private List<RouteDefinition> routeDefinitionList;
 
 }

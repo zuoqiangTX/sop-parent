@@ -88,6 +88,7 @@ public class ServerWebExchangeUtil {
                 } else if (StringUtils.containsIgnoreCase(contentTypeStr, "multipart")) {
                     // 如果是文件上传请求
                     HttpServletRequest fileUploadRequest = getFileUploadRequest(exchange, cachedBody);
+                    setFileUploadRequest(exchange, fileUploadRequest);
                     RequestUtil.UploadInfo uploadInfo = RequestUtil.getUploadInfo(fileUploadRequest);
                     params = uploadInfo.getUploadParams();
                     apiParam.setUploadContext(uploadInfo.getUploadContext());

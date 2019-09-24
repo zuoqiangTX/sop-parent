@@ -8,7 +8,6 @@ import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -19,39 +18,41 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
 
     /**
      * 构建请求参数
+     *
      * @param ctx 请求request
      * @return 返回请求参数
      */
-    public abstract Map<String, ?> buildRequestParams(T ctx);
+    public abstract ApiParam buildRequestParams(T ctx);
 
     /**
      * 返回客户端ip
-     * @param ctx  请求request
+     *
+     * @param ctx 请求request
      * @return 返回ip
      */
     public abstract String getIP(T ctx);
 
     /**
      * 将版本号添加到header中
-     * @param ctx 请求request
+     *
+     * @param ctx        请求request
      * @param headerName headerName
-     * @param version 版本号
+     * @param version    版本号
      */
     public abstract void setVersionInHeader(T ctx, String headerName, String version);
 
     @Override
     public ApiParam build(T ctx) {
-        ApiParam apiParam = this.newApiParam(ctx);
-        Map<String, ?> requestParams = this.buildRequestParams(ctx);
-        apiParam.putAll(requestParams);
+        ApiParam apiParam = this.buildRequestParams(ctx);
+        this.processApiParam(apiParam, ctx);
         this.initOtherProperty(apiParam);
         apiParam.setIp(this.getIP(ctx));
         this.setVersionInHeader(ctx, ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
         return apiParam;
     }
 
-    protected ApiParam newApiParam(T ctx) {
-        return new ApiParam();
+    protected void processApiParam(ApiParam param, T ctx) {
+
     }
 
     protected void initOtherProperty(ApiParam apiParam) {

@@ -2,7 +2,10 @@ package com.gitee.sop.gatewaycommon.util;
 
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.SopConstants;
+import com.gitee.sop.gatewaycommon.param.ApiUploadContext;
+import com.gitee.sop.gatewaycommon.param.UploadContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
+import lombok.Data;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -10,6 +13,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -26,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
@@ -74,6 +81,7 @@ public class RequestUtil {
 
     /**
      * 将map参数转换成查询参数
+     *
      * @return 返回aa=1&b=c...
      */
     public static String convertMapToQueryString(Map<String, ?> apiParam) {
@@ -152,6 +160,7 @@ public class RequestUtil {
 
     /**
      * 转换json请求到Map，
+     *
      * @param request 请求类型为application/json的Request
      * @return 返回Map
      */
@@ -167,6 +176,7 @@ public class RequestUtil {
 
     /**
      * 是否是文件上传请求
+     *
      * @param request 请求
      * @return true：是
      */
@@ -184,6 +194,12 @@ public class RequestUtil {
         return IOUtils.toString(request.getInputStream(), UTF8);
     }
 
+    /**
+     * 获取客户端IP
+     *
+     * @param request request
+     * @return 返回ip
+     */
     public static String getIP(HttpServletRequest request) {
         String ipAddress = request.getHeader("x-forwarded-for");
         if (ipAddress == null || ipAddress.length() == 0 || IP_UNKNOWN.equalsIgnoreCase(ipAddress)) {
@@ -214,4 +230,48 @@ public class RequestUtil {
         }
         return ipAddress;
     }
+
+
+    /**
+     * 获取上传文件内容
+     *
+     * @param request request
+     * @return 返回文件内容和表单内容
+     */
+    public static UploadInfo getUploadInfo(HttpServletRequest request) {
+        UploadInfo uploadInfo = new UploadInfo();
+        // 创建一个文件上传解析器
+        ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+        Map<String, String> uploadParams = new HashMap<>(16);
+        UploadContext uploadContext = null;
+        try {
+            List<MultipartFile> multipartFileList = new ArrayList<>(16);
+            List<FileItem> fileItems = upload.parseRequest(request);
+            for (FileItem fileItem : fileItems) {
+                if (fileItem.isFormField()) {
+                    uploadParams.put(fileItem.getFieldName(), fileItem.getString(SopConstants.UTF8));
+                } else {
+                    multipartFileList.add(new CommonsMultipartFile(fileItem));
+                }
+            }
+            if (multipartFileList.size() > 0) {
+                Map<String, MultipartFile> multipartFileMap = multipartFileList
+                        .stream()
+                        .collect(Collectors.toMap(MultipartFile::getName, Function.identity()));
+                uploadContext = new ApiUploadContext(multipartFileMap);
+            }
+            uploadInfo.setUploadParams(uploadParams);
+            uploadInfo.setUploadContext(uploadContext);
+        } catch (Exception e) {
+            log.error("参数解析错误", e);
+        }
+        return uploadInfo;
+    }
+
+    @Data
+    public static class UploadInfo {
+        private Map<String, String> uploadParams;
+        private UploadContext uploadContext;
+    }
+
 }

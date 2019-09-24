@@ -67,11 +67,13 @@ public class ServerWebExchangeUtil {
      * @return 没有参数返回null
      * @see com.gitee.sop.gatewaycommon.gateway.route.ReadBodyRoutePredicateFactory
      */
-    public static Map<String, ?> getRequestParams(ServerWebExchange exchange) {
-        Map<String, ?> params = exchange.getAttribute(CACHE_REQUEST_BODY_FOR_MAP);
-        if (params != null) {
-            return params;
+    public static ApiParam getRequestParams(ServerWebExchange exchange) {
+        ApiParam apiParamExist = exchange.getAttribute(CACHE_REQUEST_BODY_FOR_MAP);
+        if (apiParamExist != null) {
+            return apiParamExist;
         }
+        ApiParam apiParam = new ApiParam();
+        Map<String, ?> params = null;
         if (exchange.getRequest().getMethod() == HttpMethod.GET) {
             MultiValueMap<String, String> queryParams = exchange.getRequest().getQueryParams();
             params = buildParams(queryParams);
@@ -86,17 +88,19 @@ public class ServerWebExchangeUtil {
                 } else if (StringUtils.containsIgnoreCase(contentTypeStr, "multipart")) {
                     // 如果是文件上传请求
                     HttpServletRequest fileUploadRequest = getFileUploadRequest(exchange, cachedBody);
-                    setFileUploadRequest(exchange, fileUploadRequest);
-                    params = RequestUtil.convertMultipartRequestToMap(fileUploadRequest);
+                    RequestUtil.UploadInfo uploadInfo = RequestUtil.getUploadInfo(fileUploadRequest);
+                    params = uploadInfo.getUploadParams();
+                    apiParam.setUploadContext(uploadInfo.getUploadContext());
                 } else {
                     params = RequestUtil.parseQueryToMap(cachedBody);
                 }
             }
         }
         if (params != null) {
-            exchange.getAttributes().put(CACHE_REQUEST_BODY_FOR_MAP, params);
+            apiParam.putAll(params);
+            exchange.getAttributes().put(CACHE_REQUEST_BODY_FOR_MAP, apiParam);
         }
-        return params;
+        return apiParam;
     }
 
 

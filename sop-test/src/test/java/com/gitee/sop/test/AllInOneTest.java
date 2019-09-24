@@ -197,6 +197,7 @@ public class AllInOneTest extends TestBase {
                 .addFile("file1", new File(root + "/src/main/resources/file1.txt"))
                 .addFile("file2", new File(root + "/src/main/resources/file2.txt"))
                 .callback((requestInfo, responseData) -> {
+                    System.out.println(responseData);
                     JSONObject jsonObject = JSON.parseObject(responseData);
                     JSONObject data = jsonObject.getJSONObject(requestInfo.getDataNode());
                     Assert.assertEquals(data.getString("code"), "10000");

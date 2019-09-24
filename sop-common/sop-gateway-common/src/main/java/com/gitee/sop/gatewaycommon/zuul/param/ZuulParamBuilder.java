@@ -24,9 +24,10 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
     private static final String GET = "get";
 
     @Override
-    public Map<String, ?> buildRequestParams(RequestContext ctx) {
+    public ApiParam buildRequestParams(RequestContext ctx) {
         HttpServletRequest request = ctx.getRequest();
         Map<String, ?> params;
+        ApiParam apiParam = new ApiParam();
         if (GET.equalsIgnoreCase(request.getMethod())) {
             params = RequestUtil.convertRequestParamsToMap(request);
         } else {
@@ -39,12 +40,15 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
             if (StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE)) {
                 params = RequestUtil.convertJsonRequestToMap(request);
             } else if (ServletFileUpload.isMultipartContent(request)) {
-                params = RequestUtil.convertMultipartRequestToMap(request);
+                RequestUtil.UploadInfo uploadInfo = RequestUtil.getUploadInfo(request);
+                params = uploadInfo.getUploadParams();
+                apiParam.setUploadContext(uploadInfo.getUploadContext());
             } else {
                 params = RequestUtil.convertRequestParamsToMap(request);
             }
         }
-        return params;
+        apiParam.putAll(params);
+        return apiParam;
     }
 
     @Override
@@ -58,14 +62,12 @@ public class ZuulParamBuilder extends BaseParamBuilder<RequestContext> {
     }
 
     @Override
-    protected ApiParam newApiParam(RequestContext ctx) {
-        ApiParam apiParam = super.newApiParam(ctx);
+    protected void processApiParam(ApiParam apiParam, RequestContext ctx) {
         HttpServletRequest request = ctx.getRequest();
         String method = (String) request.getAttribute(SopConstants.REDIRECT_METHOD_KEY);
         String version = (String) request.getAttribute(SopConstants.REDIRECT_VERSION_KEY);
         apiParam.setRestName(method);
         apiParam.setRestVersion(version);
-        return apiParam;
     }
 
 }

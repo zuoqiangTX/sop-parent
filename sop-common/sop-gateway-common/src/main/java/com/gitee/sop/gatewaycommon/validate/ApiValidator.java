@@ -2,9 +2,9 @@ package com.gitee.sop.gatewaycommon.validate;
 
 import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ApiContext;
-import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.Isv;
 import com.gitee.sop.gatewaycommon.bean.RouteConfig;
+import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.IPBlacklistManager;
 import com.gitee.sop.gatewaycommon.manager.IsvRoutePermissionManager;
@@ -20,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -56,6 +58,13 @@ public class ApiValidator implements Validator {
     @Autowired
     private RouteConfigManager routeConfigManager;
 
+    /**
+     * 单个文件大小
+     */
+    @Value("${upload.max-file-size:10MB}")
+    private String maxFileSize;
+
+
     @Override
     public void validate(ApiParam param) {
         checkIP(param);
@@ -78,6 +87,7 @@ public class ApiValidator implements Validator {
 
     /**
      * 是否在IP黑名单中
+     *
      * @param param 接口参数
      */
     protected void checkIP(ApiParam param) {
@@ -89,6 +99,7 @@ public class ApiValidator implements Validator {
 
     /**
      * 检测能否访问
+     *
      * @param param 接口参数
      */
     protected void checkEnable(ApiParam param) {
@@ -116,26 +127,42 @@ public class ApiValidator implements Validator {
      * @param param
      */
     protected void checkUploadFile(ApiParam param) {
-        UploadContext uploadContext = param.fetchApiUploadContext();
+        UploadContext uploadContext = param.fetchUploadContext();
         if (uploadContext != null) {
             try {
                 List<MultipartFile> files = uploadContext.getAllFile();
                 for (MultipartFile file : files) {
-                    // 客户端传来的文件md5
-                    String clientMd5 = param.getString(file.getName());
-                    if (clientMd5 != null) {
-                        String fileMd5 = DigestUtils.md5Hex(file.getBytes());
-                        if (!clientMd5.equals(fileMd5)) {
-                            throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
-                        }
-                    }
+                    checkSingleFileSize(file);
+                    checkFileMd5(param, file);
                 }
             } catch (IOException e) {
                 log.error("验证上传文件MD5错误", e);
                 throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
             }
         }
+    }
 
+    private void checkFileMd5(ApiParam param, MultipartFile file) throws IOException {
+        // 客户端传来的文件md5
+        String clientMd5 = param.getString(file.getName());
+        if (clientMd5 != null) {
+            String fileMd5 = DigestUtils.md5Hex(file.getBytes());
+            if (!clientMd5.equals(fileMd5)) {
+                throw ErrorEnum.ISV_UPLOAD_FAIL.getErrorMeta().getException();
+            }
+        }
+    }
+
+    /**
+     * 校验单个文件大小
+     *
+     * @param file 文件
+     */
+    private void checkSingleFileSize(MultipartFile file) {
+        long fileSize = file.getSize();
+        if (fileSize > DataSize.parse(maxFileSize).toBytes()) {
+            throw ErrorEnum.ISV_INVALID_FILE_SIZE.getErrorMeta().getException(file.getName(), maxFileSize);
+        }
     }
 
     protected void checkTimeout(ApiParam param) {
@@ -210,6 +237,7 @@ public class ApiValidator implements Validator {
 
     /**
      * 校验访问权限
+     *
      * @param apiParam
      */
     protected void checkPermission(ApiParam apiParam) {

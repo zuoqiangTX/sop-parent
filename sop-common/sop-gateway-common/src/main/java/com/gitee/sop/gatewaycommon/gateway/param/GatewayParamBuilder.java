@@ -1,11 +1,9 @@
 package com.gitee.sop.gatewaycommon.gateway.param;
 
 import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
+import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.param.BaseParamBuilder;
 import org.springframework.web.server.ServerWebExchange;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * @author tanghc
@@ -13,9 +11,8 @@ import java.util.Map;
 public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {
 
     @Override
-    public Map<String, ?> buildRequestParams(ServerWebExchange exchange) {
-        Map<String, ?> params = ServerWebExchangeUtil.getRequestParams(exchange);
-        return params == null ? Collections.emptyMap() : params;
+    public ApiParam buildRequestParams(ServerWebExchange exchange) {
+        return ServerWebExchangeUtil.getRequestParams(exchange);
     }
 
     @Override

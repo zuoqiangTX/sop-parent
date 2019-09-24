@@ -14,6 +14,9 @@ import java.util.Map;
  */
 public class ApiUploadContext implements UploadContext {
 
+    /**
+     * key: 表单name
+     */
     private Map<String, MultipartFile> fileMap;
     private List<MultipartFile> allFile;
 

@@ -29,7 +29,7 @@ public class ApiParam extends JSONObject implements Param {
 
     private String ip;
 
-    private transient ApiUploadContext apiUploadContext;
+    private transient UploadContext uploadContext;
 
     public void fitNameVersion() {
         if (restName != null) {
@@ -213,12 +213,12 @@ public class ApiParam extends JSONObject implements Param {
         return getString(ParamNames.CHARSET_NAME);
     }
 
-    public void setApiUploadContext(ApiUploadContext apiUploadContext) {
-        this.apiUploadContext = apiUploadContext;
+    public void setUploadContext(UploadContext uploadContext) {
+        this.uploadContext = uploadContext;
     }
 
-    public ApiUploadContext fetchApiUploadContext() {
-        return apiUploadContext;
+    public UploadContext fetchUploadContext() {
+        return uploadContext;
     }
 
     @Override

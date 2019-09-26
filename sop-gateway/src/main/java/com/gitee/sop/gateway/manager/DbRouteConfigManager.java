@@ -27,7 +27,7 @@ import java.util.Collection;
  */
 @Slf4j
 @Service
-public class DbRouteConfigManager extends DefaultRouteConfigManager {
+public class DbRouteConfigManager extends DefaultRouteConfigManager implements ChannelMsgProcessor {
 
     @Autowired
     ConfigRouteBaseMapper configRouteBaseMapper;
@@ -72,25 +72,29 @@ public class DbRouteConfigManager extends DefaultRouteConfigManager {
         this.doUpdate(routeId, object);
     }
 
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final RouteConfig routeConfig = channelMsg.toObject( RouteConfig.class);
+        switch (channelMsg.getOperation()) {
+            case "reload":
+                log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
+                load();
+                break;
+            case "update":
+                log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
+                update(routeConfig);
+                break;
+            default:
+        }
+    }
 
     @PostConstruct
     protected void after() throws Exception {
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final RouteConfig routeConfig = JSON.parseObject(channelMsg.getData(), RouteConfig.class);
-                switch (channelMsg.getOperation()) {
-                    case "reload":
-                        log.info("重新加载路由配置信息，routeConfigDto:{}", routeConfig);
-                        load();
-                        break;
-                    case "update":
-                        log.info("更新路由配置信息，routeConfigDto:{}", routeConfig);
-                        update(routeConfig);
-                        break;
-                    default:
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
     }

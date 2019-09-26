@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.param.ApiUploadContext;
 import com.gitee.sop.gatewaycommon.param.UploadContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
 import lombok.Data;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -266,6 +267,17 @@ public class RequestUtil {
             log.error("参数解析错误", e);
         }
         return uploadInfo;
+    }
+
+    public static void checkResponseBody(String responseBody, String sign, String secret) throws Exception {
+        if (sign == null) {
+            throw new Exception("签名不存在");
+        }
+        String signContent = secret + responseBody + secret;
+        String clientSign = DigestUtils.md5Hex(signContent);
+        if (!sign.equals(clientSign)) {
+            throw new Exception("签名错误");
+        }
     }
 
     @Data

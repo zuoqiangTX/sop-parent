@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DbIsvManager extends CacheIsvManager {
+public class DbIsvManager extends CacheIsvManager implements ChannelMsgProcessor{
 
     @Autowired
     private IsvInfoMapper isvInfoMapper;
@@ -35,12 +35,29 @@ public class DbIsvManager extends CacheIsvManager {
     @Override
     public void load() {
         List<IsvDetailDTO> isvInfoList = isvInfoMapper.listIsvDetail();
-        isvInfoList.stream()
+        isvInfoList
                 .forEach(isvInfo -> {
                     IsvDefinition isvDefinition = new IsvDefinition();
                     BeanUtils.copyProperties(isvInfo, isvDefinition);
                     this.getIsvCache().put(isvDefinition.getAppKey(), isvDefinition);
                 });
+    }
+
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final IsvDefinition isvDefinition = channelMsg.toObject(IsvDefinition.class);
+        switch (channelMsg.getOperation()) {
+            case "update":
+                log.info("更新ISV信息，isvDefinition:{}", isvDefinition);
+                update(isvDefinition);
+                break;
+            case "remove":
+                log.info("删除ISV，isvDefinition:{}", isvDefinition);
+                remove(isvDefinition.getAppKey());
+                break;
+            default:
+
+        }
     }
 
     @PostConstruct
@@ -50,20 +67,8 @@ public class DbIsvManager extends CacheIsvManager {
         configService.addListener(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final IsvDefinition isvDefinition = JSON.parseObject(channelMsg.getData(), IsvDefinition.class);
-                switch (channelMsg.getOperation()) {
-                    case "update":
-                        log.info("更新ISV信息，isvDefinition:{}", isvDefinition);
-                        update(isvDefinition);
-                        break;
-                    case "remove":
-                        log.info("删除ISV，isvDefinition:{}", isvDefinition);
-                        remove(isvDefinition.getAppKey());
-                        break;
-                    default:
-
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
     }

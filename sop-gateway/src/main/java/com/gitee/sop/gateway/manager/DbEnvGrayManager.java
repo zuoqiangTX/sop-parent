@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @Service
-public class DbEnvGrayManager extends DefaultEnvGrayManager {
+public class DbEnvGrayManager extends DefaultEnvGrayManager implements ChannelMsgProcessor {
 
     private static final int STATUS_ENABLE = 1;
 
@@ -97,29 +97,32 @@ public class DbEnvGrayManager extends DefaultEnvGrayManager {
         this.saveServiceGrayConfig(serviceGrayConfig);
     }
 
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        ServiceGrayDefinition userKeyDefinition = channelMsg.toObject(ServiceGrayDefinition.class);
+        String serviceId = userKeyDefinition.getServiceId();
+        switch (channelMsg.getOperation()) {
+            case "set":
+                ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
+                setServiceGrayConfig(configGray);
+                break;
+            case "open":
+                openGray(userKeyDefinition.getInstanceId(), serviceId);
+                break;
+            case "close":
+                closeGray(userKeyDefinition.getInstanceId());
+                break;
+            default:
+        }
+    }
 
     @PostConstruct
     protected void after() throws Exception {
         configService.addListener(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                String data = channelMsg.getData();
-                ServiceGrayDefinition userKeyDefinition = JSON.parseObject(data, ServiceGrayDefinition.class);
-                String serviceId = userKeyDefinition.getServiceId();
-                switch (channelMsg.getOperation()) {
-                    case "set":
-                        ConfigGray configGray = configGrayMapper.getByColumn("service_id", serviceId);
-                        setServiceGrayConfig(configGray);
-                        break;
-                    case "open":
-                        openGray(userKeyDefinition.getInstanceId(), serviceId);
-                        break;
-                    case "close":
-                        closeGray(userKeyDefinition.getInstanceId());
-                        break;
-                    default:
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
     }

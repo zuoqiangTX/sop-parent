@@ -1,18 +1,29 @@
-package com.gitee.sop.adminserver.api.service.result;
+package com.gitee.sop.gateway.entity;
 
-import com.gitee.sop.adminserver.entity.RouteRoleDTO;
-import lombok.Getter;
-import lombok.Setter;
+import com.gitee.fastmybatis.core.annotation.LogicDelete;
+import lombok.Data;
 
-import java.util.List;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 
 /**
+ * 表名：config_service_route
+ * 备注：路由配置
+ *
  * @author tanghc
  */
-@Getter
-@Setter
-public class RouteVO {
-
+@Table(name = "config_service_route")
+@Data
+public class ConfigServiceRoute {
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     /**  数据库字段：id */
     private String id;
 
@@ -52,5 +63,9 @@ public class RouteVO {
     /** 是否需要授权才能访问, 数据库字段：permission */
     private Byte permission;
 
-    private List<RouteRoleDTO> roles;
+    /**  数据库字段：gmt_create */
+    private Date gmtCreate;
+
+    /**  数据库字段：gmt_modified */
+    private Date gmtModified;
 }

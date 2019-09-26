@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct;
  */
 @Slf4j
 @Service
-public class DbLimitConfigManager extends DefaultLimitConfigManager {
+public class DbLimitConfigManager extends DefaultLimitConfigManager implements ChannelMsgProcessor {
 
     @Autowired
     ConfigLimitMapper configLimitMapper;
@@ -39,7 +39,6 @@ public class DbLimitConfigManager extends DefaultLimitConfigManager {
     public void load() {
         Query query = new Query();
         configLimitMapper.list(query)
-                .stream()
                 .forEach(configLimit -> putVal(configLimit));
 
     }
@@ -50,25 +49,29 @@ public class DbLimitConfigManager extends DefaultLimitConfigManager {
         this.update(configLimitDto);
     }
 
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final ConfigLimitDto configLimitDto = channelMsg.toObject(ConfigLimitDto.class);
+        switch (channelMsg.getOperation()) {
+            case "reload":
+                log.info("重新加载限流配置信息，configLimitDto:{}", configLimitDto);
+                load();
+                break;
+            case "update":
+                log.info("更新限流配置信息，configLimitDto:{}", configLimitDto);
+                update(configLimitDto);
+                break;
+            default:
+        }
+    }
 
     @PostConstruct
     protected void after() throws Exception {
         configService.addListener(NacosConfigs.DATA_ID_LIMIT_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final ConfigLimitDto configLimitDto = JSON.parseObject(channelMsg.getData(), ConfigLimitDto.class);
-                switch (channelMsg.getOperation()) {
-                    case "reload":
-                        log.info("重新加载限流配置信息，configLimitDto:{}", configLimitDto);
-                        load();
-                        break;
-                    case "update":
-                        log.info("更新限流配置信息，configLimitDto:{}", configLimitDto);
-                        update(configLimitDto);
-                        break;
-                    default:
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
     }

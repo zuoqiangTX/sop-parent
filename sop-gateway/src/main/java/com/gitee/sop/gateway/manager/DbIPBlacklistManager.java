@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
+public class DbIPBlacklistManager extends DefaultIPBlacklistManager implements ChannelMsgProcessor {
 
     @Autowired
     private IPBlacklistMapper ipBlacklistMapper;
@@ -35,8 +35,25 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
     public void load() {
         List<String> ipList = ipBlacklistMapper.listAllIP();
         log.info("加载IP黑名单, size:{}", ipList.size());
-        ipList.stream().forEach(this::add);
+        ipList.forEach(this::add);
 
+    }
+
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final IPDto ipDto = channelMsg.toObject(IPDto.class);
+        String ip = ipDto.getIp();
+        switch (channelMsg.getOperation()) {
+            case "add":
+                log.info("添加IP黑名单，ip:{}", ip);
+                add(ip);
+                break;
+            case "delete":
+                log.info("移除IP黑名单，ip:{}", ip);
+                remove(ip);
+                break;
+            default:
+        }
     }
 
     @PostConstruct
@@ -44,20 +61,8 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
         configService.addListener(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final IPDto ipDto = JSON.parseObject(channelMsg.getData(), IPDto.class);
-                String ip = ipDto.getIp();
-                switch (channelMsg.getOperation()) {
-                    case "add":
-                        log.info("添加IP黑名单，ip:{}", ip);
-                        add(ip);
-                        break;
-                    case "delete":
-                        log.info("移除IP黑名单，ip:{}", ip);
-                        remove(ip);
-                        break;
-                    default:
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
     }
@@ -66,5 +71,4 @@ public class DbIPBlacklistManager extends DefaultIPBlacklistManager {
     private static class IPDto {
         private String ip;
     }
-
 }

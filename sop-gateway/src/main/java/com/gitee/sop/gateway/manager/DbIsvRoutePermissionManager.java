@@ -40,7 +40,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Service
-public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager {
+public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager implements ChannelMsgProcessor {
 
     @Autowired
     Environment environment;
@@ -122,41 +122,46 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
                 .collect(Collectors.toList());
     }
 
-    @Data
-    static class IsvRole {
-        private String appKey;
-        private String roleCode;
-    }
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final IsvRoutePermission isvRoutePermission = channelMsg.toObject(IsvRoutePermission.class);
+        switch (channelMsg.getOperation()) {
+            case "reload":
+                log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                try {
+                    load();
+                } catch (Exception e) {
+                    log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
+                }
+                break;
+            case "update":
+                log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                update(isvRoutePermission);
+                break;
+            case "remove":
+                log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                remove(isvRoutePermission.getAppKey());
+                break;
+            default:
 
+        }
+    }
 
     @PostConstruct
     protected void after() throws Exception {
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final IsvRoutePermission isvRoutePermission = JSON.parseObject(channelMsg.getData(), IsvRoutePermission.class);
-                switch (channelMsg.getOperation()) {
-                    case "reload":
-                        log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        try {
-                            load();
-                        } catch (Exception e) {
-                            log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
-                        }
-                        break;
-                    case "update":
-                        log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        update(isvRoutePermission);
-                        break;
-                    case "remove":
-                        log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        remove(isvRoutePermission.getAppKey());
-                        break;
-                    default:
-
-                }
+            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+            process(channelMsg);
             }
         });
+    }
+
+
+    @Data
+    static class IsvRole {
+        private String appKey;
+        private String roleCode;
     }
 }

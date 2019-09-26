@@ -7,6 +7,8 @@ import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
+import com.gitee.sop.gatewaycommon.route.NacosRoutesListener;
+import com.gitee.sop.gatewaycommon.route.RegistryListener;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.session.SessionManager;
 import com.gitee.sop.gatewaycommon.validate.Validator;
@@ -16,8 +18,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,12 +31,13 @@ import javax.annotation.PostConstruct;
 /**
  * @author tanghc
  */
-public class AbstractConfiguration implements ApplicationContextAware, ApplicationListener<HeartbeatEvent> {
+public class AbstractConfiguration implements ApplicationContextAware {
+
     @Autowired
     protected Environment environment;
 
     @Autowired
-    private ServiceRoutesLoader serviceRoutesLoader;
+    private RegistryListener registryListener;
 
     protected ApplicationContext applicationContext;
 
@@ -44,12 +48,15 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
 
     /**
      * nacos事件监听
-     * @see org.springframework.cloud.alibaba.nacos.discovery.NacosWatch NacosWatch
+     *
      * @param heartbeatEvent
      */
-    @Override
-    public void onApplicationEvent(HeartbeatEvent heartbeatEvent) {
-        serviceRoutesLoader.load(heartbeatEvent);
+    @EventListener(classes = HeartbeatEvent.class)
+    public void listenNacosEvent(ApplicationEvent heartbeatEvent) {
+        Object source = heartbeatEvent.getSource();
+        if (source != null && source.getClass().getName().contains("NacosWatch")) {
+            registryListener.onRegister(heartbeatEvent);
+        }
     }
 
     /**
@@ -57,8 +64,8 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
      */
     @Bean
     @ConditionalOnMissingBean
-    ServiceRoutesLoader serviceRoutesLoader() {
-        return new ServiceRoutesLoader();
+    RegistryListener registryListener() {
+        return new NacosRoutesListener();
     }
 
     @Bean

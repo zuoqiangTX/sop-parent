@@ -86,7 +86,7 @@ public class IPBlacklistApi {
         }
     }
 
-    public void sendIpBlacklistMsg(ConfigIpBlacklist configIpBlacklist, ChannelOperation channelOperation) throws Exception {
+    public void sendIpBlacklistMsg(ConfigIpBlacklist configIpBlacklist, ChannelOperation channelOperation) {
         ChannelMsg channelMsg = new ChannelMsg(channelOperation, configIpBlacklist);
         configPushService.publishConfig(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }

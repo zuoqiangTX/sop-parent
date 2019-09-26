@@ -10,6 +10,7 @@ import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
+import com.gitee.sop.gatewaycommon.route.RegistryListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,11 @@ import java.util.Objects;
  * 发现新服务，更新路由信息
  *
  * @author tanghc
+ *
+ * @deprecated
+ * @see RegistryListener
  */
+@Deprecated
 @Slf4j
 public class ServiceRoutesLoader<T extends TargetRoute> {
 

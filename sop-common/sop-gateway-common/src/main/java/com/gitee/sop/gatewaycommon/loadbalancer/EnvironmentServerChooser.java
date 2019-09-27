@@ -1,4 +1,4 @@
-package com.gitee.sop.gateway.loadbalancer;
+package com.gitee.sop.gatewaycommon.loadbalancer;
 
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.zuul.loadbalancer.BaseServerChooser;
@@ -39,8 +39,12 @@ public class EnvironmentServerChooser extends BaseServerChooser {
 
     private String getEnvValue(Server server) {
         // eureka存储的metadata
-        Map<String, String> metadata = ((NacosServer) server).getMetadata();
+        Map<String, String> metadata = getMetada(server);
         return metadata.get(MEDATA_KEY_ENV);
+    }
+
+    protected Map<String, String> getMetada(Server server) {
+        return ((NacosServer) server).getMetadata();
     }
 
 

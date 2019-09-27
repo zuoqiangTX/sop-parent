@@ -1,4 +1,4 @@
-package com.gitee.sop.gateway.manager;
+package com.gitee.sop.gatewaycommon.manager;
 
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 
@@ -6,5 +6,6 @@ import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
  * @author tanghc
  */
 public interface ChannelMsgProcessor {
-    void process(ChannelMsg channelMsg);
+    default void process(ChannelMsg channelMsg) {
+    }
 }

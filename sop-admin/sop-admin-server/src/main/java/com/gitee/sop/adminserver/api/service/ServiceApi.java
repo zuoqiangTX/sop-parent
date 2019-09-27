@@ -1,7 +1,5 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.nacos.api.annotation.NacosInjected;
-import com.alibaba.nacos.api.naming.NamingService;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -27,6 +25,7 @@ import com.gitee.sop.adminserver.entity.ConfigGray;
 import com.gitee.sop.adminserver.entity.ConfigGrayInstance;
 import com.gitee.sop.adminserver.mapper.ConfigGrayInstanceMapper;
 import com.gitee.sop.adminserver.mapper.ConfigGrayMapper;
+import com.gitee.sop.adminserver.mapper.ConfigServiceRouteMapper;
 import com.gitee.sop.adminserver.service.ConfigPushService;
 import com.gitee.sop.adminserver.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
@@ -61,43 +60,23 @@ public class ServiceApi {
     private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
     @Autowired
+    private ConfigServiceRouteMapper configServiceRouteMapper;
+
+    @Autowired
     private ConfigPushService configPushService;
 
-    @NacosInjected
-    private NamingService namingService;
-
     @Api(name = "registry.service.list")
-    @ApiDocMethod(description = "注册中心的服务列表", elementClass = RouteServiceInfo.class)
-    List<RouteServiceInfo> listServiceInfo(ServiceSearchParam param) {
-        List<ServiceInfo> servicesOfServer = null;
-        try {
-            servicesOfServer = registryService.listAllService(1, Integer.MAX_VALUE);
-        } catch (Exception e) {
-            log.error("获取服务列表失败", e);
-            throw new BizException("获取服务列表失败");
-        }
-
-        return servicesOfServer
+    @ApiDocMethod(description = "路由配置中的服务列表", elementClass = String.class)
+    List<String> listServiceInfo(ServiceSearchParam param) {
+        List<String> allServiceId = configServiceRouteMapper.listAllServiceId();
+        return allServiceId
                 .stream()
-                .filter(serviceInfo -> {
-                    String serviceId = serviceInfo.getServiceId();
-                    if ("api-gateway".equalsIgnoreCase(serviceId)) {
-                        return false;
-                    }
-                    // 隐藏空服务
-                    if (CollectionUtils.isEmpty(serviceInfo.getInstances())) {
-                        return false;
-                    }
+                .filter(serviceId -> {
                     if (StringUtils.isBlank(param.getServiceId())) {
                         return true;
                     } else {
                         return serviceId.contains(param.getServiceId());
                     }
-                })
-                .map(serviceInfo -> {
-                    RouteServiceInfo routeServiceInfo = new RouteServiceInfo();
-                    routeServiceInfo.setServiceId(serviceInfo.getServiceId());
-                    return routeServiceInfo;
                 })
                 .collect(Collectors.toList());
     }
@@ -105,14 +84,12 @@ public class ServiceApi {
     @Api(name = "service.custom.add")
     @ApiDocMethod(description = "添加服务")
     void addService(ServiceAddParam param) {
-        // TODO: 添加服务
         throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.custom.del")
     @ApiDocMethod(description = "删除自定义服务")
     void delService(ServiceSearchParam param) {
-        // TODO: 删除自定义服务
         throw new BizException("该功能已下线");
     }
 

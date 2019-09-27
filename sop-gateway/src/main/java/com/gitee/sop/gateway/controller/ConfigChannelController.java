@@ -1,7 +1,6 @@
 package com.gitee.sop.gateway.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.sop.gateway.manager.ChannelMsgProcessor;
 import com.gitee.sop.gateway.manager.DbEnvGrayManager;
 import com.gitee.sop.gateway.manager.DbIPBlacklistManager;
 import com.gitee.sop.gateway.manager.DbIsvManager;
@@ -11,6 +10,7 @@ import com.gitee.sop.gateway.manager.DbRouteConfigManager;
 import com.gitee.sop.gatewaycommon.bean.GatewayPushDTO;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
+import com.gitee.sop.gatewaycommon.manager.ChannelMsgProcessor;
 import com.gitee.sop.gatewaycommon.util.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

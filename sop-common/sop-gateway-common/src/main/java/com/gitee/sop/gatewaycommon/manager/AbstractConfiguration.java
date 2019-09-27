@@ -5,8 +5,10 @@ import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
+import com.gitee.sop.gatewaycommon.loadbalancer.SopPropertiesFactory;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
+import com.gitee.sop.gatewaycommon.route.EurekaRoutesListener;
 import com.gitee.sop.gatewaycommon.route.NacosRoutesListener;
 import com.gitee.sop.gatewaycommon.route.RegistryListener;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
@@ -14,8 +16,11 @@ import com.gitee.sop.gatewaycommon.session.SessionManager;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
+import org.springframework.cloud.netflix.ribbon.PropertiesFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
@@ -53,19 +58,33 @@ public class AbstractConfiguration implements ApplicationContextAware {
      */
     @EventListener(classes = HeartbeatEvent.class)
     public void listenNacosEvent(ApplicationEvent heartbeatEvent) {
-        Object source = heartbeatEvent.getSource();
-        if (source != null && source.getClass().getName().contains("NacosWatch")) {
-            registryListener.onRegister(heartbeatEvent);
-        }
+        registryListener.onEvent(heartbeatEvent);
+    }
+
+    @Bean
+    PropertiesFactory propertiesFactory() {
+        return new SopPropertiesFactory();
+    }
+
+    @Bean
+    @ConditionalOnClass(name = "com.alibaba.nacos.api.config.ConfigService")
+    public NacosEventProcessor nacosEventProcessor() {
+        return new NacosEventProcessor();
     }
 
     /**
      * 微服务路由加载
      */
     @Bean
-    @ConditionalOnMissingBean
-    RegistryListener registryListener() {
+    @ConditionalOnProperty("spring.cloud.nacos.discovery.server-addr")
+    RegistryListener registryListenerNacos() {
         return new NacosRoutesListener();
+    }
+
+    @Bean
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    RegistryListener registryListenerEureka() {
+        return new EurekaRoutesListener();
     }
 
     @Bean

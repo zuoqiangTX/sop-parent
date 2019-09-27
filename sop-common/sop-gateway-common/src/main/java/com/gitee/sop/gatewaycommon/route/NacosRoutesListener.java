@@ -31,7 +31,7 @@ public class NacosRoutesListener extends BaseRoutesListener {
     private ConfigService configService;
 
     @Override
-    public void onRegister(ApplicationEvent applicationEvent) {
+    public void onEvent(ApplicationEvent applicationEvent) {
         NamingService namingService = nacosDiscoveryProperties.namingServiceInstance();
         List<ServiceInfo> subscribes = null;
         try {
@@ -70,11 +70,6 @@ public class NacosRoutesListener extends BaseRoutesListener {
                 log.error("选择服务实例失败，serviceName: {}", serviceName, e);
             }
         }
-    }
-
-    @Override
-    public void onDeregister(ApplicationEvent applicationEvent) {
-
     }
 
 }

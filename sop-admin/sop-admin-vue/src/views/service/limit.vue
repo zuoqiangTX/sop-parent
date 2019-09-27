@@ -382,14 +382,13 @@ export default {
     convertToTreeData(data, pid) {
       const result = []
       const root = {
-        label: '服务列表',
+        label: data.length === 0 ? '无服务' : '服务列表',
         parentId: pid
       }
       const children = []
       for (let i = 0; i < data.length; i++) {
-        data[i].parentId = 1
-        data[i].label = data[i].serviceId
-        children.push(data[i])
+        const child = { parentId: 1, label: data[i] }
+        children.push(child)
       }
       root.children = children
       result.push(root)

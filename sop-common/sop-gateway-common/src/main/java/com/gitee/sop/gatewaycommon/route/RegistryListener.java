@@ -9,18 +9,6 @@ import org.springframework.context.ApplicationEvent;
  */
 public interface RegistryListener {
 
-    /**
-     * 触发新服务注册
-     *
-     * @param applicationEvent 事件，可能是nacos事件，也可能是eureka事件
-     */
-    void onRegister(ApplicationEvent applicationEvent);
-
-    /**
-     * 注销服务
-     *
-     * @param applicationEvent
-     */
-    void onDeregister(ApplicationEvent applicationEvent);
+    void onEvent(ApplicationEvent applicationEvent);
 
 }

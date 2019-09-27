@@ -52,7 +52,8 @@
                 size="mini"
                 icon="el-icon-delete"
                 title="删除服务"
-                @click.stop="() => onDelService(data)"/>
+                @click.stop="() => onDelService(data)"
+              />
             </span>
           </span>
         </el-tree>
@@ -60,7 +61,10 @@
       <el-main style="padding-top:0">
         <el-form :inline="true" :model="searchFormData" class="demo-form-inline" size="mini">
           <el-form-item label="路由名称">
-            <el-input v-model="searchFormData.id" placeholder="输入接口名或版本号" />
+            <el-input v-model="searchFormData.id" :clearable="true" placeholder="输入接口名或版本号" />
+          </el-form-item>
+          <el-form-item>
+            <el-checkbox v-model="searchFormData.permission">授权接口</el-checkbox>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="el-icon-search" @click="onSearchTable">查询</el-button>
@@ -76,9 +80,9 @@
           新建路由
         </el-button>
         <el-table
-          :data="tableData"
+          :data="pageInfo.rows"
           border
-          max-height="500"
+          highlight-current-row
           style="margin-top: 10px;"
         >
           <el-table-column
@@ -141,6 +145,17 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination
+          background
+          style="margin-top: 5px"
+          :current-page="searchFormData.pageIndex"
+          :page-size="searchFormData.pageSize"
+          :page-sizes="[10, 20, 40]"
+          :total="pageInfo.total"
+          layout="total, sizes, prev, pager, next"
+          @size-change="onSizeChange"
+          @current-change="onPageIndexChange"
+        />
       </el-main>
     </el-container>
     <!-- route dialog -->
@@ -252,7 +267,14 @@ export default {
       isCustomService: false,
       searchFormData: {
         id: '',
-        serviceId: ''
+        serviceId: '',
+        permission: 0,
+        pageIndex: 1,
+        pageSize: 10
+      },
+      pageInfo: {
+        rows: [],
+        total: 0
       },
       defaultProps: {
         children: 'children',
@@ -347,37 +369,36 @@ export default {
     /**
      * 数组转成树状结构
      * @param data 数据结构 [{
-          "_parentId": 14,
-          "gmtCreate": "2019-01-15 09:44:38",
-          "gmtUpdate": "2019-01-15 09:44:38",
-          "id": 15,
-          "isShow": 1,
-          "name": "用户注册",
-          "orderIndex": 10000,
-          "parentId": 14
-      },...]
+        "_parentId": 14,
+        "gmtCreate": "2019-01-15 09:44:38",
+        "gmtUpdate": "2019-01-15 09:44:38",
+        "id": 15,
+        "isShow": 1,
+        "name": "用户注册",
+        "orderIndex": 10000,
+        "parentId": 14
+    },...]
      * @param pid 初始父节点id，一般是0
      * @return 返回结果 [{
-        label: '一级 1',
+      label: '一级 1',
+      children: [{
+        label: '二级 1-1',
         children: [{
-          label: '二级 1-1',
-          children: [{
-            label: '三级 1-1-1'
-          }]
+          label: '三级 1-1-1'
         }]
-      }
+      }]
+    }
      */
     convertToTreeData(data, pid) {
       const result = []
       const root = {
-        label: '服务列表',
+        label: data.length === 0 ? '无服务' : '服务列表',
         parentId: pid
       }
       const children = []
       for (let i = 0; i < data.length; i++) {
-        data[i].parentId = 1
-        data[i].label = data[i].serviceId
-        children.push(data[i])
+        const child = { parentId: 1, label: data[i] }
+        children.push(child)
       }
       root.children = children
       result.push(root)
@@ -385,12 +406,17 @@ export default {
     },
     // table
     loadTable: function(param) {
+      if (!this.searchFormData.serviceId) {
+        this.tip('请选择一个服务', 'error')
+        return
+      }
       const postData = param || this.searchFormData
-      this.post('route.list', postData, function(resp) {
-        this.tableData = resp.data
+      this.post('route.page', postData, function(resp) {
+        this.pageInfo = resp.data
       })
     },
     onSearchTable: function() {
+      this.searchFormData.pageIndex = 1
       this.loadTable()
     },
     onTableUpdate: function(row) {
@@ -509,6 +535,14 @@ export default {
           this.loadTree()
         })
       })
+    },
+    onSizeChange: function(size) {
+      this.searchFormData.pageSize = size
+      this.loadTable()
+    },
+    onPageIndexChange: function(pageIndex) {
+      this.searchFormData.pageIndex = pageIndex
+      this.loadTable()
     }
   }
 }

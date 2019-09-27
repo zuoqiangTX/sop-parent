@@ -1,4 +1,4 @@
-package com.gitee.sop.gateway.loadbalancer;
+package com.gitee.sop.gatewaycommon.loadbalancer;
 
 import com.netflix.loadbalancer.IRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ public class SopPropertiesFactory extends PropertiesFactory {
      * 可在配置文件中设置<code>zuul.custom-rule-classname=com.xx.ClassName</code>指定负载均衡规则类
      * 默认使用com.gitee.sop.gateway.loadbalancer.PreEnvironmentServerChooser
      */
-    private static final String PROPERTIES_KEY = "zuul.custom-rule-classname";
+    public static final String PROPERTIES_KEY = "zuul.custom-rule-classname";
 
     private static final String CUSTOM_RULE_CLASSNAME = EnvironmentServerChooser.class.getName();
 

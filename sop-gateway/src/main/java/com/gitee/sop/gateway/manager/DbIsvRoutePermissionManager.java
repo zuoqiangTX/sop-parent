@@ -1,9 +1,6 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.nacos.api.annotation.NacosInjected;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.entity.IsvInfo;
 import com.gitee.sop.gateway.entity.PermIsvRole;
@@ -13,7 +10,6 @@ import com.gitee.sop.gateway.mapper.PermIsvRoleMapper;
 import com.gitee.sop.gateway.mapper.PermRolePermissionMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.IsvRoutePermission;
-import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +19,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +35,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Slf4j
 @Service
-public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager implements ChannelMsgProcessor {
+public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManager {
 
     @Autowired
     Environment environment;
@@ -54,8 +49,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
-    @NacosInjected
-    private ConfigService configService;
 
     @Override
     public void load() {
@@ -145,17 +138,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
             default:
 
         }
-    }
-
-    @PostConstruct
-    protected void after() throws Exception {
-        configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
-            @Override
-            public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-            process(channelMsg);
-            }
-        });
     }
 
 

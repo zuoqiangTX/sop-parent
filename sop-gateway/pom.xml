@@ -59,15 +59,10 @@
             <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
         <!-- 使用nacos注册中心
             版本 0.2.x.RELEASE 对应的是 Spring Boot 2.x 版本，版本 0.1.x.RELEASE 对应的是 Spring Boot 1.x 版本。
            https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-alibaba-nacos-discovery
-
+        -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -78,19 +73,18 @@
             <artifactId>nacos-client</artifactId>
             <version>${nacos-client.version}</version>
         </dependency>
-        -->
         <!-- 注册中心end -->
 
         <!--
             这里依赖springboot版本，非cloud版本。
             如果依赖了spring-cloud-starter-alibaba-nacos-config，需要额外配置一个bootstrap.properties
-
+        -->
         <dependency>
             <groupId>com.alibaba.boot</groupId>
             <artifactId>nacos-config-spring-boot-starter</artifactId>
             <version>${nacos-spring-boot-starter.version}</version>
         </dependency>
-        -->
+
 
         <!-- test -->
         <dependency>

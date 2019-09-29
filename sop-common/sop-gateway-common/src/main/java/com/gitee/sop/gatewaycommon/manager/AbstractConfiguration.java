@@ -8,15 +8,17 @@ import com.gitee.sop.gatewaycommon.limit.LimitManager;
 import com.gitee.sop.gatewaycommon.loadbalancer.SopPropertiesFactory;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
-import com.gitee.sop.gatewaycommon.route.EurekaRoutesListener;
-import com.gitee.sop.gatewaycommon.route.NacosRoutesListener;
+import com.gitee.sop.gatewaycommon.route.ServiceRouteListener;
+import com.gitee.sop.gatewaycommon.route.EurekaRegistryListener;
+import com.gitee.sop.gatewaycommon.route.NacosRegistryListener;
 import com.gitee.sop.gatewaycommon.route.RegistryListener;
+import com.gitee.sop.gatewaycommon.route.ServiceListener;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.session.SessionManager;
+import com.gitee.sop.gatewaycommon.validate.SignConfig;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
@@ -72,13 +74,19 @@ public class AbstractConfiguration implements ApplicationContextAware {
     @Bean
     @ConditionalOnProperty("spring.cloud.nacos.discovery.server-addr")
     RegistryListener registryListenerNacos() {
-        return new NacosRoutesListener();
+        return new NacosRegistryListener();
     }
 
     @Bean
     @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
     RegistryListener registryListenerEureka() {
-        return new EurekaRoutesListener();
+        return new EurekaRegistryListener();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ServiceListener serviceListener() {
+        return new ServiceRouteListener();
     }
 
     @Bean
@@ -173,6 +181,14 @@ public class AbstractConfiguration implements ApplicationContextAware {
         SpringContext.setApplicationContext(applicationContext);
         if (RouteRepositoryContext.getRouteRepository() == null) {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
+        }
+        String serverName = environment.getProperty("spring.application.name");
+        if (!"api-gateway".equals(serverName)) {
+            throw new IllegalArgumentException("spring.application.name必须为api-gateway");
+        }
+        String urlencode = environment.getProperty("sign.urlencode");
+        if ("true".equals(urlencode)) {
+            SignConfig.enableUrlencodeMode();
         }
         EnvironmentContext.setEnvironment(environment);
 

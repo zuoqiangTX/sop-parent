@@ -5,6 +5,7 @@
 package com.gitee.sop.gatewaycommon.validate.alipay;
 
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
+import com.gitee.sop.gatewaycommon.validate.SignConfig;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
@@ -188,13 +189,13 @@ public class AlipaySignature {
         params.remove("sign");
         params.remove("sign_type");
 
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         List<String> keys = new ArrayList<String>(params.keySet());
         Collections.sort(keys);
 
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
-            String value = params.get(key);
+            String value = SignConfig.wrapVal(params.get(key));
             content.append((i == 0 ? "" : "&") + key + "=" + value);
         }
 
@@ -208,13 +209,13 @@ public class AlipaySignature {
 
         params.remove("sign");
 
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         List<String> keys = new ArrayList<String>(params.keySet());
         Collections.sort(keys);
 
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
-            String value = String.valueOf(params.get(key));
+            String value = SignConfig.wrapVal(params.get(key));
             content.append((i == 0 ? "" : "&") + key + "=" + value);
         }
 

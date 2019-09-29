@@ -40,7 +40,8 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
+            <version>0.9.0.RELEASE</version>
         </dependency>
 
         <dependency>

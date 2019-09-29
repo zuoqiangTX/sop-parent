@@ -50,6 +50,7 @@ public class ConfigPushService {
         List<ServiceInstanceVO> serviceInstanceList = serverService.listService(serviceSearchParam);
         Collection<String> hostList = serviceInstanceList
                 .stream()
+                .filter(serviceInstanceVO -> StringUtils.isNotBlank(serviceInstanceVO.getInstanceId()))
                 .map(ServiceInstanceVO::getIpPort)
                 .collect(Collectors.toList());
         this.pushByHost(hostList, gatewayPushDTO);

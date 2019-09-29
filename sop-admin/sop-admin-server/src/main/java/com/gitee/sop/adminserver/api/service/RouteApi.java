@@ -127,24 +127,20 @@ public class RouteApi {
 
 
     private void updateRouteConfig(RouteUpdateParam routeUpdateParam) {
-        try {
-            String routeId = routeUpdateParam.getId();
-            ConfigRouteBase configRouteBase = configRouteBaseMapper.getByColumn("route_id", routeId);
-            boolean doSave = configRouteBase == null;
-            if (doSave) {
-                configRouteBase = new ConfigRouteBase();
-                configRouteBase.setRouteId(routeId);
-            }
-            configRouteBase.setStatus(routeUpdateParam.getStatus().byteValue());
+        String routeId = routeUpdateParam.getId();
+        ConfigRouteBase configRouteBase = configRouteBaseMapper.getByColumn("route_id", routeId);
+        boolean doSave = configRouteBase == null;
+        if (doSave) {
+            configRouteBase = new ConfigRouteBase();
+            configRouteBase.setRouteId(routeId);
+        }
+        configRouteBase.setStatus(routeUpdateParam.getStatus().byteValue());
 
-            int i = doSave ? configRouteBaseMapper.save(configRouteBase)
-                    : configRouteBaseMapper.update(configRouteBase);
+        int i = doSave ? configRouteBaseMapper.save(configRouteBase)
+                : configRouteBaseMapper.update(configRouteBase);
 
-            if (i > 0) {
-                this.sendMsg(configRouteBase);
-            }
-        } catch (Exception e) {
-            log.error("发送msg失败", e);
+        if (i > 0) {
+            this.sendMsg(configRouteBase);
         }
     }
 
@@ -176,7 +172,6 @@ public class RouteApi {
                 .stream()
                 .collect(Collectors.groupingBy(PermRolePermission::getRouteId,
                         Collectors.mapping(PermRolePermission::getRoleCode, Collectors.toList())));
-
 
 
         return permRolePermissionMapper.list(new Query().in("route_id", routeIdList))

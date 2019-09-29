@@ -66,12 +66,6 @@ public class AbstractConfiguration implements ApplicationContextAware {
         return new SopPropertiesFactory();
     }
 
-    @Bean
-    @ConditionalOnClass(name = "com.alibaba.nacos.api.config.ConfigService")
-    public NacosEventProcessor nacosEventProcessor() {
-        return new NacosEventProcessor();
-    }
-
     /**
      * 微服务路由加载
      */

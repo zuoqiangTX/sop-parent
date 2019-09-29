@@ -5,7 +5,6 @@ import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.gitee.sop.gatewaycommon.bean.ApiConfig;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
@@ -15,9 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 
 /**
+ * 用不到了
+ *
  * @author tanghc
  */
 @Slf4j
+@Deprecated
 public class NacosEventProcessor {
 
     @NacosInjected
@@ -56,8 +58,8 @@ public class NacosEventProcessor {
         configService.addListener(NacosConfigs.DATA_ID_GRAY, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-            envGrayManager.process(channelMsg);
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                envGrayManager.process(channelMsg);
             }
         });
     }
@@ -66,8 +68,8 @@ public class NacosEventProcessor {
         configService.addListener(NacosConfigs.DATA_ID_IP_BLACKLIST, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-            ipBlacklistManager.process(channelMsg);
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                ipBlacklistManager.process(channelMsg);
             }
         });
     }
@@ -76,8 +78,8 @@ public class NacosEventProcessor {
         configService.addListener(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-            isvManager.process(channelMsg);
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                isvManager.process(channelMsg);
             }
         });
     }
@@ -86,8 +88,8 @@ public class NacosEventProcessor {
         configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-            isvRoutePermissionManager.process(channelMsg);
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                isvRoutePermissionManager.process(channelMsg);
             }
         });
     }
@@ -96,7 +98,7 @@ public class NacosEventProcessor {
         configService.addListener(NacosConfigs.DATA_ID_LIMIT_CONFIG, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
             @Override
             public void receiveConfigInfo(String configInfo) {
-            ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
+                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
                 limitConfigManager.process(channelMsg);
             }
         });

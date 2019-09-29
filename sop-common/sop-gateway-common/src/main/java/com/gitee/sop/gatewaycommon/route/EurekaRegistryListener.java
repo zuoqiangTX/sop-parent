@@ -7,7 +7,6 @@ import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.shared.Application;
 import com.netflix.discovery.shared.Applications;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.eureka.CloudEurekaClient;
 import org.springframework.context.ApplicationEvent;
 
@@ -22,16 +21,13 @@ import java.util.stream.Collectors;
  *
  * @author tanghc
  */
-public class EurekaRoutesListener extends BaseRoutesListener {
+public class EurekaRegistryListener extends BaseRegistryListener {
 
     static {
         System.setProperty(SopPropertiesFactory.PROPERTIES_KEY, EurekaEnvironmentServerChooser.class.getName());
     }
 
     private Set<String> cacheServices = new HashSet<>();
-
-    @Value("${spring.application.name:api-gateway}")
-    private String appName;
 
     @Override
     public void onEvent(ApplicationEvent applicationEvent) {
@@ -44,15 +40,19 @@ public class EurekaRoutesListener extends BaseRoutesListener {
                 .map(Application::getName)
                 .collect(Collectors.toList());
 
-        Set<String> currentServices = new HashSet<>(serviceList);
+        final Set<String> currentServices = new HashSet<>(serviceList);
         currentServices.removeAll(cacheServices);
         // 如果有新的服务注册进来
         if (currentServices.size() > 0) {
-            this.doRegister(registeredApplications, currentServices);
+            List<Application> newApplications = registeredApplications.stream()
+                    .filter(application -> this.canOperator(application.getName())
+                            && currentServices.contains(application.getName()))
+                    .collect(Collectors.toList());
+
+            this.doRegister(newApplications);
         }
 
-        currentServices = new HashSet<>(serviceList);
-        cacheServices.removeAll(currentServices);
+        cacheServices.removeAll(new HashSet<>(serviceList));
         // 如果有服务删除
         if (cacheServices.size() > 0) {
             this.doRemove(cacheServices);
@@ -61,25 +61,21 @@ public class EurekaRoutesListener extends BaseRoutesListener {
         cacheServices = new HashSet<>(serviceList);
     }
 
-    private void doRegister(List<Application> registeredApplications, Set<String> newServices) {
-        registeredApplications
-                .stream()
-                .filter(application -> !appName.equalsIgnoreCase(application.getName())
-                        && newServices.contains(application.getName()))
-                .forEach(application -> {
-                    List<InstanceInfo> instances = application.getInstances();
-                    if (CollectionUtils.isNotEmpty(instances)) {
-                        instances.sort(Comparator.comparing(InstanceInfo::getLastUpdatedTimestamp).reversed());
-                        InstanceInfo instanceInfo = instances.get(0);
-                        InstanceDefinition instanceDefinition = new InstanceDefinition();
-                        instanceDefinition.setInstanceId(instanceInfo.getInstanceId());
-                        instanceDefinition.setServiceId(instanceInfo.getAppName());
-                        instanceDefinition.setIp(instanceInfo.getIPAddr());
-                        instanceDefinition.setPort(instanceInfo.getPort());
-                        instanceDefinition.setMetadata(instanceInfo.getMetadata());
-                        pullRoutes(instanceDefinition);
-                    }
-                });
+    private void doRegister(List<Application> registeredApplications) {
+        registeredApplications.forEach(application -> {
+            List<InstanceInfo> instances = application.getInstances();
+            if (CollectionUtils.isNotEmpty(instances)) {
+                instances.sort(Comparator.comparing(InstanceInfo::getLastUpdatedTimestamp).reversed());
+                InstanceInfo instanceInfo = instances.get(0);
+                InstanceDefinition instanceDefinition = new InstanceDefinition();
+                instanceDefinition.setInstanceId(instanceInfo.getInstanceId());
+                instanceDefinition.setServiceId(instanceInfo.getAppName());
+                instanceDefinition.setIp(instanceInfo.getIPAddr());
+                instanceDefinition.setPort(instanceInfo.getPort());
+                instanceDefinition.setMetadata(instanceInfo.getMetadata());
+                pullRoutes(instanceDefinition);
+            }
+        });
     }
 
     private void doRemove(Set<String> deletedServices) {

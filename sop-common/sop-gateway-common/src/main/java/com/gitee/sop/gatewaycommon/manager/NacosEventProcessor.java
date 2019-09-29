@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 
 /**
- * 用不到了
+ * 用不到了，这个类的作用是监听消息推送用的。由admin推送一条config配置，然后这里触发事件。
+ * 现在改为直接由admin请求网关提供的接口进行配置修改。
+ * 考虑
  *
  * @author tanghc
  */

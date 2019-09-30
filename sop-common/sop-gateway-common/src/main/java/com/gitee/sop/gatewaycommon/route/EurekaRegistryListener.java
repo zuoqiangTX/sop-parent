@@ -29,6 +29,16 @@ public class EurekaRegistryListener extends BaseRegistryListener {
 
     private Set<String> cacheServices = new HashSet<>();
 
+    /**
+     * 注册中心触发事件，可以从中获取服务<br>
+     *
+     * 这个方法做的事情有2个：<br>
+     *
+     * 1. 找出新注册的服务，调用pullRoutes方法<br>
+     * 2. 找出删除的服务，调用removeRoutes方法<br>
+     *
+     * @param applicationEvent 事件体
+     */
     @Override
     public void onEvent(ApplicationEvent applicationEvent) {
         Object source = applicationEvent.getSource();
@@ -57,7 +67,7 @@ public class EurekaRegistryListener extends BaseRegistryListener {
         if (cacheServices.size() > 0) {
             this.doRemove(cacheServices);
         }
-
+        // 缓存最新服务
         cacheServices = new HashSet<>(serviceList);
     }
 

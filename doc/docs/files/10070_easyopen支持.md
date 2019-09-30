@@ -13,7 +13,7 @@ SOP对easyopen项目提供了很好的支持，如果您的服务端使用了eas
 		<dependency>
 			<groupId>com.gitee.sop</groupId>
 			<artifactId>sop-service-common</artifactId>
-			<version>2.1.3-SNAPSHOT</version>
+			<version>2.2.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- 使用nacos注册中心

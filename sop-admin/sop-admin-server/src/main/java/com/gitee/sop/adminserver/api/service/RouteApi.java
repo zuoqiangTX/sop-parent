@@ -75,6 +75,10 @@ public class RouteApi {
                 .map(RouteVO::getId)
                 .collect(Collectors.toList());
 
+        if (routeIdList.isEmpty()) {
+            return datagrid;
+        }
+
         Map<String, Byte> routeIdStatusMap = configRouteBaseMapper
                 .list(new Query().in("route_id", routeIdList))
                 .stream()

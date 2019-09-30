@@ -49,9 +49,7 @@ public class TaobaoSigner extends AbstractSigner {
         StringBuilder paramNameValue = new StringBuilder();
         for (String paramName : paramNames) {
             String val = SignConfig.wrapVal(param.get(paramName));
-            if (StringUtils.isNotBlank(val)) {
-                paramNameValue.append(paramName).append(val);
-            }
+            paramNameValue.append(paramName).append(val);
         }
 
         // 第三步：使用MD5/HMAC加密

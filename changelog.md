@@ -1,9 +1,10 @@
 # changelog
 
-## 2.2.0
+## 2.2.0（需要执行`sop-2.2.0.sql`升级文件）
 
-- 支持eureka注册中心，需要执行`sop-2.2.0.sql`升级文件
+- 支持eureka注册中心，见`eureka`分支
 - 签名内容支持urlencode（设置`sign.urlencode=true`）
+- 可扩展其它注册中心
 
 ## 2.1.3
 

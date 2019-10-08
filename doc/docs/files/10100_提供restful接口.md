@@ -1,41 +1,15 @@
 # 传统web开发
 
-SOP既可以作为网关服务开发，又可以作为传统的webapp服务开发，传统web开发意思是像普通的web开发那样提供restful接口，没有签名校验功能。
+默认情况下SOP只提供开放接口，也可以同时提供restful接口，即程序提供一部分的开放接口，同时提供一部分restful接口。
 
-本篇介绍如何使用SOP进行传统web服务开发，即对接前端应用（H5、小程序、App）。
+默认情况下提供restful功能是关闭的，开启方式如下：
 
-- 网关ZuulConfig继承WebappZuulConfiguration类
+- 打开sop-gateway配置文件，新增一行配置：
 
-```java
-@Configuration
-public class ZuulConfig extends WebappZuulConfiguration {
-
-    static {
-        new ManagerInitializer();
-    }
-
-}
+```properties
+# 提供restful接口
+sop.restful.enable=true
 ```
-
-设置完毕，网关不在进行签名验证，网关统一的返回结果如下：
-
-```json
-{
-	"result": {
-		...
-	}
-}
-```
-
-- 微服务OpenServiceConfig继承WebappServiceConfiguration类
-
-```java
-public class OpenServiceConfig extends WebappServiceConfiguration {
-    ...
-}
-```
-
-其它内容不变
 
 - 前端app请求网关
 
@@ -49,7 +23,7 @@ public class OpenServiceConfig extends WebappServiceConfiguration {
 @RestController
 @RequestMapping("food")
 public class TraditionalWebappController {
-    @ApiMapping(value = "getFoodById", method = RequestMethod.GET)
+    @RequestMapping(value = "getFoodById", method = RequestMethod.GET)
     public Food getFoodById(Integer id) {
         Food food = new Food();
         food.setId(id);
@@ -57,22 +31,12 @@ public class TraditionalWebappController {
         food.setPrice(new BigDecimal(20.00));
         return food;
     }
-    
-    // 加版本号
-    @ApiMapping(value = "getFoodById", method = RequestMethod.GET, version = "1.1")
-        public Food getFoodById2(Integer id) {
-            Food food = new Food();
-            food.setId(id);
-            food.setName("香蕉2");
-            food.setPrice(new BigDecimal(22.00));
-            return food;
-        }
 }
 ```
 
 这是一个`食品服务`例子，假设网关ip为10.0.1.11，端口8081；食品服务ip为10.0.1.22，端口2222
 
-1. 网关访问：`http://10.0.1.11:8081/rest/food/getFoodById?id=2`。加版本号：`http://localhost:8081/rest/food/getFoodById?id=2&version=1.1`
+1. 网关访问：`http://10.0.1.11:8081/rest/food/getFoodById?id=2`
 
 2. 本地访问：`http://10.0.1.22:2222/food/getFoodById/?id=2`
 

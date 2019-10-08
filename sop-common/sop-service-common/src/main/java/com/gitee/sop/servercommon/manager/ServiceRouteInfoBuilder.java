@@ -64,7 +64,9 @@ public class ServiceRouteInfoBuilder {
         RouteDefinition routeDefinition = new RouteDefinition();
         // 唯一id规则：接口名 + 版本号
         String routeId = apiMeta.fetchNameVersion();
-        this.checkPath(routeId, "接口定义（" + routeId + "）不能有斜杠字符'/'");
+        if (!apiMeta.isOriginalMapping()) {
+            this.checkPath(routeId, "接口定义（" + routeId + "）不能有斜杠字符'/'");
+        }
         BeanUtils.copyProperties(apiMeta, routeDefinition);
         routeDefinition.setId(routeId);
         routeDefinition.setFilters(Collections.emptyList());

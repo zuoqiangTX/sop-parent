@@ -18,7 +18,6 @@ import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.entity.ConfigLimit;
 import com.gitee.sop.adminserver.mapper.ConfigLimitMapper;
 import com.gitee.sop.adminserver.service.RouteConfigService;
-import com.gitee.sop.adminserver.service.RouteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LimitNewApi {
 
     @Autowired
-    RouteService routeService;
-
-    @Autowired
     RouteConfigService routeConfigService;
 
     @Autowired
@@ -44,7 +40,7 @@ public class LimitNewApi {
 
     @Api(name = "config.limit.list")
     @ApiDocMethod(description = "限流列表(新)", elementClass = LimitNewVO.class)
-    PageInfo<ConfigLimit> listLimit(LimitNewParam param) throws Exception {
+    PageInfo<ConfigLimit> listLimit(LimitNewParam param) {
         Query query = Query.build(param);
         query.orderby("route_id", Sort.ASC)
                 .orderby("app_key", Sort.ASC)

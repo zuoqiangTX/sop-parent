@@ -10,11 +10,13 @@ import com.gitee.easyopen.interceptor.ApiInterceptor;
 import com.gitee.easyopen.session.ApiSessionManager;
 import com.gitee.sop.adminserver.interceptor.LoginInterceptor;
 import com.gitee.sop.adminserver.service.RegistryService;
+import com.gitee.sop.adminserver.service.impl.RegistryServiceEurekaImpl;
 import com.gitee.sop.adminserver.service.impl.RegistryServiceNacosImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -75,8 +77,20 @@ public class WebConfig {
      * @return
      */
     @Bean
+    @ConditionalOnProperty(value = "registry.name", havingValue = "nacos", matchIfMissing = true)
     RegistryService registryServiceNacos() {
         return new RegistryServiceNacosImpl();
+    }
+
+    /**
+     * 当配置了registry.name=eureka生效。
+     *
+     * @return
+     */
+    @Bean
+    @ConditionalOnProperty(value = "registry.name", havingValue = "eureka")
+    RegistryService registryServiceEureka() {
+        return new RegistryServiceEurekaImpl();
     }
 
     @PostConstruct

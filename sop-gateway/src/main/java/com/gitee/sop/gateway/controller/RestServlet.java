@@ -38,7 +38,7 @@ public class RestServlet extends HttpServlet {
         int index = url.indexOf(REST_PATH);
         // 取/rest的后面部分
         String path = url.substring(index + REST_PATH.length());
-        String method = RouteUtil.buildApiName(path);
+        String method = path;
         String version = request.getParameter(ParamNames.VERSION_NAME);
         if (version == null) {
             version = defaultVersion;

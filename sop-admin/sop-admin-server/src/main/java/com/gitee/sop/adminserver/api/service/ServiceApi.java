@@ -1,7 +1,5 @@
 package com.gitee.sop.adminserver.api.service;
 
-import com.alibaba.nacos.api.annotation.NacosInjected;
-import com.alibaba.nacos.api.naming.NamingService;
 import com.gitee.easyopen.annotation.Api;
 import com.gitee.easyopen.annotation.ApiService;
 import com.gitee.easyopen.doc.annotation.ApiDoc;
@@ -11,14 +9,12 @@ import com.gitee.sop.adminserver.api.service.param.ServiceGrayConfigParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceIdParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceInstanceParam;
 import com.gitee.sop.adminserver.api.service.param.ServiceSearchParam;
-import com.gitee.sop.adminserver.api.service.result.RouteServiceInfo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInfoVo;
 import com.gitee.sop.adminserver.api.service.result.ServiceInstanceVO;
 import com.gitee.sop.adminserver.bean.ChannelMsg;
 import com.gitee.sop.adminserver.bean.MetadataEnum;
 import com.gitee.sop.adminserver.bean.NacosConfigs;
 import com.gitee.sop.adminserver.bean.ServiceGrayDefinition;
-import com.gitee.sop.adminserver.bean.ServiceInfo;
 import com.gitee.sop.adminserver.bean.ServiceInstance;
 import com.gitee.sop.adminserver.common.BizException;
 import com.gitee.sop.adminserver.common.ChannelOperation;
@@ -27,19 +23,16 @@ import com.gitee.sop.adminserver.entity.ConfigGray;
 import com.gitee.sop.adminserver.entity.ConfigGrayInstance;
 import com.gitee.sop.adminserver.mapper.ConfigGrayInstanceMapper;
 import com.gitee.sop.adminserver.mapper.ConfigGrayMapper;
+import com.gitee.sop.adminserver.mapper.ConfigServiceRouteMapper;
 import com.gitee.sop.adminserver.service.ConfigPushService;
 import com.gitee.sop.adminserver.service.RegistryService;
+import com.gitee.sop.adminserver.service.ServerService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -55,49 +48,32 @@ public class ServiceApi {
     private RegistryService registryService;
 
     @Autowired
+    private ServerService serverService;
+
+    @Autowired
     private ConfigGrayMapper configGrayMapper;
 
     @Autowired
     private ConfigGrayInstanceMapper configGrayInstanceMapper;
 
     @Autowired
+    private ConfigServiceRouteMapper configServiceRouteMapper;
+
+    @Autowired
     private ConfigPushService configPushService;
 
-    @NacosInjected
-    private NamingService namingService;
-
     @Api(name = "registry.service.list")
-    @ApiDocMethod(description = "注册中心的服务列表", elementClass = RouteServiceInfo.class)
-    List<RouteServiceInfo> listServiceInfo(ServiceSearchParam param) {
-        List<ServiceInfo> servicesOfServer = null;
-        try {
-            servicesOfServer = registryService.listAllService(1, Integer.MAX_VALUE);
-        } catch (Exception e) {
-            log.error("获取服务列表失败", e);
-            throw new BizException("获取服务列表失败");
-        }
-
-        return servicesOfServer
+    @ApiDocMethod(description = "路由配置中的服务列表", elementClass = String.class)
+    List<String> listServiceInfo(ServiceSearchParam param) {
+        List<String> allServiceId = configServiceRouteMapper.listAllServiceId();
+        return allServiceId
                 .stream()
-                .filter(serviceInfo -> {
-                    String serviceId = serviceInfo.getServiceId();
-                    if ("api-gateway".equalsIgnoreCase(serviceId)) {
-                        return false;
-                    }
-                    // 隐藏空服务
-                    if (CollectionUtils.isEmpty(serviceInfo.getInstances())) {
-                        return false;
-                    }
+                .filter(serviceId -> {
                     if (StringUtils.isBlank(param.getServiceId())) {
                         return true;
                     } else {
                         return serviceId.contains(param.getServiceId());
                     }
-                })
-                .map(serviceInfo -> {
-                    RouteServiceInfo routeServiceInfo = new RouteServiceInfo();
-                    routeServiceInfo.setServiceId(serviceInfo.getServiceId());
-                    return routeServiceInfo;
                 })
                 .collect(Collectors.toList());
     }
@@ -105,59 +81,19 @@ public class ServiceApi {
     @Api(name = "service.custom.add")
     @ApiDocMethod(description = "添加服务")
     void addService(ServiceAddParam param) {
-        // TODO: 添加服务
         throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.custom.del")
     @ApiDocMethod(description = "删除自定义服务")
     void delService(ServiceSearchParam param) {
-        // TODO: 删除自定义服务
         throw new BizException("该功能已下线");
     }
 
     @Api(name = "service.instance.list")
     @ApiDocMethod(description = "获取注册中心的服务列表", elementClass = ServiceInfoVo.class)
     List<ServiceInstanceVO> listService(ServiceSearchParam param) {
-        List<ServiceInfo> serviceInfos;
-        try {
-            serviceInfos = registryService.listAllService(1, Integer.MAX_VALUE);
-        } catch (Exception e) {
-            log.error("获取服务实例失败", e);
-            return Collections.emptyList();
-        }
-        List<ServiceInstanceVO> serviceInfoVoList = new ArrayList<>();
-        AtomicInteger idGen = new AtomicInteger(1);
-        serviceInfos.stream()
-                .filter(serviceInfo -> {
-                    if (StringUtils.isBlank(param.getServiceId())) {
-                        return true;
-                    }
-                    return StringUtils.containsIgnoreCase(serviceInfo.getServiceId(), param.getServiceId());
-                })
-                .forEach(serviceInfo -> {
-                    int pid = idGen.getAndIncrement();
-                    String serviceId = serviceInfo.getServiceId();
-                    ServiceInstanceVO parent = new ServiceInstanceVO();
-                    parent.setId(pid);
-                    parent.setServiceId(serviceId);
-                    parent.setParentId(0);
-                    serviceInfoVoList.add(parent);
-                    List<ServiceInstance> instanceList = serviceInfo.getInstances();
-                    for (ServiceInstance instance : instanceList) {
-                        ServiceInstanceVO instanceVO = new ServiceInstanceVO();
-                        BeanUtils.copyProperties(instance, instanceVO);
-                        int id = idGen.getAndIncrement();
-                        instanceVO.setId(id);
-                        instanceVO.setParentId(pid);
-                        if (instanceVO.getMetadata() == null) {
-                            instanceVO.setMetadata(Collections.emptyMap());
-                        }
-                        serviceInfoVoList.add(instanceVO);
-                    }
-                });
-
-        return serviceInfoVoList;
+        return serverService.listService(param);
     }
 
     @Api(name = "service.instance.offline")

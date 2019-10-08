@@ -5,19 +5,29 @@ import com.gitee.sop.gatewaycommon.bean.ApiContext;
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 import com.gitee.sop.gatewaycommon.bean.SpringContext;
 import com.gitee.sop.gatewaycommon.limit.LimitManager;
+import com.gitee.sop.gatewaycommon.loadbalancer.SopPropertiesFactory;
 import com.gitee.sop.gatewaycommon.message.ErrorFactory;
 import com.gitee.sop.gatewaycommon.param.ParameterFormatter;
+import com.gitee.sop.gatewaycommon.route.ServiceRouteListener;
+import com.gitee.sop.gatewaycommon.route.EurekaRegistryListener;
+import com.gitee.sop.gatewaycommon.route.NacosRegistryListener;
+import com.gitee.sop.gatewaycommon.route.RegistryListener;
+import com.gitee.sop.gatewaycommon.route.ServiceListener;
 import com.gitee.sop.gatewaycommon.secret.IsvManager;
 import com.gitee.sop.gatewaycommon.session.SessionManager;
+import com.gitee.sop.gatewaycommon.validate.SignConfig;
 import com.gitee.sop.gatewaycommon.validate.Validator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
+import org.springframework.cloud.netflix.ribbon.PropertiesFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,12 +38,13 @@ import javax.annotation.PostConstruct;
 /**
  * @author tanghc
  */
-public class AbstractConfiguration implements ApplicationContextAware, ApplicationListener<HeartbeatEvent> {
+public class AbstractConfiguration implements ApplicationContextAware {
+
     @Autowired
     protected Environment environment;
 
     @Autowired
-    private ServiceRoutesLoader serviceRoutesLoader;
+    private RegistryListener registryListener;
 
     protected ApplicationContext applicationContext;
 
@@ -44,21 +55,38 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
 
     /**
      * nacos事件监听
-     * @see org.springframework.cloud.alibaba.nacos.discovery.NacosWatch NacosWatch
+     *
      * @param heartbeatEvent
      */
-    @Override
-    public void onApplicationEvent(HeartbeatEvent heartbeatEvent) {
-        serviceRoutesLoader.load(heartbeatEvent);
+    @EventListener(classes = HeartbeatEvent.class)
+    public void listenNacosEvent(ApplicationEvent heartbeatEvent) {
+        registryListener.onEvent(heartbeatEvent);
+    }
+
+    @Bean
+    PropertiesFactory propertiesFactory() {
+        return new SopPropertiesFactory();
     }
 
     /**
      * 微服务路由加载
      */
     @Bean
+    @ConditionalOnProperty("spring.cloud.nacos.discovery.server-addr")
+    RegistryListener registryListenerNacos() {
+        return new NacosRegistryListener();
+    }
+
+    @Bean
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    RegistryListener registryListenerEureka() {
+        return new EurekaRegistryListener();
+    }
+
+    @Bean
     @ConditionalOnMissingBean
-    ServiceRoutesLoader serviceRoutesLoader() {
-        return new ServiceRoutesLoader();
+    ServiceListener serviceListener() {
+        return new ServiceRouteListener();
     }
 
     @Bean
@@ -150,11 +178,19 @@ public class AbstractConfiguration implements ApplicationContextAware, Applicati
 
     @PostConstruct
     public final void after() {
+        EnvironmentContext.setEnvironment(environment);
         SpringContext.setApplicationContext(applicationContext);
         if (RouteRepositoryContext.getRouteRepository() == null) {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
         }
-        EnvironmentContext.setEnvironment(environment);
+        String serverName = EnvironmentKeys.SPRING_APPLICATION_NAME.getValue();
+        if (!"api-gateway".equals(serverName)) {
+            throw new IllegalArgumentException("spring.application.name必须为api-gateway");
+        }
+        String urlencode = EnvironmentKeys.SIGN_URLENCODE.getValue();
+        if ("true".equals(urlencode)) {
+            SignConfig.enableUrlencodeMode();
+        }
 
         initMessage();
         initBeanInitializer();

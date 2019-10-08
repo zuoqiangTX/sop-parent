@@ -7,14 +7,14 @@ package com.gitee.sop.gateway.config;
  */
 
 import com.gitee.sop.gatewaycommon.zuul.configuration.AlipayZuulConfiguration;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 开通支付宝开放平台能力
  * @author tanghc
  */
-//@Configuration
+@Configuration
 public class ZuulConfig extends AlipayZuulConfiguration {
-
 
 }
 

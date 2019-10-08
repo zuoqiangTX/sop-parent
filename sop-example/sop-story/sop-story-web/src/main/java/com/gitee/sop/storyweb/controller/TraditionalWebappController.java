@@ -1,6 +1,5 @@
 package com.gitee.sop.storyweb.controller;
 
-import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.util.UploadUtil;
 import lombok.Data;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +23,7 @@ public class TraditionalWebappController {
 
     // http://localhost:8081/rest/food/getFoodById?id=1  网关入口
     // http://localhost:2222/food/getFoodById/?id=12  本地入口
-    @ApiMapping(value = "getFoodById", method = RequestMethod.GET)
+    @RequestMapping(value = "getFoodById", method = RequestMethod.GET)
     public Food getFoodById(Integer id) {
         Food food = new Food();
         food.setId(id);
@@ -33,31 +32,20 @@ public class TraditionalWebappController {
         return food;
     }
 
-    // http://localhost:8081/rest/food/getFoodById?id=2&version=1.1   网关入口
-    // http://localhost:2222/food/getFoodById/?id=12&version=1.1
-    @ApiMapping(value = "getFoodById", method = RequestMethod.GET, version = "1.1")
-    public Food getFoodById2(Integer id) {
-        Food food = new Food();
-        food.setId(id);
-        food.setName("香蕉2");
-        food.setPrice(new BigDecimal(22.00));
-        return food;
-    }
-
     // http://localhost:8081/rest/food/getFoodByObj?id=2
-    @ApiMapping(value = "getFoodByObj", method = RequestMethod.GET)
+    @RequestMapping(value = "getFoodByObj", method = RequestMethod.GET)
     public Food getFoodByObj(Food food) {
         return food;
     }
 
     // http://localhost:8081/rest/food/saveFood
-    @ApiMapping(value = "saveFood", method = RequestMethod.POST)
+    @RequestMapping(value = "saveFood", method = RequestMethod.POST)
     public Food saveFood(@RequestBody Food food) {
         food.setId(3);
         return food;
     }
 
-    @ApiMapping(value = "foodUpload", method = RequestMethod.POST)
+    @RequestMapping(value = "foodUpload", method = RequestMethod.POST)
     public Food upload(Food food, HttpServletRequest request) {
         // 获取上传的文件
         Collection<MultipartFile> uploadFiles = UploadUtil.getUploadFiles(request);
@@ -70,7 +58,7 @@ public class TraditionalWebappController {
         return food;
     }
 
-    @ApiMapping(value = "foodUpload3", method = RequestMethod.POST)
+    @RequestMapping(value = "foodUpload3", method = RequestMethod.POST)
     public Food upload3(Food food, MultipartFile file) {
         food.setId(5);
         food.setName("文件名称+" + file.getOriginalFilename());

@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.bean;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 /**
@@ -7,6 +8,10 @@ import lombok.Data;
  */
 @Data
 public class ChannelMsg {
-    private String operation = "_unknown_";
-    private String data = "{}";
+    private String operation;
+    private JSONObject data;
+
+    public <T> T toObject(Class<T> clazz) {
+        return data.toJavaObject(clazz);
+    }
 }

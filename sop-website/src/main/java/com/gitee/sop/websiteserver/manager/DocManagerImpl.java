@@ -5,9 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.gitee.sop.websiteserver.bean.DocInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -23,7 +20,7 @@ import java.util.function.Consumer;
  */
 @Service
 @Slf4j
-public class DocManagerImpl implements DocManager, ApplicationListener<HeartbeatEvent> {
+public class DocManagerImpl implements DocManager {
 
     // key:title
     private Map<String, DocInfo> docDefinitionMap = new HashMap<>();
@@ -36,9 +33,6 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
     private DocParser swaggerDocParser = new SwaggerDocParser();
 
     private DocParser easyopenDocParser = new EasyopenDocParser();
-
-    @Autowired
-    private DocDiscovery docDiscovery;
 
     @Override
     public void addDocInfo(String serviceId, String docInfoJson, Consumer<DocInfo> callback) {
@@ -80,10 +74,4 @@ public class DocManagerImpl implements DocManager, ApplicationListener<Heartbeat
         serviceIdMd5Map.remove(serviceId);
         docDefinitionMap.entrySet().removeIf(entry -> serviceId.equalsIgnoreCase(entry.getValue().getServiceId()));
     }
-
-    @Override
-    public void onApplicationEvent(HeartbeatEvent heartbeatEvent) {
-        docDiscovery.refresh(this);
-    }
-
 }

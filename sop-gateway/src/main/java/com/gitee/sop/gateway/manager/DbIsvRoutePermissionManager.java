@@ -1,9 +1,6 @@
 package com.gitee.sop.gateway.manager;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.nacos.api.annotation.NacosInjected;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.gitee.fastmybatis.core.query.Query;
 import com.gitee.sop.gateway.entity.IsvInfo;
 import com.gitee.sop.gateway.entity.PermIsvRole;
@@ -13,7 +10,6 @@ import com.gitee.sop.gateway.mapper.PermIsvRoleMapper;
 import com.gitee.sop.gateway.mapper.PermRolePermissionMapper;
 import com.gitee.sop.gatewaycommon.bean.ChannelMsg;
 import com.gitee.sop.gatewaycommon.bean.IsvRoutePermission;
-import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.manager.DefaultIsvRoutePermissionManager;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +19,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +49,6 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
     @Autowired
     IsvInfoMapper isvInfoMapper;
 
-    @NacosInjected
-    private ConfigService configService;
 
     @Override
     public void load() {
@@ -122,41 +115,35 @@ public class DbIsvRoutePermissionManager extends DefaultIsvRoutePermissionManage
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void process(ChannelMsg channelMsg) {
+        final IsvRoutePermission isvRoutePermission = channelMsg.toObject(IsvRoutePermission.class);
+        switch (channelMsg.getOperation()) {
+            case "reload":
+                log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                try {
+                    load();
+                } catch (Exception e) {
+                    log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
+                }
+                break;
+            case "update":
+                log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                update(isvRoutePermission);
+                break;
+            case "remove":
+                log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
+                remove(isvRoutePermission.getAppKey());
+                break;
+            default:
+
+        }
+    }
+
+
     @Data
     static class IsvRole {
         private String appKey;
         private String roleCode;
-    }
-
-
-    @PostConstruct
-    protected void after() throws Exception {
-        configService.addListener(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, new AbstractListener() {
-            @Override
-            public void receiveConfigInfo(String configInfo) {
-                ChannelMsg channelMsg = JSON.parseObject(configInfo, ChannelMsg.class);
-                final IsvRoutePermission isvRoutePermission = JSON.parseObject(channelMsg.getData(), IsvRoutePermission.class);
-                switch (channelMsg.getOperation()) {
-                    case "reload":
-                        log.info("重新加载路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        try {
-                            load();
-                        } catch (Exception e) {
-                            log.error("重新加载路由权限失败, channelMsg:{}", channelMsg, e);
-                        }
-                        break;
-                    case "update":
-                        log.info("更新ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        update(isvRoutePermission);
-                        break;
-                    case "remove":
-                        log.info("删除ISV路由权限信息，isvRoutePermission:{}", isvRoutePermission);
-                        remove(isvRoutePermission.getAppKey());
-                        break;
-                    default:
-
-                }
-            }
-        });
     }
 }

@@ -16,11 +16,8 @@ public class EnvironmentContext {
         EnvironmentContext.environment = environment;
     }
 
-    public static String getProfile(Environment env) {
-        return env.getProperty("spring.profiles.active", "default");
+    public static String getValue(String key, String defaultValue) {
+        return environment.getProperty(key, defaultValue);
     }
 
-    public static String getProfile() {
-        return getProfile(environment);
-    }
 }

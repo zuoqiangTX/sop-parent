@@ -231,6 +231,7 @@ public class AlipayController {
     @ApiOperation(value = "获取分类信息", notes = "演示表格树")
     @ApiMapping(value = "alipay.category.get", method = RequestMethod.POST)
     public CategoryResult getCategory(CategoryParam param) {
+        System.out.println(param);
         StoryResult result = new StoryResult();
         result.setId(1L);
         result.setName("白雪公主");

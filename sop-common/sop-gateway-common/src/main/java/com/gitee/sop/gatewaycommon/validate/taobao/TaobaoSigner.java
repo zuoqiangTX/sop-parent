@@ -4,6 +4,7 @@ package com.gitee.sop.gatewaycommon.validate.taobao;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.validate.AbstractSigner;
+import com.gitee.sop.gatewaycommon.validate.SignConfig;
 import com.gitee.sop.gatewaycommon.validate.SignEncipher;
 import com.gitee.sop.gatewaycommon.validate.SignEncipherHMAC_MD5;
 import com.gitee.sop.gatewaycommon.validate.SignEncipherMD5;
@@ -47,10 +48,8 @@ public class TaobaoSigner extends AbstractSigner {
         // 第二步：把所有参数名和参数值串在一起
         StringBuilder paramNameValue = new StringBuilder();
         for (String paramName : paramNames) {
-            Object val = param.get(paramName);
-            if (val != null && StringUtils.isNotBlank(String.valueOf(val))) {
-                paramNameValue.append(paramName).append(val);
-            }
+            String val = SignConfig.wrapVal(param.get(paramName));
+            paramNameValue.append(paramName).append(val);
         }
 
         // 第三步：使用MD5/HMAC加密

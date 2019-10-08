@@ -1,6 +1,7 @@
 package com.gitee.sop.servercommon.manager;
 
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
+import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import com.gitee.sop.servercommon.util.OpenUtil;
 import lombok.Getter;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ServiceRouteController {
 
     private static final String SECRET = "a3d9sf!1@odl90zd>fkASwq";
+    private static final String HEADER_RESTFUL = "restful";
 
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -50,6 +52,9 @@ public class ServiceRouteController {
             throw new IllegalArgumentException("未指定spring.application.name参数");
         }
         ApiMetaBuilder apiMetaBuilder = getApiMetaBuilder();
+        String restful = request.getHeader(HEADER_RESTFUL);
+        boolean enableRestful = "true".equals(restful);
+        ServiceContext.getCurrentContext().set(ServiceContext.RESTFUL_KEY, enableRestful);
         ServiceApiInfo serviceApiInfo = apiMetaBuilder.getServiceApiInfo(serviceId, requestMappingHandlerMapping);
         ServiceRouteInfoBuilder serviceRouteInfoBuilder = new ServiceRouteInfoBuilder(environment);
         return serviceRouteInfoBuilder.build(serviceApiInfo);

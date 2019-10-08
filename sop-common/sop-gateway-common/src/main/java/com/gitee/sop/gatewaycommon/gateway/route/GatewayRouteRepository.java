@@ -27,13 +27,9 @@ import static java.util.Collections.synchronizedMap;
  * @author tanghc
  */
 @Slf4j
-public class GatewayRouteRepository implements ApplicationEventPublisherAware,
-        RouteDefinitionRepository,
-        RouteRepository<GatewayTargetRoute> {
+public class GatewayRouteRepository implements RouteDefinitionRepository, RouteRepository<GatewayTargetRoute> {
 
     private final Map<String, GatewayTargetRoute> routes = synchronizedMap(new LinkedHashMap<>());
-
-    private ApplicationEventPublisher publisher;
 
     @Override
     public Flux<org.springframework.cloud.gateway.route.RouteDefinition> getRouteDefinitions() {
@@ -91,7 +87,6 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
     @Override
     public void delete(String id) {
         routes.remove(id);
-        this.publisher.publishEvent(new PredicateArgsEvent(this, id, Collections.emptyMap()));
     }
 
     @Override
@@ -104,11 +99,6 @@ public class GatewayRouteRepository implements ApplicationEventPublisherAware,
         for (String id : idList) {
             this.delete(id);
         }
-    }
-
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.publisher = applicationEventPublisher;
     }
 
 }

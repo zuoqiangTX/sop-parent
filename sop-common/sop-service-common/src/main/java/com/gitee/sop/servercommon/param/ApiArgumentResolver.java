@@ -60,6 +60,8 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
 
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
+    private static List<MethodParameter> openApiParams = new ArrayList<>(64);
+
     static {
         try {
             pushBuilder = ClassUtils.forName("javax.servlet.http.PushBuilder",
@@ -75,18 +77,7 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         List<HandlerMethodArgumentResolver> argumentResolversNew = new ArrayList<>(64);
         // 先加自己，确保在第一个位置
         argumentResolversNew.add(this);
-        HandlerMethodArgumentResolver lastOne = null;
-        for (HandlerMethodArgumentResolver argumentResolver : Objects.requireNonNull(requestMappingHandlerAdapter.getArgumentResolvers())) {
-            // RequestResponseBodyMethodProcessor暂存起来，放在最后面
-            if (argumentResolver instanceof RequestResponseBodyMethodProcessor) {
-                lastOne = argumentResolver;
-            } else {
-                argumentResolversNew.add(argumentResolver);
-            }
-        }
-        if (lastOne != null) {
-            argumentResolversNew.add(lastOne);
-        }
+        argumentResolversNew.addAll(requestMappingHandlerAdapter.getArgumentResolvers());
         requestMappingHandlerAdapter.setArgumentResolvers(argumentResolversNew);
         this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
     }
@@ -96,8 +87,8 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
         // 是否有注解
         boolean hasAnnotation = methodParameter.hasMethodAnnotation(ApiMapping.class)
                 || methodParameter.hasMethodAnnotation(ApiAbility.class);
-        if (!hasAnnotation) {
-            return false;
+        if (hasAnnotation) {
+            openApiParams.add(methodParameter);
         }
         Class<?> paramType = methodParameter.getParameterType();
         if (paramType == OpenContext.class) {
@@ -132,23 +123,24 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
             , NativeWebRequest nativeWebRequest
             , WebDataBinderFactory webDataBinderFactory
     ) throws Exception {
-        Object paramObj = this.getParamObject(methodParameter, nativeWebRequest);
-        if (paramObj != null) {
-            // JSR-303验证
-            paramValidator.validateBizParam(paramObj);
-            return paramObj;
-        } else {
-            HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
-            if (resolver != null) {
-                return resolver.resolveArgument(
-                        methodParameter
-                        , modelAndViewContainer
-                        , nativeWebRequest
-                        , webDataBinderFactory
-                );
+        if (openApiParams.contains(methodParameter)) {
+            Object paramObj = this.getParamObject(methodParameter, nativeWebRequest);
+            if (paramObj != null) {
+                // JSR-303验证
+                paramValidator.validateBizParam(paramObj);
+                return paramObj;
             }
-            return null;
         }
+        HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
+        if (resolver != null) {
+            return resolver.resolveArgument(
+                    methodParameter
+                    , modelAndViewContainer
+                    , nativeWebRequest
+                    , webDataBinderFactory
+            );
+        }
+        return null;
     }
 
 

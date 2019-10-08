@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.InstanceDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import com.gitee.sop.gatewaycommon.manager.BaseRouteCache;
+import com.gitee.sop.gatewaycommon.manager.EnvironmentKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -23,6 +26,8 @@ public class ServiceRouteListener extends BaseServiceListener {
     private static final String METADATA_SERVER_CONTEXT_PATH = "server.servlet.context-path";
 
     private static final String METADATA_SOP_ROUTES_PATH = "sop.routes.path";
+
+    private static final String HEADER_WEB_MODEL = "web-model";
 
     @Autowired
     private BaseRouteCache<?> baseRouteCache;
@@ -42,7 +47,7 @@ public class ServiceRouteListener extends BaseServiceListener {
         String serviceName = instance.getServiceId();
         String url = getRouteRequestUrl(instance);
         log.info("拉取路由配置，serviceId: {}, url: {}", serviceName, url);
-        ResponseEntity<String> responseEntity = getRestTemplate().getForEntity(url, String.class);
+        ResponseEntity<String> responseEntity = getRestTemplate().postForEntity(url, getHttpEntity(), String.class);
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             String body = responseEntity.getBody();
             ServiceRouteInfo serviceRouteInfo = JSON.parseObject(body, ServiceRouteInfo.class);
@@ -50,6 +55,14 @@ public class ServiceRouteListener extends BaseServiceListener {
         } else {
             log.error("拉取路由配置异常，url: {}, status: {}, body: {}", url, responseEntity.getStatusCodeValue(), responseEntity.getBody());
         }
+    }
+
+    protected HttpEntity<String> getHttpEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        String webModel = EnvironmentKeys.SOP_WEB_MODEL_ENABLE.getValue();
+        boolean isWebModel = "true".equals(webModel);
+        headers.add(HEADER_WEB_MODEL, String.valueOf(isWebModel));
+        return new HttpEntity<>(headers);
     }
 
     /**

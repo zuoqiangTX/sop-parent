@@ -28,6 +28,8 @@ public class ServiceApiInfo {
         private int mergeResult;
         /** 是否需要授权才能访问 */
         private int permission;
+        /** 是否是原始Mapping */
+        private boolean originalMapping;
 
         public ApiMeta() {
         }

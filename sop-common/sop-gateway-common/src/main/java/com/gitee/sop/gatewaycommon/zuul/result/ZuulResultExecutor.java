@@ -60,8 +60,8 @@ public class ZuulResultExecutor extends BaseExecutorAdapter<RequestContext, Stri
     @Override
     public String buildErrorResult(RequestContext request, Throwable throwable) {
         Error error = getError(throwable);
-        JSONObject jsonObject = (JSONObject) JSON.toJSON(error);
-        return this.merge(request, jsonObject);
+        return isMergeResult(request) ? this.merge(request, (JSONObject) JSON.toJSON(error))
+                : JSON.toJSONString(error);
     }
 
     public static Error getError(Throwable throwable) {

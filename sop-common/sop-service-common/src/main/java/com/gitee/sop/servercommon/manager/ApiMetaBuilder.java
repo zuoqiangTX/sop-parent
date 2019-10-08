@@ -2,6 +2,7 @@ package com.gitee.sop.servercommon.manager;
 
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
+import com.gitee.sop.servercommon.bean.ServiceContext;
 import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
 import com.gitee.sop.servercommon.mapping.RouteUtil;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,8 @@ public class ApiMetaBuilder {
 
     /** 接口名规则：允许字母、数字、点、下划线 */
     private static final String REGEX_API_NAME = "^[a-zA-Z0-9\\.\\_\\-]+$";
+
+    private static final List<String> IGNORE_PATTERN_KEYWORDS = Arrays.asList("swagger","sop/routes");
 
     public ServiceApiInfo getServiceApiInfo(String serviceId, RequestMappingHandlerMapping requestMappingHandlerMapping) {
         if (serviceId == null) {
@@ -83,8 +87,30 @@ public class ApiMetaBuilder {
             apiMeta.setMergeResult(BooleanUtils.toInteger(apiMappingInfo.isMergeResult()));
             apiMeta.setPermission(BooleanUtils.toInteger(apiMappingInfo.isPermission()));
             return apiMeta;
+        } else {
+            if (!ServiceContext.getCurrentContext().getBoolean(ServiceContext.WEB_MODEL_KEY, false)) {
+                return null;
+            }
+            String path = patterns.iterator().next();
+            if (path.contains("$") || isIgnorePattern(path)) {
+                return null;
+            }
+            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(path, path, "1.0");
+            apiMeta.setIgnoreValidate(BooleanUtils.toInteger(true));
+            apiMeta.setMergeResult(BooleanUtils.toInteger(false));
+            apiMeta.setPermission(BooleanUtils.toInteger(false));
+            apiMeta.setOriginalMapping(true);
+            return apiMeta;
         }
-        return null;
+    }
+
+    private boolean isIgnorePattern(String pattern) {
+        for (String keyword : IGNORE_PATTERN_KEYWORDS) {
+            if (pattern.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void checkApiName(String name) {

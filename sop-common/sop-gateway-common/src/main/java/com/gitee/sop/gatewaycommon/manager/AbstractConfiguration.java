@@ -178,19 +178,19 @@ public class AbstractConfiguration implements ApplicationContextAware {
 
     @PostConstruct
     public final void after() {
+        EnvironmentContext.setEnvironment(environment);
         SpringContext.setApplicationContext(applicationContext);
         if (RouteRepositoryContext.getRouteRepository() == null) {
             throw new IllegalArgumentException("RouteRepositoryContext.setRouteRepository()方法未使用");
         }
-        String serverName = environment.getProperty("spring.application.name");
+        String serverName = EnvironmentKeys.SPRING_APPLICATION_NAME.getValue();
         if (!"api-gateway".equals(serverName)) {
             throw new IllegalArgumentException("spring.application.name必须为api-gateway");
         }
-        String urlencode = environment.getProperty("sign.urlencode");
+        String urlencode = EnvironmentKeys.SIGN_URLENCODE.getValue();
         if ("true".equals(urlencode)) {
             SignConfig.enableUrlencodeMode();
         }
-        EnvironmentContext.setEnvironment(environment);
 
         initMessage();
         initBeanInitializer();

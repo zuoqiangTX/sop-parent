@@ -106,8 +106,8 @@ public class BaseGatewayConfiguration extends AbstractConfiguration {
     }
 
     @Bean
-    GatewayRouteCache gatewayRouteLoader(GatewayRouteRepository gatewayRouteManager) {
-        return new GatewayRouteCache(gatewayRouteManager);
+    GatewayRouteCache gatewayRouteCache(GatewayRouteRepository gatewayRouteRepository) {
+        return new GatewayRouteCache(gatewayRouteRepository);
     }
 
     @Bean

@@ -90,7 +90,7 @@ public class BaseZuulConfiguration extends AbstractConfiguration {
      * @param zuulRouteRepository 路由仓库
      */
     @Bean
-    ZuulRouteCache zuulRouteLoader(ZuulRouteRepository zuulRouteRepository) {
+    ZuulRouteCache zuulRouteCache(ZuulRouteRepository zuulRouteRepository) {
         return new ZuulRouteCache(zuulRouteRepository);
     }
 

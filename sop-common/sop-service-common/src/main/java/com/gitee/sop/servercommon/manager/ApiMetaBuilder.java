@@ -88,7 +88,7 @@ public class ApiMetaBuilder {
             apiMeta.setPermission(BooleanUtils.toInteger(apiMappingInfo.isPermission()));
             return apiMeta;
         } else {
-            if (!ServiceContext.getCurrentContext().getBoolean(ServiceContext.WEB_MODEL_KEY, false)) {
+            if (!ServiceContext.getCurrentContext().getBoolean(ServiceContext.RESTFUL_KEY, false)) {
                 return null;
             }
             String path = patterns.iterator().next();

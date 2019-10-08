@@ -14,7 +14,7 @@ public class ServiceContext extends ConcurrentHashMap<String, Object> {
     public static final String RESPONSE_KEY = "response";
     public static final String OPEN_CONTEXT_KEY = "openContext";
 
-    public static final String WEB_MODEL_KEY = "sop-web-model";
+    public static final String RESTFUL_KEY = "sop-restful";
 
     protected static Class<? extends ServiceContext> contextClass = ServiceContext.class;
 

@@ -19,9 +19,9 @@ public enum EnvironmentKeys {
     SIGN_URLENCODE("sign.urlencode"),
 
     /**
-     * sop.web-model.enable=true，开启传统web开发模式
+     * sop.restful.enable=true，开启传统web开发模式
      */
-    SOP_WEB_MODEL_ENABLE("sop.web-model.enable");
+    SOP_RESTFUL_ENABLE("sop.restful.enable");
 
     private String key;
     private String defaultValue;

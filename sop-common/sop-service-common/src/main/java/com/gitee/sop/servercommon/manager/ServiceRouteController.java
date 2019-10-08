@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ServiceRouteController {
 
     private static final String SECRET = "a3d9sf!1@odl90zd>fkASwq";
-    private static final String HEADER_WEB_MODEL = "web-model";
+    private static final String HEADER_RESTFUL = "restful";
 
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
@@ -52,9 +52,9 @@ public class ServiceRouteController {
             throw new IllegalArgumentException("未指定spring.application.name参数");
         }
         ApiMetaBuilder apiMetaBuilder = getApiMetaBuilder();
-        String webModel = request.getHeader(HEADER_WEB_MODEL);
-        boolean isWebModel = "true".equals(webModel);
-        ServiceContext.getCurrentContext().set(ServiceContext.WEB_MODEL_KEY, isWebModel);
+        String restful = request.getHeader(HEADER_RESTFUL);
+        boolean enableRestful = "true".equals(restful);
+        ServiceContext.getCurrentContext().set(ServiceContext.RESTFUL_KEY, enableRestful);
         ServiceApiInfo serviceApiInfo = apiMetaBuilder.getServiceApiInfo(serviceId, requestMappingHandlerMapping);
         ServiceRouteInfoBuilder serviceRouteInfoBuilder = new ServiceRouteInfoBuilder(environment);
         return serviceRouteInfoBuilder.build(serviceApiInfo);

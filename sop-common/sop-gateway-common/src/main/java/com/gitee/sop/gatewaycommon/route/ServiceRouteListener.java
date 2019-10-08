@@ -27,7 +27,7 @@ public class ServiceRouteListener extends BaseServiceListener {
 
     private static final String METADATA_SOP_ROUTES_PATH = "sop.routes.path";
 
-    private static final String HEADER_WEB_MODEL = "web-model";
+    private static final String HEADER_RESTFUL = "restful";
 
     @Autowired
     private BaseRouteCache<?> baseRouteCache;
@@ -59,9 +59,9 @@ public class ServiceRouteListener extends BaseServiceListener {
 
     protected HttpEntity<String> getHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
-        String webModel = EnvironmentKeys.SOP_WEB_MODEL_ENABLE.getValue();
-        boolean isWebModel = "true".equals(webModel);
-        headers.add(HEADER_WEB_MODEL, String.valueOf(isWebModel));
+        String restful = EnvironmentKeys.SOP_RESTFUL_ENABLE.getValue();
+        boolean enableRestful = "true".equals(restful);
+        headers.add(HEADER_RESTFUL, String.valueOf(enableRestful));
         return new HttpEntity<>(headers);
     }
 

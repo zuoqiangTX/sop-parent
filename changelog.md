@@ -1,5 +1,9 @@
 # changelog
 
+## 2.3.0
+
+- 支持请求restful接口（设置`sop.restful.enable=true`）
+
 ## 2.2.0（需要执行`sop-2.2.0.sql`升级文件）
 
 - 支持eureka注册中心，见`eureka`分支

@@ -1,14 +1,14 @@
 # 传统web开发
 
-SOP既可以作为网关服务开发，又可以作为传统的webapp服务开发，传统web开发意思是像普通的web开发那样提供restful接口，没有签名校验功能。
+默认情况下SOP只提供开放接口，也可以同时提供restful接口，即程序提供一部分的开放接口，同时提供一部分restful接口。
 
-本篇介绍如何使用SOP进行传统web服务开发，即对接前端应用（H5、小程序、App）。
+默认情况下提供restful功能是关闭的，开启方式如下：
 
 - 打开sop-gateway配置文件，新增一行配置：
 
 ```properties
-# 开启传统的webapp服务开发
-sop.web-model.enable=true
+# 提供restful接口
+sop.restful.enable=true
 ```
 
 - 前端app请求网关

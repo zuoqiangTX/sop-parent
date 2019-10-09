@@ -1,6 +1,9 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
+import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +17,9 @@ import java.util.stream.Collectors;
  * @author tanghc
  */
 public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
+
+    private PathMatcher pathMatcher = new AntPathMatcher();
+
     /**
      * key：nameVersion
      */
@@ -24,7 +30,32 @@ public class ZuulRouteRepository implements RouteRepository<ZuulTargetRoute> {
         if (id == null) {
             return null;
         }
-        return nameVersionTargetRouteMap.get(id);
+        ZuulTargetRoute zuulTargetRoute = nameVersionTargetRouteMap.get(id);
+        if (zuulTargetRoute != null) {
+            return zuulTargetRoute;
+        }
+        for (Map.Entry<String, ZuulTargetRoute> entry : nameVersionTargetRouteMap.entrySet()) {
+            String pattern = entry.getKey();
+            if (this.pathMatcher.match(pattern, id)) {
+                return clone(id, entry.getValue());
+            }
+        }
+        return null;
+    }
+
+    private ZuulTargetRoute clone(String path, ZuulTargetRoute zuulTargetRoute) {
+        Route targetRouteDefinition = zuulTargetRoute.getTargetRouteDefinition();
+        Route route = new Route(
+                targetRouteDefinition.getId()
+                ,path
+                ,targetRouteDefinition.getLocation()
+                ,targetRouteDefinition.getPrefix()
+                ,targetRouteDefinition.getRetryable()
+                , null
+        );
+        return new ZuulTargetRoute(zuulTargetRoute.getServiceRouteInfo()
+                , zuulTargetRoute.getRouteDefinition()
+                , route);
     }
 
     @Override

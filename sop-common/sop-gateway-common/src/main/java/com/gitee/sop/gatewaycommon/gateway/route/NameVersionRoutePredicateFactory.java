@@ -1,10 +1,13 @@
 package com.gitee.sop.gatewaycommon.gateway.route;
 
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.gateway.ServerWebExchangeUtil;
 import com.gitee.sop.gatewaycommon.param.ParamNames;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.PathMatcher;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -27,6 +30,8 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
 
     private static final String PARAM_KEY = "param";
     private static final String REGEXP_KEY = "regexp";
+
+    private PathMatcher pathMatcher = new AntPathMatcher();
 
     public NameVersionRoutePredicateFactory() {
         super(Config.class);
@@ -57,7 +62,18 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             if (name == null || version == null) {
                 return false;
             }
-            return (name.toString() + version).equals(nameVersion);
+            String key = name.toString() + version.toString();
+            // 如果是通配符
+            if (nameVersion.contains("{")) {
+                boolean match = pathMatcher.match(nameVersion, key);
+                if (match) {
+                    Map<String, Object> attributes = exchange.getAttributes();
+                    attributes.put(SopConstants.REDIRECT_PATH_KEY, key);
+                }
+                return match;
+            } else {
+                return key.equals(nameVersion);
+            }
         };
     }
 

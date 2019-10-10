@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.gateway.filter;
 
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.util.RouteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -33,7 +34,7 @@ public class LoadBalancerClientExtFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
-        String path = this.findPath(route);
+        String path = this.findPath(exchange, route);
         if (StringUtils.hasLength(path)) {
             URI url = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
             UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUri(url);
@@ -44,7 +45,11 @@ public class LoadBalancerClientExtFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange);
     }
 
-    protected String findPath(Route route) {
+    protected String findPath(ServerWebExchange exchange, Route route) {
+        String path = exchange.getAttribute(SopConstants.REDIRECT_PATH_KEY);
+        if (path != null) {
+            return path;
+        }
         URI routeUri = route.getUri();
         String uriStr = routeUri.toString();
         return RouteUtil.findPath(uriStr);

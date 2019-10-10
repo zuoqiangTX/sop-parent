@@ -27,7 +27,12 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
     protected GatewayTargetRoute buildTargetRoute(ServiceRouteInfo serviceRouteInfo, RouteDefinition routeDefinition) {
         org.springframework.cloud.gateway.route.RouteDefinition targetRoute = new org.springframework.cloud.gateway.route.RouteDefinition();
         targetRoute.setId(routeDefinition.getId());
-        targetRoute.setUri(URI.create(routeDefinition.getUri() + "#" + routeDefinition.getPath()));
+        String path = routeDefinition.getPath();
+        if (path != null && path.contains("{") && path.contains("}")) {
+            path = path.replace('{', '?');
+            path = path.replace('}', '?');
+        }
+        targetRoute.setUri(URI.create(routeDefinition.getUri() + "#" + path));
         targetRoute.setOrder(routeDefinition.getOrder());
         // 添加过滤器
         List<FilterDefinition> filterDefinitionList = routeDefinition.getFilters()

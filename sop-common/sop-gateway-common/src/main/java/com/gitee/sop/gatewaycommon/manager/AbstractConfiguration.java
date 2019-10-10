@@ -64,6 +64,7 @@ public class AbstractConfiguration implements ApplicationContextAware {
     }
 
     @Bean
+    @ConditionalOnProperty("zuul.servlet-path")
     PropertiesFactory propertiesFactory() {
         return new SopPropertiesFactory();
     }

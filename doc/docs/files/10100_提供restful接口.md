@@ -15,8 +15,6 @@ sop.restful.enable=true
 
 请求格式为：`http://ip:port/rest/your_path`，其中`http://ip:port/rest/`为固定部分，后面跟微服务请求路径。
 
-> 如果想把`rest`部分改成其它名字，属性文件配置`sop.restful.path=/aaa`，则请求格式变为：`http://ip:port/aaa/your_path`
-
 注意：为了确保各个微服务路径不冲突，必须保证类上方定义的`@RequestMapping`内容唯一，不与其它微服务重复。
 
 下面是一个微服务的接口例子

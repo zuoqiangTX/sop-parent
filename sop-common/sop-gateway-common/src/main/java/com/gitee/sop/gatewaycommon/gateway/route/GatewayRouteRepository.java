@@ -5,15 +5,13 @@ import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.manager.RouteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cloud.gateway.event.PredicateArgsEvent;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,8 @@ import static java.util.Collections.synchronizedMap;
  */
 @Slf4j
 public class GatewayRouteRepository implements RouteDefinitionRepository, RouteRepository<GatewayTargetRoute> {
+
+    private PathMatcher pathMatcher = new AntPathMatcher();
 
     private final Map<String, GatewayTargetRoute> routes = synchronizedMap(new LinkedHashMap<>());
 
@@ -57,8 +57,20 @@ public class GatewayRouteRepository implements RouteDefinitionRepository, RouteR
         if (id == null) {
             return null;
         }
-        return routes.get(id);
+        GatewayTargetRoute gatewayTargetRoute = routes.get(id);
+        if (gatewayTargetRoute != null) {
+            return gatewayTargetRoute;
+        }
+        for (Map.Entry<String, GatewayTargetRoute> entry : routes.entrySet()) {
+            // /food/get/?id?
+            String pattern = entry.getKey();
+            if (StringUtils.containsAny(pattern, "{") && this.pathMatcher.match(pattern, id)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
+
 
     @Override
     public Collection<GatewayTargetRoute> getAll() {

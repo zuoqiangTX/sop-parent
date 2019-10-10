@@ -1,5 +1,13 @@
 # changelog
 
+## 2.3.2
+
+- 支持spring cloud gateway下restful接口调用
+
+## 2.3.1
+
+- 修复restful接口调用通配符问题
+
 ## 2.3.0
 
 - 支持请求restful接口（设置`sop.restful.enable=true`）

@@ -2,6 +2,7 @@ package com.gitee.sop.storyweb.controller;
 
 import com.gitee.sop.servercommon.util.UploadUtil;
 import lombok.Data;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,7 @@ import java.util.Collection;
 
 /**
  * 传统web开发实例
+ *
  * @author tanghc
  */
 @RestController
@@ -69,6 +71,15 @@ public class TraditionalWebappController {
     public Food upload2(Food food, MultipartFile file) {
         food.setId(4);
         food.setName("文件名称2+" + file.getOriginalFilename());
+        return food;
+    }
+
+    // http://localhost:2222/food/get/3  本地
+    // http://localhost:8081/rest/food/get/3  网关访问
+    @RequestMapping("/get/{id}")
+    public Food getById(@PathVariable("id") Integer id) {
+        Food food = new Food();
+        food.setId(id);
         return food;
     }
 

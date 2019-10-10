@@ -1,5 +1,6 @@
 package com.gitee.sop.gatewaycommon.zuul.route;
 
+import com.gitee.sop.gatewaycommon.bean.AbstractTargetRoute;
 import com.gitee.sop.gatewaycommon.param.ApiParam;
 import com.gitee.sop.gatewaycommon.zuul.ZuulContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -33,7 +34,7 @@ public class SopRouteLocator implements RouteLocator, Ordered {
     public List<Route> getRoutes() {
         return zuulRouteRepository.getAll()
                 .parallelStream()
-                .map(zuulTargetRoute -> zuulTargetRoute.getTargetRouteDefinition())
+                .map(AbstractTargetRoute::getTargetRouteDefinition)
                 .collect(Collectors.toList());
     }
 

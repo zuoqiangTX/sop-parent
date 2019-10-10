@@ -95,7 +95,7 @@ public class ApiMetaBuilder {
             if (path.contains("$") || isIgnorePattern(path)) {
                 return null;
             }
-            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(path, path, "1.0");
+            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(path, path, "");
             apiMeta.setIgnoreValidate(BooleanUtils.toInteger(true));
             apiMeta.setMergeResult(BooleanUtils.toInteger(false));
             apiMeta.setPermission(BooleanUtils.toInteger(false));

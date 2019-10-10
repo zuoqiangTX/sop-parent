@@ -19,13 +19,13 @@ import java.io.IOException;
 //@WebServlet(urlPatterns = "/rest/*")
 public class RestServlet extends HttpServlet {
 
-    private static final String REST_PATH = "/rest";
+    private static final String EMPTY_VERSION = "";
 
     @Value("${zuul.servlet-path:/zuul}")
     private String path;
 
-    @Value("${zuul.rest-default-version:1.0}")
-    private String defaultVersion;
+    @Value("${sop.restful.path:/rest}")
+    private String restPath;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -35,16 +35,11 @@ public class RestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String url = request.getRequestURL().toString();
-        int index = url.indexOf(REST_PATH);
+        int index = url.indexOf(restPath);
         // 取/rest的后面部分
-        String path = url.substring(index + REST_PATH.length());
-        String method = path;
-        String version = request.getParameter(ParamNames.VERSION_NAME);
-        if (version == null) {
-            version = defaultVersion;
-        }
-        request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, method);
-        request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, version);
+        String path = url.substring(index + restPath.length());
+        request.setAttribute(SopConstants.REDIRECT_METHOD_KEY, path);
+        request.setAttribute(SopConstants.REDIRECT_VERSION_KEY, EMPTY_VERSION);
         request.getRequestDispatcher(this.path).forward(request, response);
     }
 

@@ -50,7 +50,7 @@ public class RedisLimitManager extends DefaultLimitManager {
     public boolean acquire(ConfigLimitDto routeConfig) {
         String key = "sop:lmt:" + routeConfig.getRouteId();
         int limitCount = routeConfig.getExecCountPerSecond();
-
+        int duration = routeConfig.fetchDuration();
         Object result = redisTemplate.execute(
                 new RedisScript<Long>() {
                     @Override
@@ -71,7 +71,9 @@ public class RedisLimitManager extends DefaultLimitManager {
                 // KEYS[1] key
                 Collections.singletonList(key),
                 // ARGV[1] limit
-                String.valueOf(limitCount)
+                String.valueOf(limitCount),
+                // ARGV[2] expire
+                String.valueOf(duration)
         );
         return REDIS_SUCCESS.equals(result);
     }

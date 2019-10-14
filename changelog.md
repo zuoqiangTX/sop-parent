@@ -1,5 +1,9 @@
 # changelog
 
+## 2.4.0
+
+- 支持限流持续时间（每n秒允许m个请求，需要执行`sop-2.4.0.sql`升级脚本）
+
 ## 2.3.2
 
 - 支持spring cloud gateway下restful接口调用

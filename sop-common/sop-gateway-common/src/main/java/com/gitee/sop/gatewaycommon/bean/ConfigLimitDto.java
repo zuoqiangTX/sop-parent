@@ -43,6 +43,9 @@ public class ConfigLimitDto {
     /** 每秒可处理请求数, 数据库字段：exec_count_per_second */
     private Integer execCountPerSecond;
 
+    /** 限流过期时间，默认1秒，即每durationSeconds秒允许多少请求（当limit_type=1时有效）, 数据库字段：durationSeconds */
+    private Integer durationSeconds;
+
     /** 返回的错误码, 数据库字段：limit_code */
     private String limitCode;
 
@@ -66,16 +69,42 @@ public class ConfigLimitDto {
 
 
     /**
-     * 漏桶计数器
+     * 窗口计数器
      */
-    private LoadingCache<Long, AtomicLong> counter = CacheBuilder.newBuilder()
-            .expireAfterWrite(2, TimeUnit.SECONDS)
-            .build(new CacheLoader<Long, AtomicLong>() {
-                @Override
-                public AtomicLong load(Long seconds) throws Exception {
-                    return new AtomicLong(0);
+    private volatile LoadingCache<Long, AtomicLong> counter;
+
+    /**
+     * 获取持续时间，1秒内限制请求，则duration设置2
+     *
+     * @return 返回缓存保存的值。
+     */
+    public int fetchDuration() {
+        Integer durationSeconds = this.durationSeconds;
+        if (durationSeconds == null || durationSeconds < 1) {
+            durationSeconds = 1;
+        }
+        // 1秒内限制请求，则duration设置2
+        return durationSeconds + 1;
+    }
+
+    public LoadingCache<Long, AtomicLong> getCounter() {
+        if (counter == null) {
+            synchronized (this) {
+                if (counter == null) {
+                    int duration = fetchDuration();
+                    counter = CacheBuilder.newBuilder()
+                            .expireAfterWrite(duration, TimeUnit.SECONDS)
+                            .build(new CacheLoader<Long, AtomicLong>() {
+                                @Override
+                                public AtomicLong load(Long seconds) throws Exception {
+                                    return new AtomicLong(0);
+                                }
+                            });
                 }
-            });
+            }
+        }
+        return counter;
+    }
 
     /**
      * 令牌桶

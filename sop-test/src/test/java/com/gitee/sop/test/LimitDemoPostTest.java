@@ -1,6 +1,7 @@
 package com.gitee.sop.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.gitee.sop.test.alipay.AlipaySignature;
 import org.junit.Test;
 
@@ -34,8 +35,10 @@ public class LimitDemoPostTest extends TestBase {
                     try {
                         countDownLatch.await(); // 等在这里，执行countDownLatch.countDown();集体触发
                         // 业务方法
-                        doBusiness(Thread.currentThread().getName());
-                        success.incrementAndGet();
+                        boolean result = doBusiness(Thread.currentThread().getName());
+                        if (result) {
+                            success.incrementAndGet();
+                        }
                     } catch (Exception e) {
                     } finally {
                         count.countDown();
@@ -46,10 +49,11 @@ public class LimitDemoPostTest extends TestBase {
         countDownLatch.countDown();
         count.await();
         System.out.println("成功次数：" + success);
+
     }
 
     // 这个请求会路由到story服务
-    public void doBusiness(String threadName) throws Exception {
+    public boolean doBusiness(String threadName) throws Exception {
 
         // 公共请求参数
         Map<String, String> params = new HashMap<String, String>();
@@ -75,6 +79,8 @@ public class LimitDemoPostTest extends TestBase {
 
         String responseData = post(url, params);// 发送请求
         System.out.println(responseData);
+        JSONObject jsonObject = JSON.parseObject(responseData).getJSONObject("alipay_story_get_response");
+        return "10000".equals(jsonObject.getString("code"));
     }
 
 }

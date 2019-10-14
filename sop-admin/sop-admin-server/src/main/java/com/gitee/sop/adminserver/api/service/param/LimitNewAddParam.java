@@ -39,6 +39,12 @@ public class LimitNewAddParam {
     @ApiDocField(description = "每秒可处理请求数")
     private Integer execCountPerSecond;
 
+    /** 限流持续时间，默认1秒，即每durationSeconds秒允许多少请求（当limit_type=1时有效） */
+    @ApiDocField(description = "限流持续时间，默认1秒，即每durationSeconds秒允许多少请求（当limit_type=1时有效")
+    @NotNull(message = "durationSeconds不能为空")
+    @Min(value = 1, message = "durationSeconds最小是1")
+    private Integer durationSeconds;
+
     /** 返回的错误码, 数据库字段：limit_code */
     @ApiDocField(description = "返回的错误码")
     @Length(max = 64, message = "limitCode长度不能超过64")

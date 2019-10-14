@@ -95,6 +95,7 @@ CREATE TABLE `config_limit` (
   `service_id` varchar(64) NOT NULL DEFAULT '' COMMENT '服务id',
   `limit_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '限流策略，1：漏桶策略，2：令牌桶策略',
   `exec_count_per_second` int(11) DEFAULT NULL COMMENT '每秒可处理请求数',
+  `duration_seconds` int(11) NOT NULL DEFAULT '1' COMMENT '限流持续时间，默认1秒，即每durationSeconds秒允许多少请求（当limit_type=1时有效）',
   `limit_code` varchar(64) DEFAULT NULL COMMENT '返回的错误码',
   `limit_msg` varchar(100) DEFAULT NULL COMMENT '返回的错误信息',
   `token_bucket_count` int(11) DEFAULT NULL COMMENT '令牌桶容量',

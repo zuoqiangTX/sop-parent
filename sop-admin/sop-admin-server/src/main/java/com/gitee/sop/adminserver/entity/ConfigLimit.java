@@ -43,6 +43,9 @@ public class ConfigLimit {
     /** 每秒可处理请求数, 数据库字段：exec_count_per_second */
     private Integer execCountPerSecond;
 
+    /** 限流持续时间，默认1秒，即每durationSeconds秒允许多少请求（当limit_type=1时有效）, 数据库字段：durationSeconds */
+    private Integer durationSeconds;
+
     /** 返回的错误码, 数据库字段：limit_code */
     private String limitCode;
 
@@ -66,4 +69,5 @@ public class ConfigLimit {
 
     /**  数据库字段：gmt_modified */
     private Date gmtModified;
+
 }

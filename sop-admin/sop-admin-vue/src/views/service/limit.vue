@@ -206,8 +206,9 @@
                 <i class="el-icon-question limit-tip"></i>
               </el-tooltip>
             </el-form-item>
-            <el-form-item v-show="isWindowType()" label="每秒可处理请求数" prop="execCountPerSecond" :rules="isWindowType() ? rulesLimit.execCountPerSecond : []">
-              <el-input-number v-model="limitDialogFormData.execCountPerSecond" controls-position="right" :min="1" />
+            <el-form-item v-show="isWindowType()" label="请求数" prop="execCountPerSecond" :rules="isWindowType() ? rulesLimit.execCountPerSecond : []">
+              每 <el-input-number v-model="limitDialogFormData.durationSeconds" controls-position="right" :min="1" /> 秒可处理
+              <el-input-number v-model="limitDialogFormData.execCountPerSecond" controls-position="right" :min="1" /> 个请求
             </el-form-item>
             <el-form-item v-show="isWindowType()" label="错误码" prop="limitCode" :rules="isWindowType() ? rulesLimit.limitCode : []">
               <el-input v-model="limitDialogFormData.limitCode" />
@@ -275,6 +276,7 @@ export default {
         limitIp: '',
         limitKey: '',
         execCountPerSecond: 5,
+        durationSeconds: 1,
         limitCode: '',
         limitMsg: '',
         tokenBucketCount: 5,
@@ -438,15 +440,14 @@ export default {
       this.limitDialogFormData.limitStatus = 0
     },
     infoRender: function(row) {
-      const html = []
       if (row.limitType === 1) {
-        html.push('每秒可处理请求数：' + row.execCountPerSecond)
-        html.push('<br>subCode：' + row.limitCode)
-        html.push('<br>subMsg：' + row.limitMsg)
+        const durationSeconds = row.durationSeconds
+        return `每 ${durationSeconds} 秒可处理 ${row.execCountPerSecond} 个请求
+              <br>subCode：${row.limitCode}
+              <br>subMsg：${row.limitMsg}`
       } else if (row.limitType === 2) {
-        html.push('令牌桶容量：' + row.tokenBucketCount)
+        return `令牌桶容量：${row.tokenBucketCount}`
       }
-      return html.join('')
     },
     onLimitDialogSave: function() {
       this.$refs['limitDialogForm'].validate((valid) => {

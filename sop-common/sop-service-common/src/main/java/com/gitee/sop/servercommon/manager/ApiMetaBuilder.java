@@ -7,6 +7,7 @@ import com.gitee.sop.servercommon.mapping.ApiMappingInfo;
 import com.gitee.sop.servercommon.mapping.ApiMappingRequestCondition;
 import com.gitee.sop.servercommon.mapping.RouteUtil;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -91,11 +92,20 @@ public class ApiMetaBuilder {
             if (!ServiceContext.getCurrentContext().getBoolean(ServiceContext.RESTFUL_KEY, false)) {
                 return null;
             }
+            // 如果是restful服务
             String path = patterns.iterator().next();
             if (path.contains("$") || isIgnorePattern(path)) {
                 return null;
             }
-            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(path, path, "");
+            String name = path;
+            String prefix = EnvironmentKeys.SOP_RESTFUL_PREFIX.getValue();
+            if (StringUtils.isEmpty(prefix)) {
+                prefix = EnvironmentKeys.SPRING_APPLICATION_NAME.getValue();
+            }
+            if (StringUtils.hasText(prefix)) {
+                name = "/" + prefix + "/" + StringUtils.trimLeadingCharacter(path, '/');
+            }
+            ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, "");
             apiMeta.setIgnoreValidate(BooleanUtils.toInteger(true));
             apiMeta.setMergeResult(BooleanUtils.toInteger(false));
             apiMeta.setPermission(BooleanUtils.toInteger(false));

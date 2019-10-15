@@ -15,9 +15,9 @@ public enum EnvironmentKeys {
     SOP_RESTFUL_PREFIX("sop.restful.prefix"),
 
     /**
-     * sop.restful.compatibility=true，兼容老的restful调用方式（2.4.1之前）
+     * sop.restful.old-model=true，兼容老的restful调用方式（2.4.1之前）
      */
-    SOP_RESTFUL_COMPATIBILITY("sop.restful.compatibility", "false");
+    SOP_RESTFUL_OLD_MODEL("sop.restful.old-model", "false");
 
     private String key;
     private String defaultValue;

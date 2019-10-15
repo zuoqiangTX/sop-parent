@@ -20,7 +20,8 @@ sop.restful.enable=true
 **2.4.1之后：** `http://ip:port/rest/服务id/your_path`，其中`http://ip:port/rest/`为固定部分，后面跟微服务请求路径。
 
 **注意，`2.4.1`开始多了一个服务id作为区分，这样做是为了避免各微服务之间url冲突，假如两个微服务都有一个叫`/getItems`这样的接口
-那么调用`http://ip:port/rest/getItems`接口网关无法做出正确的路由，虽然可以在代码上进行规范，为了防止万一，还是强行加上了，避免采坑**
+那么调用`http://ip:port/rest/getItems`接口网关无法做出正确的路由，虽然可以在代码上进行规范，为了防止万一，还是强行加上了，避免采坑
+。可以指定`sop.restful.compatibility=true`强制使用老的调用方式**
 
 > 可在微服务端指定一个配置：`sop.restful.prefix=xxx`。请求路径将变成：`http://ip:port/rest/xxx/your_path`
 

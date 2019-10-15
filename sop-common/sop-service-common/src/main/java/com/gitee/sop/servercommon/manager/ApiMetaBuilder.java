@@ -102,7 +102,8 @@ public class ApiMetaBuilder {
             if (StringUtils.isEmpty(prefix)) {
                 prefix = EnvironmentKeys.SPRING_APPLICATION_NAME.getValue();
             }
-            if (StringUtils.hasText(prefix)) {
+            String compatibilityValue = EnvironmentKeys.SOP_RESTFUL_COMPATIBILITY.getValue();
+            if (!"true".equals(compatibilityValue) && StringUtils.hasText(prefix)) {
                 name = "/" + prefix + "/" + StringUtils.trimLeadingCharacter(path, '/');
             }
             ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, "");

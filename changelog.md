@@ -1,5 +1,9 @@
 # changelog
 
+## 2.4.1
+
+- 优化restful接口调用（如果正在使用此功能，必看）[doc](https://durcframework.gitee.io/sop/#/files/10100_%E6%8F%90%E4%BE%9Brestful%E6%8E%A5%E5%8F%A3?t=1571107529449)
+
 ## 2.4.0
 
 - 支持自定义限流持续时间（每n秒允许m个请求，需要执行`sop-2.4.0.sql`升级脚本）

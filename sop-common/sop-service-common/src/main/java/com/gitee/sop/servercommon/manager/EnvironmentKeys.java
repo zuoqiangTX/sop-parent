@@ -12,7 +12,12 @@ public enum EnvironmentKeys {
     /**
      * sop.restful.prefix=xxx，指定web开发模式前缀，不指定默认为service-id
      */
-    SOP_RESTFUL_PREFIX("sop.restful.prefix");
+    SOP_RESTFUL_PREFIX("sop.restful.prefix"),
+
+    /**
+     * sop.restful.compatibility=true，兼容老的restful调用方式（2.4.1之前）
+     */
+    SOP_RESTFUL_COMPATIBILITY("sop.restful.compatibility", "false");
 
     private String key;
     private String defaultValue;

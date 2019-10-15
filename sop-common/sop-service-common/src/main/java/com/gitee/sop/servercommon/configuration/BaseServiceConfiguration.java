@@ -2,14 +2,15 @@ package com.gitee.sop.servercommon.configuration;
 
 import com.gitee.sop.servercommon.bean.ServiceConfig;
 import com.gitee.sop.servercommon.interceptor.ServiceContextInterceptor;
+import com.gitee.sop.servercommon.manager.EnvironmentContext;
 import com.gitee.sop.servercommon.manager.ServiceRouteController;
 import com.gitee.sop.servercommon.mapping.ApiMappingHandlerMapping;
 import com.gitee.sop.servercommon.message.ServiceErrorFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,14 +26,16 @@ import java.util.List;
  * @author tanghc
  */
 @Slf4j
-public class BaseServiceConfiguration extends WebMvcConfigurationSupport
-        implements ApplicationRunner {
+public class BaseServiceConfiguration extends WebMvcConfigurationSupport {
 
     public BaseServiceConfiguration() {
         ServiceConfig.getInstance().getI18nModules().add("i18n/isp/bizerror");
     }
 
     private ApiMappingHandlerMapping apiMappingHandlerMapping = new ApiMappingHandlerMapping();
+
+    @Autowired
+    private Environment environment;
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -85,20 +88,11 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
     @PostConstruct
     public final void after() {
         log.info("-----spring容器加载完毕-----");
+        EnvironmentContext.setEnvironment(environment);
         initMessage();
         doAfter();
     }
 
-    /**
-     * springboot启动完成后执行
-     * @param args 启动参数
-     * @throws Exception 出错异常
-     */
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        log.info("-----服务器启动完毕-----");
-        this.onStartup(args);
-    }
 
     /**
      * spring容器加载完毕后执行
@@ -107,13 +101,6 @@ public class BaseServiceConfiguration extends WebMvcConfigurationSupport
 
     }
 
-    /**
-     * 启动完毕后执行
-     * @param args
-     */
-    protected void onStartup(ApplicationArguments args) {
-
-    }
 
     protected void initMessage() {
         ServiceErrorFactory.initMessageSource(ServiceConfig.getInstance().getI18nModules());

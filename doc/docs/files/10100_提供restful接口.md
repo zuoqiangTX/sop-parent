@@ -11,11 +11,18 @@
 sop.restful.enable=true
 ```
 
-- 前端app请求网关
+- 前端app请求网关(`2.4.1+之后有变动`)
 
-请求格式为：`http://ip:port/rest/your_path`，其中`http://ip:port/rest/`为固定部分，后面跟微服务请求路径。
+请求格式：
 
-注意：为了确保各个微服务路径不冲突，必须保证类上方定义的`@RequestMapping`内容唯一，不与其它微服务重复。
+**2.4.1版本之前：** `http://ip:port/rest/your_path`，其中`http://ip:port/rest/`为固定部分，后面跟微服务请求路径。
+
+**2.4.1之后：** `http://ip:port/rest/服务id/your_path`，其中`http://ip:port/rest/`为固定部分，后面跟微服务请求路径。
+
+**注意，`2.4.1`开始多了一个服务id作为区分，这样做是为了避免各微服务之间url冲突，假如两个微服务都有一个叫`/getItems`这样的接口
+那么调用`http://ip:port/rest/getItems`接口网关无法做出正确的路由，虽然可以在代码上进行规范，为了防止万一，还是强行加上了，避免采坑**
+
+> 可在微服务端指定一个配置：`sop.restful.prefix=xxx`。请求路径将变成：`http://ip:port/rest/xxx/your_path`
 
 下面是一个微服务的接口例子
 
@@ -34,9 +41,9 @@ public class TraditionalWebappController {
 }
 ```
 
-这是一个`食品服务`例子，假设网关ip为10.0.1.11，端口8081；食品服务ip为10.0.1.22，端口2222
+这是一个`食品服务`例子，serviceId为`food-service`，假设网关ip为10.0.1.11，端口8081；食品服务ip为10.0.1.22，端口2222
 
-1. 网关访问：`http://10.0.1.11:8081/rest/food/getFoodById?id=2`
+1. 网关访问：`http://10.0.1.11:8081/rest/food-service/food/getFoodById?id=2`
 
 2. 本地访问：`http://10.0.1.22:2222/food/getFoodById/?id=2`
 
@@ -63,7 +70,7 @@ const client = axios.create({
 const RequestUtil = {
   /**
    * 请求接口
-   * @param url 请求路径，如http://localhost:8081/rest/food/getFoodById
+   * @param url 请求路径，如http://localhost:8081/rest/food-service/food/getFoodById
    * @param data 请求数据，json格式
    * @param callback 成功回调
    * @param errorCallback 失败回调
@@ -101,7 +108,7 @@ jQuery版本如下：
 var RequestUtil = {
     /**
      * 请求接口
-     * @param url 请求路径，如http://localhost:8081/rest/food/getFoodById
+     * @param url 请求路径，如http://localhost:8081/rest/food-service/food/getFoodById
      * @param data 请求数据，json格式
      * @param callback 成功回调
      * @param errorCallback 失败回调
@@ -139,7 +146,7 @@ $(function () {
         id: 1
         ,name: '葫芦娃'
     }
-    RequestUtil.post('http://localhost:8081/rest/food/getFoodById', data, function (result) {
+    RequestUtil.post('http://localhost:8081/rest/food-service/food/getFoodById', data, function (result) {
         console.log(result)
     });
 })

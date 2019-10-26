@@ -87,6 +87,7 @@ public class ApiMetaBuilder {
             apiMeta.setIgnoreValidate(BooleanUtils.toInteger(apiMappingInfo.isIgnoreValidate()));
             apiMeta.setMergeResult(BooleanUtils.toInteger(apiMappingInfo.isMergeResult()));
             apiMeta.setPermission(BooleanUtils.toInteger(apiMappingInfo.isPermission()));
+            apiMeta.setNeedToken(BooleanUtils.toInteger(apiMappingInfo.isNeedToken()));
             return apiMeta;
         } else {
             if (!ServiceContext.getCurrentContext().getBoolean(ServiceContext.RESTFUL_KEY, false)) {
@@ -102,7 +103,8 @@ public class ApiMetaBuilder {
             if (StringUtils.isEmpty(prefix)) {
                 prefix = EnvironmentKeys.SPRING_APPLICATION_NAME.getValue();
             }
-            if (StringUtils.hasText(prefix)) {
+            String oldModel = EnvironmentKeys.SOP_RESTFUL_OLD_MODEL.getValue();
+            if (!"true".equals(oldModel) && StringUtils.hasText(prefix)) {
                 name = "/" + prefix + "/" + StringUtils.trimLeadingCharacter(path, '/');
             }
             ServiceApiInfo.ApiMeta apiMeta = new ServiceApiInfo.ApiMeta(name, path, "");

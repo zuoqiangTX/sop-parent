@@ -4,7 +4,7 @@
 
 **（需要执行`sop-2.5.0.sql`升级文件）**
 
-- 网关可校验token
+- 网关可校验token [doc](https://durcframework.gitee.io/sop/#/files/10089_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A0%A1%E9%AA%8Ctoken?t=1572076365259)
 
 ## 2.4.1
 

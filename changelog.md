@@ -2,7 +2,9 @@
 
 ## 2.5.0
 
-- 网关可校验token，见`com.gitee.sop.storyweb.controller.TokenController`（需要执行`sop-2.5.0.sql`升级文件）
+**（需要执行`sop-2.5.0.sql`升级文件）**
+
+- 网关可校验token
 
 ## 2.4.1
 

@@ -31,7 +31,7 @@ public class ValidatorTest extends TestCase {
 
 
     public void testField() {
-        Manager manager = new Manager("Jim", 22, Type.TWO);
+        Manager manager = new Manager("Jim", 22, Type.TWO, Status.OK);
         Store store = new Store("仓库A", manager, Type.ONE);
         Goods goods = new Goods("Apple", new BigDecimal(50000), store);
         serviceParamValidator.validateBizParam(goods);
@@ -90,10 +90,17 @@ public class ValidatorTest extends TestCase {
 
         @NotNull(message = "Manager.type不能为空")
         private Type type;
+
+        @NotNull(message = "Manager.status不能为空")
+        private Status status;
     }
 
     enum Type {
         ONE,TWO
+    }
+
+    enum Status {
+        OK, ERROR
     }
 
 }

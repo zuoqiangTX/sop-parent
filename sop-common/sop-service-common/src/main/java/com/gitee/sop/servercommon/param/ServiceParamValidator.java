@@ -11,6 +11,7 @@ import org.springframework.util.ReflectionUtils;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,21 +58,29 @@ public class ServiceParamValidator implements ParamValidator {
     private List<Object> listObjectField(Object object) {
         List<Object> ret = new ArrayList<>();
         ReflectionUtils.doWithFields(object.getClass(), field -> {
-            if (isCustomPackage(field.getType())) {
-                ReflectionUtils.makeAccessible(field);
-                ret.add(field.get(object));
-            }
-        });
+            ReflectionUtils.makeAccessible(field);
+            ret.add(field.get(object));
+        }, this::isMatchField);
         return ret;
     }
 
     /**
-     * 字段类型所在package是否是自定义包
-     * @param fieldType 指定的类型
+     * 匹配校验字段。
+     *
+     * 1. 不为基本类型；
+     * 2. 不为java自带的类型；
+     * 3. 不为枚举
+     * @param field field
      * @return true，是自定义的
      */
-    private boolean isCustomPackage(Class<?> fieldType) {
+    private boolean isMatchField(Field field) {
+        Class<?> fieldType = field.getType();
         if (fieldType.isPrimitive()) {
+            return false;
+        }
+        Class<?> declaringClass = field.getDeclaringClass();
+        boolean isEnum = declaringClass == field.getType() && declaringClass.isEnum();
+        if (isEnum) {
             return false;
         }
         Package aPackage = fieldType.getPackage();

@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -70,12 +71,16 @@ public class ServiceParamValidator implements ParamValidator {
      * 1. 不为基本类型；
      * 2. 不为java自带的类型；
      * 3. 不为枚举
+     * 4. 不为Map
      * @param field field
      * @return true，是自定义的
      */
     private boolean isMatchField(Field field) {
         Class<?> fieldType = field.getType();
         if (fieldType.isPrimitive()) {
+            return false;
+        }
+        if (Map.class.isAssignableFrom(fieldType)) {
             return false;
         }
         Class<?> declaringClass = field.getDeclaringClass();
@@ -88,7 +93,12 @@ public class ServiceParamValidator implements ParamValidator {
             return false;
         }
         String packageName = aPackage.getName();
-        return !SYSTEM_PACKAGE_LIST.contains(packageName);
+        for (String prefix : SYSTEM_PACKAGE_LIST) {
+            if (packageName.startsWith(prefix)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private RuntimeException getValidateBizParamException(String errorMsg) {

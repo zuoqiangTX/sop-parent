@@ -129,11 +129,9 @@ public class ApiArgumentResolver implements SopHandlerMethodArgumentResolver {
             if (paramObj instanceof OpenContext) {
                 paramObj = ((OpenContext) paramObj).getBizObject();
             }
-            if (paramObj != null) {
-                // JSR-303验证
-                paramValidator.validateBizParam(paramObj);
-                return ret;
-            }
+            // JSR-303验证
+            paramValidator.validateBizParam(paramObj);
+            return ret;
         }
         HandlerMethodArgumentResolver resolver = getOtherArgumentResolver(methodParameter);
         if (resolver != null) {

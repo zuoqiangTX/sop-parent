@@ -244,6 +244,8 @@ public class AlipayClientPostTest extends TestBase {
         params.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         // 业务参数
         Map<String, String> bizContent = new HashMap<>();
+        bizContent.put("name", "Jim");
+        bizContent.put("age", "2");
 
         params.put("biz_content", JSON.toJSONString(bizContent));
 

@@ -152,6 +152,16 @@ public class AlipayController {
         return story;
     }
 
+    @ApiAbility(ignoreValidate = true)
+    @GetMapping("/empinfo/get")
+    @ApiOperation(value="遗留接口", notes = "遗留接口")
+    public StoryResult getEmpInfo() {
+        StoryResult story = new StoryResult();
+        story.setId(1L);
+        story.setName("遗留接口");
+        return story;
+    }
+
     // http://localhost:2222/alipay.story.get/
     @ApiOperation(value="获取故事信息2", notes = "获取故事信息2的详细信息")
     @ApiMapping(value = "alipay.story.get")
@@ -223,6 +233,13 @@ public class AlipayController {
 
         return Arrays.asList(storyVO, storyVO2);
     }
+
+    @ApiAbility
+    @RequestMapping("getJson")
+    public Object getJson(@RequestBody JSONObject param) {
+        return param;
+    }
+
 
     /**
      * 演示文档表格树

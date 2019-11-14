@@ -1,19 +1,15 @@
 package com.gitee.sop.servercommon.manager;
 
-import com.alibaba.fastjson.JSON;
 import com.gitee.sop.servercommon.bean.ServiceApiInfo;
 import com.gitee.sop.servercommon.route.RouteDefinition;
 import com.gitee.sop.servercommon.route.ServiceRouteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.util.DigestUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author tanghc
@@ -83,7 +79,7 @@ public class ServiceRouteInfoBuilder {
     }
 
     protected String buildServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        String contextPath = environment.getProperty("server.servlet.context-path", DEFAULT_CONTEXT_PATH);
+        String contextPath = environment.getProperty("server.servlet.context-path", getContextPathForOld());
         String servletPath = apiMeta.getPath();
         if (servletPath == null) {
             servletPath = "";
@@ -96,6 +92,14 @@ public class ServiceRouteInfoBuilder {
         } else {
             return contextPath + servletPath;
         }
+    }
+
+    /**
+     * 兼容老版本获取context-path
+     * @return 返回context-path，没有返回/
+     */
+    private String getContextPathForOld() {
+        return environment.getProperty("server.context-path", DEFAULT_CONTEXT_PATH);
     }
 
     private void checkPath(String path, String errorMsg) {

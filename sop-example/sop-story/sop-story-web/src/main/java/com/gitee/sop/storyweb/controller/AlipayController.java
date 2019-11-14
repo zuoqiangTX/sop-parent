@@ -234,6 +234,13 @@ public class AlipayController {
         return Arrays.asList(storyVO, storyVO2);
     }
 
+    @ApiAbility
+    @RequestMapping("getJson")
+    public Object getJson(@RequestBody JSONObject param) {
+        return param;
+    }
+
+
     /**
      * 演示文档表格树
      *

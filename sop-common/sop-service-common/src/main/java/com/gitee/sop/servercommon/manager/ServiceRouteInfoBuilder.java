@@ -79,7 +79,7 @@ public class ServiceRouteInfoBuilder {
     }
 
     protected String buildServletPath(ServiceApiInfo serviceApiInfo, ServiceApiInfo.ApiMeta apiMeta) {
-        String contextPath = environment.getProperty("server.servlet.context-path", getContextPathForOld());
+        String contextPath = getContextPathCompatibility();
         String servletPath = apiMeta.getPath();
         if (servletPath == null) {
             servletPath = "";
@@ -95,11 +95,13 @@ public class ServiceRouteInfoBuilder {
     }
 
     /**
-     * 兼容老版本获取context-path
-     * @return 返回context-path，没有返回/
+     * 获取context-path，兼容老版本
+     * @return 返回context-path，没有返回"/"
      */
-    private String getContextPathForOld() {
-        return environment.getProperty("server.context-path", DEFAULT_CONTEXT_PATH);
+    private String getContextPathCompatibility() {
+        return environment.getProperty("server.servlet.context-path",
+                environment.getProperty("server.context-path", DEFAULT_CONTEXT_PATH)
+        );
     }
 
     private void checkPath(String path, String errorMsg) {

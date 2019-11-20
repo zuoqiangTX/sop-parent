@@ -22,7 +22,7 @@ public abstract class BaseRegistryListener implements RegistryListener {
     public static List<String> EXCLUDE_SERVICE_ID_LIST = new ArrayList<>(8);
 
     static {
-        EXCLUDE_SERVICE_ID_LIST.add("api-gateway");
+        EXCLUDE_SERVICE_ID_LIST.add("sop-gateway");
         EXCLUDE_SERVICE_ID_LIST.add("website-server");
     }
 

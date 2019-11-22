@@ -31,7 +31,11 @@ public enum EnvironmentKeys {
     /**
      * 排除其它微服务，多个用英文逗号隔开
      */
-    SOP_SERVICE_EXCLUDE("sop.service.exclude")
+    SOP_SERVICE_EXCLUDE("sop.service.exclude"),
+    /**
+     * 排除其它微服务，正则形式，多个用英文逗号隔开
+     */
+    SOP_SERVICE_EXCLUDE_REGEX("sop.service.exclude-regex")
     ;
 
     private String key;

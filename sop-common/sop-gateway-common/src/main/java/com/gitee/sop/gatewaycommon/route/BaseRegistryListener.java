@@ -53,11 +53,9 @@ public abstract class BaseRegistryListener implements RegistryListener {
     }
 
     protected boolean canOperator(String serviceId) {
-        List<String> excludeServiceIdList = getExcludeServiceId();
-        for (String excludeServiceId : excludeServiceIdList) {
-            if (excludeServiceId.equalsIgnoreCase(serviceId)) {
-                return false;
-            }
+        // 被排除的服务，不能操作
+        if (isExcludeService(serviceId)) {
+            return false;
         }
         // nacos会不停的触发事件，这里做了一层拦截
         // 同一个serviceId5秒内允许访问一次
@@ -70,6 +68,32 @@ public abstract class BaseRegistryListener implements RegistryListener {
         return can;
     }
 
+    /**
+     * 是否是被排除的服务
+     *
+     * @param serviceId 服务id
+     * @return true，是
+     */
+    private boolean isExcludeService(String serviceId) {
+        List<String> excludeServiceIdList = getExcludeServiceId();
+        for (String excludeServiceId : excludeServiceIdList) {
+            if (excludeServiceId.equalsIgnoreCase(serviceId)) {
+                return true;
+            }
+        }
+        // 匹配正则
+        String sopServiceExcludeRegex = EnvironmentKeys.SOP_SERVICE_EXCLUDE_REGEX.getValue();
+        if (StringUtils.isNotBlank(sopServiceExcludeRegex)) {
+            String[] regexArr = sopServiceExcludeRegex.split(";");
+            for (String regex : regexArr) {
+                if (serviceId.matches(regex)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private List<String> getExcludeServiceId() {
         String excludeServiceIds = EnvironmentKeys.SOP_SERVICE_EXCLUDE.getValue();
         List<String> excludeServiceIdList = new ArrayList<>(8);
@@ -80,4 +104,6 @@ public abstract class BaseRegistryListener implements RegistryListener {
         excludeServiceIdList.addAll(EXCLUDE_SERVICE_ID_LIST);
         return excludeServiceIdList;
     }
+
+
 }

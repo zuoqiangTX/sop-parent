@@ -1,10 +1,13 @@
 package com.gitee.sop.gatewaycommon.route;
 
 import com.gitee.sop.gatewaycommon.bean.InstanceDefinition;
+import com.gitee.sop.gatewaycommon.manager.EnvironmentKeys;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,7 +53,8 @@ public abstract class BaseRegistryListener implements RegistryListener {
     }
 
     protected boolean canOperator(String serviceId) {
-        for (String excludeServiceId : EXCLUDE_SERVICE_ID_LIST) {
+        List<String> excludeServiceIdList = getExcludeServiceId();
+        for (String excludeServiceId : excludeServiceIdList) {
             if (excludeServiceId.equalsIgnoreCase(serviceId)) {
                 return false;
             }
@@ -64,5 +68,16 @@ public abstract class BaseRegistryListener implements RegistryListener {
             updateTimeMap.put(serviceId, now);
         }
         return can;
+    }
+
+    private List<String> getExcludeServiceId() {
+        String excludeServiceIds = EnvironmentKeys.SOP_SERVICE_EXCLUDE.getValue();
+        List<String> excludeServiceIdList = new ArrayList<>(8);
+        if (StringUtils.isNotBlank(excludeServiceIds)) {
+            String[] serviceIdArr = excludeServiceIds.split(",");
+            excludeServiceIdList.addAll(Arrays.asList(serviceIdArr));
+        }
+        excludeServiceIdList.addAll(EXCLUDE_SERVICE_ID_LIST);
+        return excludeServiceIdList;
     }
 }

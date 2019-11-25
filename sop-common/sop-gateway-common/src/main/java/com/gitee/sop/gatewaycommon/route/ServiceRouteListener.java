@@ -3,6 +3,7 @@ package com.gitee.sop.gatewaycommon.route;
 import com.alibaba.fastjson.JSON;
 import com.gitee.sop.gatewaycommon.bean.InstanceDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.manager.BaseRouteCache;
 import com.gitee.sop.gatewaycommon.manager.EnvironmentKeys;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,6 @@ import java.util.Map;
 public class ServiceRouteListener extends BaseServiceListener {
 
     private static final String SOP_ROUTES_PATH = "/sop/routes";
-
-    private static final String METADATA_SERVER_CONTEXT_PATH = "server.servlet.context-path";
 
     private static final String METADATA_SOP_ROUTES_PATH = "sop.routes.path";
 
@@ -89,7 +88,7 @@ public class ServiceRouteListener extends BaseServiceListener {
         } else {
             // 默认处理
             homeUrl = getHomeUrl(instance);
-            String contextPath = metadata.getOrDefault(METADATA_SERVER_CONTEXT_PATH, "");
+            String contextPath = metadata.getOrDefault(SopConstants.METADATA_SERVER_CONTEXT_PATH, "");
             servletPath = contextPath + SOP_ROUTES_PATH;
         }
         if (StringUtils.isNotBlank(servletPath) && !servletPath.startsWith("/")) {

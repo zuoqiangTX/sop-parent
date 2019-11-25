@@ -9,6 +9,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.gitee.sop.gatewaycommon.bean.NacosConfigs;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.route.RegistryListener;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,6 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
     private static final String SECRET = "a3d9sf!1@odl90zd>fkASwq";
 
     private static final int FIVE_SECONDS = 1000 * 5;
-
-    private static final String METADATA_SERVER_CONTEXT_PATH = "server.servlet.context-path";
 
     private static final String METADATA_SOP_ROUTES_PATH = "sop.routes.path";
 
@@ -159,7 +158,7 @@ public class ServiceRoutesLoader<T extends TargetRoute> {
         } else {
             // 默认处理
             homeUrl = getHomeUrl(instance);
-            String contextPath = metadata.getOrDefault(METADATA_SERVER_CONTEXT_PATH, "");
+            String contextPath = metadata.getOrDefault(SopConstants.METADATA_SERVER_CONTEXT_PATH, "");
             servletPath = contextPath + SOP_ROUTES_PATH;
         }
         if (StringUtils.isNotBlank(servletPath) && !servletPath.startsWith("/")) {

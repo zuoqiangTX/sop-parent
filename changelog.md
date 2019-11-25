@@ -1,5 +1,9 @@
 # changelog
 
+## 2.5.5
+
+- 优化文档显示
+
 ## 2.5.4
 
 - 可排除其它服务（`sop.service.exclude=your-serviceId1,your-serviceId2`）

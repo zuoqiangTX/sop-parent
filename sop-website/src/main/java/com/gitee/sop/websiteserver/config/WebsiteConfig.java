@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author tanghc
  */
@@ -89,6 +91,11 @@ public class WebsiteConfig implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+
+    }
+
+    @PostConstruct
+    public void after() {
         EnvironmentContext.setEnvironment(environment);
     }
 }

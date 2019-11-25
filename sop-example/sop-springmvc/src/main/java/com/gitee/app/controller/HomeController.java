@@ -1,7 +1,9 @@
-package com.gitee.app;
+package com.gitee.app.controller;
 
 import com.gitee.app.model.Goods;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import java.util.Locale;
 /**
  * Handles requests for the application home page.
  */
+@Api(tags = "MVC接口")
 @Controller
 public class HomeController {
 	
@@ -41,6 +44,7 @@ public class HomeController {
 	}
 
 
+	@ApiOperation(value="获取商品", notes = "获取商品说明")
 	@ApiMapping(value = "springmvc.goods.get")
 	@ResponseBody
 	public Goods getGoods(Goods param) {

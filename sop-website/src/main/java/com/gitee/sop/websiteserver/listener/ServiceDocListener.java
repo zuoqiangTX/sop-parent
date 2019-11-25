@@ -1,6 +1,7 @@
 package com.gitee.sop.websiteserver.listener;
 
 import com.gitee.sop.gatewaycommon.bean.InstanceDefinition;
+import com.gitee.sop.gatewaycommon.bean.SopConstants;
 import com.gitee.sop.gatewaycommon.route.BaseServiceListener;
 import com.gitee.sop.websiteserver.manager.DocManager;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,7 @@ public class ServiceDocListener extends BaseServiceListener {
 
     private static String getRouteRequestUrl(InstanceDefinition instance) {
         String query = buildQuery(SECRET);
-        return "http://" + instance.getIp() + ":" + instance.getPort() + "/v2/api-docs" + query;
+        String contextPath = instance.getMetadata().getOrDefault(SopConstants.METADATA_SERVER_CONTEXT_PATH, "");
+        return "http://" + instance.getIp() + ":" + instance.getPort() + contextPath + "/v2/api-docs" + query;
     }
 }

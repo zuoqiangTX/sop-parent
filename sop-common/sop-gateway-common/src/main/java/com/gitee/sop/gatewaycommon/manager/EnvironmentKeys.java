@@ -26,7 +26,17 @@ public enum EnvironmentKeys {
     /**
      * sop.restful.path=/xx ，指定请求前缀，默认/rest
      */
-    SOP_RESTFUL_PATH("sop.restful.path", "/rest");
+    SOP_RESTFUL_PATH("sop.restful.path", "/rest"),
+
+    /**
+     * 排除其它微服务，多个用英文逗号隔开
+     */
+    SOP_SERVICE_EXCLUDE("sop.service.exclude"),
+    /**
+     * 排除其它微服务，正则形式，多个用英文逗号隔开
+     */
+    SOP_SERVICE_EXCLUDE_REGEX("sop.service.exclude-regex")
+    ;
 
     private String key;
     private String defaultValue;

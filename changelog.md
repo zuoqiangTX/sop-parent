@@ -1,5 +1,9 @@
 # changelog
 
+## 2.5.4
+
+- 可排除其它服务（`sop.service.exclude=your-serviceId1,your-serviceId2`）
+
 ## 2.5.3
 
 - 修复JSR-303校验问题

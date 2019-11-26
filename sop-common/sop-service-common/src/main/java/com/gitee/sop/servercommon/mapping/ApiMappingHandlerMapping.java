@@ -3,6 +3,7 @@ package com.gitee.sop.servercommon.mapping;
 import com.gitee.sop.servercommon.annotation.ApiAbility;
 import com.gitee.sop.servercommon.annotation.ApiMapping;
 import com.gitee.sop.servercommon.bean.ServiceConfig;
+import com.gitee.sop.servercommon.bean.ServiceContext;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringValueResolver;
@@ -18,13 +19,17 @@ import java.lang.reflect.Method;
 public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping implements PriorityOrdered {
 
     private static StringValueResolver stringValueResolver = new ApiMappingStringValueResolver();
+    private static StringValueResolver stringValueResolverMVC = new ApiMappingStringValueResolverMVC();
 
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+        String sopMvc = System.getProperty(ServiceContext.SOP_MVC);
+        boolean isMvc = sopMvc != null;
         ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
+        ApiAbility apiAbility = method.getAnnotation(ApiAbility.class);
         StringValueResolver valueResolver = null;
-        if (apiMapping != null) {
-            valueResolver = stringValueResolver;
+        if (apiMapping != null || apiAbility != null) {
+            valueResolver = isMvc ? stringValueResolverMVC : stringValueResolver;
         }
         this.setEmbeddedValueResolver(valueResolver);
         return super.getMappingForMethod(method, handlerType);

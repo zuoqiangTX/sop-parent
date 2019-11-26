@@ -57,7 +57,7 @@ public class ApiMetaBuilder {
                 continue;
             }
             String key = apiMeta.fetchNameVersion();
-            if (store.contains(key)) {
+            if (!apiMeta.isOriginalMapping() && store.contains(key)) {
                 throw new IllegalArgumentException("重复申明接口，请检查path和version，path:" + apiMeta.getPath() + ", version:" + apiMeta.getVersion());
             } else {
                 store.add(key);

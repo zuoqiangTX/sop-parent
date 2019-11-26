@@ -17,6 +17,19 @@ import java.lang.reflect.Method;
  */
 public class ApiMappingHandlerMapping extends RequestMappingHandlerMapping implements PriorityOrdered {
 
+    private static StringValueResolver stringValueResolver = new ApiMappingStringValueResolver();
+
+    @Override
+    protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+        ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
+        StringValueResolver valueResolver = null;
+        if (apiMapping != null) {
+            valueResolver = stringValueResolver;
+        }
+        this.setEmbeddedValueResolver(valueResolver);
+        return super.getMappingForMethod(method, handlerType);
+    }
+
     @Override
     protected RequestCondition<?> getCustomMethodCondition(Method method) {
         method.setAccessible(true);

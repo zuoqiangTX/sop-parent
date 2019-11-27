@@ -1,4 +1,9 @@
+# 转载自gitee 项目，这里这是方便阅读源码，做一个保存
+
+
 # SOP(Simple Open Platform)
+源码地址
+https://gitee.com/durcframework/SOP
 
 一个开放平台解决方案项目，基于Spring Cloud实现，目标让用户快速搭建自己的开放平台。
 

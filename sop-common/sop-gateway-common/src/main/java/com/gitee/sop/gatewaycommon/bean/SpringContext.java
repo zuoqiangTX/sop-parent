@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.bean;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * spring 上下文
+ *
  * @author tanghc
  */
 public class SpringContext {

@@ -37,7 +37,9 @@ public class ServiceRouteListener extends BaseServiceListener {
     @Override
     public void onRemoveService(String serviceId) {
         log.info("服务下线，删除路由配置，serviceId: {}", serviceId);
+        //删除内存中的本地化缓存数据
         baseRouteCache.remove(serviceId);
+        //db删除配置
         routesProcessor.removeAllRoutes(serviceId);
     }
 
@@ -50,6 +52,7 @@ public class ServiceRouteListener extends BaseServiceListener {
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             String body = responseEntity.getBody();
             ServiceRouteInfo serviceRouteInfo = JSON.parseObject(body, ServiceRouteInfo.class);
+            //根据接口拉取服务接口详细信息
             baseRouteCache.load(serviceRouteInfo, callback -> routesProcessor.saveRoutes(serviceRouteInfo, instance));
         } else {
             log.error("拉取路由配置异常，url: {}, status: {}, body: {}", url, responseEntity.getStatusCodeValue(), responseEntity.getBody());

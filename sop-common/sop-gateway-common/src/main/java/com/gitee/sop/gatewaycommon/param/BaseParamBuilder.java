@@ -43,10 +43,14 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
 
     @Override
     public ApiParam build(T ctx) {
+        //获取原始请求参数
         ApiParam apiParam = this.buildRequestParams(ctx);
+        //处理请求参数
         this.processApiParam(apiParam, ctx);
+        //初始化其他属性
         this.initOtherProperty(apiParam);
         apiParam.setIp(this.getIP(ctx));
+        //        将sop-version 设置到请求头中
         this.setVersionInHeader(ctx, ParamNames.HEADER_VERSION_NAME, apiParam.fetchVersion());
         return apiParam;
     }
@@ -56,14 +60,19 @@ public abstract class BaseParamBuilder<T> implements ParamBuilder<T> {
     }
 
     protected void initOtherProperty(ApiParam apiParam) {
+        //从服务缓存上下文拿到 所有服务的缓存【从路由缓存中拿到路由】
         RouteRepository<? extends TargetRoute> routeRepository = RouteRepositoryContext.getRouteRepository();
         if (routeRepository == null) {
+            //没有设置 服务缓存
             log.error("RouteRepositoryContext.setRouteRepository()方法未使用");
             throw ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getException();
         }
 
+        //接口名+版本号
         String nameVersion = Optional.ofNullable(apiParam.fetchNameVersion()).orElse(String.valueOf(System.currentTimeMillis()));
+        //目标路由
         TargetRoute targetRoute = routeRepository.get(nameVersion);
+//        如果目标路由不存在
         Integer ignoreValidate = Optional.ofNullable(targetRoute)
                 .map(TargetRoute::getRouteDefinition)
                 .map(RouteDefinition::getIgnoreValidate)

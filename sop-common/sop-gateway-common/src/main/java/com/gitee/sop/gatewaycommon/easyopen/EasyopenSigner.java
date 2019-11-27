@@ -12,6 +12,8 @@ import java.util.Set;
 /**
  * @author tanghc
  */
+@Deprecated
+
 public class EasyopenSigner extends AbstractSigner {
     @Override
     protected String buildServerSign(ApiParam params, String secret) {

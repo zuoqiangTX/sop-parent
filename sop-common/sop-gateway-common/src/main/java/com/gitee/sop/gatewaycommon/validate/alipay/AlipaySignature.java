@@ -207,10 +207,12 @@ public class AlipaySignature {
             return null;
         }
 
+//        1、去掉签名
         params.remove("sign");
 
         StringBuilder content = new StringBuilder();
         List<String> keys = new ArrayList<String>(params.keySet());
+//        2、排序
         Collections.sort(keys);
 
         for (int i = 0; i < keys.size(); i++) {

@@ -5,6 +5,8 @@ import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import java.util.function.Consumer;
 
 /**
+ * 路由定位器
+ *
  * @author tanghc
  */
 public interface RouteLoader {

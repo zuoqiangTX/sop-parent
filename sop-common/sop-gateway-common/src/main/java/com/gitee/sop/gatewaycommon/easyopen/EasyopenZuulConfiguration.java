@@ -8,6 +8,7 @@ import com.gitee.sop.gatewaycommon.zuul.configuration.BaseZuulConfiguration;
 /**
  * @author tanghc
  */
+@Deprecated
 public class EasyopenZuulConfiguration extends BaseZuulConfiguration {
 
     public EasyopenZuulConfiguration() {

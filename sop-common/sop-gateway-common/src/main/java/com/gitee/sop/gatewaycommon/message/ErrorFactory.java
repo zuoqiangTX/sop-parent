@@ -43,6 +43,7 @@ public class ErrorFactory {
      */
     public static void initMessageSource(List<String> isvModules) {
         HashSet<String> baseNamesSet = new HashSet<>();
+        //        错误资源路径
         baseNamesSet.add(I18N_OPEN_ERROR);
 
         if (!isvModules.isEmpty()) {

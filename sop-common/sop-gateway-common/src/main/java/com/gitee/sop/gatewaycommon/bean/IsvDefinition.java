@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * isv授权过的路由
+ * 用户应用定义类
+ *
  * @author tanghc
  */
 @Getter
@@ -22,19 +25,29 @@ public class IsvDefinition implements Isv {
 
     private String appKey;
 
-    /** 秘钥,签名方式为MD5时有用 */
+    /**
+     * 秘钥,签名方式为MD5时有用
+     */
     private String secret;
 
-    /** 开发者生成的公钥, 数据库字段：public_key_isv */
+    /**
+     * 开发者生成的公钥, 数据库字段：public_key_isv
+     */
     private String publicKeyIsv;
 
-    /** 平台生成的私钥, 数据库字段：private_key_platform */
+    /**
+     * 平台生成的私钥, 数据库字段：private_key_platform
+     */
     private String privateKeyPlatform;
 
-    /** 0启用，1禁用 */
+    /**
+     * 0启用，1禁用
+     */
     private Byte status;
 
-    /** 签名类型：1:RSA2,2:MD5 */
+    /**
+     * 签名类型：1:RSA2,2:MD5
+     */
     private Byte signType = 1;
 
     @Override

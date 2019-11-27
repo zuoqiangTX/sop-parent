@@ -1,6 +1,8 @@
 package com.gitee.sop.gatewaycommon.bean;
 
 /**
+ * 阿里nacos配置类
+ *
  * @author tanghc
  */
 public class NacosConfigs {

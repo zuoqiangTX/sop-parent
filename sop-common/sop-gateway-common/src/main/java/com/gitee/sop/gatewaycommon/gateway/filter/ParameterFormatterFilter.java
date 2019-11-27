@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 import static com.gitee.sop.gatewaycommon.gateway.filter.Orders.PARAMETER_FORMATTER_FILTER_ORDER;
 
 /**
+ * 参数格式化过滤器 进行参数转换
+ *
  * @author tanghc
  */
 @Slf4j
@@ -25,6 +27,7 @@ public class ParameterFormatterFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+//        获取apiParam参数
         ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         if (apiParam == null) {
             return chain.filter(exchange);

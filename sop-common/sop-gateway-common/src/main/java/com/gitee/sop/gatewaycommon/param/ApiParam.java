@@ -21,14 +21,19 @@ public class ApiParam extends JSONObject implements Param {
         super(map);
     }
 
+    //是否忽略签名
     private boolean ignoreSign;
+    //是否忽略验证信息
     private boolean ignoreValidate;
 
+    //接口名称
     private String restName;
+    //接口版本
     private String restVersion;
 
+    //ip
     private String ip;
-
+//上传上下文
     private transient UploadContext uploadContext;
 
     public void fitNameVersion() {

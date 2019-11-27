@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.bean;
 import lombok.Data;
 
 /**
+ * 服务灰度定义
+ *
  * @author tanghc
  */
 @Data

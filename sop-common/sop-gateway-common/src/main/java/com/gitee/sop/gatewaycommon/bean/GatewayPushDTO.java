@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.bean;
 import lombok.Data;
 
 /**
+ * 网关配置推送对象
+ *
  * @author tanghc
  */
 @Data

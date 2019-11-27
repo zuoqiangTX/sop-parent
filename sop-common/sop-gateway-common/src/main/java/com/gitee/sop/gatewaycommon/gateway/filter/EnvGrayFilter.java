@@ -14,6 +14,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
+ * 灰度发布过滤器 todo  此功能暂时不需要
+ *
  * @author tanghc
  */
 public class EnvGrayFilter implements GlobalFilter, Ordered {
@@ -25,6 +27,7 @@ public class EnvGrayFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         String nameVersion = apiParam.fetchNameVersion();
+//        从缓存中拿到目标路由
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(nameVersion);
         if (targetRoute == null) {
             return null;

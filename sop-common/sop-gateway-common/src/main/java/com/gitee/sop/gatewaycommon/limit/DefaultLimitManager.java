@@ -14,6 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultLimitManager implements LimitManager {
 
     @Override
+    /**
+     * 获取令牌桶
+     */
     public double acquireToken(ConfigLimitDto routeConfig) {
         if (routeConfig.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
             return 0;
@@ -25,14 +28,24 @@ public class DefaultLimitManager implements LimitManager {
     }
 
 
+    /**
+     * 获取漏桶
+     *
+     * @param routeConfig 路由配置
+     * @return
+     */
     @Override
     public boolean acquire(ConfigLimitDto routeConfig) {
         if (routeConfig.getLimitStatus() == ConfigLimitDto.LIMIT_STATUS_CLOSE) {
+            //            如果限流关闭，直接返回
             return true;
         }
         if (LimitType.TOKEN_BUCKET.getType() == routeConfig.getLimitType().byteValue()) {
+            //            如果是令牌桶策略，直接返回
             return true;
         }
+        // 每秒可处理请求数,
+
         int execCountPerSecond = routeConfig.getExecCountPerSecond();
         long currentSeconds = System.currentTimeMillis() / 1000;
         try {

@@ -8,7 +8,9 @@ import lombok.Data;
  */
 @Data
 public class ChannelMsg {
+    //    操作
     private String operation;
+    //    数据
     private JSONObject data;
 
     public <T> T toObject(Class<T> clazz) {

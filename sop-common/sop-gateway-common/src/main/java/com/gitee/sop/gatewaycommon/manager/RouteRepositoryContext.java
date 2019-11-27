@@ -23,10 +23,12 @@ public class RouteRepositoryContext {
 
     /**
      * 检查路由是否存在，不存在报错
-     * @param routeId 路由id
+     *
+     * @param routeId   路由id
      * @param errorEnum 报错信息
      */
     public static void checkExist(String routeId, ErrorEnum errorEnum) {
+        //在路由缓存里面查找是否存在
         TargetRoute targetRoute = routeRepository.get(routeId);
         if (targetRoute == null) {
             throw errorEnum.getErrorMeta().getException();

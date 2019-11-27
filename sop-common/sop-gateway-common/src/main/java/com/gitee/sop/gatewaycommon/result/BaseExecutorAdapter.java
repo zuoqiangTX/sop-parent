@@ -73,6 +73,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     @Override
     public String mergeResult(T request, String serviceResult) {
+        //是否合并参数
         boolean isMergeResult = this.isMergeResult(request);
         if (!isMergeResult) {
             return serviceResult;

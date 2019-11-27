@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 路由缓存
+ *
  * @author tanghc
  */
 public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
@@ -23,6 +25,13 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
         super(routeRepository);
     }
 
+    /**
+     * 自己定义的服务信息和路由设置到getWay中去
+     *
+     * @param serviceRouteInfo 路由服务对象
+     * @param routeDefinition
+     * @return
+     */
     @Override
     protected GatewayTargetRoute buildTargetRoute(ServiceRouteInfo serviceRouteInfo, RouteDefinition routeDefinition) {
         org.springframework.cloud.gateway.route.RouteDefinition targetRoute = new org.springframework.cloud.gateway.route.RouteDefinition();
@@ -38,13 +47,14 @@ public class GatewayRouteCache extends BaseRouteCache<GatewayTargetRoute> {
         List<FilterDefinition> filterDefinitionList = routeDefinition.getFilters()
                 .stream()
                 .map(filter -> {
+                    //                    springgateway自带的过滤器
                     FilterDefinition filterDefinition = new FilterDefinition();
                     BeanUtils.copyProperties(filter, filterDefinition);
                     return filterDefinition;
                 })
                 .collect(Collectors.toList());
 
-
+//        自定义断言
         LinkedList<PredicateDefinition> predicateDefinitionList = routeDefinition.getPredicates()
                 .stream()
                 .map(predicate -> {

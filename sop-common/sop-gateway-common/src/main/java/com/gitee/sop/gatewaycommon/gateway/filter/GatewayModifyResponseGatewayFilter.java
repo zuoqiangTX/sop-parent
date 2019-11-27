@@ -43,6 +43,7 @@ public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered
 
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+//                原始返回结果
                 String originalResponseContentType = exchange.getAttribute(ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
                 // 如果是下载文件，直接放行，不合并结果
                 if (StringUtils.containsIgnoreCase(originalResponseContentType, MediaType.APPLICATION_OCTET_STREAM_VALUE)) {

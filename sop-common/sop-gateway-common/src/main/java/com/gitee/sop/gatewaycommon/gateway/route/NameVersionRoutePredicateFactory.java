@@ -56,8 +56,11 @@ public class NameVersionRoutePredicateFactory extends AbstractRoutePredicateFact
             if (CollectionUtils.isEmpty(params)) {
                 return false;
             }
+//            路由id
             String nameVersion = config.param;
+//            api名称
             Object name = params.get(ParamNames.API_NAME);
+//            版本号
             Object version = params.get(ParamNames.VERSION_NAME);
             if (name == null || version == null) {
                 return false;

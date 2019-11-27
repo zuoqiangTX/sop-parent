@@ -25,12 +25,15 @@ public class EnvironmentServerChooser extends BaseServerChooser {
      */
     private static final String PRE_DOMAIN = "localhost";
 
+    //    判断是否是预发布环境
+
     @Override
     protected boolean isPreServer(Server server) {
         String env = getEnvValue(server);
         return ENV_PRE_VALUE.equals(env);
     }
 
+    //    判断是否是灰度环境
     @Override
     protected boolean isGrayServer(Server server) {
         String env = getEnvValue(server);
@@ -57,6 +60,7 @@ public class EnvironmentServerChooser extends BaseServerChooser {
     @Override
     protected boolean canVisitPre(Server server, HttpServletRequest request) {
         String serverName = request.getServerName();
+        //        判断主机域名是否是预发布域名
         String domain = SpringContext.getBean(Environment.class).getProperty("pre.domain", PRE_DOMAIN);
         return domain.equals(serverName);
     }

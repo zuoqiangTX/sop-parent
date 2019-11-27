@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 路由配置管理器
+ *
  * @author tanghc
  */
 public class DefaultRouteConfigManager implements RouteConfigManager {

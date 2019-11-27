@@ -34,12 +34,14 @@ public class LoadBalancerClientExtFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+//        从路由中找到路径
         String path = this.findPath(exchange, route);
         if (StringUtils.hasLength(path)) {
             URI url = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
             UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUri(url);
             uriComponentsBuilder.path(path);
             URI requestUrl = uriComponentsBuilder.build(true).toUri();
+//            重新设置url
             exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, requestUrl);
         }
         return chain.filter(exchange);

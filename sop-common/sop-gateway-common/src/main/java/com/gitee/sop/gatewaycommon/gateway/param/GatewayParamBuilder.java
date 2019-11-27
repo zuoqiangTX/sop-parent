@@ -6,6 +6,7 @@ import com.gitee.sop.gatewaycommon.param.BaseParamBuilder;
 import org.springframework.web.server.ServerWebExchange;
 
 /**
+ * 参数构建器
  * @author tanghc
  */
 public class GatewayParamBuilder extends BaseParamBuilder<ServerWebExchange> {

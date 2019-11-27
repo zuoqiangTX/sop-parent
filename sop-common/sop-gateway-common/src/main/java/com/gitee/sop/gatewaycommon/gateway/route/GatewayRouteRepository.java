@@ -28,7 +28,7 @@ import static java.util.Collections.synchronizedMap;
 public class GatewayRouteRepository implements RouteDefinitionRepository, RouteRepository<GatewayTargetRoute> {
 
     private PathMatcher pathMatcher = new AntPathMatcher();
-
+    //    本地spring gateway路由缓存
     private final Map<String, GatewayTargetRoute> routes = synchronizedMap(new LinkedHashMap<>());
 
     @Override

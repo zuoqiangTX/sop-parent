@@ -15,6 +15,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
+ * 验证拦截器
+ *
  * @author tanghc
  */
 @Slf4j
@@ -30,8 +32,9 @@ public class ValidateFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 解析参数
         ApiParam param = paramBuilder.build(exchange);
+        //        将api参数设置进webExchange中
         ServerWebExchangeUtil.setApiParam(exchange, param);
-        // 验证操作，这里有负责验证签名参数
+        // 验证操作，这里有负责验证签名参数，检查ip等等各种处理器
         try {
             validator.validate(param);
         } catch (ApiException e) {

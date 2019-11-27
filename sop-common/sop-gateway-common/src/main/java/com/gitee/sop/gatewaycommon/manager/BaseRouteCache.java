@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
+ * 本地路由缓存
+ *
  * @author tanghc
  */
 @Slf4j
@@ -47,6 +49,7 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
     @Override
     public void load(ServiceRouteInfo serviceRouteInfo, Consumer<Object> callback) {
         try {
+            //服务名
             String serviceId = serviceRouteInfo.getServiceId();
             String newMd5 = buildMd5(serviceRouteInfo.getRouteDefinitionList());
             String oldMd5 = serviceIdMd5Map.get(serviceId);
@@ -93,6 +96,7 @@ public abstract class BaseRouteCache<T extends TargetRoute> implements RouteLoad
 
     /**
      * 返回附加的路由选项
+     *
      * @return 返回附加的路由选项
      */
     protected List<RouteDefinition> getExtRouteDefinitionList(ServiceRouteInfo serviceRouteInfo) {

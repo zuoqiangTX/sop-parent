@@ -49,6 +49,7 @@ public abstract class BaseRegistryListener implements RegistryListener {
     public void pullRoutes(InstanceDefinition instance) {
         // serviceId统一小写
         instance.setServiceId(instance.getServiceId().toLowerCase());
+        //添加路由信息
         serviceListener.onAddInstance(instance);
     }
 

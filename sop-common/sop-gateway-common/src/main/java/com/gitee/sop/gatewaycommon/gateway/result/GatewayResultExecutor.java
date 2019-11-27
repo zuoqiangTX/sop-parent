@@ -18,6 +18,8 @@ import java.util.Map;
 
 
 /**
+ * 网关结果处理器
+ *
  * @author tanghc
  */
 @Slf4j
@@ -47,6 +49,8 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
 
     @Override
     public Map<String, Object> getApiParam(ServerWebExchange exchange) {
+        //        获取apiParam cacheRequestBodyForMap
+
         return exchange.getAttribute(SopConstants.CACHE_REQUEST_BODY_FOR_MAP);
     }
 

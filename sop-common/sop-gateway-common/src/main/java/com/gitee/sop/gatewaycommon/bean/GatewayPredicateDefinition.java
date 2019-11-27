@@ -8,14 +8,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * 网关断言定义规则
+ *
  * @author tanghc
  */
 @Data
 public class GatewayPredicateDefinition {
     public static final String GEN_KEY = "_genkey_";
-    /** 断言对应的Name */
+    /**
+     * 断言对应的Name
+     */
     private String name;
-    /** 配置的断言规则 */
+    /**
+     * 配置的断言规则
+     */
     private Map<String, String> args = new LinkedHashMap<>();
 
     public GatewayPredicateDefinition() {
@@ -29,7 +35,7 @@ public class GatewayPredicateDefinition {
             this.setName(text.substring(0, eqIdx));
             String[] params = StringUtils.tokenizeToStringArray(text.substring(eqIdx + 1), ",");
 
-            for(int i = 0; i < params.length; ++i) {
+            for (int i = 0; i < params.length; ++i) {
                 this.args.put(generateName(i), params[i]);
             }
 

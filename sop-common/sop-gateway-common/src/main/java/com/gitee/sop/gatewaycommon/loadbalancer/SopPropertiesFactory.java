@@ -6,14 +6,17 @@ import org.springframework.cloud.netflix.ribbon.PropertiesFactory;
 
 /**
  * 自定义PropertiesFactory，用来动态添加LoadBalance规则
+ *
  * @author tanghc
  */
+@Deprecated
 public class SopPropertiesFactory extends PropertiesFactory {
 
     /**
      * 配置文件配置：<serviceId>.ribbon.NFLoadBalancerRuleClassName=com.gitee.sop.gateway.loadbalancer.EnvironmentServerChooser
+     *
      * @param clazz
-     * @param name serviceId
+     * @param name  serviceId
      * @return 返回class全限定名
      */
     @Override

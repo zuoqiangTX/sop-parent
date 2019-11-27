@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.bean;
 import lombok.Data;
 
 /**
+ * 错误定义类
+ *
  * @author tanghc
  */
 @Data

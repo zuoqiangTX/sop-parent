@@ -29,7 +29,9 @@ public class DbIsvManager extends CacheIsvManager {
 
     @Override
     public void load() {
+        //从数据库中更新isv信息
         List<IsvDetailDTO> isvInfoList = isvInfoMapper.listIsvDetail();
+        //加载到redis缓存中
         isvInfoList
                 .forEach(isvInfo -> {
                     IsvDefinition isvDefinition = new IsvDefinition();

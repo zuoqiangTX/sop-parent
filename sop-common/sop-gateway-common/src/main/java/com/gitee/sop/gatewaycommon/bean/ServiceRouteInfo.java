@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 服务路由信息
+ *
  * @author tanghc
  */
 @Data

@@ -5,6 +5,8 @@ import com.gitee.sop.gatewaycommon.bean.RouteDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 
 /**
+ * spring gateway本身自带的路由
+ *
  * @author tanghc
  */
 public class GatewayTargetRoute extends AbstractTargetRoute<org.springframework.cloud.gateway.route.RouteDefinition> {

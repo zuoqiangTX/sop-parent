@@ -13,11 +13,21 @@ import java.util.Objects;
 @Setter
 @ToString
 public class ErrorEntity {
+    //    接口ID
     private String id;
+    //    接口名称
+
     private String name;
+    //    接口版本号
+
     private String version;
+    //    接口服务ID
+
     private String serviceId;
+    //    错误信息
+
     private String errorMsg;
+    //    次数
     private long count;
 
     @Override

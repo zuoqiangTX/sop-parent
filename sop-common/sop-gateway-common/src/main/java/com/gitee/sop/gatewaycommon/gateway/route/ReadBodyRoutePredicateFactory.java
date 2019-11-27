@@ -28,19 +28,19 @@ import java.util.function.Predicate;
 import static org.springframework.cloud.gateway.filter.AdaptCachedBodyGlobalFilter.CACHED_REQUEST_BODY_KEY;
 
 /**
+ * 其实就是ReadBodyPredicateFactory 这个将请求体缓存在了body中
  * 获取请求参数插件，兼容get，post，使用方式：
- *     &#64;Bean
- *     ReadBodyRoutePredicateFactory readBodyRoutePredicateFactory() {
- *         return new ReadBodyRoutePredicateFactory();
- *     }
- *
- * @see org.springframework.cloud.gateway.handler.predicate.ReadBodyPredicateFactory
- * 详见：https://blog.51cto.com/thinklili/2329184
- *
- * 使用地方：
- * @see com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteCache
+ * &#64;Bean
+ * ReadBodyRoutePredicateFactory readBodyRoutePredicateFactory() {
+ * return new ReadBodyRoutePredicateFactory();
+ * }
  *
  * @author tanghc
+ * @see org.springframework.cloud.gateway.handler.predicate.ReadBodyPredicateFactory
+ * 详见：https://blog.51cto.com/thinklili/2329184
+ * <p>
+ * 使用地方：
+ * @see com.gitee.sop.gatewaycommon.gateway.route.GatewayRouteCache
  */
 public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory<ReadBodyRoutePredicateFactory.Config> {
 
@@ -69,6 +69,7 @@ public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory
 
     /**
      * 获取post表单参数
+     *
      * @param exchange
      * @param config
      * @return
@@ -126,6 +127,7 @@ public class ReadBodyRoutePredicateFactory extends AbstractRoutePredicateFactory
 
     /**
      * 获取GET请求参数
+     *
      * @param exchange
      * @param config
      * @return

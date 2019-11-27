@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 /**
+ * 网关处理结果
+ *
  * @author tanghc
  */
 @Data

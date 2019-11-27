@@ -36,13 +36,17 @@ import org.springframework.web.filter.CorsFilter;
 import javax.annotation.PostConstruct;
 
 /**
+ * ApplicationContextAware 获取ApplicationContext 上下文
+ *
  * @author tanghc
  */
 public class AbstractConfiguration implements ApplicationContextAware {
 
+    //   环境属性
     @Autowired
     protected Environment environment;
 
+    //    注册中心监听器
     @Autowired
     private RegistryListener registryListener;
 
@@ -90,60 +94,70 @@ public class AbstractConfiguration implements ApplicationContextAware {
         return new ServiceRouteListener();
     }
 
+    //    接口校验器
     @Bean
     @ConditionalOnMissingBean
     Validator validator() {
         return ApiConfig.getInstance().getValidator();
     }
 
+    //    isv管理类
     @Bean
     @ConditionalOnMissingBean
     IsvManager isvManager() {
         return ApiConfig.getInstance().getIsvManager();
     }
 
+    //    路由权限管理类
     @Bean
     @ConditionalOnMissingBean
     IsvRoutePermissionManager isvRoutePermissionManager() {
         return ApiConfig.getInstance().getIsvRoutePermissionManager();
     }
 
+    //    路由配置管理
     @Bean
     @ConditionalOnMissingBean
     RouteConfigManager routeConfigManager() {
         return ApiConfig.getInstance().getRouteConfigManager();
     }
 
+    //    限流配置
     @Bean
     @ConditionalOnMissingBean
     LimitConfigManager limitConfigManager() {
         return ApiConfig.getInstance().getLimitConfigManager();
     }
 
+    //    限流管理
     @Bean
     @ConditionalOnMissingBean
     LimitManager limitManager() {
         return ApiConfig.getInstance().getLimitManager();
     }
 
+    //    黑名单管理
     @Bean
     @ConditionalOnMissingBean
     IPBlacklistManager ipBlacklistManager() {
         return ApiConfig.getInstance().getIpBlacklistManager();
     }
 
+    //    灰度管理
     @Bean
     @ConditionalOnMissingBean
     EnvGrayManager envGrayManager() {
         return ApiConfig.getInstance().getUserKeyManager();
     }
 
+    //    会话管理
     @Bean
     @ConditionalOnMissingBean
     SessionManager sessionManager() {
         return ApiConfig.getInstance().getSessionManager();
     }
 
+    //    参数格式化管理
     @Bean
     @ConditionalOnMissingBean
     ParameterFormatter parameterFormatter() {
@@ -177,6 +191,7 @@ public class AbstractConfiguration implements ApplicationContextAware {
         return corsConfiguration;
     }
 
+    //    完成依赖项注入以执行
     @PostConstruct
     public final void after() {
         EnvironmentContext.setEnvironment(environment);

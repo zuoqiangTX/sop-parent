@@ -1,6 +1,8 @@
 package com.gitee.sop.gatewaycommon.bean;
 
 /**
+ * spring gateway目标路由处理类
+ *
  * @author tanghc
  */
 public interface TargetRoute<T> {

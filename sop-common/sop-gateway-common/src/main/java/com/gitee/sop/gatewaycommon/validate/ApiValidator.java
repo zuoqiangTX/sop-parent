@@ -67,7 +67,9 @@ public class ApiValidator implements Validator {
 
     @Override
     public void validate(ApiParam param) {
+        //检查ip
         checkIP(param);
+//        检查是否可用
         checkEnable(param);
         ApiConfig apiConfig = ApiContext.getApiConfig();
         if (apiConfig.isIgnoreValidate() || param.fetchIgnoreValidate()) {
@@ -78,11 +80,17 @@ public class ApiValidator implements Validator {
         }
         // 需要验证签名,先校验appKey，后校验签名,顺序不能变
         checkAppKey(param);
+        //todo  看到这里了验证签名
         checkSign(param);
+        //验证是否超时
         checkTimeout(param);
+        //检查格式化
         checkFormat(param);
+//        检查上传文件
         checkUploadFile(param);
+//        检查权限
         checkPermission(param);
+//        检查token信息
         checkToken(param);
     }
 
@@ -105,19 +113,23 @@ public class ApiValidator implements Validator {
      */
     protected void checkEnable(ApiParam param) {
         String name = param.fetchName();
+//        找不到接口名直接抛出异常
         if (name == null) {
             throw ErrorEnum.ISV_MISSING_METHOD.getErrorMeta().getException();
         }
+        //        找不到版本号直接抛出异常
         String version = param.fetchVersion();
         if (version == null) {
             throw ErrorEnum.ISV_MISSING_VERSION.getErrorMeta().getException();
         }
+        //拼装路由ID + 版本号
         String routeId = param.fetchNameVersion();
         // 检查路由是否存在
         RouteRepositoryContext.checkExist(routeId, ErrorEnum.ISV_INVALID_METHOD);
-        // 检查路由是否启用
+        // 检查路由是否启用【在路由配置列表中检查】
         RouteConfig routeConfig = routeConfigManager.get(routeId);
         if (!routeConfig.enable()) {
+            //服务不可用，被禁用【后台管理台设置得到】
             throw ErrorEnum.ISP_API_DISABLED.getErrorMeta().getException();
         }
     }
@@ -133,7 +145,9 @@ public class ApiValidator implements Validator {
             try {
                 List<MultipartFile> files = uploadContext.getAllFile();
                 for (MultipartFile file : files) {
+//                    检查文件大小
                     checkSingleFileSize(file);
+//                    检查文件md5
                     checkFileMd5(param, file);
                 }
             } catch (IOException e) {
@@ -175,10 +189,12 @@ public class ApiValidator implements Validator {
         if (timeoutSeconds < 0) {
             throw new IllegalArgumentException("服务端timeoutSeconds设置错误");
         }
+//        请求时间
         String requestTime = param.fetchTimestamp();
         try {
             Date requestDate = new SimpleDateFormat(ParamNames.TIMESTAMP_PATTERN).parse(requestTime);
             long requestMilliseconds = requestDate.getTime();
+//            当前时间减去请求时间是否大于超时时间
             if (System.currentTimeMillis() - requestMilliseconds > timeoutSeconds * MILLISECOND_OF_ONE_SECOND) {
                 throw ErrorEnum.ISV_INVALID_TIMESTAMP.getErrorMeta().getException();
             }
@@ -188,6 +204,7 @@ public class ApiValidator implements Validator {
     }
 
     protected void checkAppKey(ApiParam param) {
+//        appkey不为空
         if (StringUtils.isEmpty(param.fetchAppKey())) {
             throw ErrorEnum.ISV_MISSING_APP_ID.getErrorMeta().getException();
         }
@@ -203,6 +220,7 @@ public class ApiValidator implements Validator {
     }
 
     protected void checkSign(ApiParam param) {
+        //获取客户端签名
         String clientSign = param.fetchSign();
         try {
             if (StringUtils.isEmpty(clientSign)) {
@@ -211,6 +229,7 @@ public class ApiValidator implements Validator {
             ApiConfig apiConfig = ApiContext.getApiConfig();
             // 根据appId获取秘钥
             Isv isvInfo = isvManager.getIsv(param.fetchAppKey());
+//            应用私钥
             String secret = isvInfo.getSecretInfo();
             if (StringUtils.isEmpty(secret)) {
                 throw ErrorEnum.ISV_MISSING_SIGNATURE_CONFIG.getErrorMeta().getException();

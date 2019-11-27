@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @author tanghc
  */
+@Deprecated
 public class EurekaEnvironmentServerChooser extends EnvironmentServerChooser {
     @Override
     protected Map<String, String> getMetada(Server server) {

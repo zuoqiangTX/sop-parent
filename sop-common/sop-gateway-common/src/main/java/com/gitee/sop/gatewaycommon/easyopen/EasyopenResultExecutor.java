@@ -10,6 +10,7 @@ import com.netflix.zuul.context.RequestContext;
 
 import java.util.Optional;
 
+@Deprecated
 /**
  * @author tanghc
  */

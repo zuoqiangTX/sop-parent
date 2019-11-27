@@ -75,9 +75,11 @@ public class ServerWebExchangeUtil {
         ApiParam apiParam = new ApiParam();
         Map<String, ?> params = null;
         if (exchange.getRequest().getMethod() == HttpMethod.GET) {
+            //            get请求直接获取
             MultiValueMap<String, String> queryParams = exchange.getRequest().getQueryParams();
             params = buildParams(queryParams);
         } else {
+            //            其他请求需要获取请求体
             String cachedBody = exchange.getAttribute(CACHE_REQUEST_BODY_OBJECT_KEY);
             if (cachedBody != null) {
                 MediaType contentType = exchange.getRequest().getHeaders().getContentType();
@@ -93,6 +95,7 @@ public class ServerWebExchangeUtil {
                     params = uploadInfo.getUploadParams();
                     apiParam.setUploadContext(uploadInfo.getUploadContext());
                 } else {
+                    //                    普通get请求
                     params = RequestUtil.parseQueryToMap(cachedBody);
                 }
             }
@@ -184,6 +187,7 @@ public class ServerWebExchangeUtil {
         } else {
             MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
             if (mediaType == null) {
+                //如果没有定义，默认按照表单类型请求头
                 mediaType = MediaType.APPLICATION_FORM_URLENCODED;
             }
             String contentType = mediaType.toString().toLowerCase();

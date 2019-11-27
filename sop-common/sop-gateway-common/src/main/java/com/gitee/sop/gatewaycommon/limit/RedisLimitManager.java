@@ -48,8 +48,13 @@ public class RedisLimitManager extends DefaultLimitManager {
 
     @Override
     public boolean acquire(ConfigLimitDto routeConfig) {
+        //        lua脚本 key为  路由Id（应用+版本号）
         String key = "sop:lmt:" + routeConfig.getRouteId();
+        //        限制数量
+
         int limitCount = routeConfig.getExecCountPerSecond();
+        //        过期时间
+
         int duration = routeConfig.fetchDuration();
         Object result = redisTemplate.execute(
                 new RedisScript<Long>() {
@@ -75,6 +80,7 @@ public class RedisLimitManager extends DefaultLimitManager {
                 // ARGV[2] expire
                 String.valueOf(duration)
         );
+        //        返回1代表通过
         return REDIS_SUCCESS.equals(result);
     }
 

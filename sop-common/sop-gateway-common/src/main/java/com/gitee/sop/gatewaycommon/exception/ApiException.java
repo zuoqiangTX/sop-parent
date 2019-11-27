@@ -4,6 +4,8 @@ package com.gitee.sop.gatewaycommon.exception;
 import com.gitee.sop.gatewaycommon.message.Error;
 
 /**
+ * 定义全局api异常
+ *
  * @author tanghc
  */
 public class ApiException extends RuntimeException {

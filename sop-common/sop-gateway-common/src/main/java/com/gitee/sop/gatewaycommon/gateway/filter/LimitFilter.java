@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * 限流过滤器
  * @author tanghc
  */
 @Slf4j

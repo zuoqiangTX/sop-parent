@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 通过nacos查出所有节点，然后进行配置的修改
+ *
  * @author tanghc
  */
 @Slf4j
@@ -43,6 +45,13 @@ public class ConfigChannelController {
     @Value("${zuul.secret}")
     private String secret;
 
+    /**
+     * 网关配置修改
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/configChannelMsg")
     public String configChannel(HttpServletRequest request) throws IOException {
         String requestJson = RequestUtil.getText(request);

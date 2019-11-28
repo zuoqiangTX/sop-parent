@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 网关后台配置推送类
+ *
  * @author tanghc
  */
 @Slf4j
@@ -47,6 +49,7 @@ public class ConfigPushService {
         GatewayPushDTO gatewayPushDTO = new GatewayPushDTO(dataId, groupId, channelMsg);
         ServiceSearchParam serviceSearchParam = new ServiceSearchParam();
         serviceSearchParam.setServiceId(API_GATEWAY_SERVICE_ID);
+        //遍历网关节点，查询出所有网关实例
         List<ServiceInstanceVO> serviceInstanceList = serverService.listService(serviceSearchParam);
         Collection<String> hostList = serviceInstanceList
                 .stream()
@@ -56,6 +59,12 @@ public class ConfigPushService {
         this.pushByHost(hostList, gatewayPushDTO);
     }
 
+    /**
+     * 推送修改配置信息给网关下各个实例，进行配置修改（本地缓存的修改）
+     *
+     * @param hosts
+     * @param gatewayPushDTO
+     */
     private void pushByHost(Collection<String> hosts, GatewayPushDTO gatewayPushDTO) {
         for (String host : hosts) {
             String url = String.format(GATEWAY_PUSH_URL, host);

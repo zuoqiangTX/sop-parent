@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.manager;
 import com.gitee.sop.gatewaycommon.bean.BeanInitializer;
 
 /**
+ * ip黑名单管理接口
+ *
  * @author tanghc
  */
 public interface IPBlacklistManager extends BeanInitializer {

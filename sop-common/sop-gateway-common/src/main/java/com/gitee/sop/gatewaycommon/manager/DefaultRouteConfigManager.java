@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultRouteConfigManager implements RouteConfigManager {
     /**
-     * key: routeId
+     * key: routeId  本地路由配置缓存
      */
     protected static Map<String, RouteConfig> routeConfigMap = new ConcurrentHashMap<>(64);
 

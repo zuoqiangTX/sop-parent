@@ -3,6 +3,8 @@ package com.gitee.sop.gatewaycommon.manager;
 import org.springframework.core.env.Environment;
 
 /**
+ * 环境上下文信息
+ *
  * @author tanghc
  */
 public class EnvironmentContext {

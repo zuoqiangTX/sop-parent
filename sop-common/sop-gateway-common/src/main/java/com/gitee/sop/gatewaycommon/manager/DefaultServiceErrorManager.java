@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 默认服务错误管理类
+ *
  * @author tanghc
  */
 public class DefaultServiceErrorManager implements ServiceErrorManager {

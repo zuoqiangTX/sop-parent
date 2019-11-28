@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 限流配置管理
+ * ip黑名单管理（从db中获取）
  *
  * @author tanghc
  */

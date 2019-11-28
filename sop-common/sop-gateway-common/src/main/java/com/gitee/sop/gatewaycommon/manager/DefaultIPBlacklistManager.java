@@ -7,10 +7,12 @@ import java.util.Set;
 
 /**
  * ip黑名单管理
+ *
  * @author tanghc
  */
 public class DefaultIPBlacklistManager implements IPBlacklistManager {
 
+    //    ip黑名单本地缓存
     private static Set<String> ipList = Sets.newConcurrentHashSet();
 
     @Override

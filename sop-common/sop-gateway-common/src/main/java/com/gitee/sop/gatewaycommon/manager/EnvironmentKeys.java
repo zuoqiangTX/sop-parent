@@ -2,6 +2,9 @@ package com.gitee.sop.gatewaycommon.manager;
 
 import com.gitee.sop.gatewaycommon.loadbalancer.EnvironmentServerChooser;
 
+/**
+ * 上下文配置key
+ */
 public enum EnvironmentKeys {
     SPRING_PROFILES_ACTIVE("spring.profiles.active", "default"),
     /**
@@ -35,8 +38,7 @@ public enum EnvironmentKeys {
     /**
      * 排除其它微服务，正则形式，多个用英文逗号隔开
      */
-    SOP_SERVICE_EXCLUDE_REGEX("sop.service.exclude-regex")
-    ;
+    SOP_SERVICE_EXCLUDE_REGEX("sop.service.exclude-regex");
 
     private String key;
     private String defaultValue;

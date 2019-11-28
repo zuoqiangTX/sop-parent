@@ -6,6 +6,8 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 /**
+ * 灰度服务默认管理类
+ *
  * @author tanghc
  */
 public class DefaultEnvGrayManager implements EnvGrayManager {

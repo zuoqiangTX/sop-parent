@@ -7,11 +7,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 默认isv权限管理
+ *
  * @author tanghc
  */
 public class DefaultIsvRoutePermissionManager implements IsvRoutePermissionManager {
 
-    /** key: appKey */
+    /**
+     * key: appKey  本地isv 权限管理缓存
+     */
     protected static Map<String, IsvRoutePermission> isvRoutePermissionMap = new ConcurrentHashMap<>(64);
 
     @Override

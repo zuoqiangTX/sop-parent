@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 限流配置管理类
+ *
  * @author tanghc
  */
 public class DefaultLimitConfigManager implements LimitConfigManager {
@@ -20,6 +22,7 @@ public class DefaultLimitConfigManager implements LimitConfigManager {
     /**
      * key: limitKey
      */
+//    本地限流配置cache
     protected static Map<String, ConfigLimitDto> limitCache = new ConcurrentHashMap<>();
 
     protected static Map<Long, Set<String>> idKeyMap = new HashMap<>();

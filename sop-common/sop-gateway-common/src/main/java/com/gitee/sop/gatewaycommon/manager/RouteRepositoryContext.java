@@ -4,6 +4,8 @@ import com.gitee.sop.gatewaycommon.bean.TargetRoute;
 import com.gitee.sop.gatewaycommon.message.ErrorEnum;
 
 /**
+ * 路由仓库上下文
+ *
  * @author tanghc
  */
 public class RouteRepositoryContext {
@@ -11,6 +13,7 @@ public class RouteRepositoryContext {
     private RouteRepositoryContext() {
     }
 
+    //    路由仓库
     private static RouteRepository<? extends TargetRoute> routeRepository;
 
     public static RouteRepository<? extends TargetRoute> getRouteRepository() {

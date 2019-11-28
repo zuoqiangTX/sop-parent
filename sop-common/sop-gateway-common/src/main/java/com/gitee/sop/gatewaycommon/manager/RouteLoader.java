@@ -5,7 +5,7 @@ import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 import java.util.function.Consumer;
 
 /**
- * 路由定位器
+ * 路由定位器接口
  *
  * @author tanghc
  */

@@ -134,6 +134,7 @@ public class AlipayController {
     // 遗留接口具备开放平台能力
     @ApiAbility
     @GetMapping("getStory2")
+    @ApiOperation(value="JSONObject", notes = "JSONObject")
     public StoryResult getStory2_0(@RequestBody JSONObject param) {
         StoryResult story = new StoryResult();
         story.setId(1L);

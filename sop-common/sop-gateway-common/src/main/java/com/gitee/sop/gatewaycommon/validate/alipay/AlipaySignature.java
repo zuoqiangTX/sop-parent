@@ -251,6 +251,7 @@ public class AlipaySignature {
     public static boolean rsaCheckV2(Map<String, ?> params, String publicKey,
                                      String charset, String signType) {
         String sign = String.valueOf(params.get("sign"));
+//        获取签名
         String content = getSignCheckContentV2(params);
 
         return rsaCheck(content, sign, publicKey, charset, signType);

@@ -29,9 +29,11 @@ public class ServiceRouteListener extends BaseServiceListener {
     private static final String HEADER_RESTFUL = "restful";
 
     @Autowired
+//    本地路由缓存处理器
     private BaseRouteCache<?> baseRouteCache;
 
     @Autowired
+//    db处理器
     private RoutesProcessor routesProcessor;
 
     @Override

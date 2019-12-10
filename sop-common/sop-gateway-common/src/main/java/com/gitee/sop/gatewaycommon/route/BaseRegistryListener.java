@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 基础网关监听类
+ *
  * @author tanghc
  */
 @Slf4j

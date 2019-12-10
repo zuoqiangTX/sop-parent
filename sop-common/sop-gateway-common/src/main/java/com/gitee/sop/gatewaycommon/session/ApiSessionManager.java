@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author tanghc
  */
+@Deprecated
 public class ApiSessionManager implements SessionManager {
     private static Logger logger = LoggerFactory.getLogger(ApiSessionManager.class);
 

@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 不需要oauth2 session签名的，可以直接md5签名
  * 淘宝开放平台签名验证实现，http://open.taobao.com/doc.htm?docId=101617&docType=1
  *
  * @author tanghc

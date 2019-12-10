@@ -12,6 +12,7 @@ import java.util.UUID;
  *
  * @author tanghc
  */
+@Deprecated
 public class RedisSessionManager implements SessionManager {
 
     private ApiRedisTemplate redisTemplate;

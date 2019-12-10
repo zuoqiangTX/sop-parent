@@ -4,6 +4,8 @@ import com.gitee.sop.gatewaycommon.bean.InstanceDefinition;
 import com.gitee.sop.gatewaycommon.bean.ServiceRouteInfo;
 
 /**
+ * 路由处理器
+ *
  * @author tanghc
  */
 public interface RoutesProcessor {
@@ -18,7 +20,7 @@ public interface RoutesProcessor {
      * 保存路由
      *
      * @param serviceRouteInfo 路由信息
-     * @param instance 服务实例
+     * @param instance         服务实例
      */
     void saveRoutes(ServiceRouteInfo serviceRouteInfo, InstanceDefinition instance);
 }

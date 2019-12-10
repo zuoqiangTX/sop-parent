@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * 结果合并处理器
+ *
  * @author tanghc
  */
 @Slf4j
@@ -92,7 +94,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             responseData = JSON.parseObject(serviceResult);
             responseData.put(GATEWAY_CODE_NAME, ISP_BIZ_ERROR.getCode());
             responseData.put(GATEWAY_MSG_NAME, ISP_BIZ_ERROR.getError().getMsg());
-        } else if(responseStatus == HttpStatus.NOT_FOUND.value()) {
+        } else if (responseStatus == HttpStatus.NOT_FOUND.value()) {
             responseData = JSON.parseObject(serviceResult);
             responseData.put(GATEWAY_CODE_NAME, ISV_MISSING_METHOD_META.getCode());
             responseData.put(GATEWAY_MSG_NAME, ISV_MISSING_METHOD_META.getError().getCode());
@@ -189,6 +191,13 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         return serviceResult;
     }
 
+    /**
+     * 合并结果
+     *
+     * @param exchange
+     * @param responseData
+     * @return
+     */
     public String merge(T exchange, JSONObject responseData) {
         JSONObject finalData = new JSONObject(true);
         Map<String, Object> params = this.getApiParam(exchange);

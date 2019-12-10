@@ -19,6 +19,7 @@ import java.util.Vector;
 /**
  * @author tanghc
  */
+@Deprecated
 @SuppressWarnings("deprecation")
 public class ApiHttpSession implements HttpSession, Serializable {
     private static final long serialVersionUID = 946272038219216222L;

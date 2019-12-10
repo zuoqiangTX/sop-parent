@@ -10,6 +10,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * @author tanghc
  */
+@Deprecated
 public class ApiRedisTemplate extends RedisTemplate<String, Object> {
     public ApiRedisTemplate() {
         RedisSerializer<String> stringSerializer = new StringRedisSerializer();

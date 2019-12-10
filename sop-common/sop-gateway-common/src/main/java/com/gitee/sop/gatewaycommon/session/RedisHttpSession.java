@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author tanghc
  */
+@Deprecated
 @SuppressWarnings("deprecation")
 public class RedisHttpSession implements HttpSession, Serializable {
     private static final long serialVersionUID = -8081963657251144855L;

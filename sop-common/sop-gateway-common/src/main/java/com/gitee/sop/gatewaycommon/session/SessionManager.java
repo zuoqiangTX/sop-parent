@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
  * @author tanghc
  *
  */
+@Deprecated
 public interface SessionManager {
 
     /**

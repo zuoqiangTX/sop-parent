@@ -47,9 +47,10 @@ public class NacosRegistryListener extends BaseRegistryListener {
                 .forEach(serviceInfo -> {
                     String serviceName = serviceInfo.getName();
                     try {
+//                        nacos获取所有实例
                         List<Instance> allInstances = namingService.getAllInstances(serviceName);
                         if (CollectionUtils.isEmpty(allInstances)) {
-                            // 如果没有服务列表，则删除所有路由信息
+                            // 如果没有服务列表，则该服务下删除所有路由信息
                             removeRoutes(serviceName);
                         } else {
                             for (Instance instance : allInstances) {
@@ -59,6 +60,7 @@ public class NacosRegistryListener extends BaseRegistryListener {
                                 instanceDefinition.setIp(instance.getIp());
                                 instanceDefinition.setPort(instance.getPort());
                                 instanceDefinition.setMetadata(instance.getMetadata());
+//                                拉取路由信息到数据库和本地
                                 pullRoutes(instanceDefinition);
                             }
                         }

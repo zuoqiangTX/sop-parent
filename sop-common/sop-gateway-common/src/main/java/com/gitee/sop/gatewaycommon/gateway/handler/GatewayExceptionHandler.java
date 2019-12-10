@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 统一异常处理
+ * 统一异常处理【网关全局错误都会走到这里】
  *
  * @author tanghc
  */
@@ -35,8 +35,10 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+        //获取结果处理器
         ResultExecutor<ServerWebExchange, GatewayResult> resultExecutor = ApiContext.getApiConfig().getGatewayResultExecutor();
         GatewayResult errorResult = resultExecutor.buildErrorResult(exchange, ex);
+        //获取api参数信息
         ApiParam apiParam = ServerWebExchangeUtil.getApiParam(exchange);
         // 错误记录
         log.error("gateway网关报错，params:{}, errorMsg:{}", apiParam, ex.getMessage(), ex);

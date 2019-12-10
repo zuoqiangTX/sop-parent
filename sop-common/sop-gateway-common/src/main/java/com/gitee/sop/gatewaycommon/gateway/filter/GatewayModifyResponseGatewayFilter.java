@@ -30,6 +30,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 
 /**
  * 修改返回结果
+ *
  * @author tanghc
  */
 public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered {
@@ -54,6 +55,7 @@ public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered
                 HttpHeaders httpHeaders = new HttpHeaders();
                 //explicitly add it in this way instead of 'httpHeaders.setContentType(originalResponseContentType)'
                 //this will prevent exception in case of using non-standard media types like "Content-Type: image"
+                // 添加原始请求头
                 httpHeaders.add(HttpHeaders.CONTENT_TYPE, originalResponseContentType);
                 ResponseAdapter responseAdapter = new ResponseAdapter(body, httpHeaders);
                 DefaultClientResponse clientResponse = new DefaultClientResponse(responseAdapter, ExchangeStrategies.withDefaults());
@@ -62,6 +64,7 @@ public class GatewayModifyResponseGatewayFilter implements GlobalFilter, Ordered
                 Mono modifiedBody = clientResponse.bodyToMono(inClass)
                         .flatMap(originalBody -> {
                             // 合并微服务传递过来的结果，变成最终结果
+                            //apiConfig默认结果处理器
                             ResultExecutor resultExecutor = ApiContext.getApiConfig().getGatewayResultExecutor();
                             String ret = resultExecutor.mergeResult(exchange, String.valueOf(originalBody));
                             return Mono.just(ret);

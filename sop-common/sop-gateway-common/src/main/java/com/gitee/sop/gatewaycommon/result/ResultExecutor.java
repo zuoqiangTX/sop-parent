@@ -34,7 +34,7 @@ public interface ResultExecutor<T, R> {
     /**
      * 合并结果
      * @param request
-     * @param serviceResult
+     * @param serviceResult 微服务的结果
      * @return 返回最终输出结果
      */
     String mergeResult(T request, String serviceResult);

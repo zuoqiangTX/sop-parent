@@ -81,8 +81,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             return serviceResult;
         }
         serviceResult = wrapResult(serviceResult);
+        //获取请求状态
         int responseStatus = this.getResponseStatus(request);
         JSONObject responseData;
+        //添加code，msg国际化信息
         if (responseStatus == HttpStatus.OK.value()) {
             // 200正常返回
             responseData = JSON.parseObject(serviceResult);
@@ -108,6 +110,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             responseData.put(GATEWAY_CODE_NAME, ISP_UNKNOW_ERROR_META.getCode());
             responseData.put(GATEWAY_MSG_NAME, ISP_UNKNOW_ERROR_META.getError().getMsg());
         }
+//        合并处理结果
         return this.merge(request, responseData);
     }
 
@@ -143,6 +146,7 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         if (defaultSetting != null) {
             return defaultSetting;
         }
+        //拿到api信息
         ApiInfo apiInfo = this.getApiInfo(request);
         RouteDefinition baseRouteDefinition = apiInfo.gatewayRouteDefinition;
         return Optional.ofNullable(baseRouteDefinition)
@@ -155,16 +159,20 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
 
     protected ApiInfo getApiInfo(T request) {
         Map<String, Object> params = this.getApiParam(request);
+        //获取接口名称
         String name = this.getParamValue(params, ParamNames.API_NAME, SopConstants.UNKNOWN_METHOD);
+//        获取接口版本
         String version = this.getParamValue(params, ParamNames.VERSION_NAME, SopConstants.UNKNOWN_VERSION);
-
+        //根据路由缓存拿到目标路由的地址
         TargetRoute targetRoute = RouteRepositoryContext.getRouteRepository().get(name + version);
 
+        //获取微服务的服务ID
         String serviceId = Optional.ofNullable(targetRoute)
                 .flatMap(route -> Optional.ofNullable(route.getServiceRouteInfo()))
                 .map(ServiceRouteInfo::getServiceId)
                 .orElse(SopConstants.UNKNOWN_SERVICE);
 
+        //获取路由的具体定义
         RouteDefinition baseRouteDefinition = Optional.ofNullable(targetRoute)
                 .map(TargetRoute::getRouteDefinition)
                 .orElse(null);
@@ -177,10 +185,17 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
         return apiInfo;
     }
 
+    /**
+     * 包装结果参数
+     *
+     * @param serviceResult
+     * @return
+     */
     protected String wrapResult(String serviceResult) {
         if (serviceResult == null) {
             serviceResult = "";
         }
+        //去除空格
         serviceResult = serviceResult.trim();
         if (StringUtils.isEmpty(serviceResult)) {
             return SopConstants.EMPTY_JSON;
@@ -199,13 +214,16 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
      * @return
      */
     public String merge(T exchange, JSONObject responseData) {
+//        最终返回结果jsonobject
         JSONObject finalData = new JSONObject(true);
         Map<String, Object> params = this.getApiParam(exchange);
+        //获取方法名，如果找不到用error 代替
         String name = this.getParamValue(params, ParamNames.API_NAME, ERROR_METHOD);
         ApiConfig apiConfig = ApiConfig.getInstance();
         // 点换成下划线
         DataNameBuilder dataNameBuilder = apiConfig.getDataNameBuilder();
         // alipay_goods_get_response
+        //获取response名称
         String responseDataNodeName = dataNameBuilder.build(name);
         finalData.put(responseDataNodeName, responseData);
         ResultAppender resultAppender = apiConfig.getResultAppender();
@@ -218,8 +236,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
             // 添加try...catch，生成sign出错不影响结果正常返回
             try {
                 String responseSignContent = this.buildResponseSignContent(responseDataNodeName, finalData);
+                //rsa加签算法
                 String sign = this.createResponseSign(apiConfig, params, responseSignContent);
                 if (StringUtils.hasLength(sign)) {
+                    //将签名加入最终的json字符串中
                     finalData.put(ParamNames.RESPONSE_SIGN_NAME, sign);
                 }
             } catch (Exception e) {
@@ -238,8 +258,10 @@ public abstract class BaseExecutorAdapter<T, R> implements ResultExecutor<T, R> 
      */
     protected String buildResponseSignContent(String rootNodeName, JSONObject finalData) {
         String body = finalData.toJSONString();
+        //获取开始名称的首位索引
         int indexOfRootNode = body.indexOf(rootNodeName);
         if (indexOfRootNode > 0) {
+//            获取签名内容的位置索引
             int signDataStartIndex = indexOfRootNode + rootNodeName.length() + 2;
             int length = body.length() - 1;
             return body.substring(signDataStartIndex, length);

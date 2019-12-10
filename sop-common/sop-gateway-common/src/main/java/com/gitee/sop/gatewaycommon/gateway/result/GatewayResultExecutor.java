@@ -64,6 +64,7 @@ public class GatewayResultExecutor extends BaseExecutorAdapter<ServerWebExchange
             error = ErrorEnum.ISP_UNKNOWN_ERROR.getErrorMeta().getError();
         }
 
+        //错误信息content请求体
         JSONObject jsonObject = (JSONObject) JSON.toJSON(error);
         String body = this.merge(exchange, jsonObject);
 

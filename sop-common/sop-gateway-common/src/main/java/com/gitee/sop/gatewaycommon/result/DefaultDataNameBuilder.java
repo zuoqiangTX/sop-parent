@@ -14,6 +14,7 @@ package com.gitee.sop.gatewaycommon.result;
  *     "sign": "ERITJKEIJKJHKKKKKKKHJEREEEEEEEEEEE"
  * }
  * </pre>
+ *
  * @author tanghc
  */
 public class DefaultDataNameBuilder implements DataNameBuilder {
@@ -22,6 +23,9 @@ public class DefaultDataNameBuilder implements DataNameBuilder {
     private static final String DATA_SUFFIX = "_response";
 
     @Override
+    /**
+     * 将.换成_ 并且加上_response
+     */
     public String build(String method) {
         return method.replace(DOT, UNDERLINE) + DATA_SUFFIX;
     }

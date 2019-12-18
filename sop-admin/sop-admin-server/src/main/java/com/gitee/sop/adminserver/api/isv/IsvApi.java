@@ -65,6 +65,7 @@ public class IsvApi {
     public static final byte SIGN_TYPE_MD5 = 2;
 
     static Map<String, Byte> SIGN_TYPE_MAP = new HashMap<>();
+
     static {
         SIGN_TYPE_MAP.put("rsa", (byte) SIGN_TYPE_RSA);
         SIGN_TYPE_MAP.put("md5", (byte) SIGN_TYPE_MD5);
@@ -86,11 +87,20 @@ public class IsvApi {
     RoutePermissionService routePermissionService;
 
     @Autowired
+    /**
+     * 推送配置管理（在amdin后台修改以后，推送更新到各个实例上面去）
+     */
     private ConfigPushService configPushService;
 
     @Value("${sop.sign-type}")
     private String sopSignType;
 
+    /**
+     * isv列表接口
+     *
+     * @param param
+     * @return
+     */
     @Api(name = "isv.info.page")
     @ApiDocMethod(description = "isv列表", results = {
             @ApiDocField(name = "pageIndex", description = "第几页", dataType = DataType.INT, example = "1"),
@@ -101,6 +111,7 @@ public class IsvApi {
     PageInfo<IsvInfoVO> pageIsv(IsvPageParam param) {
         Query query = Query.build(param);
         query.orderby("id", Sort.DESC);
+        //查询所有isv列表
         PageInfo<IsvInfo> pageInfo = MapperUtil.query(isvInfoMapper, query);
         List<IsvInfo> list = pageInfo.getList();
 
@@ -117,18 +128,32 @@ public class IsvApi {
         return pageInfoRet;
     }
 
+    /**
+     * 根据id获取isv信息
+     *
+     * @param param
+     * @return
+     */
     @Api(name = "isv.info.get")
     @ApiDocMethod(description = "获取isv")
     IsvInfoVO getIsvVO(IdParam param) {
+        //根据id查询isv列表
         IsvInfo isvInfo = isvInfoMapper.getById(param.getId());
         return buildIsvVO(isvInfo);
     }
 
+    /**
+     * 根据appKey获取isv
+     *
+     * @param appKey
+     * @return
+     */
     @Api(name = "isv.keys.get")
     @ApiDocMethod(description = "获取isv2")
     IsvKeysVO getIsvKeys(@NotBlank(message = "appKey不能为空")
                          @ApiDocField(description = "appKey")
                                  String appKey) {
+        //根据appKey查询isv信息
         IsvKeys isvKeys = isvKeysMapper.getByColumn("app_key", appKey);
         IsvKeysVO isvDetailVO = new IsvKeysVO();
         if (isvKeys != null) {
@@ -156,6 +181,7 @@ public class IsvApi {
      * @return
      */
     List<RoleVO> buildIsvRole(IsvInfo permClient) {
+        //查询角色列表
         List<String> roleCodeList = routePermissionService.listClientRoleCode(permClient.getId());
         if (CollectionUtils.isEmpty(roleCodeList)) {
             return Collections.emptyList();
@@ -171,6 +197,12 @@ public class IsvApi {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 添加isv信息
+     *
+     * @param param
+     * @throws Exception
+     */
     @Api(name = "isv.info.add")
     @ApiDocMethod(description = "添加isv")
     @Transactional(rollbackFor = Exception.class)
@@ -179,6 +211,7 @@ public class IsvApi {
         IsvInfo rec = new IsvInfo();
         rec.setAppKey(appKey);
         CopyUtil.copyPropertiesIgnoreNull(param, rec);
+        //保存isv信息
         isvInfoMapper.saveIgnoreNull(rec);
         if (CollectionUtils.isNotEmpty(param.getRoleCode())) {
             this.saveIsvRole(rec, param.getRoleCode());
@@ -188,8 +221,10 @@ public class IsvApi {
         isvKeys.setAppKey(appKey);
         isvKeys.setSignType(getSignType());
         CopyUtil.copyPropertiesIgnoreNull(isvKeysGenVO, isvKeys);
+        //保存isv公私钥信息
         isvKeysMapper.saveIgnoreNull(isvKeys);
 
+        //推送配置信息
         this.sendChannelMsg(rec.getAppKey());
     }
 
@@ -227,11 +262,14 @@ public class IsvApi {
     }
 
     private void sendChannelMsg(String appKey) {
+        //查询isv信息（包含平台公钥和用户公钥）
         IsvDetailDTO isvDetail = isvInfoMapper.getIsvDetail(appKey);
         if (isvDetail == null) {
             return;
         }
+        //构建修改对象
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ISV_INFO_UPDATE, isvDetail);
+        //推送配置到网关层（isv信息）
         configPushService.publishConfig(NacosConfigs.DATA_ID_ISV, NacosConfigs.GROUP_CHANNEL, channelMsg);
     }
 

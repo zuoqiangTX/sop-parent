@@ -56,6 +56,7 @@ public class ConfigPushService {
                 .filter(serviceInstanceVO -> StringUtils.isNotBlank(serviceInstanceVO.getInstanceId()))
                 .map(ServiceInstanceVO::getIpPort)
                 .collect(Collectors.toList());
+        //根据查出来的host列表进行配置推送
         this.pushByHost(hostList, gatewayPushDTO);
     }
 
@@ -67,8 +68,10 @@ public class ConfigPushService {
      */
     private void pushByHost(Collection<String> hosts, GatewayPushDTO gatewayPushDTO) {
         for (String host : hosts) {
+            //构建推送实例url
             String url = String.format(GATEWAY_PUSH_URL, host);
             try {
+                //网关请求体构造（json请求体）
                 String requestBody = JSON.toJSONString(gatewayPushDTO);
                 Map<String, String> header = new HashMap<>(8);
                 header.put("sign", buildRequestBodySign(requestBody, secret));
@@ -89,6 +92,7 @@ public class ConfigPushService {
     }
 
     public static String buildRequestBodySign(String requestBody, String secret) {
+//        签名加签
         String signContent = secret + requestBody + secret;
         return DigestUtils.md5Hex(signContent);
     }

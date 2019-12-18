@@ -64,12 +64,15 @@ public class ConfigChannelController {
         }
         GatewayPushDTO gatewayPushDTO = JSON.parseObject(requestJson, GatewayPushDTO.class);
         ChannelMsgProcessor channelMsgProcessor = getChannelMsgProcessor(gatewayPushDTO);
+        //进行具体的推送工作
         channelMsgProcessor.process(gatewayPushDTO.getChannelMsg());
         return "ok";
     }
 
     private ChannelMsgProcessor getChannelMsgProcessor(GatewayPushDTO gatewayPushDTO) {
+        //查出操作类型
         String key = gatewayPushDTO.getGroupId() + gatewayPushDTO.getDataId();
+        //选择具体的处理类
         Class<? extends ChannelMsgProcessor> aClass = processorMap.get(key);
         return SpringContext.getBean(aClass);
     }

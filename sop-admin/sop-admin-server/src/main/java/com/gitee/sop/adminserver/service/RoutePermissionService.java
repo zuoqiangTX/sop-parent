@@ -71,6 +71,7 @@ public class RoutePermissionService {
         isvRoutePermission.setAppKey(appKey);
         isvRoutePermission.setRouteIdList(routeIdList);
         isvRoutePermission.setRouteIdListMd5(roleCodeListMd5);
+        //推送配置到网关层（isv信息）
         ChannelMsg channelMsg = new ChannelMsg(ChannelOperation.ROUTE_PERMISSION_UPDATE, isvRoutePermission);
         configPushService.publishConfig(NacosConfigs.DATA_ID_ROUTE_PERMISSION, NacosConfigs.GROUP_CHANNEL, channelMsg);
 

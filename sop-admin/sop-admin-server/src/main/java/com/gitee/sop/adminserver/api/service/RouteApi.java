@@ -140,6 +140,9 @@ public class RouteApi {
         }
         configRouteBase.setStatus(routeUpdateParam.getStatus().byteValue());
 
+        /**
+         * 修改路由本地mysql配置
+         */
         int i = doSave ? configRouteBaseMapper.save(configRouteBase)
                 : configRouteBaseMapper.update(configRouteBase);
 
@@ -152,6 +155,7 @@ public class RouteApi {
         RouteConfigDto routeConfigDto = new RouteConfigDto();
         routeConfigDto.setRouteId(routeDefinition.getRouteId());
         routeConfigDto.setStatus(routeDefinition.getStatus().intValue());
+        //推送路由信息变动
         routeConfigService.sendRouteConfigMsg(routeConfigDto);
     }
 
